@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# programming-tutorial (仮)
 
-## Getting Started
+## インストール
+```bash
+npm ci
+```
 
-First, run the development server:
+## 開発環境
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 技術スタック・ドキュメント・メモ
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org/docs)
+    - 検索する際は「App Router」を含めることで古い記事に惑わされることが少なくなります。
+- [DaisyUI](https://daisyui.com/docs/use/) / [Tailwind CSS](https://tailwindcss.com/docs)
+    - buttonやinputやメニューなどの基本的なコンポーネントのデザインはDaisyUIにあるものを使うと楽です
+    - 細かくスタイルを調整したい場合はTailwind CSSを使います (CSS直接指定(`style={{...}}`)よりもちょっと楽に書ける)
+    - よくわからなかったらstyle直接指定でも良い
+- [react-markdown](https://www.npmjs.com/package/react-markdown)
+    - オプションがいろいろあり、今はほぼデフォルト設定で突っ込んでいるがあとでなんとかする
