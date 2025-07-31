@@ -10,7 +10,17 @@ npm ci
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) で開きます。
+
+```bash
+npm run format
+```
+でコードを整形します。
+
+```bash
+npm run lint
+```
+でコードをチェックします。出てくるwarningやerrorはできるだけ直しましょう。
 
 ## 技術スタック・ドキュメント・メモ
 

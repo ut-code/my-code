@@ -14,7 +14,7 @@ export default async function Page({
   try {
     mdContent = await readFile(
       join(process.cwd(), "docs", `${docs_id}.md`),
-      "utf-8",
+      "utf-8"
     );
   } catch (error) {
     console.error(error);
