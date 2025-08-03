@@ -2,7 +2,7 @@
 
 Pythonのプログラミングにおいて、データを効率的に扱う能力は非常に重要です。この章では、Pythonに組み込まれている強力なコレクション（データ構造）である**リスト**、**タプル**、**辞書**、**セット**を学びます。これらのデータ構造は、他の言語における配列、ハッシュマップ、集合などと似ていますが、Pythonならではの便利な特性やメソッドを持っています。これらを理解し、使いこなすことが「Pythonらしい」コードを書くための第一歩です。
 
-## リスト (List)：ミュータブルなシーケンス  Mutable Sequence
+## リスト (List)：ミュータブルなシーケンス
 
 リストは、複数の要素を順序付けて格納できるコレクションです。他の言語における「動的配列」に最も近い存在です。
 
@@ -10,33 +10,39 @@ Pythonのプログラミングにおいて、データを効率的に扱う能�
   * **順序あり (Ordered)**: 要素は格納された順序を保持します。
   * **多様な要素**: 数値、文字列、さらには他のリストなど、異なるデータ型の要素を混在させることができます。
 
-**基本的な使い方**
+**基本的な使い方 (REPL実行例)**
 
 ```python
-# リストの作成
-fruits = ['apple', 'banana', 'cherry']
-print(fruits)  # 出力: ['apple', 'banana', 'cherry']
+>>> # リストの作成
+>>> fruits = ['apple', 'banana', 'cherry']
+>>> fruits
+['apple', 'banana', 'cherry']
 
-# 要素へのアクセス (インデックスは0から)
-print(fruits[1])  # 出力: 'banana'
+>>> # 要素へのアクセス (インデックスは0から)
+>>> fruits[1]
+'banana'
 
-# 要素の変更
-fruits[0] = 'apricot'
-print(fruits)  # 出力: ['apricot', 'banana', 'cherry']
+>>> # 要素の変更
+>>> fruits[0] = 'apricot'
+>>> fruits
+['apricot', 'banana', 'cherry']
 
-# 要素の追加 (末尾に)
-fruits.append('mango')
-print(fruits)  # 出力: ['apricot', 'banana', 'cherry', 'mango']
+>>> # 要素の追加 (末尾に)
+>>> fruits.append('mango')
+>>> fruits
+['apricot', 'banana', 'cherry', 'mango']
 
-# 要素の削除 (指定したインデックス)
-removed_fruit = fruits.pop(1)
-print(removed_fruit) # 出力: 'banana'
-print(fruits)        # 出力: ['apricot', 'cherry', 'mango']
+>>> # 要素の削除 (指定したインデックス)
+>>> removed_fruit = fruits.pop(1)
+>>> removed_fruit
+'banana'
+>>> fruits
+['apricot', 'cherry', 'mango']
 ```
 
 リストは非常に柔軟性が高く、Pythonで最も頻繁に使われるデータ構造の一つです。
 
-## タプル (Tuple)：イミュータブルなシーケンス Immutable Sequence
+## タプル (Tuple)：イミュータブルなシーケンス
 
 タプルはリストと非常によく似ていますが、最大の違いは**イミュータブル (Immutable)**、つまり一度作成したら変更できない点です。
 
@@ -49,25 +55,33 @@ print(fruits)        # 出力: ['apricot', 'cherry', 'mango']
 2.  **パフォーマンス**: 一般的にリストよりわずかに高速で、メモリ効率が良いとされています。
 3.  **辞書のキーとして使用可能**: ミュータブルなリストは辞書のキーになれませんが、イミュータブルなタプルはキーとして使えます。
 
-**基本的な使い方**
+**基本的な使い方 (REPL実行例)**
 
 ```python
-# タプルの作成 (丸括弧を使用)
-coordinates = (10, 20)
-print(coordinates)  # 出力: (10, 20)
+>>> # タプルの作成 (丸括弧を使用)
+>>> coordinates = (10, 20)
+>>> coordinates
+(10, 20)
 
-# 要素へのアクセス
-print(coordinates[0]) # 出力: 10
+>>> # 要素へのアクセス
+>>> coordinates[0]
+10
 
-# 変更しようとするとエラーが発生する
-# coordinates[0] = 5  # TypeError: 'tuple' object does not support item assignment
+>>> # 変更しようとするとエラーが発生する
+>>> coordinates[0] = 5
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'tuple' object does not support item assignment
 
-# アンパッキング (複数の変数に要素を一度に代入)
-x, y = coordinates
-print(f"x: {x}, y: {y}") # 出力: x: 10, y: 20
+>>> # アンパッキング (複数の変数に要素を一度に代入)
+>>> x, y = coordinates
+>>> x
+10
+>>> y
+20
 ```
 
-## 辞書 (Dictionary)：キーと値のペア Key-Value Pairs
+## 辞書 (Dictionary)：キーと値のペア
 
 辞書は、他の言語の**ハッシュマップ**や**連想配列**に相当します。順序ではなく、一意な「キー」を使って「値」にアクセスします。
 
@@ -76,34 +90,34 @@ print(f"x: {x}, y: {y}") # 出力: x: 10, y: 20
   * **順序**: Python 3.7以降では、要素が追加された順序が保持されます。
   * **ミュータブル**: 要素の追加、変更、削除が可能です。
 
-**基本的な使い方**
+**基本的な使い方 (REPL実行例)**
 
 ```python
-# 辞書の作成
-person = {
-    'name': 'Taro Yamada',
-    'age': 30,
-    'city': 'Tokyo'
-}
-print(person) # 出力: {'name': 'Taro Yamada', 'age': 30, 'city': 'Tokyo'}
+>>> # 辞書の作成
+>>> person = {'name': 'Taro Yamada', 'age': 30, 'city': 'Tokyo'}
+>>> person
+{'name': 'Taro Yamada', 'age': 30, 'city': 'Tokyo'}
 
-# 値へのアクセス (キーを使用)
-print(person['name']) # 出力: 'Taro Yamada'
+>>> # 値へのアクセス (キーを使用)
+>>> person['name']
+'Taro Yamada'
 
-# 値の変更
-person['age'] = 31
-print(person['age']) # 出力: 31
+>>> # 値の変更
+>>> person['age'] = 31
+>>> person['age']
+31
 
-# 新しいキーと値のペアの追加
-person['job'] = 'Engineer'
-print(person) # 出力: {'name': 'Taro Yamada', 'age': 31, 'city': 'Tokyo', 'job': 'Engineer'}
+>>> # 新しいキーと値のペアの追加
+>>> person['job'] = 'Engineer'
+>>> person
+{'name': 'Taro Yamada', 'age': 31, 'city': 'Tokyo', 'job': 'Engineer'}
 
-# キーと値のペアをまとめて取得
-for key, value in person.items():
-    print(f"{key}: {value}")
+>>> # キーと値のペアをまとめて取得
+>>> person.items()
+dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'Engineer')])
 ```
 
-## セット (Set)：ユニークな要素のコレクション Unique Elements
+## セット (Set)：ユニークな要素のコレクション
 
 セットは、**順序がなく、重複した要素を持たない**コレクションです。数学の「集合」の概念に近く、和集合や積集合といった集合演算を高速に行えます。
 
@@ -116,102 +130,113 @@ for key, value in person.items():
   * リストなどから重複した要素を効率的に削除したい場合。
   * 二つのコレクションに共通する要素（積集合）や、全ての要素（和集合）を求めたい場合。
 
-**基本的な使い方**
+**基本的な使い方 (REPL実行例)**
 
 ```python
-# セットの作成
-numbers = {1, 2, 3, 4, 4, 5} # 重複した4は自動的に無視される
-print(numbers) # 出力: {1, 2, 3, 4, 5} (順序は異なる場合がある)
+>>> # セットの作成 (重複した4は自動的に無視される)
+>>> numbers = {1, 2, 3, 4, 4, 5}
+>>> numbers
+{1, 2, 3, 4, 5}
 
-# 要素の追加
-numbers.add(6)
-print(numbers) # 出力: {1, 2, 3, 4, 5, 6}
+>>> # 要素の追加
+>>> numbers.add(6)
+>>> numbers
+{1, 2, 3, 4, 5, 6}
 
-# 重複削除への応用
-my_list = ['a', 'b', 'c', 'a', 'b']
-unique_elements = set(my_list)
-print(unique_elements) # 出力: {'a', 'b', 'c'}
+>>> # 重複削除への応用
+>>> my_list = ['a', 'b', 'c', 'a', 'b']
+>>> unique_elements = set(my_list)
+>>> unique_elements
+{'c', 'a', 'b'}
 
-# 集合演算
-set_a = {1, 2, 3, 4}
-set_b = {3, 4, 5, 6}
+>>> # 集合演算
+>>> set_a = {1, 2, 3, 4}
+>>> set_b = {3, 4, 5, 6}
 
-# 和集合 (A ∪ B)
-print(set_a | set_b) # 出力: {1, 2, 3, 4, 5, 6}
+>>> # 和集合 (A ∪ B)
+>>> set_a | set_b
+{1, 2, 3, 4, 5, 6}
 
-# 積集合 (A ∩ B)
-print(set_a & set_b) # 出力: {3, 4}
+>>> # 積集合 (A ∩ B)
+>>> set_a & set_b
+{3, 4}
 ```
 
 ## スライシングによる部分的な要素の取得
 
-スライシングは、リストやタプルのようなシーケンスから、部分的な要素を効率的に取り出すための非常に強力な機能です。
+スライシングは、リストやタプルのようなシーケンスから、部分的な要素を効率的に取り出すための非常に強力な機能です。構文は `[start:stop:step]` です。
 
-構文は `[start:stop:step]` です。
-
-  * `start`: 開始インデックス（この値は含まれる）。省略すると最初から。
-  * `stop`: 終了インデックス（この値は含まれない）。省略すると最後まで。
-  * `step`: ステップ数。省略すると1。
-
-<!-- end list -->
+**REPL実行例**
 
 ```python
-numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+>>> numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-# インデックス1から4の手前まで
-print(numbers[1:4])  # 出力: [1, 2, 3]
+>>> # インデックス1から4の手前まで
+>>> numbers[1:4]
+[1, 2, 3]
 
-# 最初からインデックス5の手前まで
-print(numbers[:5])   # 出力: [0, 1, 2, 3, 4]
+>>> # 最初からインデックス5の手前まで
+>>> numbers[:5]
+[0, 1, 2, 3, 4]
 
-# インデックス6から最後まで
-print(numbers[6:])   # 出力: [6, 7, 8, 9]
+>>> # インデックス6から最後まで
+>>> numbers[6:]
+[6, 7, 8, 9]
 
-# 2つおきに要素を取得
-print(numbers[::2])  # 出力: [0, 2, 4, 6, 8]
+>>> # 2つおきに要素を取得
+>>> numbers[::2]
+[0, 2, 4, 6, 8]
 
-# 逆順にする
-print(numbers[::-1]) # 出力: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+>>> # 逆順にする
+>>> numbers[::-1]
+[9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 ```
 
 ## 内包表記 (Comprehensions)による効率的な生成
 
-内包表記は、既存のイテラブル（リストやタプルなど）から新しいリスト、辞書、セットを簡潔かつ効率的に生成するためのPythonらしい構文です。`for`ループを使うよりも短く、可読性が高いコードを書くことができます。
+内包表記は、既存のイテラブルから新しいリスト、辞書、セットを簡潔かつ効率的に生成するためのPythonらしい構文です。`for`ループを使うよりも短く、可読性が高いコードを書くことができます。
 
 **リスト内包表記**
 
+`for`ループで書く場合と、リスト内包表記で書く場合を比較してみましょう。
+
 ```python
-# 0から9までの数の2乗のリストを作成
-# forループの場合
-squares_loop = []
-for i in range(10):
-    squares_loop.append(i * i)
-print(squares_loop)
+>>> # forループの場合
+>>> squares_loop = []
+>>> for i in range(10):
+...     squares_loop.append(i * i)
+...
+>>> squares_loop
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
-# リスト内包表記の場合
-squares_comp = [i * i for i in range(10)]
-print(squares_comp) # 出力は上と同じ: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+>>> # リスト内包表記の場合 (簡潔！)
+>>> squares_comp = [i * i for i in range(10)]
+>>> squares_comp
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
-# 条件付きも可能 (偶数のみ2乗)
-even_squares = [i * i for i in range(10) if i % 2 == 0]
-print(even_squares) # 出力: [0, 4, 16, 36, 64]
+>>> # 条件付きも可能 (偶数のみ2乗)
+>>> even_squares = [i * i for i in range(10) if i % 2 == 0]
+>>> even_squares
+[0, 4, 16, 36, 64]
 ```
 
 **辞書内包表記**
 
 ```python
-# 数値をキー、その2乗を値とする辞書を作成
-square_dict = {x: x*x for x in range(5)}
-print(square_dict) # 出力: {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+>>> # 数値をキー、その2乗を値とする辞書を作成
+>>> square_dict = {x: x*x for x in range(5)}
+>>> square_dict
+{0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
 ```
 
 **セット内包表記**
 
 ```python
-# リスト内のユニークな数値の2乗のセットを作成
-numbers = [1, 2, 2, 3, 4, 4, 5]
-square_set = {x*x for x in numbers}
-print(square_set) # 出力: {1, 4, 9, 16, 25}
+>>> # リスト内のユニークな数値の2乗のセットを作成
+>>> numbers = [1, 2, 2, 3, 4, 4, 5]
+>>> square_set = {x*x for x in numbers}
+>>> square_set
+{1, 4, 9, 16, 25}
 ```
 
 内包表記は、Pythonプログラマーにとって必須のテクニックです。積極的に活用して、効率的で美しいコードを目指しましょう。

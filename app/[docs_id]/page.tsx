@@ -41,6 +41,9 @@ const components: Components = {
   h3: ({ node, ...props }) => (
     <h3 className="text-lg font-bold mt-4 mb-2" {...props} />
   ),
+  h4: ({ node, ...props }) => (
+    <h4 className="text-base font-bold mt-3 mb-2" {...props} />
+  ),
   p: ({ node, ...props }) => <p className="mx-2 my-2" {...props} />,
   ul: ({ node, ...props }) => (
     <ul className="list-disc list-outside ml-6 my-2" {...props} />
