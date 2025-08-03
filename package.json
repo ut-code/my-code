@@ -10,6 +10,7 @@
     "format": "prettier --write app/"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
