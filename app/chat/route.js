@@ -1,4 +1,3 @@
-// npm install @google/generative-ai
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
