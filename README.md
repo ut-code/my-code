@@ -1,4 +1,4 @@
-# programming-tutorial (仮)
+# my.code();
 
 ## インストール
 ```bash
