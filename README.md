@@ -1,5 +1,7 @@
 # my.code();
 
+https://my-code.utcode.net
+
 ## インストール
 ```bash
 npm ci
