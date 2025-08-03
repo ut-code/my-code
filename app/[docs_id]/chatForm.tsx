@@ -1,7 +1,10 @@
 "use client";
 
 import { hello } from "./chatServer";
-
+import { submit } from "./chatServer"; // 送信処理をインポート
+import { useState, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 export function ChatForm() {return (
     <>
     <style jsx>{`
@@ -12,9 +15,11 @@ export function ChatForm() {return (
             box-shadow: 0 4px 8px rgba(67, 204, 216, 0.86);
             padding: 20px;
             width: 90%;
-            max-width: 1000px;
+            max-width: 900px;
             display: flex;
             flex-direction: column;
+            position:fixed;
+            z-index: 1000;
         }
         .input-area {
             border: 1px solid #ccc;
@@ -91,7 +96,6 @@ export function ChatForm() {return (
             background-color: #0056b3;
         }
     `}</style>
-
     <div className="form-container">
         <div className="input-area">
             <textarea className="text-input" placeholder="質問を入力してください"></textarea>
@@ -102,7 +106,7 @@ export function ChatForm() {return (
                 
             </div>
             <div className="right-controls">
-                <button type="submit" className="send-button" title="送信">
+                <button type="submit" className="send-button" title="送信" onClick={submit}>
                     <span className="icon">➤</span>
                 </button>
             </div>
