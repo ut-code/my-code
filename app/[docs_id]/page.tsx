@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { ChatForm } from "./chatForm";
 import { StyledMarkdown } from "./markdown";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export default async function Page({
   params,
@@ -13,10 +12,10 @@ export default async function Page({
 
   let mdContent: string;
   try {
-    mdContent = await readFile(
-      join(process.cwd(), "docs", `${docs_id}.md`),
-      "utf-8"
-    );
+    const cfAssets = getCloudflareContext().env.ASSETS;
+    mdContent = await cfAssets!
+      .fetch(`https://assets.local/docs/${docs_id}.md`)
+      .then((res) => res.text());
   } catch (error) {
     console.error(error);
     notFound();
@@ -29,4 +28,3 @@ export default async function Page({
     </div>
   );
 }
-
