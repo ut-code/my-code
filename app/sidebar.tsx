@@ -10,7 +10,13 @@ export function Sidebar() {
       </h2>
       <ul className="menu w-full">
         <li>
-          <Link href="/1">1</Link>
+          <Link href="/python-1">python-1</Link>
+        </li>
+        <li>
+          <Link href="/python-2">python-2</Link>
+        </li>
+        <li>
+          <Link href="/python-3">python-3</Link>
         </li>
       </ul>
     </div>
