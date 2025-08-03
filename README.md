@@ -7,6 +7,11 @@ https://my-code.utcode.net
 npm ci
 ```
 
+ルートディレクトリに .env.local という名前のファイルを作成し、Gemini APIキーを設定してください
+```dotenv
+API_KEY="XXXXXXXX"
+```
+
 ## 開発環境
 
 ```bash
