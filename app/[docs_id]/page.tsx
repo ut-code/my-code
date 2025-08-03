@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import Markdown, { Components } from "react-markdown";
+import { ChatForm } from "./chatForm";
 
 export default async function Page({
   params,
@@ -24,6 +25,7 @@ export default async function Page({
   return (
     <div className="p-4">
       <Markdown components={components}>{mdContent}</Markdown>
+      <ChatForm />
     </div>
   );
 }
