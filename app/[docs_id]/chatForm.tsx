@@ -6,15 +6,6 @@ export function ChatForm() {return (
     <>
     <style jsx>{`
         /* 簡単なCSSで見た目を整える（オプション） */
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-        }
         .form-container {
             background-color: white;
             border-radius: 10px;
