@@ -32,3 +32,4 @@ npm run lint
     - よくわからなかったらstyle直接指定でも良い
 - [react-markdown](https://www.npmjs.com/package/react-markdown)
     - オプションがいろいろあり、今はほぼデフォルト設定で突っ込んでいるがあとでなんとかする
+- [OpenNext](https://opennext.js.org/cloudflare)
