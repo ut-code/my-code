@@ -30,8 +30,12 @@ export function ChatForm() {
         throw new Error(data.response || "エラーが発生しました。");
       }
       setResponse(data.response);
-    } catch (error: any) {
-      setResponse(`エラー: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setResponse(`エラー: ${error.message}`);
+      } else {
+        setResponse(`エラー: ${String(error)}`);
+      }
     } finally {
       setIsLoading(false);
     }
