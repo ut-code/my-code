@@ -40,6 +40,18 @@ export function TerminalComponent(props: TerminalComponentProps) {
     const term = new Terminal({
       cursorBlink: true,
       convertEol: true,
+      cursorStyle: "bar",
+      cursorInactiveStyle: "none",
+      theme: {
+        // DaisyUIの変数を使用してテーマを設定している
+        // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
+        // TODO: red, green, blueなどの色も設定する
+        background: window.getComputedStyle(document.body).getPropertyValue("--color-base-300"),
+        foreground: window.getComputedStyle(document.body).getPropertyValue("--color-base-content"),
+        cursor: window.getComputedStyle(document.body).getPropertyValue("--color-base-content"),
+        selectionBackground: window.getComputedStyle(document.body).getPropertyValue("--color-primary"),
+        selectionForeground: window.getComputedStyle(document.body).getPropertyValue("--color-primary-content"),
+      },
     });
     terminalInstanceRef.current = term;
     initDone.current = false;
