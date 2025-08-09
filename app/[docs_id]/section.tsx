@@ -3,14 +3,16 @@
 import { ReactNode } from "react";
 import { type MarkdownSection } from "./splitMarkdown";
 import { StyledMarkdown } from "./markdown";
+import { ChatForm } from "./chatForm";
 
 // 1つのセクションのタイトルと内容を表示する。内容はMarkdownとしてレンダリングする
 export function Section({ section }: { section: MarkdownSection }) {
   return (
-    <>
+    <div>
       <Heading level={section.level}>{section.title}</Heading>
       <StyledMarkdown content={section.content} />
-    </>
+      <ChatForm />
+    </div>
   );
 }
 

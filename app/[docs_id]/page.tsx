@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { ChatForm } from "./chatForm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -38,7 +37,6 @@ export default async function Page({
       {splitMdContent.map((section, index) => (
         <Section key={index} section={section} />
       ))}
-      <ChatForm />
     </div>
   );
 }
