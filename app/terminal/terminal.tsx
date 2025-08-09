@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
+import { highlightCodeToAnsi } from "./highlight";
+import chalk from "chalk";
 
 export interface TerminalOutput {
   type: "stdout" | "stderr" | "error" | "return"; // 出力の種類
@@ -16,6 +18,8 @@ interface TerminalComponentProps {
   initMessage: string; // ターミナル初期化時のメッセージ
   prompt: string; // プロンプト文字列
   promptMore?: string;
+  language?: string;
+  tabSize: number;
   // コマンド実行時のコールバック関数
   sendCommand: (command: string) => Promise<TerminalOutput[]>;
   // 構文チェックのコールバック関数
@@ -26,28 +30,10 @@ export function TerminalComponent(props: TerminalComponentProps) {
   const terminalRef = useRef<HTMLDivElement>(null!);
   const terminalInstanceRef = useRef<Terminal | null>(null);
   const [termReady, setTermReady] = useState<boolean>(false);
-  const inputBuffer = useRef<string[]>([""]);
+  const inputBuffer = useRef<string[]>([]);
 
-  const initMessage = useRef<string>(null!);
-  initMessage.current = props.initMessage;
-  const prompt = useRef<string>(null!);
-  prompt.current = props.prompt;
-  const promptMore = useRef<string>(null!);
-  promptMore.current = props.promptMore || props.prompt;
-  const sendCommand = useRef<(command: string) => Promise<TerminalOutput[]>>(
-    null!
-  );
-  sendCommand.current = props.sendCommand;
-  const checkSyntax = useRef<(code: string) => Promise<SyntaxStatus>>(null!);
-  checkSyntax.current = props.checkSyntax || (async () => "complete");
-
-  useEffect(() => {
-    if (terminalInstanceRef.current && termReady && props.ready) {
-      // 初期メッセージとプロンプトを表示
-      terminalInstanceRef.current.writeln(initMessage.current);
-      terminalInstanceRef.current.write(prompt.current);
-    }
-  }, [props.ready, termReady]);
+  const { prompt, promptMore, language, tabSize, sendCommand, checkSyntax } =
+    props;
 
   // ターミナルの初期化処理
   useEffect(() => {
@@ -56,6 +42,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
       convertEol: true,
     });
     terminalInstanceRef.current = term;
+    initDone.current = false;
 
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
@@ -66,72 +53,168 @@ export function TerminalComponent(props: TerminalComponentProps) {
     // TODO: loadingメッセージ
     // TODO: ターミナルのサイズ変更に対応する
 
-    const onOutput = (outputs: TerminalOutput[]) => {
-      for (const output of outputs) {
-        // 出力内容に応じて色を変える
-        const message = String(output.message).replace(/\n/g, "\r\n");
-        switch (output.type) {
-          case "stderr":
-          case "error":
-            term.writeln(`\x1b[1;31m${message}\x1b[0m`);
-            break;
-          default:
-            term.writeln(message);
-            break;
-        }
-      }
-      // 出力が終わったらプロンプトを表示
-      term.write(prompt.current);
-    };
-
-    // キー入力のハンドリング
-    const onDataHandler = term.onData(async (key) => {
-      const code = key.charCodeAt(0);
-
-      // inputBufferは必ず1行以上ある状態にする
-      if (code === 13) {
-        // Enter
-        const hasContent =
-          inputBuffer.current[inputBuffer.current.length - 1].trim().length > 0;
-        const status = await checkSyntax.current(
-          inputBuffer.current.join("\n")
-        );
-        if (
-          (inputBuffer.current.length === 1 && status === "incomplete") ||
-          (inputBuffer.current.length >= 2 && hasContent)
-        ) {
-          // 次の行に続く
-          term.writeln("");
-          term.write(promptMore.current);
-          inputBuffer.current.push("");
-        } else {
-          // 実行
-          term.writeln("");
-          const outputs = await sendCommand.current(
-            inputBuffer.current.join("\n").trim()
-          );
-          onOutput(outputs);
-          inputBuffer.current = [""];
-        }
-      } else if (code === 127) {
-        // Backspace
-        if (inputBuffer.current[inputBuffer.current.length - 1].length > 0) {
-          term.write("\b \b");
-          inputBuffer.current[inputBuffer.current.length - 1] =
-            inputBuffer.current[inputBuffer.current.length - 1].slice(0, -1);
-        }
-      } else if (code >= 32) {
-        inputBuffer.current[inputBuffer.current.length - 1] += key;
-        term.write(key);
-      }
-    });
-
-    // アンマウント時のクリーンアップ
     return () => {
-      onDataHandler.dispose();
       term.dispose();
+      terminalInstanceRef.current = null;
     };
-  }, [initMessage, prompt, promptMore]);
+  }, []);
+
+  // bufferを更新し、画面に描画する
+  const updateBuffer = useCallback(
+    (newBuffer: () => string[]) => {
+      if (terminalInstanceRef.current) {
+        // カーソル非表示
+        terminalInstanceRef.current.write("\x1b[?25l");
+        // バッファの行数分カーソルを戻す
+        if (inputBuffer.current.length >= 2) {
+          terminalInstanceRef.current.write(
+            `\x1b[${inputBuffer.current.length - 1}A`
+          );
+        }
+        terminalInstanceRef.current.write("\r");
+        // バッファの内容をクリア
+        terminalInstanceRef.current.write("\x1b[0J");
+        // 新しいバッファの内容を表示
+        inputBuffer.current = newBuffer();
+        for (let i = 0; i < inputBuffer.current.length; i++) {
+          terminalInstanceRef.current.write(
+            i === 0 ? prompt : promptMore || prompt
+          );
+          if (language) {
+            terminalInstanceRef.current.write(
+              highlightCodeToAnsi(inputBuffer.current[i], language)
+            );
+          } else {
+            terminalInstanceRef.current.write(inputBuffer.current[i]);
+          }
+          if (i < inputBuffer.current.length - 1) {
+            terminalInstanceRef.current.writeln("");
+          }
+        }
+        // カーソルを表示
+        terminalInstanceRef.current.write("\x1b[?25h");
+      }
+    },
+    [prompt, promptMore, language]
+  );
+
+  const initDone = useRef<boolean>(false);
+  useEffect(() => {
+    if (
+      terminalInstanceRef.current &&
+      termReady &&
+      props.ready &&
+      !initDone.current
+    ) {
+      // 初期メッセージとプロンプトを表示
+      terminalInstanceRef.current.writeln(props.initMessage);
+      initDone.current = true;
+      updateBuffer(() => [""]);
+    }
+  }, [props.ready, termReady, props.initMessage, updateBuffer]);
+
+  // ランタイムからの出力を処理し、bufferをリセット
+  const onOutput = useCallback(
+    (outputs: TerminalOutput[]) => {
+      if (terminalInstanceRef.current) {
+        for (const output of outputs) {
+          // 出力内容に応じて色を変える
+          const message = String(output.message).replace(/\n/g, "\r\n");
+          switch (output.type) {
+            case "stderr":
+            case "error":
+              terminalInstanceRef.current.writeln(chalk.red(message));
+              break;
+            default:
+              terminalInstanceRef.current.writeln(message);
+              break;
+          }
+        }
+        // 出力が終わったらプロンプトを表示
+        updateBuffer(() => [""]);
+      }
+    },
+    [updateBuffer]
+  );
+
+  const keyHandler = useCallback(
+    async (key: string) => {
+      if (terminalInstanceRef.current) {
+        for (let i = 0; i < key.length; i++) {
+          const code = key.charCodeAt(i);
+          const isLastChar = i === key.length - 1;
+
+          // inputBufferは必ず1行以上ある状態にする
+          if (code === 13) {
+            // Enter
+            const hasContent =
+              inputBuffer.current[inputBuffer.current.length - 1].trim()
+                .length > 0;
+            const status = checkSyntax
+              ? await checkSyntax(inputBuffer.current.join("\n"))
+              : "complete";
+            if (
+              (inputBuffer.current.length === 1 && status === "incomplete") ||
+              (inputBuffer.current.length >= 2 && hasContent) ||
+              !isLastChar
+            ) {
+              // 次の行に続く
+              updateBuffer(() => [...inputBuffer.current, ""]);
+            } else {
+              // 実行
+              terminalInstanceRef.current.writeln("");
+              const command = inputBuffer.current.join("\n").trim();
+              inputBuffer.current = [];
+              const outputs = await sendCommand(command);
+              onOutput(outputs);
+            }
+          } else if (code === 127) {
+            // Backspace
+            if (
+              inputBuffer.current[inputBuffer.current.length - 1].length > 0
+            ) {
+              updateBuffer(() => {
+                const newBuffer = [...inputBuffer.current];
+                newBuffer[newBuffer.length - 1] = newBuffer[
+                  newBuffer.length - 1
+                ].slice(0, -1);
+                return newBuffer;
+              });
+            }
+          } else if (code === 9) {
+            // Tab
+            // タブをスペースに変換
+            const spaces = " ".repeat(tabSize);
+            updateBuffer(() => {
+              const newBuffer = [...inputBuffer.current];
+              // 最後の行にスペースを追加
+              newBuffer[newBuffer.length - 1] += spaces;
+              return newBuffer;
+            });
+          } else if (code >= 32) {
+            updateBuffer(() => {
+              const newBuffer = [...inputBuffer.current];
+              // 最後の行にキーを追加
+              newBuffer[newBuffer.length - 1] += key[i];
+              return newBuffer;
+            });
+          }
+        }
+      }
+    },
+    [updateBuffer, sendCommand, onOutput, checkSyntax, tabSize]
+  );
+  useEffect(() => {
+    if (terminalInstanceRef.current && termReady && props.ready) {
+      // キー入力のハンドリング
+      const onDataHandler = terminalInstanceRef.current.onData(keyHandler);
+
+      // アンマウント時のクリーンアップ
+      return () => {
+        onDataHandler.dispose();
+      };
+    }
+  }, [keyHandler, termReady, props.ready]);
 
   return <div ref={terminalRef} style={{ width: "100%", height: "400px" }} />;
 }

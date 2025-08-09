@@ -12,6 +12,8 @@ export default function PythonPage() {
         initMessage="Welcome to Pyodide Terminal!"
         prompt=">>> "
         promptMore="... "
+        language="python"
+        tabSize={4}
         sendCommand={runPython}
         checkSyntax={checkSyntax}
       />
