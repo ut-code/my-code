@@ -1,6 +1,7 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { Heading } from "./section";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -12,18 +13,12 @@ export function StyledMarkdown({ content }: { content: string }) {
 
 // TailwindCSSがh1などのタグのスタイルを消してしまうので、手動でスタイルを指定する必要がある
 const components: Components = {
-  h1: ({ node, ...props }) => (
-    <h1 className="text-2xl font-bold my-4" {...props} />
-  ),
-  h2: ({ node, ...props }) => (
-    <h2 className="text-xl font-bold mt-4 mb-3 " {...props} />
-  ),
-  h3: ({ node, ...props }) => (
-    <h3 className="text-lg font-bold mt-4 mb-2" {...props} />
-  ),
-  h4: ({ node, ...props }) => (
-    <h4 className="text-base font-bold mt-3 mb-2" {...props} />
-  ),
+  h1: ({ children }) => <Heading level={1}>{children}</Heading>,
+  h2: ({ children }) => <Heading level={2}>{children}</Heading>,
+  h3: ({ children }) => <Heading level={3}>{children}</Heading>,
+  h4: ({ children }) => <Heading level={4}>{children}</Heading>,
+  h5: ({ children }) => <Heading level={5}>{children}</Heading>,
+  h6: ({ children }) => <Heading level={6}>{children}</Heading>,
   p: ({ node, ...props }) => <p className="mx-2 my-2" {...props} />,
   ul: ({ node, ...props }) => (
     <ul className="list-disc list-outside ml-6 my-2" {...props} />
