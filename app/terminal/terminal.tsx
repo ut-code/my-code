@@ -9,31 +9,45 @@ export interface TerminalOutput {
   type: "stdout" | "stderr" | "error" | "return"; // 出力の種類
   message: string; // 出力メッセージ
 }
+export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
+
 interface TerminalComponentProps {
   ready: boolean;
   initMessage: string; // ターミナル初期化時のメッセージ
   prompt: string; // プロンプト文字列
-  sendCommand: (command: string) => Promise<TerminalOutput[]>; // コマンド実行時のコールバック関数
+  promptMore?: string;
+  // コマンド実行時のコールバック関数
+  sendCommand: (command: string) => Promise<TerminalOutput[]>;
+  // 構文チェックのコールバック関数
+  // incompleteの場合は次の行に続くことを示す
+  checkSyntax?: (code: string) => Promise<SyntaxStatus>;
 }
 export function TerminalComponent(props: TerminalComponentProps) {
   const terminalRef = useRef<HTMLDivElement>(null!);
   const terminalInstanceRef = useRef<Terminal | null>(null);
   const [termReady, setTermReady] = useState<boolean>(false);
-  const inputBuffer = useRef<string>("");
+  const inputBuffer = useRef<string[]>([""]);
 
-  const [initMessage] = useState<string>(props.initMessage);
-  const [prompt] = useState<string>(props.prompt);
+  const initMessage = useRef<string>(null!);
+  initMessage.current = props.initMessage;
+  const prompt = useRef<string>(null!);
+  prompt.current = props.prompt;
+  const promptMore = useRef<string>(null!);
+  promptMore.current = props.promptMore || props.prompt;
   const sendCommand = useRef<(command: string) => Promise<TerminalOutput[]>>(
-    props.sendCommand
+    null!
   );
+  sendCommand.current = props.sendCommand;
+  const checkSyntax = useRef<(code: string) => Promise<SyntaxStatus>>(null!);
+  checkSyntax.current = props.checkSyntax || (async () => "complete");
 
   useEffect(() => {
     if (terminalInstanceRef.current && termReady && props.ready) {
       // 初期メッセージとプロンプトを表示
-      terminalInstanceRef.current.writeln(initMessage);
-      terminalInstanceRef.current.write(prompt);
+      terminalInstanceRef.current.writeln(initMessage.current);
+      terminalInstanceRef.current.write(prompt.current);
     }
-  }, [initMessage, prompt, props.ready, termReady]);
+  }, [props.ready, termReady]);
 
   // ターミナルの初期化処理
   useEffect(() => {
@@ -67,29 +81,47 @@ export function TerminalComponent(props: TerminalComponentProps) {
         }
       }
       // 出力が終わったらプロンプトを表示
-      term.write(prompt);
+      term.write(prompt.current);
     };
 
     // キー入力のハンドリング
-    const onDataHandler = term.onData((key) => {
+    const onDataHandler = term.onData(async (key) => {
       const code = key.charCodeAt(0);
 
+      // inputBufferは必ず1行以上ある状態にする
       if (code === 13) {
         // Enter
-        term.writeln("");
-        if (inputBuffer.current.trim().length > 0) {
-          sendCommand.current(inputBuffer.current).then(onOutput);
-          inputBuffer.current = "";
+        const hasContent =
+          inputBuffer.current[inputBuffer.current.length - 1].trim().length > 0;
+        const status = await checkSyntax.current(
+          inputBuffer.current.join("\n")
+        );
+        if (
+          (inputBuffer.current.length === 1 && status === "incomplete") ||
+          (inputBuffer.current.length >= 2 && hasContent)
+        ) {
+          // 次の行に続く
+          term.writeln("");
+          term.write(promptMore.current);
+          inputBuffer.current.push("");
+        } else {
+          // 実行
+          term.writeln("");
+          const outputs = await sendCommand.current(
+            inputBuffer.current.join("\n").trim()
+          );
+          onOutput(outputs);
+          inputBuffer.current = [""];
         }
-        // 新しいプロンプトは外部からのoutputを待ってから表示する
       } else if (code === 127) {
         // Backspace
-        if (inputBuffer.current.length > 0) {
+        if (inputBuffer.current[inputBuffer.current.length - 1].length > 0) {
           term.write("\b \b");
-          inputBuffer.current = inputBuffer.current.slice(0, -1);
+          inputBuffer.current[inputBuffer.current.length - 1] =
+            inputBuffer.current[inputBuffer.current.length - 1].slice(0, -1);
         }
       } else if (code >= 32) {
-        inputBuffer.current += key;
+        inputBuffer.current[inputBuffer.current.length - 1] += key;
         term.write(key);
       }
     });
@@ -99,7 +131,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
       onDataHandler.dispose();
       term.dispose();
     };
-  }, [initMessage, prompt]);
+  }, [initMessage, prompt, promptMore]);
 
   return <div ref={terminalRef} style={{ width: "100%", height: "400px" }} />;
 }
