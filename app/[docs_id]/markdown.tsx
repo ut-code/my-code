@@ -1,6 +1,7 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -39,24 +40,28 @@ const components: Components = {
   code: ({ node, className, ref, style, ...props }) => {
     const match = /language-(\w+)/.exec(className || "");
     if (match) {
-      // block
-      return (
-        <SyntaxHighlighter
-          language={match[1]}
-          PreTag="div"
-          className="px-4! py-4! m-0!"
-          // style={todo dark theme?}
-          {...props}
-        >
-          {String(props.children).replace(/\n$/, "")}
-        </SyntaxHighlighter>
-      );
+      switch (match[1]) {
+        case "python":
+          return <PythonEmbeddedTerminal content={String(props.children).replace(/\n$/, "")} />;
+        default:
+          return (
+            <SyntaxHighlighter
+              language={match[1]}
+              PreTag="div"
+              className="px-4! py-4! m-0! font-mono!"
+              // style={todo dark theme?}
+              {...props}
+            >
+              {String(props.children).replace(/\n$/, "")}
+            </SyntaxHighlighter>
+          );
+      }
     } else if (String(props.children).includes("\n")) {
       // 言語指定なしコードブロック
       return (
         <SyntaxHighlighter
           PreTag="div"
-          className="px-4! py-4! m-0!"
+          className="px-4! py-4! m-0! font-mono!"
           // style={todo dark theme?}
           {...props}
         >
@@ -67,7 +72,7 @@ const components: Components = {
       // inline
       return (
         <code
-          className="bg-base-200 border border-base-300 p-1 rounded font-mono "
+          className="bg-base-200 border border-base-300 px-1 py-0.5 rounded text-sm "
           {...props}
         />
       );
@@ -75,7 +80,7 @@ const components: Components = {
   },
   pre: ({ node, ...props }) => (
     <pre
-      className="bg-base-200 border border-primary mx-2 my-2 rounded-lg font-mono text-sm overflow-x-auto"
+      className="bg-base-200 border border-primary mx-2 my-2 rounded-lg text-sm overflow-x-auto"
       {...props}
     />
   ),

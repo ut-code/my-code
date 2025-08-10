@@ -15,7 +15,8 @@ export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チ�
 
 interface TerminalComponentProps {
   ready: boolean;
-  initMessage: string; // ターミナル初期化時のメッセージ
+  initMessage?: string; // ターミナル初期化時のメッセージ
+  initCommand?: { command: string; output: TerminalOutput[] }[]; // 初期化時に実行するコマンドとその出力
   prompt: string; // プロンプト文字列
   promptMore?: string;
   language?: string;
@@ -34,60 +35,6 @@ export function TerminalComponent(props: TerminalComponentProps) {
 
   const { prompt, promptMore, language, tabSize, sendCommand, checkSyntax } =
     props;
-
-  // ターミナルの初期化処理
-  useEffect(() => {
-    const fromCSS = (varName: string) =>
-      window.getComputedStyle(document.body).getPropertyValue(varName);
-    // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
-    const term = new Terminal({
-      cursorBlink: true,
-      convertEol: true,
-      cursorStyle: "bar",
-      cursorInactiveStyle: "none",
-      theme: {
-        // DaisyUIの変数を使用してテーマを設定している
-        // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
-        background: fromCSS("--color-base-300"),
-        foreground: fromCSS("--color-base-content"),
-        cursor: fromCSS("--color-base-content"),
-        selectionBackground: fromCSS("--color-primary"),
-        selectionForeground: fromCSS("--color-primary-content"),
-        black: fromCSS("--color-black"),
-        brightBlack: fromCSS("--color-neutral-500"),
-        red: fromCSS("--color-red-600"),
-        brightRed: fromCSS("--color-red-400"),
-        green: fromCSS("--color-green-600"),
-        brightGreen: fromCSS("--color-green-400"),
-        yellow: fromCSS("--color-yellow-700"),
-        brightYellow: fromCSS("--color-yellow-400"),
-        blue: fromCSS("--color-indigo-600"),
-        brightBlue: fromCSS("--color-indigo-400"),
-        magenta: fromCSS("--color-fuchsia-600"),
-        brightMagenta: fromCSS("--color-fuchsia-400"),
-        cyan: fromCSS("--color-cyan-600"),
-        brightCyan: fromCSS("--color-cyan-400"),
-        white: fromCSS("--color-base-100"),
-        brightWhite: fromCSS("--color-white"),
-      },
-    });
-    terminalInstanceRef.current = term;
-    initDone.current = false;
-
-    const fitAddon = new FitAddon();
-    term.loadAddon(fitAddon);
-    term.open(terminalRef.current);
-    fitAddon.fit();
-
-    setTermReady(true);
-    // TODO: loadingメッセージ
-    // TODO: ターミナルのサイズ変更に対応する
-
-    return () => {
-      term.dispose();
-      terminalInstanceRef.current = null;
-    };
-  }, []);
 
   // bufferを更新し、画面に描画する
   const updateBuffer = useCallback(
@@ -128,21 +75,6 @@ export function TerminalComponent(props: TerminalComponentProps) {
     [prompt, promptMore, language]
   );
 
-  const initDone = useRef<boolean>(false);
-  useEffect(() => {
-    if (
-      terminalInstanceRef.current &&
-      termReady &&
-      props.ready &&
-      !initDone.current
-    ) {
-      // 初期メッセージとプロンプトを表示
-      terminalInstanceRef.current.writeln(props.initMessage);
-      initDone.current = true;
-      updateBuffer(() => [""]);
-    }
-  }, [props.ready, termReady, props.initMessage, updateBuffer]);
-
   // ランタイムからの出力を処理し、bufferをリセット
   const onOutput = useCallback(
     (outputs: TerminalOutput[]) => {
@@ -166,6 +98,126 @@ export function TerminalComponent(props: TerminalComponentProps) {
     },
     [updateBuffer]
   );
+
+  // initCommandのコマンドについて、実行せずコマンドと結果の表示だけを事前にする
+  const renderInitCommand = useRef<() => void>(null!);
+  renderInitCommand.current = () => {
+    if (props.initCommand) {
+      for (const cmd of props.initCommand) {
+        updateBuffer(() => cmd.command.split("\n"));
+        terminalInstanceRef.current!.writeln("");
+        inputBuffer.current = [];
+        onOutput(cmd.output);
+      }
+    }
+  };
+
+  // ターミナルの初期化処理
+  useEffect(() => {
+    const fromCSS = (varName: string) =>
+      window.getComputedStyle(document.body).getPropertyValue(varName);
+    // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
+    const term = new Terminal({
+      cursorBlink: true,
+      convertEol: true,
+      cursorStyle: "bar",
+      cursorInactiveStyle: "none",
+      fontSize: 14,
+      lineHeight: 1.4,
+      letterSpacing: -1,
+      fontFamily: "var(--default-mono-font-family)",
+      theme: {
+        // DaisyUIの変数を使用してテーマを設定している
+        // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
+        background: fromCSS("--color-base-300"),
+        foreground: fromCSS("--color-base-content"),
+        cursor: fromCSS("--color-base-content"),
+        selectionBackground: fromCSS("--color-primary"),
+        selectionForeground: fromCSS("--color-primary-content"),
+        black: fromCSS("--color-black"),
+        brightBlack: fromCSS("--color-neutral-500"),
+        red: fromCSS("--color-red-600"),
+        brightRed: fromCSS("--color-red-400"),
+        green: fromCSS("--color-green-600"),
+        brightGreen: fromCSS("--color-green-400"),
+        yellow: fromCSS("--color-yellow-700"),
+        brightYellow: fromCSS("--color-yellow-400"),
+        blue: fromCSS("--color-indigo-600"),
+        brightBlue: fromCSS("--color-indigo-400"),
+        magenta: fromCSS("--color-fuchsia-600"),
+        brightMagenta: fromCSS("--color-fuchsia-400"),
+        cyan: fromCSS("--color-cyan-600"),
+        brightCyan: fromCSS("--color-cyan-400"),
+        white: fromCSS("--color-base-100"),
+        brightWhite: fromCSS("--color-white"),
+      },
+    });
+    terminalInstanceRef.current = term;
+    initDone.current = false;
+
+    const fitAddon = new FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(terminalRef.current);
+    fitAddon.fit();
+
+    renderInitCommand.current();
+    setTermReady(true);
+    // TODO: loadingメッセージ
+    // TODO: ターミナルのサイズ変更に対応する
+
+    return () => {
+      term.dispose();
+      terminalInstanceRef.current = null;
+    };
+  }, []);
+
+  const initDone = useRef<boolean>(false);
+  useEffect(() => {
+    if (
+      terminalInstanceRef.current &&
+      termReady &&
+      props.ready &&
+      !initDone.current
+    ) {
+      initDone.current = true;
+      if (props.initMessage) {
+        terminalInstanceRef.current.writeln(props.initMessage);
+      }
+      (async () => {
+        if (props.initCommand) {
+          // 初期化時に実行するコマンドがある場合はそれを実行
+          const initCommandResult: {
+            command: string;
+            output: TerminalOutput[];
+          }[] = [];
+          for (const cmd of props.initCommand) {
+            const outputs = await sendCommand(cmd.command);
+            initCommandResult.push({
+              command: cmd.command,
+              output: outputs,
+            });
+          }
+          // 実際の実行結果でターミナルを再描画
+          terminalInstanceRef.current!.clear();
+          for (const cmd of initCommandResult) {
+            updateBuffer(() => cmd.command.split("\n"));
+            terminalInstanceRef.current!.writeln("");
+            inputBuffer.current = [];
+            onOutput(cmd.output);
+          }
+        }
+        updateBuffer(() => [""]);
+      })();
+    }
+  }, [
+    props.ready,
+    termReady,
+    props.initMessage,
+    updateBuffer,
+    onOutput,
+    props.initCommand,
+    sendCommand,
+  ]);
 
   const keyHandler = useCallback(
     async (key: string) => {
@@ -246,5 +298,27 @@ export function TerminalComponent(props: TerminalComponentProps) {
     }
   }, [keyHandler, termReady, props.ready]);
 
-  return <div ref={terminalRef} style={{ width: "100%", height: "400px" }} />;
+  const initCommandText: string[] = [];
+  for (const cmd of props.initCommand || []) {
+    initCommandText.push(cmd.command);
+    initCommandText.push(...cmd.output.map((out) => out.message));
+  }
+  initCommandText.push("prompt");
+  initCommandText.push("prompt");
+  return (
+    <div className="relative p-4 bg-base-300 min-h-32">
+      <div className="absolute top-4 bottom-0 inset-x-4" ref={terminalRef} />
+      <pre
+        className="invisible relative z-10 break-all overflow-hidden"
+        style={{
+          /* Xtermjsの表示と同じ幅、高さになるよう調整 (Xtermjsの指定はCSSと基準が違うっぽい?) */
+          fontSize: 14,
+          lineHeight: 1.44,
+          letterSpacing: "0.025em",
+        }}
+      >
+        {initCommandText.join("\n")}
+      </pre>
+    </div>
+  );
 }

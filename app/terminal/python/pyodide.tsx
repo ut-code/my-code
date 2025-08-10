@@ -1,6 +1,16 @@
+"use client";
+
 // Nextjsではドキュメント通りにpyodideをimportすると動かない? typeのインポートだけはできる
 import { type PyodideAPI } from "pyodide";
-import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  ReactNode,
+  createContext,
+  useContext,
+} from "react";
 import { SyntaxStatus, TerminalOutput } from "../terminal";
 
 declare global {
@@ -8,6 +18,14 @@ declare global {
     loadPyodide: (options: { indexURL: string }) => Promise<PyodideAPI>;
   }
 }
+
+interface IPyodideContext {
+  init: () => void;
+  isPyodideReady: boolean;
+  runPython: (code: string) => Promise<TerminalOutput[]>;
+  checkSyntax: (code: string) => Promise<SyntaxStatus>;
+}
+const PyodideContext = createContext<IPyodideContext>(null!);
 
 // Python側で実行する構文チェックのコード
 // codeop.compile_commandは、コードが不完全な場合はNoneを返します。
@@ -32,16 +50,19 @@ def __check_syntax():
 __check_syntax()
 `;
 
-export function usePyodide() {
+export function PyodideProvider({ children }: { children: ReactNode }) {
   const pyodideRef = useRef<PyodideAPI>(null);
   const [isPyodideReady, setIsPyodideReady] = useState<boolean>(false);
   const pyodideOutput = useRef<TerminalOutput[]>([]);
+  const initRunning = useRef<boolean>(false);
 
-  useEffect(() => {
+  const init = useCallback(() => {
     // next.config.ts 内でpyodideをimportし、バージョンを取得している
     const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${process.env.PYODIDE_VERSION}/full/`;
 
     const initPyodide = () => {
+      if (initRunning.current) return; // 重複実行を防ぐ
+      initRunning.current = true;
       window
         .loadPyodide({
           indexURL: PYODIDE_CDN,
@@ -104,9 +125,31 @@ export function usePyodide() {
       } catch (e) {
         console.log(e);
         if (e instanceof Error) {
-          pyodideOutput.current.push({ type: "error", message: e.message });
+          // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
+          if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
+            const lines = e.message.split("\n");
+            const execLineIndex = lines.findIndex((line) =>
+              line.includes("<exec>")
+            );
+            pyodideOutput.current.push({
+              type: "error",
+              message: lines
+                .slice(0, 1)
+                .concat(lines.slice(execLineIndex))
+                .join("\n")
+                .trim(),
+            });
+          } else {
+            pyodideOutput.current.push({
+              type: "error",
+              message: `予期せぬエラー: ${e.message.trim()}`,
+            });
+          }
         } else {
-          pyodideOutput.current.push({ type: "error", message: String(e) });
+          pyodideOutput.current.push({
+            type: "error",
+            message: `予期せぬエラー: ${String(e).trim()}`,
+          });
         }
       }
       const output = [...pyodideOutput.current];
@@ -122,22 +165,45 @@ export function usePyodide() {
   const checkSyntax = useCallback<(code: string) => Promise<SyntaxStatus>>(
     async (code) => {
       const pyodide = pyodideRef.current;
-      if (!pyodide || !isPyodideReady) return 'invalid';
+      if (!pyodide || !isPyodideReady) return "invalid";
 
       // グローバルスコープにチェック対象のコードを渡す
-      (window as any).__code_to_check = code
+      (window as any).__code_to_check = code;
       try {
         // Pythonのコードを実行して結果を受け取る
         const status = await pyodide.runPythonAsync(CHECK_SYNTAX_CODE);
         return status;
       } catch (e) {
         console.error("Syntax check error:", e);
-        return 'invalid';
+        return "invalid";
       }
     },
     [isPyodideReady]
   );
 
-  // 外部に公開する値と関数
-  return { isPyodideReady, runPython, checkSyntax };
+  return (
+    <PyodideContext.Provider
+      value={{
+        init,
+        isPyodideReady,
+        runPython,
+        checkSyntax,
+      }}
+    >
+      {children}
+    </PyodideContext.Provider>
+  );
+}
+
+export function usePyodide() {
+  const context = useContext(PyodideContext);
+  if (!context) {
+    throw new Error("usePyodide must be used within a PyodideProvider");
+  }
+  useEffect(() => {
+    // Pyodideの初期化を行う
+    context.init();
+  }, [context]);
+
+  return context;
 }
