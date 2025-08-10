@@ -135,8 +135,8 @@ export function TerminalComponent(props: TerminalComponentProps) {
       cursorInactiveStyle: "none",
       fontSize: 14,
       lineHeight: 1.4,
-      letterSpacing: -3,
-      fontFamily: "var(--default-mono-font-family)",
+      letterSpacing: 0,
+      fontFamily: "Inconsolata Variable",
       theme: {
         // DaisyUIの変数を使用してテーマを設定している
         // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
@@ -325,7 +325,12 @@ export function TerminalComponent(props: TerminalComponentProps) {
     <div
       className="relative p-4 bg-base-300 min-h-32"
       onClick={() => {
-        if (!runtimeReady && terminalInstanceRef.current && termReady) {
+        if (
+          !runtimeInitializing &&
+          !runtimeReady &&
+          terminalInstanceRef.current &&
+          termReady
+        ) {
           initRuntime();
           terminalInstanceRef.current.write(
             chalk.dim.bold.italic("(初期化しています...しばらくお待ちください)")
