@@ -12,7 +12,7 @@ Pythonのプログラミングにおいて、データを効率的に扱う能�
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # リストの作成
 >>> fruits = ['apple', 'banana', 'cherry']
 >>> fruits
@@ -57,7 +57,7 @@ Pythonのプログラミングにおいて、データを効率的に扱う能�
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # タプルの作成 (丸括弧を使用)
 >>> coordinates = (10, 20)
 >>> coordinates
@@ -92,7 +92,7 @@ TypeError: 'tuple' object does not support item assignment
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # 辞書の作成
 >>> person = {'name': 'Taro Yamada', 'age': 30, 'city': 'Tokyo'}
 >>> person
@@ -132,7 +132,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # セットの作成 (重複した4は自動的に無視される)
 >>> numbers = {1, 2, 3, 4, 4, 5}
 >>> numbers
@@ -168,7 +168,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **REPL実行例**
 
-```python
+```python-repl
 >>> numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 >>> # インデックス1から4の手前まで
@@ -200,7 +200,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 `for`ループで書く場合と、リスト内包表記で書く場合を比較してみましょう。
 
-```python
+```python-repl
 >>> # forループの場合
 >>> squares_loop = []
 >>> for i in range(10):
@@ -222,7 +222,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **辞書内包表記**
 
-```python
+```python-repl
 >>> # 数値をキー、その2乗を値とする辞書を作成
 >>> square_dict = {x: x*x for x in range(5)}
 >>> square_dict
@@ -231,7 +231,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **セット内包表記**
 
-```python
+```python-repl
 >>> # リスト内のユニークな数値の2乗のセットを作成
 >>> numbers = [1, 2, 2, 3, 4, 4, 5]
 >>> square_set = {x*x for x in numbers}

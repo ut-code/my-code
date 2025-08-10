@@ -22,7 +22,7 @@ if (score > 80) {
 **Pythonでの対話モード実行例:**
 対話モードで複数行のブロックを入力すると、継続行プロンプト `...` が表示されます。
 
-```python
+```python-repl
 >>> score = 85
 >>> if score > 80:
 ...     # このブロックはインデントによって定義される
@@ -44,7 +44,7 @@ if (score > 80) {
 
 変数名だけを入力してEnterキーを押すと、その時点での変数の値を確認できます。
 
-```python
+```python-repl
 >>> # 変数 `count` は整数(int)型として自動的に解釈される
 >>> count = 100
 >>> count
@@ -68,7 +68,7 @@ if (score > 80) {
 
 Pythonには整数 (`int`) と浮動小数点数 (`float`) があります。型の区別は自動的に行われます。
 
-```python
+```python-repl
 >>> x = 10
 >>> y = 3.14
 
@@ -91,7 +91,7 @@ Pythonには整数 (`int`) と浮動小数点数 (`float`) があります。型
 
 文字列はシングルクォート `'` またはダブルクォート `"` で囲みます。どちらを使っても機能的な違いはありません。
 
-```python
+```python-repl
 >>> message1 = "こんにちは、世界"
 >>> message2 = 'Hello, World!'
 
@@ -110,7 +110,7 @@ Pythonには整数 (`int`) と浮動小数点数 (`float`) があります。型
 
 文字列の前に `f` を置き、波括弧 `{}` の中に変数名や式を直接記述できます。
 
-```python
+```python-repl
 >>> name = "佐藤"
 >>> age = 28
 
@@ -132,7 +132,7 @@ Pythonには整数 (`int`) と浮動小数点数 (`float`) があります。型
 
 真偽値は `True` または `False` の2つの値を持ちます。**先頭が大文字であることに注意してください**。
 
-```python
+```python-repl
 >>> is_active = True
 >>> is_admin = False
 
@@ -153,7 +153,7 @@ False
 
 **重要**: 型ヒントはあくまで「ヒント」であり、Pythonのインタプリタはこれを**実行時に強制しません**。しかし、エディタや静的解析ツールがこのヒントを解釈し、型の不一致を開発段階で警告してくれるため、コードの可読性と堅牢性が大幅に向上します。
 
-```python
+```python-repl
 >>> # nameはstr型、ageはint型を期待し、戻り値はstr型であることを示す
 >>> def create_user_profile(name: str, age: int) -> str:
 ...     return f"ユーザー名: {name}, 年齢: {age}"

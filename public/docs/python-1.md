@@ -58,7 +58,7 @@ Pythonには **REPL** (Read-Eval-Print Loop) と呼ばれる対話モードが�
 
 ターミナルで `python` と入力するだけで起動します。
 
-```python
+```bash
 $ python
 Python 3.11.5 (main, Aug 24 2023, 15:09:47) [Clang 14.0.3 (clang-1403.0.22.14.1)] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
@@ -79,7 +79,7 @@ Hello, Python!
 
 **hello.py**
 
-```python
+```python:hello.py
 def main():
     print("Hello from a Python script!")
 
@@ -106,7 +106,7 @@ Hello from a Python script!
 
 Pythonには、その設計哲学を端的に表した **「The Zen of Python」** という短い詩のような文章があります。これはPythonの思想を理解する上で非常に重要です。対話モードで `import this` と入力すると表示されます。
 
-```python
+```python-repl
 >>> import this
 The Zen of Python, by Tim Peters
 

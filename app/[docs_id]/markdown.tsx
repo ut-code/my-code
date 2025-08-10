@@ -38,23 +38,44 @@ const components: Components = {
     <strong className="text-primary" {...props} />
   ),
   code: ({ node, className, ref, style, ...props }) => {
-    const match = /language-(\w+)/.exec(className || "");
+    const match = /^language-(\w+)(-repl)?\:?(.+)?$/.exec(className || "");
     if (match) {
-      switch (match[1]) {
-        case "python":
-          return <PythonEmbeddedTerminal content={String(props.children).replace(/\n$/, "")} />;
-        default:
-          return (
-            <SyntaxHighlighter
-              language={match[1]}
-              PreTag="div"
-              className="px-4! py-4! m-0! font-mono!"
-              // style={todo dark theme?}
-              {...props}
-            >
-              {String(props.children).replace(/\n$/, "")}
-            </SyntaxHighlighter>
-          );
+      if (match[2]) {
+        // repl付きの言語指定
+        // 現状はPythonのみ対応
+        switch (match[1]) {
+          case "python":
+            return (
+              <PythonEmbeddedTerminal
+                content={String(props.children).replace(/\n$/, "")}
+              />
+            );
+          default:
+            console.warn(`Unsupported language for repl: ${match[1]}`);
+            return (
+              <SyntaxHighlighter
+                language={match[1]}
+                PreTag="div"
+                className="px-4! py-4! m-0! font-mono!"
+                // style={todo dark theme?}
+                {...props}
+              >
+                {String(props.children).replace(/\n$/, "")}
+              </SyntaxHighlighter>
+            );
+        }
+      } else {
+        return (
+          <SyntaxHighlighter
+            language={match[1]}
+            PreTag="div"
+            className="px-4! py-4! m-0! font-mono!"
+            // style={todo dark theme?}
+            {...props}
+          >
+            {String(props.children).replace(/\n$/, "")}
+          </SyntaxHighlighter>
+        );
       }
     } else if (String(props.children).includes("\n")) {
       // 言語指定なしコードブロック
