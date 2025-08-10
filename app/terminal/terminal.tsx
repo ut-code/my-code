@@ -122,6 +122,30 @@ export function TerminalComponent(props: TerminalComponentProps) {
       }
     }
   };
+  const [currentRows, setCurrentRows] = useState<number>(0);
+  const getRowsOfInitCommand = useRef<(cols: number) => number>(null!);
+  getRowsOfInitCommand.current = (cols: number) => {
+    let rows = 0;
+    for (const cmd of props.initCommand || []) {
+      // コマンドの行数をカウント
+      console.log(
+        prompt + cmd.command,
+        Math.max(1, Math.ceil(strWidth(prompt + cmd.command) / cols))
+      );
+      for (const line of cmd.command.split("\n")) {
+        rows += Math.max(1, Math.ceil(strWidth(prompt + line) / cols));
+      }
+      // 出力の行数をカウント
+      for (const out of cmd.output) {
+        console.log(
+          out.message,
+          Math.max(1, Math.ceil(strWidth(out.message) / cols))
+        );
+        rows += Math.max(1, Math.ceil(strWidth(out.message) / cols));
+      }
+    }
+    return rows + 2; // 最後のプロンプト行を含める
+  };
 
   // ターミナルの初期化処理
   useEffect(() => {
@@ -168,14 +192,21 @@ export function TerminalComponent(props: TerminalComponentProps) {
 
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
+    // fitAddon.fit();
+
     term.open(terminalRef.current);
-    fitAddon.fit();
 
     renderInitCommand.current();
     setTermReady(true);
 
     const observer = new ResizeObserver(() => {
-      fitAddon.fit();
+      // fitAddon.fit();
+      const dims = fitAddon.proposeDimensions();
+      if (dims) {
+        const rows = getRowsOfInitCommand.current(dims.cols);
+        term.resize(dims.cols, rows);
+        setCurrentRows(rows);
+      }
     });
     observer.observe(terminalRef.current);
 
@@ -314,16 +345,9 @@ export function TerminalComponent(props: TerminalComponentProps) {
     }
   }, [keyHandler, termReady, runtimeReady]);
 
-  const initCommandText: string[] = [];
-  for (const cmd of props.initCommand || []) {
-    initCommandText.push(cmd.command);
-    initCommandText.push(...cmd.output.map((out) => out.message));
-  }
-  initCommandText.push("prompt");
-  initCommandText.push("prompt");
   return (
     <div
-      className="relative p-4 bg-base-300 min-h-32"
+      className="relative p-4 bg-base-300 min-h-32 h-max"
       onClick={() => {
         if (
           !runtimeInitializing &&
@@ -341,30 +365,27 @@ export function TerminalComponent(props: TerminalComponentProps) {
       {runtimeInitializing && (
         <div className="absolute z-10 inset-0 cursor-wait" />
       )}
-      <div
-        className="absolute top-4 left-4 bottom-0 right-4"
-        ref={terminalRef}
-      />
-      {/* preタグにinitialCommandの内容を入れることで、
-      divのサイズをinitialCommand全体が収まるサイズにし、
-      Terminalのサイズをそれに合わせている。
-      しかし日本語が含まれている場合preでの表示サイズとTerminal内の表示サイズが合わないので、たぶんずれる
-      文字数をカウントして行数を計算したほうが良さそう (TODO)
-
-      サイズの誤差を軽減するためにbottom-4ではなくbottom-0にしている
-      (Xtermjsはサイズが行の高さの倍数でない場合余った部分は無視するっぽい)
-       */}
-      <pre
-        className="invisible relative z-10 break-all overflow-hidden"
-        style={{
-          /* Xtermjsの表示と同じ幅、高さになるよう調整 (Xtermjsの指定はCSSと基準が違うっぽい?) */
-          fontSize: 14,
-          lineHeight: 1.44,
-          letterSpacing: "0.01em",
-        }}
-      >
-        {initCommandText.join("\n")}
-      </pre>
+      <div ref={terminalRef} />
     </div>
   );
+}
+
+/**
+ * 文字列の幅を計算する。
+ * 厳密にやるなら @xterm/xterm/src/common/input/UnicodeV6.ts を使うとよさそう
+ * (しかしそれをimportしても動かなかった)
+ *
+ * とりあえず日本語と英数を最低限区別するでっち上げ実装にしている
+ *
+ */
+function strWidth(str: string): number {
+  let len: number = 0;
+  for (const char of str) {
+    if (char.charCodeAt(0) < 0x2000) {
+      len += 1;
+    } else {
+      len += 2;
+    }
+  }
+  return len;
 }
