@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
@@ -135,7 +135,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
       cursorInactiveStyle: "none",
       fontSize: 14,
       lineHeight: 1.4,
-      letterSpacing: -1,
+      letterSpacing: -3,
       fontFamily: "var(--default-mono-font-family)",
       theme: {
         // DaisyUIの変数を使用してテーマを設定している
@@ -173,9 +173,14 @@ export function TerminalComponent(props: TerminalComponentProps) {
 
     renderInitCommand.current();
     setTermReady(true);
-    // TODO: ターミナルのサイズ変更に対応する
+
+    const observer = new ResizeObserver(() => {
+      fitAddon.fit();
+    });
+    observer.observe(terminalRef.current);
 
     return () => {
+      observer.disconnect();
       term.dispose();
       terminalInstanceRef.current = null;
     };
@@ -331,14 +336,26 @@ export function TerminalComponent(props: TerminalComponentProps) {
       {runtimeInitializing && (
         <div className="absolute z-10 inset-0 cursor-wait" />
       )}
-      <div className="absolute top-4 bottom-0 inset-x-4" ref={terminalRef} />
+      <div
+        className="absolute top-4 left-4 bottom-0 right-4"
+        ref={terminalRef}
+      />
+      {/* preタグにinitialCommandの内容を入れることで、
+      divのサイズをinitialCommand全体が収まるサイズにし、
+      Terminalのサイズをそれに合わせている。
+      しかし日本語が含まれている場合preでの表示サイズとTerminal内の表示サイズが合わないので、たぶんずれる
+      文字数をカウントして行数を計算したほうが良さそう (TODO)
+
+      サイズの誤差を軽減するためにbottom-4ではなくbottom-0にしている
+      (Xtermjsはサイズが行の高さの倍数でない場合余った部分は無視するっぽい)
+       */}
       <pre
         className="invisible relative z-10 break-all overflow-hidden"
         style={{
           /* Xtermjsの表示と同じ幅、高さになるよう調整 (Xtermjsの指定はCSSと基準が違うっぽい?) */
           fontSize: 14,
           lineHeight: 1.44,
-          letterSpacing: "0.025em",
+          letterSpacing: "0.01em",
         }}
       >
         {initCommandText.join("\n")}

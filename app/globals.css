@@ -1,13 +1,13 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* fira-code-latin-wght-normal */
+/* inconsolata-latin-wght-normal */
 @font-face {
-  font-family: "Fira Code Variable";
+  font-family: "Inconsolata Variable";
   font-style: normal;
   font-display: swap;
-  font-weight: 300 700;
-  src: url(https://cdn.jsdelivr.net/fontsource/fonts/fira-code:vf@latest/latin-wght-normal.woff2)
+  font-weight: 200 900;
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/inconsolata:vf@latest/latin-wght-normal.woff2)
     format("woff2-variations");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
@@ -16,5 +16,5 @@
 }
 
 @theme {
-  --font-mono: "Fira Code Variable", monospace;
+  --font-mono: "Inconsolata Variable", monospace;
 }
