@@ -7,16 +7,42 @@ const nothing = (text: string): string => text;
 
 // PrismのトークンクラスとANSIコードをマッピング
 const prismToAnsi: Record<string, (text: string) => string> = {
-  keyword: chalk.bold.cyan,
-  function: chalk.bold.yellow,
-  string: chalk.green,
-  number: chalk.yellow,
-  boolean: chalk.yellow,
+  //
   comment: chalk.dim,
+  prolog: chalk.dim,
+  cdata: chalk.dim,
+  doctype: chalk.dim,
+  punctuation: chalk.dim,
+  entity: chalk.dim,
+  //
+  keyword: chalk.magenta,
   operator: chalk.magenta,
-  punctuation: nothing,
-  "class-name": chalk.bold.blue,
-  // 必要に応じて他のトークンも追加
+  //
+  builtin: chalk.cyan,
+  url: chalk.cyan,
+  //
+  "attr-name": chalk.blue,
+  "class-name": chalk.blue,
+  variable: chalk.blue,
+  function: chalk.blue,
+  //
+  boolean: chalk.yellow,
+  constant: chalk.yellow,
+  number: chalk.yellow,
+  atrule: chalk.yellow,
+  //
+  property: chalk.red,
+  tag: chalk.red,
+  symbol: chalk.red,
+  deleted: chalk.red,
+  important: chalk.red,
+  //
+  selector: chalk.green,
+  string: chalk.green,
+  char: chalk.green,
+  inserted: chalk.green,
+  regex: chalk.green,
+  "attr-value": chalk.green,
 };
 
 /**
@@ -45,15 +71,23 @@ export function highlightCodeToAnsi(code: string, language: string): string {
 
     // 要素ノード(<span>)の場合
     if (node.nodeType === Node.ELEMENT_NODE) {
-      const tokenType = (node as Element).className.replace("token ", "");
-      if (!(tokenType in prismToAnsi)) {
-        console.warn(`Unknown token type: ${tokenType}`);
+      const tokenTypes = (node as Element).className
+        .replace("token ", "")
+        .split(" ");
+      let highlight: ((text: string) => string) | undefined = undefined;
+      for (const tokenType of tokenTypes) {
+        // トークンタイプに対応するANSIコードを取得
+        if (tokenType in prismToAnsi) {
+          highlight = prismToAnsi[tokenType];
+          break; // 最初に見つかったものを使用
+        }
       }
-      const withHighlight: (text: string) => string =
-        prismToAnsi[tokenType] ?? nothing;
+      if (!highlight) {
+        console.warn(`Unknown token type: ${tokenTypes}`);
+      }
 
       // 子ノードを再帰的に処理
-      return withHighlight(
+      return (highlight || nothing)(
         Array.from(node.childNodes).reduce(
           (acc, child) => acc + traverseNodes(child),
           ""

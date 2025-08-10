@@ -37,6 +37,9 @@ export function TerminalComponent(props: TerminalComponentProps) {
 
   // ターミナルの初期化処理
   useEffect(() => {
+    const fromCSS = (varName: string) =>
+      window.getComputedStyle(document.body).getPropertyValue(varName);
+    // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
     const term = new Terminal({
       cursorBlink: true,
       convertEol: true,
@@ -45,12 +48,27 @@ export function TerminalComponent(props: TerminalComponentProps) {
       theme: {
         // DaisyUIの変数を使用してテーマを設定している
         // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
-        // TODO: red, green, blueなどの色も設定する
-        background: window.getComputedStyle(document.body).getPropertyValue("--color-base-300"),
-        foreground: window.getComputedStyle(document.body).getPropertyValue("--color-base-content"),
-        cursor: window.getComputedStyle(document.body).getPropertyValue("--color-base-content"),
-        selectionBackground: window.getComputedStyle(document.body).getPropertyValue("--color-primary"),
-        selectionForeground: window.getComputedStyle(document.body).getPropertyValue("--color-primary-content"),
+        background: fromCSS("--color-base-300"),
+        foreground: fromCSS("--color-base-content"),
+        cursor: fromCSS("--color-base-content"),
+        selectionBackground: fromCSS("--color-primary"),
+        selectionForeground: fromCSS("--color-primary-content"),
+        black: fromCSS("--color-black"),
+        brightBlack: fromCSS("--color-neutral-500"),
+        red: fromCSS("--color-red-600"),
+        brightRed: fromCSS("--color-red-400"),
+        green: fromCSS("--color-green-600"),
+        brightGreen: fromCSS("--color-green-400"),
+        yellow: fromCSS("--color-yellow-700"),
+        brightYellow: fromCSS("--color-yellow-400"),
+        blue: fromCSS("--color-indigo-600"),
+        brightBlue: fromCSS("--color-indigo-400"),
+        magenta: fromCSS("--color-fuchsia-600"),
+        brightMagenta: fromCSS("--color-fuchsia-400"),
+        cyan: fromCSS("--color-cyan-600"),
+        brightCyan: fromCSS("--color-cyan-400"),
+        white: fromCSS("--color-base-100"),
+        brightWhite: fromCSS("--color-white"),
       },
     });
     terminalInstanceRef.current = term;
