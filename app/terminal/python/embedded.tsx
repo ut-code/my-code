@@ -6,11 +6,13 @@ import { usePyodide } from "./pyodide";
 
 export function PythonEmbeddedTerminal({ content }: { content: string }) {
   const initCommands = useMemo(() => splitContents(content), [content]);
-  const { isPyodideReady, runPython, checkSyntax } = usePyodide();
+  const { init, initializing, ready, runPython, checkSyntax } = usePyodide();
 
   return (
     <TerminalComponent
-      ready={isPyodideReady}
+      initRuntime={init}
+      runtimeInitializing={initializing}
+      runtimeReady={ready}
       initCommand={initCommands}
       prompt=">>> "
       promptMore="... "

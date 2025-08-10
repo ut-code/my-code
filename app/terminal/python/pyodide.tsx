@@ -4,7 +4,6 @@
 import { type PyodideAPI } from "pyodide";
 import {
   useState,
-  useEffect,
   useRef,
   useCallback,
   ReactNode,
@@ -21,7 +20,8 @@ declare global {
 
 interface IPyodideContext {
   init: () => void;
-  isPyodideReady: boolean;
+  initializing: boolean;
+  ready: boolean;
   runPython: (code: string) => Promise<TerminalOutput[]>;
   checkSyntax: (code: string) => Promise<SyntaxStatus>;
 }
@@ -52,17 +52,17 @@ __check_syntax()
 
 export function PyodideProvider({ children }: { children: ReactNode }) {
   const pyodideRef = useRef<PyodideAPI>(null);
-  const [isPyodideReady, setIsPyodideReady] = useState<boolean>(false);
+  const [ready, setReady] = useState<boolean>(false);
+  const [initializing, setInitializing] = useState<boolean>(false);
   const pyodideOutput = useRef<TerminalOutput[]>([]);
-  const initRunning = useRef<boolean>(false);
 
   const init = useCallback(() => {
     // next.config.ts 内でpyodideをimportし、バージョンを取得している
     const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${process.env.PYODIDE_VERSION}/full/`;
 
     const initPyodide = () => {
-      if (initRunning.current) return; // 重複実行を防ぐ
-      initRunning.current = true;
+      if(initializing) return;
+      setInitializing(true);
       window
         .loadPyodide({
           indexURL: PYODIDE_CDN,
@@ -82,7 +82,8 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
             },
           });
 
-          setIsPyodideReady(true);
+          setReady(true);
+          setInitializing(false);
         });
     };
 
@@ -104,12 +105,12 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         document.body.removeChild(script);
       };
     }
-  }, []);
+  }, [initializing]);
 
   const runPython = useCallback<(code: string) => Promise<TerminalOutput[]>>(
     async (code: string) => {
       const pyodide = pyodideRef.current;
-      if (!pyodide || !isPyodideReady) {
+      if (!pyodide || !ready) {
         return [{ type: "error", message: "Pyodide is not ready yet." }];
       }
       try {
@@ -156,7 +157,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
       pyodideOutput.current = []; // 出力をクリア
       return output;
     },
-    [isPyodideReady]
+    [ready]
   );
 
   /**
@@ -165,9 +166,10 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
   const checkSyntax = useCallback<(code: string) => Promise<SyntaxStatus>>(
     async (code) => {
       const pyodide = pyodideRef.current;
-      if (!pyodide || !isPyodideReady) return "invalid";
+      if (!pyodide || !ready) return "invalid";
 
       // グローバルスコープにチェック対象のコードを渡す
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).__code_to_check = code;
       try {
         // Pythonのコードを実行して結果を受け取る
@@ -178,14 +180,15 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         return "invalid";
       }
     },
-    [isPyodideReady]
+    [ready]
   );
 
   return (
     <PyodideContext.Provider
       value={{
         init,
-        isPyodideReady,
+        initializing,
+        ready,
         runPython,
         checkSyntax,
       }}
@@ -200,10 +203,11 @@ export function usePyodide() {
   if (!context) {
     throw new Error("usePyodide must be used within a PyodideProvider");
   }
-  useEffect(() => {
-    // Pyodideの初期化を行う
-    context.init();
-  }, [context]);
+  // 初期化は読み込み時と別でTerminal側からinitを呼ぶ
+  // useEffect(() => {
+  //   // Pyodideの初期化を行う
+  //   context.init();
+  // }, [context]);
 
   return context;
 }

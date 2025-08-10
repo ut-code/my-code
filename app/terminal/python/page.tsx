@@ -4,11 +4,13 @@ import { TerminalComponent } from "../terminal";
 import { usePyodide } from "./pyodide";
 
 export default function PythonPage() {
-  const { isPyodideReady, runPython, checkSyntax } = usePyodide();
+  const { init, ready, initializing, runPython, checkSyntax } = usePyodide();
   return (
     <div className="p-4">
       <TerminalComponent
-        ready={isPyodideReady}
+        initRuntime={init}
+        runtimeInitializing={initializing}
+        runtimeReady={ready}
         initMessage="Welcome to Pyodide Terminal!"
         prompt=">>> "
         promptMore="... "

@@ -14,7 +14,9 @@ export interface TerminalOutput {
 export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
 interface TerminalComponentProps {
-  ready: boolean;
+  initRuntime: () => void;
+  runtimeInitializing: boolean;
+  runtimeReady: boolean;
   initMessage?: string; // ターミナル初期化時のメッセージ
   initCommand?: { command: string; output: TerminalOutput[] }[]; // 初期化時に実行するコマンドとその出力
   prompt: string; // プロンプト文字列
@@ -33,8 +35,17 @@ export function TerminalComponent(props: TerminalComponentProps) {
   const [termReady, setTermReady] = useState<boolean>(false);
   const inputBuffer = useRef<string[]>([]);
 
-  const { prompt, promptMore, language, tabSize, sendCommand, checkSyntax } =
-    props;
+  const {
+    initRuntime,
+    runtimeInitializing,
+    runtimeReady,
+    prompt,
+    promptMore,
+    language,
+    tabSize,
+    sendCommand,
+    checkSyntax,
+  } = props;
 
   // bufferを更新し、画面に描画する
   const updateBuffer = useCallback(
@@ -162,7 +173,6 @@ export function TerminalComponent(props: TerminalComponentProps) {
 
     renderInitCommand.current();
     setTermReady(true);
-    // TODO: loadingメッセージ
     // TODO: ターミナルのサイズ変更に対応する
 
     return () => {
@@ -176,11 +186,12 @@ export function TerminalComponent(props: TerminalComponentProps) {
     if (
       terminalInstanceRef.current &&
       termReady &&
-      props.ready &&
+      runtimeReady &&
       !initDone.current
     ) {
       initDone.current = true;
       if (props.initMessage) {
+        terminalInstanceRef.current!.clear();
         terminalInstanceRef.current.writeln(props.initMessage);
       }
       (async () => {
@@ -210,7 +221,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
       })();
     }
   }, [
-    props.ready,
+    runtimeReady,
     termReady,
     props.initMessage,
     updateBuffer,
@@ -287,7 +298,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
     [updateBuffer, sendCommand, onOutput, checkSyntax, tabSize]
   );
   useEffect(() => {
-    if (terminalInstanceRef.current && termReady && props.ready) {
+    if (terminalInstanceRef.current && termReady && runtimeReady) {
       // キー入力のハンドリング
       const onDataHandler = terminalInstanceRef.current.onData(keyHandler);
 
@@ -296,7 +307,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
         onDataHandler.dispose();
       };
     }
-  }, [keyHandler, termReady, props.ready]);
+  }, [keyHandler, termReady, runtimeReady]);
 
   const initCommandText: string[] = [];
   for (const cmd of props.initCommand || []) {
@@ -306,7 +317,20 @@ export function TerminalComponent(props: TerminalComponentProps) {
   initCommandText.push("prompt");
   initCommandText.push("prompt");
   return (
-    <div className="relative p-4 bg-base-300 min-h-32">
+    <div
+      className="relative p-4 bg-base-300 min-h-32"
+      onClick={() => {
+        if (!runtimeReady && terminalInstanceRef.current && termReady) {
+          initRuntime();
+          terminalInstanceRef.current.write(
+            chalk.dim.bold.italic("(初期化しています...しばらくお待ちください)")
+          );
+        }
+      }}
+    >
+      {runtimeInitializing && (
+        <div className="absolute z-10 inset-0 cursor-wait" />
+      )}
       <div className="absolute top-4 bottom-0 inset-x-4" ref={terminalRef} />
       <pre
         className="invisible relative z-10 break-all overflow-hidden"
