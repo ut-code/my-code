@@ -10,6 +10,7 @@ export function ChatForm() {
   const [inputValue, setInputValue] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,111 +43,38 @@ export function ChatForm() {
   };
   return (
     <>
-      <style jsx>{`
-        /* 簡単なCSSで見た目を整える（オプション） */
-        .form-container {
-          background-color: white;
-          border-radius: 10px;
-          box-shadow: 0 4px 8px rgba(67, 204, 216, 0.86);
-          padding: 20px;
-          width: 90%;
-          max-width: 1000px;
-          display: flex;
-          flex-direction: column;
-        }
-        .input-area {
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          padding: 5px 15 px;
-          margin-bottom: 15px;
-          min-height: 150px; /* 入力欄の高さ */
-          display: flex;
-        }
-        .text-input {
-          border: none;
-          outline: none;
-          flex-grow: 1;
-          font-size: 16px;
-          resize: none; /* テキストエリアのリサイズを無効化 */
-          overflow: auto;
-          padding: 10px;
-        }
-        .controls {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-        .left-icons button {
-          background: none;
-          border: none;
-          font-size: 24px;
-          cursor: pointer;
-          color: #555;
-          margin-right: 15px;
-          padding: 5px;
-        }
-        .left-icons button:hover {
-          color: #000;
-        }
-        .left-icons span {
-          font-size: 14px;
-          vertical-align: middle;
-          margin-left: 5px;
-          color: #555;
-        }
-        .right-controls {
-          display: flex;
-          align-items: center;
-        }
-        .voice-icon button {
-          background: none;
-          border: none;
-          font-size: 24px;
-          cursor: pointer;
-          color: #555;
-          margin-right: 15px;
-          padding: 5px;
-        }
-        .voice-icon button:hover {
-          color: #000;
-        }
-        .send-button {
-          background-color: #007bff; /* 青色の送信ボタン */
-          color: white;
-          border: none;
-          border-radius: 50%; /* 丸いボタン */
-          width: 40px;
-          height: 40px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-size: 20px;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          transition: background-color 0.3s ease;
-        }
-        .send-button:hover {
-          background-color: #0056b3;
-        }
-      `}</style>
-
-      <form className="form-container" onSubmit={handleSubmit}>
-        <div className="input-area">
+      {isFormVisible && (
+      <form className="border border-2 border-primary shadow-xl p-6 rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
+        <h2 className="text-xl font-bold mb-4 text-left relative -top-2 font-mono h-2">
+          AIへ質問
+        </h2>
+        <div className="input-area" style={{height:"80px"}}>
           <textarea
-            className="text-input"
+            className="textarea textarea-white textarea-md"
             placeholder="質問を入力してください"
+            style={{width: "100%", height: "110px", resize: "none"}}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             disabled={isLoading}
           ></textarea>
         </div>
-        <div className="controls">
-          <div className="left-icons"></div>
+        <br />
+        <div className="controls" style={{position:"relative", top:"22px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+          <div className="left-icons">
+            <button 
+              className="btn btn-soft btn-secondary rounded-full"
+              onClick={() => setIsFormVisible(false)}
+            >
+
+              閉じる
+            </button>
+          </div>
           <div className="right-controls">
             <button
               type="submit"
-              className="send-button"
+              className="btn btn-soft btn-circle btn-primary rounded-full"
               title="送信"
+              style={{marginTop:"10px"}}
               disabled={isLoading}
             >
               <span className="icon">➤</span>
@@ -154,7 +82,33 @@ export function ChatForm() {
           </div>
         </div>
       </form>
-      {response && <div className="response-container">{response}</div>}
+      )}
+      {!isFormVisible && (
+      <button 
+        className="btn btn-soft btn-secondary rounded-full"
+        onClick={() => setIsFormVisible(true)}
+      >
+        チャットを開く
+      </button>
+      )}
+
+      {response && (
+        <article>
+          <h3 className="text-lg font-semibold mb-2">AIの回答</h3>
+          <div className="chat chat-start">
+            <div className="chat-bubble chat-bubble-primary">
+               <div className="response-container">{response}</div>
+            </div>
+          </div>
+        </article>
+      )}
+
+      {isLoading && (
+      <div className="mt-2 text-l text-gray-500 animate-pulse">
+        AIが考え中です…
+      </div>
+      )}
+
     </>
   );
 }
