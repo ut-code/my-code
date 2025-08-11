@@ -10,6 +10,7 @@ export function ChatForm() {
   const [inputValue, setInputValue] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,8 +43,11 @@ export function ChatForm() {
   };
   return (
     <>
-      <form className="border border-2 border-primary shadow-xl p-6 rounded-lg bg-base-100" style={{width:"70%", textAlign:"center", boxShadow:"-moz-initial", position:"fixed", bottom:"10px", marginLeft:"20px"}} onSubmit={handleSubmit}>
-        <h2 className="text-xl font-bold mb-4"　style={{textAlign:"left", position:"relative", bottom:"10px", fontFamily:"monospace", height:"10px"}}>AIへ質問</h2>
+      {isFormVisible && (
+      <form className="border border-2 border-primary shadow-xl p-6 rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
+        <h2 className="text-xl font-bold mb-4 text-left relative -top-2 font-mono h-2">
+          AIへ質問
+        </h2>
         <div className="input-area" style={{height:"80px"}}>
           <textarea
             className="textarea textarea-white textarea-md"
@@ -54,12 +58,21 @@ export function ChatForm() {
             disabled={isLoading}
           ></textarea>
         </div>
+        <br />
         <div className="controls" style={{position:"relative", top:"22px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
-          <div className="left-icons"></div>
+          <div className="left-icons">
+            <button 
+              className="btn btn-soft btn-secondary rounded-full"
+              onClick={() => setIsFormVisible(false)}
+            >
+
+              閉じる
+            </button>
+          </div>
           <div className="right-controls">
             <button
               type="submit"
-              className="btn btn-soft btn-primary rounded-full"
+              className="btn btn-soft btn-circle btn-primary rounded-full"
               title="送信"
               style={{marginTop:"10px"}}
               disabled={isLoading}
@@ -69,7 +82,33 @@ export function ChatForm() {
           </div>
         </div>
       </form>
-      {response && <div className="response-container">{response}</div>}
+      )}
+      {!isFormVisible && (
+      <button 
+        className="btn btn-soft btn-secondary rounded-full"
+        onClick={() => setIsFormVisible(true)}
+      >
+        チャットを開く
+      </button>
+      )}
+
+      {response && (
+        <article>
+          <h3 className="text-lg font-semibold mb-2">AIの回答</h3>
+          <div className="chat chat-start">
+            <div className="chat-bubble chat-bubble-primary">
+               <div className="response-container">{response}</div>
+            </div>
+          </div>
+        </article>
+      )}
+
+      {isLoading && (
+      <div className="mt-2 text-l text-gray-500 animate-pulse">
+        AIが考え中です…
+      </div>
+      )}
+
     </>
   );
 }
