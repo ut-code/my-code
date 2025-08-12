@@ -1,7 +1,8 @@
 "use client";
 
 import { EditorComponent } from "../editor";
-import { TerminalComponent } from "../terminal";
+import { ExecFile } from "../exec";
+import { ReplTerminal } from "../repl";
 import { usePyodide } from "./pyodide";
 
 export default function PythonPage() {
@@ -9,7 +10,7 @@ export default function PythonPage() {
     usePyodide();
   return (
     <div className="p-4 flex flex-col gap-4">
-      <TerminalComponent
+      <ReplTerminal
         initRuntime={init}
         runtimeInitializing={initializing}
         runtimeReady={ready}
@@ -28,6 +29,7 @@ export default function PythonPage() {
         filename="main.py"
         initContent="print('hello, world!')"
       />
+      <ExecFile filename="main.py" language="python" content="" />
     </div>
   );
 }

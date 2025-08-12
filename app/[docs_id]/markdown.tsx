@@ -1,9 +1,10 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { PythonEmbeddedTerminal, PythonExecFile } from "../terminal/python/embedded";
+import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 import { Heading } from "./section";
 import { EditorComponent } from "../terminal/editor";
+import { ExecFile } from "../terminal/exec";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -36,9 +37,11 @@ const components: Components = {
   hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => {
-    const match = /^language-(\w+)(-repl|-exec)?\:?(.+)?$/.exec(className || "");
+    const match = /^language-(\w+)(-repl|-exec)?\:?(.+)?$/.exec(
+      className || ""
+    );
     if (match) {
-      if(match[2] === "-exec" && match[3]) {
+      if (match[2] === "-exec" && match[3]) {
         /*
         ```python-exec:main.py
         hello, world!
@@ -49,18 +52,16 @@ const components: Components = {
           hello, world!
         ---------------------------
         */
-        switch(match[1]){
-          case "python":
-            return (
-              <div className="border border-primary m-2 rounded-lg">
-                <PythonExecFile filename={match[3]} content={String(props.children).replace(/\n$/, "")} />
-              </div>
-            );
-          default:
-            console.warn(`Unsupported language for exec: ${match[1]}`);
-            break;
-        }
-      }else if (match[3]) {
+        return (
+          <div className="border border-primary m-2 rounded-lg">
+            <ExecFile
+              language={match[1]}
+              filename={match[3]}
+              content={String(props.children).replace(/\n$/, "")}
+            />
+          </div>
+        );
+      } else if (match[3]) {
         // ファイル名指定がある場合、ファイルエディター
         // 現状はPythonのみ対応
         switch (match[1]) {
@@ -79,7 +80,7 @@ const components: Components = {
             console.warn(`Unsupported language for editor: ${match[1]}`);
             break;
         }
-      }else if (match[2] === "-repl") {
+      } else if (match[2] === "-repl") {
         // repl付きの言語指定
         // 現状はPythonのみ対応
         switch (match[1]) {

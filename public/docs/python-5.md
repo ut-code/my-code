@@ -30,7 +30,7 @@
 
     すると、画面に以下のように出力されるはずです。
 
-    ```
+    ```python-exec:hello.py
     Hello, Python Script!
     2 + 3 = 5
     ```
@@ -91,7 +91,6 @@
     まず、便利な関数をまとめた `utils.py` というファイルを作成します。
 
     ```python:utils.py
-
     def say_hello(name):
         """指定された名前で挨拶を返す"""
         return f"Hello, {name}!"
@@ -110,6 +109,12 @@
         print(f"Average: {avg}")
     ```
 
+    ```python-exec:utils.py
+    This is a utility module.
+    Hello, World!
+    Average: 20.0
+    ```
+
     > **`if __name__ == "__main__":` の重要性**
     > この記述はPythonの定型句です。
 
@@ -121,16 +126,20 @@
     次に、`utils.py` と同じディレクトリに `main.py` を作成し、`utils` モジュールをインポートして使います。
 
     ```python:main.py
-
     # 自作のutilsモジュールをインポート
     import utils
 
     greeting = utils.say_hello("Alice")
-    print(greeting) # => Hello, Alice!
+    print(greeting)
 
     scores = [88, 92, 75, 100]
     average_score = utils.get_list_average(scores)
-    print(f"Your average score is: {average_score}") # => Your average score is: 88.75
+    print(f"Your average score is: {average_score}")
+    ```
+
+    ```python-exec:main.py
+    Hello, Alice!
+    Your average score is: 88.75
     ```
 
 このように、機能ごとにファイルを分割することで、コードの見通しが良くなり、再利用も簡単になります。
@@ -161,8 +170,7 @@ my_project/
 
 `main.py` からこれらのモジュールをインポートするには、`パッケージ名.モジュール名` のように記述します。
 
-```python:main.py
-
+```python
 # パッケージ内のモジュールをインポート
 from my_app import services
 
@@ -200,7 +208,7 @@ class date(builtins.object)
  |  date(year, month, day) --> a date object
  |
  |  Methods defined here:
-... (ヘルプ情報が続く) ...
+(ヘルプ情報が続く) ...
 ```
 
 ### よく使われる標準ライブラリの例

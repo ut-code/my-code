@@ -21,9 +21,9 @@ export default function RootLayout({
           <input id="drawer-toggle" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col">
             <Navbar />
-            <PyodideProvider>
-              <FileProvider>{children}</FileProvider>
-            </PyodideProvider>
+            <FileProvider>
+              <PyodideProvider>{children}</PyodideProvider>
+            </FileProvider>
           </div>
           <div className="drawer-side shadow-md">
             <label

@@ -1,35 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
-import { TerminalComponent, TerminalOutput } from "../terminal";
+import { ReplTerminal, ReplOutput } from "../repl";
 import { usePyodide } from "./pyodide";
-import { useFile } from "../file";
-
-interface ExecProps {
-  filename: string;
-  content: string;
-}
-export function PythonExecFile(props: ExecProps){
-  const {files} = useFile();
-
-  return <>
-    <div>
-      <button className="btn btn-soft btn-primary">
-        ▶ 実行
-      </button>
-      <code className="text-sm">
-        python {props.filename}
-      </code>
-    </div>
-  </>
-}
 
 export function PythonEmbeddedTerminal({ content }: { content: string }) {
   const initCommands = useMemo(() => splitContents(content), [content]);
   const { init, initializing, ready, runPython, checkSyntax, mutex } = usePyodide();
 
   return (
-    <TerminalComponent
+    <ReplTerminal
       initRuntime={init}
       runtimeInitializing={initializing}
       runtimeReady={ready}
@@ -47,8 +27,8 @@ export function PythonEmbeddedTerminal({ content }: { content: string }) {
 
 function splitContents(
   contents: string
-): { command: string; output: TerminalOutput[] }[] {
-  const initCommands: { command: string; output: TerminalOutput[] }[] = [];
+): { command: string; output: ReplOutput[] }[] {
+  const initCommands: { command: string; output: ReplOutput[] }[] = [];
   for (const line of contents.split("\n")) {
     if (line.startsWith(">>> ")) {
       // Remove the prompt from the command
