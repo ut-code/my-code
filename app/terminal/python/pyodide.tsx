@@ -11,6 +11,7 @@ import {
   useContext,
 } from "react";
 import { SyntaxStatus, TerminalOutput } from "../terminal";
+import { Mutex, MutexInterface } from "async-mutex";
 
 declare global {
   interface Window {
@@ -19,9 +20,12 @@ declare global {
 }
 
 interface IPyodideContext {
-  init: () => void;
-  initializing: boolean;
-  ready: boolean;
+  init: () => void; // Pyodideを初期化する
+  initializing: boolean; // Pyodideの初期化が実行中
+  ready: boolean; // Pyodideの初期化が完了した
+  // runPython() などを複数の場所から同時実行すると結果が混ざる。
+  // コードブロックの実行全体を mutex.runExclusive() で囲うことで同時実行を防ぐ必要がある
+  mutex: MutexInterface;
   runPython: (code: string) => Promise<TerminalOutput[]>;
   checkSyntax: (code: string) => Promise<SyntaxStatus>;
 }
@@ -55,13 +59,14 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState<boolean>(false);
   const [initializing, setInitializing] = useState<boolean>(false);
   const pyodideOutput = useRef<TerminalOutput[]>([]);
+  const mutex = useRef<MutexInterface>(new Mutex());
 
   const init = useCallback(() => {
     // next.config.ts 内でpyodideをimportし、バージョンを取得している
     const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${process.env.PYODIDE_VERSION}/full/`;
 
     const initPyodide = () => {
-      if(initializing) return;
+      if (initializing) return;
       setInitializing(true);
       window
         .loadPyodide({
@@ -109,6 +114,10 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
 
   const runPython = useCallback<(code: string) => Promise<TerminalOutput[]>>(
     async (code: string) => {
+      if (!mutex.current.isLocked()) {
+        throw new Error("mutex of PyodideContext must be locked for runPython");
+      }
+
       const pyodide = pyodideRef.current;
       if (!pyodide || !ready) {
         return [{ type: "error", message: "Pyodide is not ready yet." }];
@@ -165,6 +174,10 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
    */
   const checkSyntax = useCallback<(code: string) => Promise<SyntaxStatus>>(
     async (code) => {
+      if (mutex.current.isLocked()) {
+        throw new Error("mutex of PyodideContext must not be locked for checkSyntax");
+      }
+
       const pyodide = pyodideRef.current;
       if (!pyodide || !ready) return "invalid";
 
@@ -191,6 +204,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         ready,
         runPython,
         checkSyntax,
+        mutex: mutex.current,
       }}
     >
       {children}

@@ -6,6 +6,7 @@ import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { highlightCodeToAnsi } from "./highlight";
 import chalk from "chalk";
+import { MutexInterface } from "async-mutex";
 
 export interface TerminalOutput {
   type: "stdout" | "stderr" | "error" | "return"; // 出力の種類
@@ -23,6 +24,8 @@ interface TerminalComponentProps {
   promptMore?: string;
   language?: string;
   tabSize: number;
+  // コードブロックの実行全体を mutex.runExclusive() で囲うことで同時実行を防ぐ
+  mutex: MutexInterface;
   // コマンド実行時のコールバック関数
   sendCommand: (command: string) => Promise<TerminalOutput[]>;
   // 構文チェックのコールバック関数
@@ -45,6 +48,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
     tabSize,
     sendCommand,
     checkSyntax,
+    mutex,
   } = props;
 
   // bufferを更新し、画面に描画する
@@ -237,13 +241,15 @@ export function TerminalComponent(props: TerminalComponentProps) {
             command: string;
             output: TerminalOutput[];
           }[] = [];
-          for (const cmd of props.initCommand) {
-            const outputs = await sendCommand(cmd.command);
-            initCommandResult.push({
-              command: cmd.command,
-              output: outputs,
-            });
-          }
+          await mutex.runExclusive(async () => {
+            for (const cmd of props.initCommand!) {
+              const outputs = await sendCommand(cmd.command);
+              initCommandResult.push({
+                command: cmd.command,
+                output: outputs,
+              });
+            }
+          });
           // 実際の実行結果でターミナルを再描画
           terminalInstanceRef.current!.clear();
           for (const cmd of initCommandResult) {
@@ -264,6 +270,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
     onOutput,
     props.initCommand,
     sendCommand,
+    mutex,
   ]);
 
   const keyHandler = useCallback(
@@ -294,7 +301,9 @@ export function TerminalComponent(props: TerminalComponentProps) {
               terminalInstanceRef.current.writeln("");
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
-              const outputs = await sendCommand(command);
+              const outputs = await mutex.runExclusive(() =>
+                sendCommand(command)
+              );
               onOutput(outputs);
             }
           } else if (code === 127) {
@@ -331,7 +340,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
         }
       }
     },
-    [updateBuffer, sendCommand, onOutput, checkSyntax, tabSize]
+    [updateBuffer, sendCommand, onOutput, checkSyntax, tabSize, mutex]
   );
   useEffect(() => {
     if (terminalInstanceRef.current && termReady && runtimeReady) {
