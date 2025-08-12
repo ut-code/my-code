@@ -207,7 +207,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
       // fitAddon.fit();
       const dims = fitAddon.proposeDimensions();
       if (dims) {
-        const rows = getRowsOfInitCommand.current(dims.cols);
+        const rows = Math.max(5, getRowsOfInitCommand.current(dims.cols));
         term.resize(dims.cols, rows);
         setCurrentRows(rows);
       }
@@ -356,7 +356,7 @@ export function TerminalComponent(props: TerminalComponentProps) {
 
   return (
     <div
-      className="relative p-4 bg-base-300 min-h-32 h-max"
+      className="relative h-max"
       onClick={() => {
         if (
           !runtimeInitializing &&

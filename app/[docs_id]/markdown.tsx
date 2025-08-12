@@ -1,8 +1,9 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
+import { PythonEmbeddedTerminal, PythonExecFile } from "../terminal/python/embedded";
 import { Heading } from "./section";
+import { EditorComponent } from "../terminal/editor";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -32,52 +33,86 @@ const components: Components = {
   strong: ({ node, ...props }) => (
     <strong className="text-primary" {...props} />
   ),
+  hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
+  pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => {
-    const match = /^language-(\w+)(-repl)?\:?(.+)?$/.exec(className || "");
+    const match = /^language-(\w+)(-repl|-exec)?\:?(.+)?$/.exec(className || "");
     if (match) {
-      if (match[2]) {
+      if(match[2] === "-exec" && match[3]) {
+        /*
+        ```python-exec:main.py
+        hello, world!
+        ```
+        ↓
+        ---------------------------
+         [▶ 実行] `python main.py`
+          hello, world!
+        ---------------------------
+        */
+        switch(match[1]){
+          case "python":
+            return (
+              <div className="border border-primary m-2 rounded-lg">
+                <PythonExecFile filename={match[3]} content={String(props.children).replace(/\n$/, "")} />
+              </div>
+            );
+          default:
+            console.warn(`Unsupported language for exec: ${match[1]}`);
+            break;
+        }
+      }else if (match[3]) {
+        // ファイル名指定がある場合、ファイルエディター
+        // 現状はPythonのみ対応
+        switch (match[1]) {
+          case "python":
+            return (
+              <div className="border border-primary m-2 rounded-lg">
+                <EditorComponent
+                  language={match[1]}
+                  tabSize={4}
+                  filename={match[3]}
+                  initContent={String(props.children).replace(/\n$/, "")}
+                />
+              </div>
+            );
+          default:
+            console.warn(`Unsupported language for editor: ${match[1]}`);
+            break;
+        }
+      }else if (match[2] === "-repl") {
         // repl付きの言語指定
         // 現状はPythonのみ対応
         switch (match[1]) {
           case "python":
             return (
-              <PythonEmbeddedTerminal
-                content={String(props.children).replace(/\n$/, "")}
-              />
+              <div className="bg-base-300 border border-primary m-2 p-4 rounded-lg">
+                <PythonEmbeddedTerminal
+                  content={String(props.children).replace(/\n$/, "")}
+                />
+              </div>
             );
           default:
             console.warn(`Unsupported language for repl: ${match[1]}`);
-            return (
-              <SyntaxHighlighter
-                language={match[1]}
-                PreTag="div"
-                className="px-4! py-4! m-0! font-mono!"
-                // style={todo dark theme?}
-                {...props}
-              >
-                {String(props.children).replace(/\n$/, "")}
-              </SyntaxHighlighter>
-            );
+            break;
         }
-      } else {
-        return (
-          <SyntaxHighlighter
-            language={match[1]}
-            PreTag="div"
-            className="px-4! py-4! m-0! font-mono!"
-            // style={todo dark theme?}
-            {...props}
-          >
-            {String(props.children).replace(/\n$/, "")}
-          </SyntaxHighlighter>
-        );
       }
+      return (
+        <SyntaxHighlighter
+          language={match[1]}
+          PreTag="div"
+          className="border border-primary mx-2 my-2 rounded-lg text-sm! m-2! p-4! font-mono!"
+          // style={todo dark theme?}
+          {...props}
+        >
+          {String(props.children).replace(/\n$/, "")}
+        </SyntaxHighlighter>
+      );
     } else if (String(props.children).includes("\n")) {
       // 言語指定なしコードブロック
       return (
         <SyntaxHighlighter
           PreTag="div"
-          className="px-4! py-4! m-0! font-mono!"
+          className="border border-primary mx-2 my-2 rounded-lg text-sm! m-2! p-4! font-mono!"
           // style={todo dark theme?}
           {...props}
         >
@@ -94,11 +129,4 @@ const components: Components = {
       );
     }
   },
-  pre: ({ node, ...props }) => (
-    <pre
-      className="bg-base-200 border border-primary mx-2 my-2 rounded-lg text-sm overflow-x-auto"
-      {...props}
-    />
-  ),
-  hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
 };

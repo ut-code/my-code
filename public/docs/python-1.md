@@ -91,13 +91,7 @@ if __name__ == "__main__":
 
 このスクリプトを実行するには、ターミナルで以下のようにコマンドを入力します。
 
-```bash
-python hello.py
-```
-
-出力結果:
-
-```
+```python-exec:hello.py
 Hello from a Python script!
 ```
 

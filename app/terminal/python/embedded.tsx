@@ -3,6 +3,26 @@
 import { useMemo } from "react";
 import { TerminalComponent, TerminalOutput } from "../terminal";
 import { usePyodide } from "./pyodide";
+import { useFile } from "../file";
+
+interface ExecProps {
+  filename: string;
+  content: string;
+}
+export function PythonExecFile(props: ExecProps){
+  const {files} = useFile();
+
+  return <>
+    <div>
+      <button className="btn btn-soft btn-primary">
+        ▶ 実行
+      </button>
+      <code className="text-sm">
+        python {props.filename}
+      </code>
+    </div>
+  </>
+}
 
 export function PythonEmbeddedTerminal({ content }: { content: string }) {
   const initCommands = useMemo(() => splitContents(content), [content]);
