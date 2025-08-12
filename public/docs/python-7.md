@@ -17,7 +17,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
 
 <!-- end list -->
 
-```python
+```python-repl
 >>> # 'w' モードでファイルを開く（または新規作成する）
 >>> f = open('spam.txt', 'w', encoding='utf-8')
 >>> f
@@ -37,7 +37,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
 
 **`write()`** メソッドは、文字列をファイルに書き込みます。このメソッドは書き込んだ文字数を返します。
 
-```python
+```python-repl
 >>> f = open('test.txt', 'w', encoding='utf-8')
 >>> f.write('こんにちは、世界！\n')
 9
@@ -58,7 +58,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
 
 <!-- end list -->
 
-```python
+```python-repl
 >>> # 先ほど書き込んだファイルを読み込む
 >>> f = open('test.txt', 'r', encoding='utf-8')
 >>> content = f.read()
@@ -86,7 +86,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
 
 **`with`** 文のブロックを抜けると、ファイルオブジェクトは自動的に `close()` されます。エラーが発生した場合でも同様です。これは「コンテキストマネージャ」という仕組みによって実現されており、ファイル操作の標準的な方法です。
 
-```python
+```python-repl
 >>> # with文を使った書き込み
 >>> with open('spam.txt', 'w', encoding='utf-8') as f:
 ...     f.write('withブロックを使っています。\n')
@@ -118,7 +118,7 @@ withブロックを使っています。
 
 <!-- end list -->
 
-```python
+```python-repl
 >>> import json
 
 >>> # 書き込むデータ（Pythonの辞書）
@@ -156,7 +156,7 @@ withブロックを使っています。
 
 **`csv.writer()`** を使ってライターオブジェクトを作成し、**`writerow()`** (1行) や **`writerows()`** (複数行) メソッドでデータを書き込みます。
 
-```python
+```python-repl
 >>> import csv
 
 >>> # 書き込むデータ（リストのリスト）
@@ -178,7 +178,7 @@ withブロックを使っています。
 
 **`csv.reader()`** を使ってリーダーオブジェクトを作成します。このオブジェクトをループで回すことで、1行ずつリストとしてデータを取得できます。
 
-```python
+```python-repl
 >>> import csv
 
 >>> with open('scores.csv', 'r', newline='', encoding='-utf-8') as f:

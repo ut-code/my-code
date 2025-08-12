@@ -6,7 +6,7 @@
 
 Pythonの条件分岐は`if`、`elif`（else ifの略）、`else`を使って記述します。C言語やJavaのような波括弧`{}`は使わず、**コロン`:`とインデント（通常は半角スペース4つ）**でコードブロックを表現するのが最大の特徴です。
 
-```python
+```python-repl
 >>> score = 85
 >>> if score >= 90:
 ...     print('優')
@@ -22,7 +22,7 @@ Pythonの条件分岐は`if`、`elif`（else ifの略）、`else`を使って記
 
 条件式に`and`や`or`、`not`といった論理演算子も使用できます。
 
-```python
+```python-repl
 >>> temp = 25
 >>> is_sunny = True
 >>> if temp > 20 and is_sunny:
@@ -35,7 +35,7 @@ Pythonの条件分岐は`if`、`elif`（else ifの略）、`else`を使って記
 
 Pythonの`for`ループは、他の言語の`for (int i = 0; i < 5; i++)`といったカウンタ変数を使うスタイルとは少し異なります。リストやタプル、文字列などの**イテラブル（反復可能）オブジェクト**から要素を1つずつ取り出して処理を実行します。これは、Javaの拡張for文やC\#の`foreach`に似ています。
 
-```python
+```python-repl
 >>> fruits = ['apple', 'banana', 'cherry']
 >>> for fruit in fruits:
 ...     print(f"I like {fruit}")
@@ -49,7 +49,7 @@ I like cherry
 
 決まった回数のループを実行したい場合は、`range()`関数が便利です。`range(n)`は0からn-1までの連続した数値を生成します。
 
-```python
+```python-repl
 >>> for i in range(5):
 ...     print(i)
 ...
@@ -64,7 +64,7 @@ I like cherry
 
 ループ処理の中で、要素のインデックス（番号）と値の両方を使いたい場合があります。そのような時は`enumerate()`関数を使うと、コードが非常にスッキリします。これは非常にPythonらしい書き方の一つです。
 
-```python
+```python-repl
 >>> fruits = ['apple', 'banana', 'cherry']
 >>> for i, fruit in enumerate(fruits):
 ...     print(f"Index: {i}, Value: {fruit}")
@@ -78,7 +78,7 @@ Index: 2, Value: cherry
 
 `while`ループは、指定された条件が`True`である間、処理を繰り返します。ループを途中で抜けたい場合は`break`を、現在の回の処理をスキップして次の回に進みたい場合は`continue`を使用します。
 
-```python
+```python-repl
 >>> n = 0
 >>> while n < 5:
 ...     print(n)
@@ -95,7 +95,7 @@ Index: 2, Value: cherry
 
 関数は`def`キーワードを使って定義します。ここでもコードブロックはコロン`:`とインデントで示します。値は`return`キーワードで返します。
 
-```python
+```python-repl
 >>> def greet(name):
 ...     """指定された名前で挨拶を返す関数"""  # これはDocstringと呼ばれるドキュメント文字列です
 ...     return f"Hello, {name}!"
@@ -113,7 +113,7 @@ Pythonの関数は、非常に柔軟な引数の渡し方ができます。
 * **キーワード引数 (Keyword Arguments):** `引数名=値`の形式で渡します。順序を問わないため、可読性が向上します。
 * **デフォルト引数値 (Default Argument Values):** 関数を定義する際に引数にデフォルト値を設定できます。呼び出し時にその引数が省略されると、デフォルト値が使われます。
 
-```python
+```python-repl
 >>> def describe_pet(animal_type, pet_name, owner_name="Taro"):
 ...     print(f"私には {animal_type} がいます。")
 ...     print(f"名前は {pet_name} で、飼い主は {owner_name} です。")
@@ -145,7 +145,7 @@ Pythonの関数は、非常に柔軟な引数の渡し方ができます。
 
 任意の数の**位置引数**をタプルとして受け取ります。慣習的に`args`という名前が使われます。
 
-```python
+```python-repl
 >>> def sum_all(*numbers):
 ...     print(f"受け取ったタプル: {numbers}")
 ...     total = 0
@@ -165,7 +165,7 @@ Pythonの関数は、非常に柔軟な引数の渡し方ができます。
 
 任意の数の**キーワード引数**を辞書として受け取ります。慣習的に`kwargs` (keyword arguments) という名前が使われます。
 
-```python
+```python-repl
 >>> def print_profile(**user_info):
 ...     print(f"受け取った辞書: {user_info}")
 ...     for key, value in user_info.items():
@@ -184,7 +184,7 @@ city: Tokyo
 
 構文: `lambda 引数: 式`
 
-```python
+```python-repl
 # 通常の関数で2つの数を足す
 >>> def add(x, y):
 ...     return x + y

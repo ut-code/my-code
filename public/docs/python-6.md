@@ -8,7 +8,7 @@ Pythonでは、`class`キーワードを使ってクラスを定義します。J
 
 クラスを定義したら、関数を呼び出すように`クラス名()`と書くことで、そのクラスの**インスタンス**（オブジェクト）を生成できます。
 
-```python
+```python-repl
 >>> # 中身が何もない、最もシンプルなクラスを定義
 >>> class User:
 ...     pass
@@ -27,7 +27,7 @@ Pythonでは、`class`キーワードを使ってクラスを定義します。J
 
 `__init__`メソッドの最初の引数には、慣習的に`self`という名前を付けます。この`self`は、生成されるインスタンス自身を指す参照で、JavaやJavaScriptの`this`と同じ役割を果たします。`self`を通じて、インスタンスに固有のデータを格納する**インスタンス変数**を定義します。
 
-```python
+```python-repl
 >>> class Dog:
 ...     # インスタンス生成時に呼び出されるコンストラクタ
 ...     def __init__(self, name, age):
@@ -56,7 +56,7 @@ Pythonのクラスには2種類の変数があります。
 
 <!-- end list -->
 
-```python
+```python-repl
 >>> class Cat:
 ...     # このクラスから作られるインスタンス全てで共有されるクラス変数
 ...     species = "ネコ科"
@@ -94,7 +94,7 @@ Pythonのクラスには2種類の変数があります。
 
 メソッドを定義する際も、最初の引数には必ず`self`を指定する必要があります。これにより、メソッド内から`self`を通じてインスタンス変数にアクセスできます。
 
-```python
+```python-repl
 >>> class Dog:
 ...     def __init__(self, name):
 ...         self.name = name
@@ -119,7 +119,7 @@ Pythonでは`class 子クラス名(親クラス名):`という構文で継承を
 
 子クラスで親クラスのメソッドを上書き（**オーバーライド**）したり、`super()`関数を使って親クラスのメソッドを呼び出したりすることもできます。特に、子クラスの`__init__`で親クラスの`__init__`を呼び出すのは一般的なパターンです。
 
-```python
+```python-repl
 >>> # 親クラス
 >>> class Animal:
 ...     def __init__(self, name):
@@ -172,7 +172,7 @@ Animalの__init__が呼ばれました
 
 <!-- end list -->
 
-```python
+```python-repl
 >>> class Person:
 ...     def __init__(self, name, age):
 ...         self.name = name

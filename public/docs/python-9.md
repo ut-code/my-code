@@ -13,7 +13,7 @@ Pythonの`for`ループは非常にシンプルで強力ですが、その裏側
 
 REPLで動きを見てみましょう。`iter()`関数でイテレータを取得し、`next()`関数で要素を取り出します。
 
-```python
+```python-repl
 >>> my_list = [1, 2, 3]
 >>> my_iterator = iter(my_list)
 >>> type(my_iterator)
@@ -45,7 +45,7 @@ StopIteration
 
 フィボナッチ数列を生成するジェネレータの例を見てみましょう。
 
-```python
+```python-repl
 >>> def fib_generator(n):
 ...     a, b = 0, 1
 ...     count = 0
@@ -86,7 +86,7 @@ StopIteration
 
 リスト内包表記はリストオブジェクトを生成するため、要素数が多いとメモリを大量に消費します。一方、ジェネレータ式はジェネレータオブジェクトを返すため、遅延評価（必要になるまで計算しない）が行われ、メモリ使用量を抑えられます。
 
-```python
+```python-repl
 # リスト内包表記
 >>> list_comp = [i * 2 for i in range(5)]
 >>> list_comp
@@ -127,7 +127,7 @@ StopIteration
 
 関数の実行前後にメッセージを表示する簡単なデコレータを見てみましょう。
 
-```python
+```python-repl
 >>> def my_decorator(func):
 ...     def wrapper():
 ...         print("--- 処理を開始します ---")
@@ -150,7 +150,7 @@ StopIteration
 
 この書き方をより簡単にするための構文が `@`（アットマーク）、シンタックスシュガーです。
 
-```python
+```python-repl
 >>> @my_decorator
 ... def say_goodbye():
 ...     print("さようなら！")

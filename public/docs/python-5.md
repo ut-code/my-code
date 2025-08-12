@@ -14,8 +14,7 @@
 1.  **ファイルの作成**:
     お使いのテキストエディタ（VS Code、サクラエディタ、メモ帳など何でも構いません）を開き、以下のコードを記述してください。そして、`hello.py` という名前で保存します。ファイルの拡張子は必ず `.py` にしてください。
 
-    ```python
-    # hello.py
+    ```python:hello.py
     message = "Hello, Python Script!"
     print(message)
     print(f"2 + 3 = {2 + 3}")
@@ -47,7 +46,7 @@
 
 モジュールを利用するには `import` 文を使います。Pythonには多くの便利なモジュールが標準で用意されています（これらを**標準ライブラリ**と呼びます）。例えば、数学的な計算を行う `math` モジュールをREPLで使ってみましょう。
 
-```python
+```python-repl
 >>> # mathモジュールをインポート
 >>> import math
 >>>
@@ -62,7 +61,7 @@
 
   * **`from ... import ...`**: モジュールから特定の関数や変数だけを取り込む
 
-    ```python
+    ```python-repl
     >>> from math import pi, sqrt
     >>>
     >>> print(pi)       # 直接piを参照できる
@@ -73,7 +72,7 @@
 
   * **`as` (別名)**: モジュールに別名をつけて利用する
 
-    ```python
+    ```python-repl
     >>> import math as m
     >>>
     >>> print(m.pi)
@@ -91,8 +90,7 @@
 1.  **`utils.py` の作成**:
     まず、便利な関数をまとめた `utils.py` というファイルを作成します。
 
-    ```python
-    # utils.py
+    ```python:utils.py
 
     def say_hello(name):
         """指定された名前で挨拶を返す"""
@@ -122,8 +120,7 @@
 2.  **`main.py` からの利用**:
     次に、`utils.py` と同じディレクトリに `main.py` を作成し、`utils` モジュールをインポートして使います。
 
-    ```python
-    # main.py
+    ```python:main.py
 
     # 自作のutilsモジュールをインポート
     import utils
@@ -164,8 +161,7 @@ my_project/
 
 `main.py` からこれらのモジュールをインポートするには、`パッケージ名.モジュール名` のように記述します。
 
-```python
-# main.py
+```python:main.py
 
 # パッケージ内のモジュールをインポート
 from my_app import services
@@ -190,7 +186,7 @@ Pythonの大きな魅力の一つは、その「**バッテリー同梱 (Batteri
 
 また、REPLの `help()` や `dir()` を使うと、モジュールの内容を簡単に確認できます。
 
-```python
+```python-repl
 >>> import datetime
 >>> # datetimeモジュールが持つ属性や関数のリストを表示
 >>> dir(datetime)
@@ -213,7 +209,7 @@ class date(builtins.object)
 
   * **`os`**: OSとの対話。ファイルやディレクトリの操作など。
 
-    ```python
+    ```python-repl
     >>> import os
     >>>
     >>> # カレントディレクトリのファイル一覧を取得
@@ -228,7 +224,7 @@ class date(builtins.object)
 
   * **`sys`**: Pythonインタプリタに関する情報。コマンドライン引数など。
 
-    ```python
+    ```python-repl
     >>> import sys
     >>>
     >>> # Pythonのバージョンを表示
@@ -240,7 +236,7 @@ class date(builtins.object)
 
   * **`datetime`**: 日付や時刻の操作。
 
-    ```python
+    ```python-repl
     >>> import datetime
     >>>
     >>> # 現在の日時を取得
@@ -255,7 +251,7 @@ class date(builtins.object)
 
   * **`json`**: JSON形式のデータの操作。
 
-    ```python
+    ```python-repl
     >>> import json
     >>>
     >>> # Pythonの辞書型データ
