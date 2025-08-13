@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { ReplTerminal, ReplOutput } from "../repl";
+import { ReplTerminal, ReplOutput, ReplCommand } from "../repl";
 import { usePyodide } from "./pyodide";
 
 export function PythonEmbeddedTerminal({ content }: { content: string }) {
   const initCommands = useMemo(() => splitContents(content), [content]);
-  const { init, initializing, ready, runPython, checkSyntax, mutex } = usePyodide();
+  const { init, initializing, ready, runPython, checkSyntax, mutex } =
+    usePyodide();
 
   return (
     <ReplTerminal
@@ -25,9 +26,7 @@ export function PythonEmbeddedTerminal({ content }: { content: string }) {
   );
 }
 
-function splitContents(
-  contents: string
-): { command: string; output: ReplOutput[] }[] {
+function splitContents(contents: string): ReplCommand[] {
   const initCommands: { command: string; output: ReplOutput[] }[] = [];
   for (const line of contents.split("\n")) {
     if (line.startsWith(">>> ")) {

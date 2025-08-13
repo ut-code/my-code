@@ -3,6 +3,7 @@
 import chalk from "chalk";
 import { usePyodide } from "./python/pyodide";
 import { clearTerminal, getRows, useTerminal } from "./terminal";
+import { useSectionCode } from "../[docs_id]/section";
 
 interface ExecProps {
   filename: string;
@@ -20,6 +21,7 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
+  const sectionContext = useSectionCode();
 
   const pyodide = usePyodide();
 
@@ -52,6 +54,7 @@ export function ExecFile(props: ExecProps) {
               break;
           }
         }
+        sectionContext?.setExecResult(props.filename, outputs);
       };
       break;
     default:

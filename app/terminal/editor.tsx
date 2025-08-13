@@ -10,6 +10,7 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import "ace-builds/src-min-noconflict/mode-python";
 import { useEffect } from "react";
+import { useSectionCode } from "../[docs_id]/section";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
 interface EditorProps {
@@ -21,11 +22,14 @@ interface EditorProps {
 export function EditorComponent(props: EditorProps) {
   const { files, writeFile } = useFile();
   const code = files[props.filename] || props.initContent;
+  const sectionContext = useSectionCode();
+  const addSectionFile = sectionContext?.addFile;
   useEffect(() => {
     if (!files[props.filename]) {
       writeFile(props.filename, props.initContent);
     }
-  }, [files, props.filename, props.initContent, writeFile]);
+    addSectionFile?.(props.filename);
+  }, [files, props.filename, props.initContent, writeFile, addSectionFile]);
 
   return (
     <div className="embedded-editor">

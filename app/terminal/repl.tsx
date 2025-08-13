@@ -5,10 +5,15 @@ import { highlightCodeToAnsi } from "./highlight";
 import chalk from "chalk";
 import { MutexInterface } from "async-mutex";
 import { clearTerminal, getRows, useTerminal } from "./terminal";
+import { useSectionCode } from "../[docs_id]/section";
 
 export interface ReplOutput {
   type: "stdout" | "stderr" | "error" | "return"; // 出力の種類
   message: string; // 出力メッセージ
+}
+export interface ReplCommand {
+  command: string;
+  output: ReplOutput[];
 }
 export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
@@ -17,7 +22,7 @@ interface ReplComponentProps {
   runtimeInitializing: boolean;
   runtimeReady: boolean;
   initMessage?: string; // ターミナル初期化時のメッセージ
-  initCommand?: { command: string; output: ReplOutput[] }[]; // 初期化時に実行するコマンドとその出力
+  initCommand?: ReplCommand[]; // 初期化時に実行するコマンドとその出力
   prompt: string; // プロンプト文字列
   promptMore?: string;
   language?: string;
@@ -33,6 +38,9 @@ interface ReplComponentProps {
 export function ReplTerminal(props: ReplComponentProps) {
   const inputBuffer = useRef<string[]>([]);
   const initDone = useRef<boolean>(false);
+
+  const sectionContext = useSectionCode();
+  const addReplOutput = sectionContext?.addReplOutput;
 
   const {
     initRuntime,
@@ -152,10 +160,7 @@ export function ReplTerminal(props: ReplComponentProps) {
       (async () => {
         if (props.initCommand) {
           // 初期化時に実行するコマンドがある場合はそれを実行
-          const initCommandResult: {
-            command: string;
-            output: ReplOutput[];
-          }[] = [];
+          const initCommandResult: ReplCommand[] = [];
           await mutex.runExclusive(async () => {
             for (const cmd of props.initCommand!) {
               const outputs = await sendCommand(cmd.command);
@@ -221,6 +226,7 @@ export function ReplTerminal(props: ReplComponentProps) {
                 sendCommand(command)
               );
               onOutput(outputs);
+              addReplOutput?.(command, outputs);
             }
           } else if (code === 127) {
             // Backspace
@@ -264,6 +270,7 @@ export function ReplTerminal(props: ReplComponentProps) {
       tabSize,
       mutex,
       terminalInstanceRef,
+      addReplOutput,
     ]
   );
   useEffect(() => {
