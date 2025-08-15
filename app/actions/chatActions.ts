@@ -14,14 +14,20 @@ export async function askAI(
   formData: FormData
 ): Promise<FormState> {
   const message = formData.get('message');
+  const documentContent = formData.get('documentContent');
 
   if (!message || typeof message !== 'string' || message.trim() === '') {
     return { response: '', error: 'メッセージを入力してください。' };
   }
 
+  if (!documentContent || typeof documentContent !== 'string') {
+    return { response: '', error: 'コンテキストとなるドキュメントがありません。' };
+  }
+  
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(message);
+    const fullMessage = documentContent + "\n\n" + message;
+    const result = await model.generateContent(fullMessage);
     const response = result.response;
     const text = response.text();
     return { response: text, error: null };
