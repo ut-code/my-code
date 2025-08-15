@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-
-interface ChatApiResponse {
-  response: string;
-}
+import { askAI } from "@/app/actions/chatActions";
 
 export function ChatForm() {
   const [inputValue, setInputValue] = useState("");
@@ -17,29 +14,18 @@ export function ChatForm() {
     setIsLoading(true);
     setResponse("");
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: inputValue }),
-      });
+    const formData = new FormData();
+    formData.append("message", inputValue);
 
-      const data = (await res.json()) as ChatApiResponse;
-      if (!res.ok) {
-        throw new Error(data.response || "エラーが発生しました。");
-      }
-      setResponse(data.response);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setResponse(`エラー: ${error.message}`);
+    const result = await askAI({ response: "", error: null }, formData);
+
+    if (result.error) {
+      setResponse(`エラー: ${result.error}`);
       } else {
-        setResponse(`エラー: ${String(error)}`);
-      }
-    } finally {
-      setIsLoading(false);
+      setResponse(result.response);
     }
+    
+    setIsLoading(false);
   };
   return (
     <>
