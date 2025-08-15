@@ -1,85 +1,109 @@
-# 第1章: Pythonへようこそ：環境構築と基本思想
+# 第1章: Pythonへようこそ：環境構築と基本
 
-プログラミング経験者にとって、新しい言語を学ぶ上で最も重要なことの一つは、その言語特有の「流儀」や設計思想を理解することです。この章では、Pythonの開発環境を構築し、Pythonがどのような考え方で作られているのかを探ります。
+プログラミング経験者であっても、言語ごとのツールや流儀を最初に理解することは重要です。この章では、Pythonの開発環境を整え、基本的なツールの使い方を学びます。
 
-## Pythonのインストールとバージョン管理
+## Pythonのインストール方法
 
-Pythonを始めるには、まずお使いのコンピュータにPythonをインストールする必要があります。しかし、プロジェクトごとに異なるバージョンのPythonを使いたい場面は頻繁にあります。そこで、複数のPythonバージョンを簡単に切り替えて管理できる **`pyenv`** の利用を強く推奨します。
+手元の環境で本格的に開発を進めるために、Pythonのインストール方法を紹介します。
 
-**`pyenv` とは？**
-`pyenv` は、システム全体に影響を与えることなく、ユーザーのホームディレクトリ内で複数のPythonバージョンを管理できるツールです。これにより、「プロジェクトAではPython 3.9を、プロジェクトBではPython 3.11を使う」といったことが容易になります。
+### Windows
 
-### インストール手順（macOS/Linuxの例）：
-Homebrew（macOS）やgitを使って簡単にインストールできます。
+WindowsでPythonをインストールするには、主に2つの方法があります。
 
-1.  **pyenvのインストール:**
+1.  **[Python公式インストーラ](https://www.python.org/downloads/)**: Pythonの公式サイトからインストーラをダウンロードする方法が最も一般的です。インストール時に「Add Python to PATH」のチェックを入れると、コマンドプロンプトやPowerShellから `python` コマンドを直接実行できるようになり便利です。
+2.  **Microsoft Store**: Microsoft Storeからも手軽にPythonをインストールできます。
 
-    ```bash
-    # Homebrewの場合 (macOS)
-    brew install pyenv
-    ```
+### macOS / Linux
 
-2.  **シェルの設定:**
-    インストール後、以下のコマンドをシェルの設定ファイル（`.zshrc`, `.bash_profile`など）に追加します。
+macOSでは、**Homebrew** というパッケージマネージャを使ってインストールするのが簡単です。
+`brew install python`
 
-    ```bash
-    eval "$(pyenv init --path)"
-    eval "$(pyenv init -)"
-    ```
+もちろん、Windowsと同様に公式サイトからインストーラをダウンロードすることも可能です。多くのLinuxディストリビューションには初めからPythonがインストールされていますが、最新版を使いたい場合はディストリビューションのパッケージマネージャ（`apt`, `yum`など）を利用するのが一般的です。
 
-3.  **Pythonのインストール:**
-    利用可能なバージョンを確認し、特定のバージョンをインストールします。
+### バージョン管理と環境管理ツール
 
-    ```bash
-    # インストール可能なバージョンの一覧を表示
-    pyenv install --list
+より高度な開発や、複数のプロジェクトを並行して進める場合は、バージョン管理ツールや統合的な環境管理ツールの利用が推奨されます。
 
-    # 例として Python 3.11.5 をインストール
-    pyenv install 3.11.5
-    ```
+  * **[pyenv](https://github.com/pyenv/pyenv)**: 複数のPythonバージョン（例: 3.9と3.11）を一つのPCに共存させ、プロジェクトごとに切り替えるためのツールです。
+  * **[Conda](https://docs.conda.io/en/latest/)**: 特にデータサイエンスの分野で人気のあるツールです。**Conda** はPythonのバージョン管理だけでなく、パッケージ管理、仮想環境の管理までを一つでこなせるオールインワンのソリューションです。
 
-4.  **バージョンの切り替え:**
-    `pyenv` を使うと、ディレクトリごと、またはグローバルに使用するPythonのバージョンを切り替えられます。
+## 対話モード（REPL）でPythonを体験しよう
 
-    ```bash
-    # このディレクトリでは 3.11.5 を使う
-    pyenv local 3.11.5
+**REPL**（Read-Eval-Print Loop）は、入力したコードをその場で実行し、結果をすぐに見ることができる強力な学習・デバッグツールです。
 
-    # グローバルで 3.11.5 を使う
-    pyenv global 3.11.5
-    ```
+### ブラウザで今すぐ試す
 
-Windowsユーザーの方は、`pyenv`のWindows版である **`pyenv-win`** を利用すると同様の環境を構築できます。
+このウェブサイトではこのようにドキュメント内に Python {process.env.PYODIDE_PYTHON_VERSION} のREPLが埋め込まれており、インストール不要ですぐにPythonコードを試せます。気軽に利用してください。
 
-
-## 対話モード（REPL）の活用
-
-Pythonには **REPL** (Read-Eval-Print Loop) と呼ばれる対話モードが備わっています。これは、コードを1行書くたびに即座に実行・評価し、結果を返してくれる機能です。他の言語での経験者にとっても、新しいライブラリの動作確認や、ちょっとした文法のテストに非常に便利です。
-
-ターミナルで `python` と入力するだけで起動します。
-
-```bash
-$ python
-Python 3.11.5 (main, Aug 24 2023, 15:09:47) [Clang 14.0.3 (clang-1403.0.22.14.1)] on darwin
-Type "help", "copyright", "credits" or "license" for more information.
+```python-repl
 >>> message = "Hello, Python!"
 >>> print(message)
 Hello, Python!
 >>> 1 + 2 * 3
 7
->>> exit()
 ```
 
-より高機能なREPLとして **IPython** や **Jupyter Notebook** も人気があります。これらはコード補完や履歴管理、インラインでのグラフ描画など、さらに強力な機能を備えています。
+### 自分のPCで使う
 
+インストールが完了したら、自分のPCのターミナル（コマンドプロンプトやPowerShellなど）で `python` と入力すれば、同じ対話モードを起動できます。
+
+```
+$ python
+Python 3.11.5 (...)
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+```
+
+`>>>` というプロンプトが表示されたら準備完了です。
+
+### REPL の基本的な使い方
+
+* **計算:** 数式を直接入力すると、計算結果が返ってきます。
+```python-repl
+>>> 10 * 5 + 3
+53
+```
+* **変数と関数の利用:** 変数を定義したり、`print()`のような組み込み関数を呼び出したりできます。
+```python-repl
+>>> greeting = "Hi there"
+>>> print(greeting)
+Hi there
+```
+* **ヘルプ機能:** `help()` と入力するとヘルプが表示されます。調べたいモジュールや関数名（例: `str`）を入力するとドキュメントが表示されます。
+    * PCのターミナルで起動したREPLでは、対話的なヘルプモードが起動します。ヘルプモードを抜けるには `quit` と入力します。
+```python-repl
+>>> help(str)
+Help on class str in module builtins:
+
+class str(object)
+ |  str(object='') -> str
+ |  str(bytes_or_buffer[, encoding[, errors]]) -> str
+ | ...
+```
+* **終了方法:** REPLを終了するには、`exit()` と入力するか、ショートカットキー（macOS/Linuxでは `Ctrl + D`、Windowsでは `Ctrl + Z` を押してからEnter）を使用します。
+    * このウェブサイトに埋め込まれているREPLは、終了できません。
 
 ## スクリプトの実行方法
 
 一連の処理をまとめて実行する場合は、`.py` という拡張子を持つファイルにコードを記述します。例えば、`hello.py` というファイルを以下のように作成します。
 
-**hello.py**
-
 ```python:hello.py
+print("Hello from a Python script!")
+```
+
+このスクリプトを実行するには、ターミナルで `python hello.py` のようにコマンドを入力します。
+
+このウェブサイト上では以下のように実行ボタンをクリックするとスクリプトの実行結果が表示されます。上の hello1.py のコードを変更して再度実行すると結果も変わるはずです。試してみてください。
+
+```python-exec:hello.py
+Hello from a Python script!
+```
+
+### __main__ について
+
+前述の hello.py のようにファイルの1行目から処理を書いても問題なく動作しますが、一般的には以下のようなお決まりの書き方が用いられます。
+
+```python:hello2.py
 def main():
     print("Hello from a Python script!")
 
@@ -87,87 +111,103 @@ if __name__ == "__main__":
     main()
 ```
 
-`if __name__ == "__main__":` は、このスクリプトが直接実行された場合にのみ `main()` 関数を呼び出すためのお決まりの書き方です。他のスクリプトからモジュールとしてインポートされた際には `main()` は実行されません。
-
-このスクリプトを実行するには、ターミナルで以下のようにコマンドを入力します。
-
-```bash
-python hello.py
-```
-
-出力結果:
-
-```python-exec:hello.py
+```python-exec:hello2.py
 Hello from a Python script!
 ```
 
+なぜわざわざ `if __name__ == "__main__":` を使うのでしょうか？
+それは、**書いたコードを「スクリプトとして直接実行する」場合と、「他のファイルから部品（モジュール）として読み込んで使う」場合の両方に対応できるようにするため**です。
 
-## Pythonの禅 (The Zen of Python)
+Pythonでは、ファイルは他のファイルから `import` 文で読み込むことができます。このとき、読み込まれたファイル（モジュール）は上から順に実行されます。
 
-Pythonには、その設計哲学を端的に表した **「The Zen of Python」** という短い詩のような文章があります。これはPythonの思想を理解する上で非常に重要です。対話モードで `import this` と入力すると表示されます。
+`if __name__ == "__main__":` を使うと、**「このファイルがコマンドラインから直接 `python a.py` のように実行された時だけ、このブロックの中の処理を実行してね」** という意味になります。
 
-```python-repl
->>> import this
-The Zen of Python, by Tim Peters
+**例：再利用可能な関数を持つスクリプト**
 
-Beautiful is better than ugly.
-Explicit is better than implicit.
-Simple is better than complex.
-Complex is better than complicated.
-Flat is better than nested.
-Sparse is better than dense.
-Readability counts.
-...
+```python:my_utils.py
+def say_hello(name):
+  """挨拶を返す関数"""
+  return f"Hello, {name}!"
+
+# このファイルが直接実行された時だけ、以下のテストコードを実行する
+if __name__ == "__main__":
+  print("--- Running Test ---")
+  message = say_hello("Alice")
+  print(message)
+  print("--- Test Finished ---")
 ```
 
-「美しいは醜いより良い」「明示的は暗黙的より良い」「シンプルは複雑より良い」といった言葉は、Pythonでコードを書く上での指針となります。Pythonらしいコードとは、**読みやすく、シンプルで、意図が明確なコード**であると言えます。
+このファイルを2通りの方法で使ってみます。
+
+1.  **直接スクリプトとして実行する**
+
+    ```python-exec:my_utils.py
+    --- Running Test ---
+    Hello, Alice!
+    --- Test Finished ---
+    ```
+
+2.  **他のファイルからモジュールとして読み込む**
+
+    ```python:main_app.py
+    # my_utils.py から say_hello 関数だけを読み込む
+    from my_utils import say_hello
+
+    print("--- Running Main App ---")
+    greeting = say_hello("Bob")
+    print(greeting)
+    ```
+
+    ```python-exec:main_app.py
+    --- Running Main App ---
+    Hello, Bob!
+    ```
+
+    `my_utils.py` のテストコード（`--- Running Test ---`など）は実行されず、`say_hello` 関数だけを部品として利用できました。
+
+このように、`if __name__ == "__main__":` は、**再利用可能な関数やクラスの定義**と、**そのファイル単体で動かすための処理**をきれいに分離するための、Pythonにおける非常に重要な作法です。
 
 ## パッケージ管理ツール `pip` と仮想環境 `venv`
 
 Pythonの強力なエコシステムは、豊富なサードパーティ製パッケージ（ライブラリ）によって支えられています。これらのパッケージを管理するのが **`pip`** です。
 
-**`pip`** はPythonの標準パッケージインストーラで、例えばデータ分析で人気の `pandas` をインストールするには、以下のコマンドを実行します。
+しかし、プロジェクトごとに異なるバージョンのパッケージを使いたい場合、依存関係の衝突が問題になります。これを解決するのが **仮想環境** で、Pythonでは **`venv`** モジュールを使って作成するのが標準的です。
 
-```bash
-pip install pandas
-```
+**仮想環境とは？** 🚧
+プロジェクト専用の独立したPython実行環境です。ここでインストールしたパッケージはシステム全体には影響を与えず、そのプロジェクト内に限定されます。
 
-しかし、プロジェクトAでは `pandas` のバージョン1.0が必要で、プロジェクトBでは2.0が必要、といった依存関係の衝突が起こる可能性があります。これを解決するのが **仮想環境** です。
+**基本的な流れ:**
 
-**`venv`** は、プロジェクトごとに独立したPython環境を作成するための標準モジュールです。仮想環境を有効にすると、`pip` でインストールしたパッケージはその環境内にのみ保存され、他のプロジェクトやシステムのPython環境を汚染しません。
-
-**仮想環境の作成と利用:**
-
-1.  **作成:** プロジェクトディレクトリで以下のコマンドを実行します。（`.venv` は仮想環境を保存するディレクトリ名で、慣例的によく使われます）
+1.  **仮想環境の作成**:
 
     ```bash
+    # .venvという名前の仮想環境を作成
     python -m venv .venv
     ```
 
-2.  **有効化 (Activate):**
+2.  **仮想環境の有効化（Activate）**:
 
     ```bash
     # macOS / Linux
     source .venv/bin/activate
 
-    # Windows (Command Prompt)
-    .\.venv\Scripts\activate
+    # Windows (PowerShell)
+    .\.venv\Scripts\Activate.ps1
     ```
 
-    有効化すると、プロンプトの先頭に `(.venv)` のような表示が追加され、このターミナルセッションでは仮想環境が使われていることが分かります。
+    有効化すると、ターミナルのプロンプトに `(.venv)` のような表示が付きます。
 
-3.  **パッケージのインストール:**
-    この状態で `pip install` を実行すると、パッケージは `.venv` ディレクトリ内にインストールされます。
+3.  **パッケージのインストール**:
+    有効化された環境で `pip` を使ってパッケージをインストールします。
 
     ```bash
     (.venv) $ pip install requests
     ```
 
-4.  **無効化 (Deactivate):**
-    仮想環境から抜けるには `deactivate` コマンドを使います。
+4.  **仮想環境の無効化（Deactivate）**:
 
     ```bash
     (.venv) $ deactivate
     ```
 
-`pyenv` でPythonのバージョンを管理し、`venv` でプロジェクトごとのパッケージを管理する。この2つを組み合わせることが、現代的なPython開発の基本スタイルです。
+**`pyenv` でPythonバージョンを固定し、`venv` でプロジェクトのパッケージを隔離する** のが、現代的なPython開発の基本スタイルです。（前述の **Conda** は、このPythonバージョン管理と環境・パッケージ管理を両方とも行うことができます。）

@@ -86,7 +86,7 @@ const components: Components = {
         switch (match[1]) {
           case "python":
             return (
-              <div className="bg-base-300 border border-primary m-2 p-4 rounded-lg">
+              <div className="bg-base-300 border border-primary m-2 p-4 pr-1 rounded-lg">
                 <PythonEmbeddedTerminal
                   content={String(props.children).replace(/\n$/, "")}
                 />

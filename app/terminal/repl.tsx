@@ -80,6 +80,7 @@ export function ReplTerminal(props: ReplComponentProps) {
           onOutput(cmd.output);
         }
       }
+      terminalInstanceRef.current!.scrollToTop();
     },
   });
 
@@ -180,6 +181,8 @@ export function ReplTerminal(props: ReplComponentProps) {
           }
         }
         updateBuffer(() => [""]);
+        // なぜかそのままscrollToTop()を呼ぶとスクロールせず、setTimeoutを入れるとscrollする(治安bad)
+        setTimeout(() => terminalInstanceRef.current!.scrollToTop());
       })();
     }
   }, [
