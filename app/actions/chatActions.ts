@@ -1,30 +1,32 @@
 'use server';
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { z } from "zod";
 
 interface FormState {
   response: string;
   error: string | null;
 }
 
-interface ChatParams {
-  userQuestion: string;
-  documentContent: string;
-}
+const ChatSchema = z.object({
+  userQuestion: z.string().min(1, { message: "メッセージを入力してください。" }),
+  documentContent: z.string().min(1, { message: "コンテキストとなるドキュメントがありません。"}),
+});
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY!);
 
-export async function askAI(params: ChatParams): Promise<FormState> {
-  const { userQuestion, documentContent } = params;
+export async function askAI(params: unknown): Promise<FormState> {
+  const parseResult = ChatSchema.safeParse(params);
 
-  if (!userQuestion || userQuestion.trim() === '') {
-    return { response: '', error: 'メッセージを入力してください。' };
-  }
-
-  if (!documentContent) {
-    return { response: '', error: 'コンテキストとなるドキュメントがありません。' };
+  if (!parseResult.success) {
+    return {
+      response: "",
+      error: parseResult.error.issues.map((e) => e.message).join(", "),
+    };
   }
   
+  const { userQuestion, documentContent } = parseResult.data;
+
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const fullMessage = documentContent + "\n\n" + userQuestion;
