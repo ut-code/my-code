@@ -14,11 +14,10 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
     setIsLoading(true);
     setResponse("");
 
-    const formData = new FormData();
-    formData.append("message", inputValue);
-    formData.append("documentContent", documentContent);
-
-    const result = await askAI({ response: "", error: null }, formData);
+    const result = await askAI({
+      userQuestion: inputValue,
+      documentContent: documentContent,
+    });
 
     if (result.error) {
       setResponse(`エラー: ${result.error}`);

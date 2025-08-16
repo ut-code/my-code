@@ -7,26 +7,27 @@ interface FormState {
   error: string | null;
 }
 
+interface ChatParams {
+  userQuestion: string;
+  documentContent: string;
+}
+
 const genAI = new GoogleGenerativeAI(process.env.API_KEY!);
 
-export async function askAI(
-  prevState: FormState,
-  formData: FormData
-): Promise<FormState> {
-  const message = formData.get('message');
-  const documentContent = formData.get('documentContent');
+export async function askAI(params: ChatParams): Promise<FormState> {
+  const { userQuestion, documentContent } = params;
 
-  if (!message || typeof message !== 'string' || message.trim() === '') {
+  if (!userQuestion || userQuestion.trim() === '') {
     return { response: '', error: 'メッセージを入力してください。' };
   }
 
-  if (!documentContent || typeof documentContent !== 'string') {
+  if (!documentContent) {
     return { response: '', error: 'コンテキストとなるドキュメントがありません。' };
   }
   
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const fullMessage = documentContent + "\n\n" + message;
+    const fullMessage = documentContent + "\n\n" + userQuestion;
     const result = await model.generateContent(fullMessage);
     const response = result.response;
     const text = response.text();
