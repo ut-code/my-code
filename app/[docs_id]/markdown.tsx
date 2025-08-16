@@ -57,7 +57,7 @@ const components: Components = {
             <ExecFile
               language={match[1]}
               filename={match[3]}
-              content={String(props.children).replace(/\n$/, "")}
+              content={String(props.children || "").replace(/\n$/, "")}
             />
           </div>
         );
@@ -72,7 +72,7 @@ const components: Components = {
                   language={match[1]}
                   tabSize={4}
                   filename={match[3]}
-                  initContent={String(props.children).replace(/\n$/, "")}
+                  initContent={String(props.children || "").replace(/\n$/, "")}
                 />
               </div>
             );
@@ -88,7 +88,7 @@ const components: Components = {
             return (
               <div className="bg-base-300 border border-primary m-2 p-4 pr-1 rounded-lg">
                 <PythonEmbeddedTerminal
-                  content={String(props.children).replace(/\n$/, "")}
+                  content={String(props.children || "").replace(/\n$/, "")}
                 />
               </div>
             );
@@ -105,7 +105,7 @@ const components: Components = {
           // style={todo dark theme?}
           {...props}
         >
-          {String(props.children).replace(/\n$/, "")}
+          {String(props.children || "").replace(/\n$/, "")}
         </SyntaxHighlighter>
       );
     } else if (String(props.children).includes("\n")) {
@@ -117,7 +117,7 @@ const components: Components = {
           // style={todo dark theme?}
           {...props}
         >
-          {String(props.children).replace(/\n$/, "")}
+          {String(props.children || "").replace(/\n$/, "")}
         </SyntaxHighlighter>
       );
     } else {

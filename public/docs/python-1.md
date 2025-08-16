@@ -99,6 +99,8 @@ print("Hello from a Python script!")
 Hello from a Python script!
 ```
 
+REPLでは式を入力するだけでも結果が表示されていましたが、スクリプトで結果を表示するには `print()` 関数を使う必要があります。
+
 ### __main__ について
 
 前述の hello.py のようにファイルの1行目から処理を書いても問題なく動作しますが、一般的には以下のようなお決まりの書き方が用いられます。
@@ -126,15 +128,15 @@ Pythonでは、ファイルは他のファイルから `import` 文で読み込�
 
 ```python:my_utils.py
 def say_hello(name):
-  """挨拶を返す関数"""
-  return f"Hello, {name}!"
+    """挨拶を返す関数"""
+    return f"Hello, {name}!"
 
 # このファイルが直接実行された時だけ、以下のテストコードを実行する
 if __name__ == "__main__":
-  print("--- Running Test ---")
-  message = say_hello("Alice")
-  print(message)
-  print("--- Test Finished ---")
+    print("--- Running Test ---")
+    message = say_hello("Alice")
+    print(message)
+    print("--- Test Finished ---")
 ```
 
 このファイルを2通りの方法で使ってみます。

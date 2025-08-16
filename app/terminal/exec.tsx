@@ -12,7 +12,7 @@ interface ExecProps {
 }
 export function ExecFile(props: ExecProps) {
   const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
-    getRows: (cols: number) => getRows(props.content, cols),
+    getRows: (cols: number) => getRows(props.content, cols) + 1,
     onReady: () => {
       // カーソル非表示
       terminalInstanceRef.current!.write("\x1b[?25l");
