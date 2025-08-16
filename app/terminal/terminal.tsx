@@ -38,7 +38,7 @@ export function getRows(contents: string, cols: number): number {
 }
 
 // なぜか term.clear(); が効かない場合がある... これは効く
-export function clearTerminal(term: Terminal){
+export function clearTerminal(term: Terminal) {
   // term.clear();
   term.write("\x1b[3J\x1b[2J\x1b[1;1H");
 }
@@ -50,6 +50,7 @@ interface TerminalProps {
 export function useTerminal(props: TerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null!);
   const terminalInstanceRef = useRef<Terminal | null>(null);
+  const fitAddonRef = useRef<FitAddon | null>(null);
   const [termReady, setTermReady] = useState<boolean>(false);
 
   const getRowsRef = useRef<(cols: number) => number>(undefined);
@@ -59,69 +60,94 @@ export function useTerminal(props: TerminalProps) {
 
   // ターミナルの初期化処理
   useEffect(() => {
-    const fromCSS = (varName: string) =>
-      window.getComputedStyle(document.body).getPropertyValue(varName);
-    // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
-    const term = new Terminal({
-      cursorBlink: true,
-      convertEol: true,
-      cursorStyle: "bar",
-      cursorInactiveStyle: "none",
-      fontSize: 14,
-      lineHeight: 1.4,
-      letterSpacing: 0,
-      fontFamily: "Inconsolata Variable",
-      theme: {
-        // DaisyUIの変数を使用してテーマを設定している
-        // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
-        background: fromCSS("--color-base-300"),
-        foreground: fromCSS("--color-base-content"),
-        cursor: fromCSS("--color-base-content"),
-        selectionBackground: fromCSS("--color-primary"),
-        selectionForeground: fromCSS("--color-primary-content"),
-        black: fromCSS("--color-black"),
-        brightBlack: fromCSS("--color-neutral-500"),
-        red: fromCSS("--color-red-600"),
-        brightRed: fromCSS("--color-red-400"),
-        green: fromCSS("--color-green-600"),
-        brightGreen: fromCSS("--color-green-400"),
-        yellow: fromCSS("--color-yellow-700"),
-        brightYellow: fromCSS("--color-yellow-400"),
-        blue: fromCSS("--color-indigo-600"),
-        brightBlue: fromCSS("--color-indigo-400"),
-        magenta: fromCSS("--color-fuchsia-600"),
-        brightMagenta: fromCSS("--color-fuchsia-400"),
-        cyan: fromCSS("--color-cyan-600"),
-        brightCyan: fromCSS("--color-cyan-400"),
-        white: fromCSS("--color-base-100"),
-        brightWhite: fromCSS("--color-white"),
-      },
-    });
-    terminalInstanceRef.current = term;
+    const abortController = new AbortController();
 
-    const fitAddon = new FitAddon();
-    term.loadAddon(fitAddon);
-    // fitAddon.fit();
+    (async () => {
+      // globals.cssでフォントを指定し読み込んでいるが、
+      // それが読み込まれる前にterminalを初期化してしまうとバグる。
+      // なのでここでフォントをfetchし成功するまでterminalの初期化は待つ
+      try {
+        await fetch(
+          "https://cdn.jsdelivr.net/fontsource/fonts/inconsolata:vf@latest/latin-wght-normal.woff2",
+          { signal: abortController.signal }
+        );
+      } catch {
+        // ignore
+      }
 
-    term.open(terminalRef.current);
+      if (!abortController.signal.aborted) {
+        const fromCSS = (varName: string) =>
+          window.getComputedStyle(document.body).getPropertyValue(varName);
+        // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
+        const term = new Terminal({
+          cursorBlink: true,
+          convertEol: true,
+          cursorStyle: "bar",
+          cursorInactiveStyle: "none",
+          fontSize: 14,
+          lineHeight: 1.4,
+          letterSpacing: 0,
+          fontFamily: "Inconsolata Variable",
+          theme: {
+            // DaisyUIの変数を使用してテーマを設定している
+            // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
+            background: fromCSS("--color-base-300"),
+            foreground: fromCSS("--color-base-content"),
+            cursor: fromCSS("--color-base-content"),
+            selectionBackground: fromCSS("--color-primary"),
+            selectionForeground: fromCSS("--color-primary-content"),
+            black: fromCSS("--color-black"),
+            brightBlack: fromCSS("--color-neutral-500"),
+            red: fromCSS("--color-red-600"),
+            brightRed: fromCSS("--color-red-400"),
+            green: fromCSS("--color-green-600"),
+            brightGreen: fromCSS("--color-green-400"),
+            yellow: fromCSS("--color-yellow-700"),
+            brightYellow: fromCSS("--color-yellow-400"),
+            blue: fromCSS("--color-indigo-600"),
+            brightBlue: fromCSS("--color-indigo-400"),
+            magenta: fromCSS("--color-fuchsia-600"),
+            brightMagenta: fromCSS("--color-fuchsia-400"),
+            cyan: fromCSS("--color-cyan-600"),
+            brightCyan: fromCSS("--color-cyan-400"),
+            white: fromCSS("--color-base-100"),
+            brightWhite: fromCSS("--color-white"),
+          },
+        });
+        terminalInstanceRef.current = term;
 
-    setTermReady(true);
-    onReadyRef.current?.();
+        fitAddonRef.current = new FitAddon();
+        term.loadAddon(fitAddonRef.current);
+        // fitAddon.fit();
+
+        term.open(terminalRef.current);
+
+        setTermReady(true);
+        onReadyRef.current?.();
+      }
+    })();
 
     const observer = new ResizeObserver(() => {
       // fitAddon.fit();
-      const dims = fitAddon.proposeDimensions();
+      const dims = fitAddonRef.current?.proposeDimensions();
       if (dims) {
         const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
-        term.resize(dims.cols, rows);
+        terminalInstanceRef.current?.resize(dims.cols, rows);
       }
     });
     observer.observe(terminalRef.current);
 
     return () => {
+      abortController.abort("terminal component dismount");
       observer.disconnect();
-      term.dispose();
-      terminalInstanceRef.current = null;
+      if (fitAddonRef.current) {
+        fitAddonRef.current.dispose();
+        fitAddonRef.current = null;
+      }
+      if (terminalInstanceRef.current) {
+        terminalInstanceRef.current.dispose();
+        terminalInstanceRef.current = null;
+      }
     };
   }, []);
 
