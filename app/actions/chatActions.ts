@@ -15,7 +15,9 @@ const ChatSchema = z.object({
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY!);
 
-export async function askAI(params: unknown): Promise<FormState> {
+type ChatParams = z.input<typeof ChatSchema>;
+
+export async function askAI(params: ChatParams): Promise<FormState> {
   const parseResult = ChatSchema.safeParse(params);
 
   if (!parseResult.success) {
@@ -42,4 +44,3 @@ export async function askAI(params: unknown): Promise<FormState> {
     return { response: '', error: '予期せぬエラーが発生しました。' };
   }
 }
-
