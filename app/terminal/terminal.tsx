@@ -130,8 +130,9 @@ export function useTerminal(props: TerminalProps) {
     const observer = new ResizeObserver(() => {
       // fitAddon.fit();
       const dims = fitAddonRef.current?.proposeDimensions();
-      if (dims) {
+      if (dims && !isNaN(dims.cols)) {
         const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
+        console.log(dims.cols, rows)
         terminalInstanceRef.current?.resize(dims.cols, rows);
       }
     });
