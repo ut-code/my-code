@@ -132,7 +132,6 @@ export function useTerminal(props: TerminalProps) {
       const dims = fitAddonRef.current?.proposeDimensions();
       if (dims && !isNaN(dims.cols)) {
         const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
-        console.log(dims.cols, rows)
         terminalInstanceRef.current?.resize(dims.cols, rows);
       }
     });
