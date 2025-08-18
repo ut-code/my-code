@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { highlightCodeToAnsi } from "./highlight";
 import chalk from "chalk";
 import { MutexInterface } from "async-mutex";
-import { clearTerminal, getRows, useTerminal } from "./terminal";
+import { clearTerminal, getRows, hideCursor, showCursor, useTerminal } from "./terminal";
 import { useSectionCode } from "../[docs_id]/section";
 
 export interface ReplOutput {
@@ -88,8 +88,7 @@ export function ReplTerminal(props: ReplComponentProps) {
   const updateBuffer = useCallback(
     (newBuffer: () => string[]) => {
       if (terminalInstanceRef.current) {
-        // カーソル非表示
-        terminalInstanceRef.current.write("\x1b[?25l");
+        hideCursor(terminalInstanceRef.current);
         // バッファの行数分カーソルを戻す
         if (inputBuffer.current.length >= 2) {
           terminalInstanceRef.current.write(
@@ -116,8 +115,7 @@ export function ReplTerminal(props: ReplComponentProps) {
             terminalInstanceRef.current.writeln("");
           }
         }
-        // カーソルを表示
-        terminalInstanceRef.current.write("\x1b[?25h");
+        showCursor(terminalInstanceRef.current);
       }
     },
     [prompt, promptMore, language, terminalInstanceRef]
@@ -289,22 +287,24 @@ export function ReplTerminal(props: ReplComponentProps) {
   }, [keyHandler, termReady, runtimeReady, terminalInstanceRef]);
 
   return (
-    <div
-      className="relative h-max"
-      onClick={() => {
-        if (
-          !runtimeInitializing &&
-          !runtimeReady &&
-          terminalInstanceRef.current &&
-          termReady
-        ) {
-          initRuntime();
-          terminalInstanceRef.current.write(
-            chalk.dim.bold.italic("(初期化しています...しばらくお待ちください)")
-          );
-        }
-      }}
-    >
+    <div className={"relative h-max"}>
+      {!runtimeInitializing && !runtimeReady && (
+        <div
+          className="absolute z-10 inset-0 cursor-pointer"
+          onClick={() => {
+            if (terminalInstanceRef.current && termReady) {
+              initRuntime();
+              hideCursor(terminalInstanceRef.current);
+              terminalInstanceRef.current.write(
+                chalk.dim.bold.italic(
+                  "(初期化しています...しばらくお待ちください)"
+                )
+              );
+              terminalInstanceRef.current.focus();
+            }
+          }}
+        />
+      )}
       {runtimeInitializing && (
         <div className="absolute z-10 inset-0 cursor-wait" />
       )}

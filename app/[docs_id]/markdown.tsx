@@ -53,7 +53,7 @@ const components: Components = {
         ---------------------------
         */
         return (
-          <div className="border border-primary m-2 rounded-lg">
+          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
             <ExecFile
               language={match[1]}
               filename={match[3]}
@@ -64,7 +64,7 @@ const components: Components = {
       } else if (match[3]) {
         // ファイル名指定がある場合、ファイルエディター
         return (
-          <div className="border border-primary m-2 rounded-lg">
+          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
             <EditorComponent
               language={match[1]}
               tabSize={4}
@@ -80,7 +80,7 @@ const components: Components = {
         switch (match[1]) {
           case "python":
             return (
-              <div className="bg-base-300 border border-primary m-2 p-4 pr-1 rounded-lg">
+              <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
                 <PythonEmbeddedTerminal
                   content={String(props.children || "").replace(/\n$/, "")}
                 />
@@ -95,7 +95,7 @@ const components: Components = {
         <SyntaxHighlighter
           language={match[1]}
           PreTag="div"
-          className="border border-primary mx-2 my-2 rounded-lg text-sm! m-2! p-4! font-mono!"
+          className="border border-base-300 mx-2 my-2 rounded-lg text-sm! m-2! p-4!"
           // style={todo dark theme?}
           {...props}
         >
@@ -107,7 +107,7 @@ const components: Components = {
       return (
         <SyntaxHighlighter
           PreTag="div"
-          className="border border-primary mx-2 my-2 rounded-lg text-sm! m-2! p-4! font-mono!"
+          className="border border-base-300 mx-2 my-2 rounded-lg text-sm! m-2! p-4!"
           // style={todo dark theme?}
           {...props}
         >

@@ -33,7 +33,8 @@ macOSでは、**Homebrew** というパッケージマネージャを使って�
 
 ### ブラウザで今すぐ試す
 
-このウェブサイトではこのようにドキュメント内に Python {process.env.PYODIDE_PYTHON_VERSION} のREPLが埋め込まれており、インストール不要ですぐにPythonコードを試せます。気軽に利用してください。
+このウェブサイトではドキュメント内に Python {process.env.PYODIDE_PYTHON_VERSION} の実行環境を埋め込んでいます。
+以下のように青枠で囲われたコード例には自由にPythonコードを書いて試すことができます。気軽に利用してください。
 
 ```python-repl
 >>> message = "Hello, Python!"
@@ -86,6 +87,7 @@ class str(object)
 ## スクリプトの実行方法
 
 一連の処理をまとめて実行する場合は、`.py` という拡張子を持つファイルにコードを記述します。例えば、`hello.py` というファイルを以下のように作成します。
+REPLでは式を入力するだけでも結果が表示されていましたが、スクリプトで結果を表示するには `print()` 関数を使う必要があります。
 
 ```python:hello.py
 print("Hello from a Python script!")
@@ -98,8 +100,6 @@ print("Hello from a Python script!")
 ```python-exec:hello.py
 Hello from a Python script!
 ```
-
-REPLでは式を入力するだけでも結果が表示されていましたが、スクリプトで結果を表示するには `print()` 関数を使う必要があります。
 
 ### __main__ について
 

@@ -42,6 +42,12 @@ export function clearTerminal(term: Terminal) {
   // term.clear();
   term.write("\x1b[3J\x1b[2J\x1b[1;1H");
 }
+export function hideCursor(term: Terminal) {
+  term.write("\x1b[?25l");
+}
+export function showCursor(term: Terminal) {
+  term.write("\x1b[?25h");
+}
 
 interface TerminalProps {
   getRows?: (cols: number) => number;
