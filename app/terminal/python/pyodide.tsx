@@ -84,6 +84,18 @@ def __writefile(filepath, content):
 
 __writefile
 `;
+const READALLFILE_CODE = `
+def __readallfile():
+    import os
+    files = []
+    for file in os.listdir():
+        if os.path.isfile(file):
+          with open(file, 'r') as f:
+              files.append((file, f.read()))
+    return files
+
+__readallfile
+`;
 
 export function PyodideProvider({ children }: { children: ReactNode }) {
   const pyodideRef = useRef<PyodideAPI>(null);
@@ -91,7 +103,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
   const [initializing, setInitializing] = useState<boolean>(false);
   const pyodideOutput = useRef<ReplOutput[]>([]);
   const mutex = useRef<MutexInterface>(new Mutex());
-  const { files } = useFile();
+  const { files, writeFile } = useFile();
 
   const init = useCallback(async () => {
     // next.config.ts 内でpyodideをimportし、バージョンを取得している
@@ -197,11 +209,17 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
           });
         }
       }
+      
+      const pyReadFile = pyodide.runPython(READALLFILE_CODE) as PyCallable;
+      for(const [file, content] of pyReadFile() as [string, string][]){
+        writeFile(file, content);
+      }
+
       const output = [...pyodideOutput.current];
       pyodideOutput.current = []; // 出力をクリア
       return output;
     },
-    [ready]
+    [ready, writeFile]
   );
 
   /**
@@ -260,6 +278,12 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
             });
           }
         }
+
+        const pyReadFile = pyodide.runPython(READALLFILE_CODE) as PyCallable;
+        for(const [file, content] of pyReadFile() as [string, string][]){
+          writeFile(file, content);
+        }
+        
         const output = [...pyodideOutput.current];
         pyodideOutput.current = []; // 出力をクリア
         return output;

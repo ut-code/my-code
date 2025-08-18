@@ -151,10 +151,10 @@ False
 
 `item_name` という変数に商品名（文字列）、`price` という変数に価格（整数）、`stock` という変数に在庫数（整数）をそれぞれ代入してください。その後、f-stringを使って「商品: [商品名], 価格: [価格]円, 在庫: [在庫数]個」という形式の文字列にし、 `print()` で出力するコードを書いてみましょう。
 
-```python:practice2-1.py
+```python:practice2_1.py
 ```
 
-```python-exec:practice2-1.py
+```python-exec:practice2_1.py
 (出力例) 商品: 高性能マウス, 価格: 4500円, 在庫: 2個
 ```
 
@@ -162,8 +162,8 @@ False
 
 `is_adult` という変数に `bool` 型の型ヒントを付けて `True` を代入し、`type()` で型を確認してください。その後、同じ変数に数値の `20` を代入し、再度 `type()` で型を確認してください。この結果から、型ヒントが実行時の動作にどのような影響を与える（あるいは与えない）か考察してみましょう。
 
-```python:practice2-2.py
+```python:practice2_2.py
 ```
 
-```python-exec:practice2-2.py
+```python-exec:practice2_2.py
 ```

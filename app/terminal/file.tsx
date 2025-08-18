@@ -39,8 +39,12 @@ export function FileProvider({ children }: { children: ReactNode }) {
   const writeFile = useCallback(
     (name: string, content: string) => {
       setFiles((files) => {
-        files[pathname][name] = content;
-        return { ...files };
+        if (files[pathname][name] !== content) {
+          files[pathname][name] = content;
+          return { ...files };
+        } else {
+          return files;
+        }
       });
     },
     [pathname]

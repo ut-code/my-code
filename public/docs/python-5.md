@@ -278,18 +278,18 @@ class date(builtins.object)
       * `subtract(a, b)`: aとbの差を返す
       * `multiply(a, b)`: aとbの積を返す
       * `divide(a, b)`: aをbで割った商を返す。ただし、`b` が `0` の場合は「ゼロで割ることはできません」という文字列を返すようにしてください。
-2.  `practice5-1.py` というファイルを作成し、作成した `calculator` モジュールをインポートします。
-3.  `practice5-1.py` の中で、`calculator` モジュールの各関数を少なくとも1回ずつ呼び出し、結果を `print` 関数で表示してください。
+2.  `practice5_1.py` というファイルを作成し、作成した `calculator` モジュールをインポートします。
+3.  `practice5_1.py` の中で、`calculator` モジュールの各関数を少なくとも1回ずつ呼び出し、結果を `print` 関数で表示してください。
 
 ```python:calculator.py
 def add(a, b):
     
 ```
 
-```python:practice5-1.py
+```python:practice5_1.py
 ```
 
-```python-exec:practice5-1.py
+```python-exec:practice5_1.py
 (出力例)
 10 + 5 = 15
 10 - 5 = 5
@@ -313,12 +313,12 @@ def add(a, b):
 
 **ヒント**: `datetime.datetime.now()` で現在時刻を取得し、`.strftime('%Y-%m-%d')` メソッドで日付をフォーマットできます。`json.dumps()` の `indent` 引数を指定すると、出力がきれになります。
 
-```python:practice5-2.py
+```python:practice5_2.py
 import datetime
 import json
 ```
 
-```python-exec:practice5-2.py
+```python-exec:practice5_2.py
 (出力例)
 {
   "author": "山田 太郎",

@@ -37,7 +37,7 @@ const components: Components = {
   hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => {
-    const match = /^language-(\w+)(-repl|-exec)?\:?(.+)?$/.exec(
+    const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
       className || ""
     );
     if (match) {
@@ -63,23 +63,17 @@ const components: Components = {
         );
       } else if (match[3]) {
         // ファイル名指定がある場合、ファイルエディター
-        // 現状はPythonのみ対応
-        switch (match[1]) {
-          case "python":
-            return (
-              <div className="border border-primary m-2 rounded-lg">
-                <EditorComponent
-                  language={match[1]}
-                  tabSize={4}
-                  filename={match[3]}
-                  initContent={String(props.children || "").replace(/\n$/, "")}
-                />
-              </div>
-            );
-          default:
-            console.warn(`Unsupported language for editor: ${match[1]}`);
-            break;
-        }
+        return (
+          <div className="border border-primary m-2 rounded-lg">
+            <EditorComponent
+              language={match[1]}
+              tabSize={4}
+              filename={match[3]}
+              readonly={match[2] === "-readonly"}
+              initContent={String(props.children || "").replace(/\n$/, "")}
+            />
+          </div>
+        );
       } else if (match[2] === "-repl") {
         // repl付きの言語指定
         // 現状はPythonのみ対応

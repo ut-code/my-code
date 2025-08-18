@@ -259,7 +259,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 **ヒント:**
 リスト内包表記と、辞書の値にアクセスする方法 (`product['price']`) を組み合わせ、`if` 条件を追加してみましょう。
 
-```python:practice3-1.py
+```python:practice3_1.py
 products = [
     {'name': 'Apple', 'price': 150},
     {'name': 'Banana', 'price': 100},
@@ -270,7 +270,7 @@ products = [
 
 ```
 
-```python-exec:practice3-1.py
+```python-exec:practice3_1.py
 (出力例) ['Melon', 'Grape']
 ```
 
@@ -285,13 +285,13 @@ c. 数学クラブにのみ所属しているメンバー
 **ヒント:**
 セットの積集合 (`&`)、和集合 (`|`)、差集合 (`-`) 演算子を使います。
 
-```python:practice3-2.py
+```python:practice3_2.py
 math_club = {'Alice', 'Bob', 'Charlie', 'David'}
 science_club = {'Charlie', 'David', 'Eve', 'Frank'}
 
 ```
 
-```python-exec:practice3-2.py
+```python-exec:practice3_2.py
 (出力例)
 a. {'Charlie', 'David'}
 b. {'Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank'}

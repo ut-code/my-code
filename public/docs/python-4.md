@@ -236,12 +236,12 @@ city: Tokyo
   * `for`ループと`enumerate()`を組み合わせます。
   * 数値が偶数かどうかは、`%`（剰余）演算子を使って、2で割った余りが0になるかで判定できます (`number % 2 == 0`)。
 
-```python:practice4-1.py
+```python:practice4_1.py
 numbers: list[int] = [8, 15, 22, 37, 40, 51, 68]
 
 ```
 
-```python-exec:practice4-1.py
+```python-exec:practice4_1.py
 (出力例)
 インデックス: 0, 値: 8
 インデックス: 2, 値: 22
@@ -265,11 +265,11 @@ numbers: list[int] = [8, 15, 22, 37, 40, 51, 68]
   * `age`と`city`にはデフォルト引数値を設定します。
   * 値を返さない関数の返り値の型アノテーションは `-> None` です。
 
-```python:practice4-2.py
+```python:practice4_2.py
 def create_profile(
 ```
 
-```python-exec:practice4-2.py
+```python-exec:practice4_2.py
 (出力例)
 --- プロフィール ---
 名前: Tanaka

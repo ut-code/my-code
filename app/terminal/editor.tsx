@@ -9,6 +9,9 @@ import "ace-builds/src-min-noconflict/theme-twilight";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import "ace-builds/src-min-noconflict/mode-python";
+import "ace-builds/src-min-noconflict/mode-json";
+import "ace-builds/src-min-noconflict/mode-csv";
+import "ace-builds/src-min-noconflict/mode-text";
 import { useEffect } from "react";
 import { useSectionCode } from "../[docs_id]/section";
 import clsx from "clsx";
@@ -19,6 +22,7 @@ interface EditorProps {
   tabSize: number;
   filename: string;
   initContent: string;
+  readonly?: boolean;
 }
 export function EditorComponent(props: EditorProps) {
   const { files, writeFile } = useFile();
@@ -30,13 +34,20 @@ export function EditorComponent(props: EditorProps) {
       writeFile(props.filename, props.initContent);
     }
     addSectionFile?.(props.filename);
-  }, [files, props.filename, props.initContent, writeFile, addSectionFile]);
+  }, [
+    files,
+    props.filename,
+    props.initContent,
+    writeFile,
+    addSectionFile,
+  ]);
 
   return (
     <div className="embedded-editor">
       <div className="flex flex-row items-center">
         <div className="font-mono text-sm mt-2 mb-1 ml-4 mr-2">
           {props.filename}
+          {props.readonly && <span className="font-sans ml-2">(編集不可)</span>}
         </div>
         <button
           className={clsx(
@@ -44,7 +55,7 @@ export function EditorComponent(props: EditorProps) {
             // btn-warning は文字色を変えるがsvgの色は変えてくれないので、 stroke-warning を追加指定している
             "stroke-warning hover:stroke-warning-content active:stroke-warning-content",
             // codeの内容が変更された場合のみ表示する
-            code == props.initContent && "invisible"
+            (props.readonly || code == props.initContent) && "invisible"
           )}
           onClick={() => writeFile(props.filename, props.initContent)}
         >
@@ -79,6 +90,7 @@ export function EditorComponent(props: EditorProps) {
           Math.max((props.initContent.split("\n").length + 2) * 14, 128) + "px"
         }
         className="font-mono!" // Aceのデフォルトフォントを上書き
+        readOnly={props.readonly}
         fontSize={14}
         enableBasicAutocompletion={true}
         enableLiveAutocompletion={true}
