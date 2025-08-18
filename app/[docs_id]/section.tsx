@@ -11,7 +11,7 @@ export function Section({ section }: { section: MarkdownSection }) {
     <div>
       <Heading level={section.level}>{section.title}</Heading>
       <StyledMarkdown content={section.content} />
-      <ChatForm />
+      <ChatForm documentContent={section.content} />
     </div>
   );
 }
