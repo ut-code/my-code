@@ -31,8 +31,24 @@ export async function askAI(params: ChatParams): Promise<FormState> {
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const fullMessage = documentContent + "\n\n" + userQuestion;
-    const result = await model.generateContent(fullMessage);
+    const prompt = `
+以下のPythonチュートリアルのドキュメントの内容を正確に理解し、ユーザーからの質問に対して、初心者にも分かりやすく、丁寧な解説を提供してください。
+
+# ドキュメント
+${documentContent}
+
+# ユーザーからの質問
+${userQuestion}
+
+# 指示
+- 回答はMarkdown形式で記述し、コードブロックを適切に使用してください。
+- ドキュメントの内容に基づいて回答してください。
+- ユーザーへの回答のみを出力してください。
+- 必要であれば、具体的なコード例を提示してください。
+- 
+
+`;
+    const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text();
     return { response: text, error: null };
