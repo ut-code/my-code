@@ -12,7 +12,7 @@ Pythonのプログラミングにおいて、データを効率的に扱う能�
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # リストの作成
 >>> fruits = ['apple', 'banana', 'cherry']
 >>> fruits
@@ -57,7 +57,7 @@ Pythonのプログラミングにおいて、データを効率的に扱う能�
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # タプルの作成 (丸括弧を使用)
 >>> coordinates = (10, 20)
 >>> coordinates
@@ -92,7 +92,7 @@ TypeError: 'tuple' object does not support item assignment
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # 辞書の作成
 >>> person = {'name': 'Taro Yamada', 'age': 30, 'city': 'Tokyo'}
 >>> person
@@ -132,7 +132,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **基本的な使い方 (REPL実行例)**
 
-```python
+```python-repl
 >>> # セットの作成 (重複した4は自動的に無視される)
 >>> numbers = {1, 2, 3, 4, 4, 5}
 >>> numbers
@@ -168,7 +168,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **REPL実行例**
 
-```python
+```python-repl
 >>> numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 >>> # インデックス1から4の手前まで
@@ -200,7 +200,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 `for`ループで書く場合と、リスト内包表記で書く場合を比較してみましょう。
 
-```python
+```python-repl
 >>> # forループの場合
 >>> squares_loop = []
 >>> for i in range(10):
@@ -222,7 +222,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **辞書内包表記**
 
-```python
+```python-repl
 >>> # 数値をキー、その2乗を値とする辞書を作成
 >>> square_dict = {x: x*x for x in range(5)}
 >>> square_dict
@@ -231,7 +231,7 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 
 **セット内包表記**
 
-```python
+```python-repl
 >>> # リスト内のユニークな数値の2乗のセットを作成
 >>> numbers = [1, 2, 2, 3, 4, 4, 5]
 >>> square_set = {x*x for x in numbers}
@@ -239,4 +239,61 @@ dict_items([('name', 'Taro Yamada'), ('age', 31), ('city', 'Tokyo'), ('job', 'En
 {1, 4, 9, 16, 25}
 ```
 
-内包表記は、Pythonプログラマーにとって必須のテクニックです。積極的に活用して、効率的で美しいコードを目指しましょう。
+## この章のまとめ
+
+この章では、Pythonでデータを扱うための基本的な4つのコレクションを学びました。それぞれの特性を理解し、状況に応じて適切に使い分けることが重要です。
+
+| データ構造 | 構文例 | 変更可能性 | 順序 | 重複 | 主な用途 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **リスト (List)** | `[1, 'a', 2]` | **可能** (ミュータブル) | **あり** | 許可 | 順序があり、変更が必要な要素の集まり。 |
+| **タプル (Tuple)** | `(1, 'a', 2)` | **不可能** (イミュータブル) | **あり** | 許可 | 変更しない（させたくない）データの集まり、辞書のキー。 |
+| **辞書 (Dictionary)** | `{'key': 'value'}` | **可能** (ミュータブル) | **あり** (Python 3.7+) | キーは不許可 | キーと値のペアでデータを管理。 |
+| **セット (Set)** | `{1, 'a', 2}` | **可能** (ミュータブル) | **なし** | 不許可 | 重複を除き、要素の存在確認や集合演算を高速に行う。 |
+
+加えて、**スライシング**を使えばシーケンス（リストやタプル）から部分的な要素を柔軟に取得でき、**内包表記**を利用すれば、これらのコレクションを一行で効率的かつPythonらしく生成できます。これらのツールは、あなたのコードをより簡潔で強力なものにしてくれるでしょう。
+
+### 練習問題1: 商品のフィルタリング
+
+ある店舗の商品のリストがあります。このリストから、価格が500円以上の商品だけを抽出し、その名前だけを新しいリストに格納してください。
+
+**ヒント:**
+リスト内包表記と、辞書の値にアクセスする方法 (`product['price']`) を組み合わせ、`if` 条件を追加してみましょう。
+
+```python:practice3_1.py
+products = [
+    {'name': 'Apple', 'price': 150},
+    {'name': 'Banana', 'price': 100},
+    {'name': 'Melon', 'price': 600},
+    {'name': 'Orange', 'price': 120},
+    {'name': 'Grape', 'price': 550}
+]
+
+```
+
+```python-exec:practice3_1.py
+(出力例) ['Melon', 'Grape']
+```
+
+### 練習問題2: クラブ活動のメンバー分析
+
+2つのクラブ活動、「数学クラブ」と「科学クラブ」のメンバーリストがあります。セット（集合）の機能を使って、以下のメンバーリストを作成してください。
+
+a. 両方のクラブに所属しているメンバー
+b. 少なくともどちらか一方のクラブに所属している全メンバー
+c. 数学クラブにのみ所属しているメンバー
+
+**ヒント:**
+セットの積集合 (`&`)、和集合 (`|`)、差集合 (`-`) 演算子を使います。
+
+```python:practice3_2.py
+math_club = {'Alice', 'Bob', 'Charlie', 'David'}
+science_club = {'Charlie', 'David', 'Eve', 'Frank'}
+
+```
+
+```python-exec:practice3_2.py
+(出力例)
+a. {'Charlie', 'David'}
+b. {'Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank'}
+c. {'Alice', 'Bob'}
+```

@@ -1,7 +1,10 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 import { Heading } from "./section";
+import { EditorComponent } from "../terminal/editor";
+import { ExecFile } from "../terminal/exec";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -31,19 +34,72 @@ const components: Components = {
   strong: ({ node, ...props }) => (
     <strong className="text-primary" {...props} />
   ),
+  hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
+  pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => {
-    const match = /language-(\w+)/.exec(className || "");
+    const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
+      className || ""
+    );
     if (match) {
-      // block
+      if (match[2] === "-exec" && match[3]) {
+        /*
+        ```python-exec:main.py
+        hello, world!
+        ```
+        ↓
+        ---------------------------
+         [▶ 実行] `python main.py`
+          hello, world!
+        ---------------------------
+        */
+        return (
+          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
+            <ExecFile
+              language={match[1]}
+              filename={match[3]}
+              content={String(props.children || "").replace(/\n$/, "")}
+            />
+          </div>
+        );
+      } else if (match[3]) {
+        // ファイル名指定がある場合、ファイルエディター
+        return (
+          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
+            <EditorComponent
+              language={match[1]}
+              tabSize={4}
+              filename={match[3]}
+              readonly={match[2] === "-readonly"}
+              initContent={String(props.children || "").replace(/\n$/, "")}
+            />
+          </div>
+        );
+      } else if (match[2] === "-repl") {
+        // repl付きの言語指定
+        // 現状はPythonのみ対応
+        switch (match[1]) {
+          case "python":
+            return (
+              <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
+                <PythonEmbeddedTerminal
+                  content={String(props.children || "").replace(/\n$/, "")}
+                />
+              </div>
+            );
+          default:
+            console.warn(`Unsupported language for repl: ${match[1]}`);
+            break;
+        }
+      }
       return (
         <SyntaxHighlighter
           language={match[1]}
           PreTag="div"
-          className="px-4! py-4! m-0!"
+          className="border border-base-300 mx-2 my-2 rounded-lg text-sm! m-2! p-4!"
           // style={todo dark theme?}
           {...props}
         >
-          {String(props.children).replace(/\n$/, "")}
+          {String(props.children || "").replace(/\n$/, "")}
         </SyntaxHighlighter>
       );
     } else if (String(props.children).includes("\n")) {
@@ -51,28 +107,21 @@ const components: Components = {
       return (
         <SyntaxHighlighter
           PreTag="div"
-          className="px-4! py-4! m-0!"
+          className="border border-base-300 mx-2 my-2 rounded-lg text-sm! m-2! p-4!"
           // style={todo dark theme?}
           {...props}
         >
-          {String(props.children).replace(/\n$/, "")}
+          {String(props.children || "").replace(/\n$/, "")}
         </SyntaxHighlighter>
       );
     } else {
       // inline
       return (
         <code
-          className="bg-base-200 border border-base-300 p-1 rounded font-mono "
+          className="bg-base-200 border border-base-300 px-1 py-0.5 rounded text-sm "
           {...props}
         />
       );
     }
   },
-  pre: ({ node, ...props }) => (
-    <pre
-      className="bg-base-200 border border-primary mx-2 my-2 rounded-lg font-mono text-sm overflow-x-auto"
-      {...props}
-    />
-  ),
-  hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
 };
