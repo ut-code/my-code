@@ -31,7 +31,7 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
   return (
     <>
       {isFormVisible && (
-      <form className="border border-2 border-primary shadow-xl p-6 rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
+      <form className="border border-2 border-secondary shadow-xl p-6 rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
           <h2 className="text-xl font-bold mb-4 text-left relative -top-2 font-mono h-2">
             AIへ質問
           </h2>
@@ -59,7 +59,7 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
             <div className="right-controls">
               <button
                 type="submit"
-                className="btn btn-soft btn-circle btn-primary rounded-full"
+                className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
                 title="送信"
               style={{marginTop:"10px"}}
                 disabled={isLoading}
