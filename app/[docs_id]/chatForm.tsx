@@ -27,9 +27,12 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
       const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
       if (savedHistory) {
         setMessages(JSON.parse(savedHistory));
+      } else {
+        setMessages([]);
       }
     } catch (error) {
       console.error("Failed to load chat history from localStorage", error);
+      setMessages([]);
     }
   }, [CHAT_HISTORY_KEY]);
 
