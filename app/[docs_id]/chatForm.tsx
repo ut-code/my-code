@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { askAI } from "@/app/actions/chatActions";
+import { StyledMarkdown } from "./markdown";
 
 export function ChatForm({ documentContent }: { documentContent: string }) {
   const [inputValue, setInputValue] = useState("");
@@ -82,8 +83,8 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
         <article>
           <h3 className="text-lg font-semibold mb-2">AIの回答</h3>
           <div className="chat chat-start">
-            <div className="chat-bubble chat-bubble-primary">
-              <div className="response-container">{response}</div>
+            <div className="chat-bubble bg-secondary-content text-black" style={{maxWidth: "100%", wordBreak: "break-word"}}>
+              <div className="response-container"><StyledMarkdown content={response}/></div>
             </div>
           </div>
         </article>
