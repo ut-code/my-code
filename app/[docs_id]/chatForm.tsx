@@ -1,19 +1,45 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
 
+interface Message {
+  sender: "user" | "ai";
+  text: string;
+}
+
+const CHAT_HISTORY_KEY = "my-code-chat-history";
+
 export function ChatForm({ documentContent }: { documentContent: string }) {
   const [inputValue, setInputValue] = useState("");
-  const [response, setResponse] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+      if (savedHistory) {
+        setMessages(JSON.parse(savedHistory));
+      }
+    } catch (error) {
+      console.error("Failed to load chat history from localStorage", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+    }
+  }, [messages]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setResponse("");
+
+    const userMessage: Message = { sender: "user", text: inputValue };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     const result = await askAI({
       userQuestion: inputValue,
@@ -21,11 +47,14 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
     });
 
     if (result.error) {
-      setResponse(`エラー: ${result.error}`);
+      const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}` };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } else {
-      setResponse(result.response);
+      const aiMessage: Message = { sender: "ai", text: result.response };
+      setMessages((prevMessages) => [...prevMessages, aiMessage]);
     }
 
+    setInputValue("");
     setIsLoading(false);
   };
   return (
@@ -51,8 +80,8 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
               <button
                 className="btn btn-soft btn-secondary rounded-full"
                 onClick={() => setIsFormVisible(false)}
+                type="button"
               >
-
                 閉じる
               </button>
             </div>
@@ -62,7 +91,7 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
                 className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
                 title="送信"
               style={{marginTop:"10px"}}
-                disabled={isLoading}
+                disabled={isLoading || !inputValue.trim()}
               >
                 <span className="icon">➤</span>
               </button>
@@ -79,14 +108,16 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
         </button>
       )}
 
-      {response && (
-        <article>
-          <h3 className="text-lg font-semibold mb-2">AIの回答</h3>
-          <div className="chat chat-start">
-            <div className="chat-bubble bg-secondary-content text-black" style={{maxWidth: "100%", wordBreak: "break-word"}}>
-              <div className="response-container"><StyledMarkdown content={response}/></div>
+      {messages.length > 0 && (
+        <article className="mt-4">
+          <h3 className="text-lg font-semibold mb-2">チャット履歴</h3>
+          {messages.map((msg, index) => (
+            <div key={index} className={`chat ${msg.sender === 'user' ? 'chat-end' : 'chat-start'}`}>
+              <div className={`chat-bubble ${msg.sender === 'user' ? 'bg-primary text-primary-content' : 'bg-secondary-content text-black'}`} style={{maxWidth: "100%", wordBreak: "break-word"}}>
+                <StyledMarkdown content={msg.text} />
+              </div>
             </div>
-          </div>
+          ))}
         </article>
       )}
 
