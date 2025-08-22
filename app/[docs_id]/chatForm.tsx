@@ -9,9 +9,14 @@ interface Message {
   text: string;
 }
 
-const CHAT_HISTORY_KEY = "my-code-chat-history";
+interface ChatFormProps {
+  documentContent: string;
+  sectionId: string;
+}
 
-export function ChatForm({ documentContent }: { documentContent: string }) {
+export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
+  const CHAT_HISTORY_KEY = `my-code-chat-history-${sectionId}`;
+
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,20 +31,22 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
     } catch (error) {
       console.error("Failed to load chat history from localStorage", error);
     }
-  }, []);
+  }, [CHAT_HISTORY_KEY]);
 
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length === 0) {
+      localStorage.removeItem(CHAT_HISTORY_KEY);
+    } else {
       localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
     }
-  }, [messages]);
+  }, [messages, CHAT_HISTORY_KEY]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     const userMessage: Message = { sender: "user", text: inputValue };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setMessages([userMessage]);
 
     const result = await askAI({
       userQuestion: inputValue,
@@ -48,10 +55,10 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
 
     if (result.error) {
       const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}` };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      setMessages([userMessage, errorMessage]);
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      setMessages([userMessage, aiMessage]);
     }
 
     setInputValue("");
@@ -110,7 +117,7 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
 
       {messages.length > 0 && (
         <article className="mt-4">
-          <h3 className="text-lg font-semibold mb-2">チャット履歴</h3>
+          <h3 className="text-lg font-semibold mb-2">AIとのチャット</h3>
           {messages.map((msg, index) => (
             <div key={index} className={`chat ${msg.sender === 'user' ? 'chat-end' : 'chat-start'}`}>
               <div className={`chat-bubble ${msg.sender === 'user' ? 'bg-primary text-primary-content' : 'bg-secondary-content text-black'}`} style={{maxWidth: "100%", wordBreak: "break-word"}}>
