@@ -118,7 +118,7 @@ const components: Components = {
       // inline
       return (
         <code
-          className="bg-base-200 border border-base-300 px-1 py-0.5 rounded text-sm "
+          className="bg-base-200/60 border border-base-300 px-1 py-0.5 rounded text-sm "
           {...props}
         />
       );
