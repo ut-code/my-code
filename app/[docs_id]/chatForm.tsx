@@ -32,9 +32,9 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
     <>
       {isFormVisible && (
       <form className="border border-2 border-secondary shadow-md rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
-        <div className="input-area" style={{height:"90px", margin:"10px"}}>
+        <div className="input-area" style={{height:"90px"}}>
             <textarea
-              className="textarea-ghost textarea-white textarea-md"
+              className="textarea textarea-ghost textarea-md"
               placeholder="質問を入力してください"
             style={{width: "100%", height: "110px", resize: "none", outlineStyle: "none"}}
               value={inputValue}
@@ -42,8 +42,7 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
               disabled={isLoading}
             ></textarea>
           </div>
-          <br />
-        <div className="controls" style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+        <div className="controls" style={{margin:"22px 10px 10px 10px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
             <div className="left-icons">
               <button
                 className="btn btn-soft btn-secondary rounded-full"
