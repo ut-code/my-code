@@ -32,9 +32,9 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
     <>
       {isFormVisible && (
       <form className="border border-2 border-secondary shadow-md rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
-        <div className="input-area" style={{height:"90px"}}>
+        <div className="input-area">
             <textarea
-              className="textarea textarea-ghost textarea-md"
+              className="textarea textarea-ghost textarea-md rounded-lg"
               placeholder="質問を入力してください"
             style={{width: "100%", height: "110px", resize: "none", outlineStyle: "none"}}
               value={inputValue}
