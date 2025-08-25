@@ -31,22 +31,18 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
   return (
     <>
       {isFormVisible && (
-      <form className="border border-2 border-secondary shadow-xl p-6 rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
-          <h2 className="text-xl font-bold mb-4 text-left relative -top-2 font-mono h-2">
-            AIへ質問
-          </h2>
-        <div className="input-area" style={{height:"80px"}}>
+      <form className="border border-2 border-secondary shadow-md rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
+        <div className="input-area">
             <textarea
-              className="textarea textarea-white textarea-md"
+              className="textarea textarea-ghost textarea-md rounded-lg"
               placeholder="質問を入力してください"
-            style={{width: "100%", height: "110px", resize: "none"}}
+            style={{width: "100%", height: "110px", resize: "none", outlineStyle: "none"}}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               disabled={isLoading}
             ></textarea>
           </div>
-          <br />
-        <div className="controls" style={{position:"relative", top:"22px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+        <div className="controls" style={{margin:"10px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
             <div className="left-icons">
               <button
                 className="btn btn-soft btn-secondary rounded-full"
@@ -61,7 +57,6 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
                 type="submit"
                 className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
                 title="送信"
-              style={{marginTop:"10px"}}
                 disabled={isLoading}
               >
                 <span className="icon">➤</span>
