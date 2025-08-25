@@ -42,7 +42,7 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
               disabled={isLoading}
             ></textarea>
           </div>
-        <div className="controls" style={{margin:"22px 10px 10px 10px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+        <div className="controls" style={{margin:"10px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
             <div className="left-icons">
               <button
                 className="btn btn-soft btn-secondary rounded-full"
