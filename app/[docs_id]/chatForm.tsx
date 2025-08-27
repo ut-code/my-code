@@ -3,6 +3,7 @@
 import { useState, FormEvent, useEffect } from "react";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
+import { useChatHistory } from "../context/ChatHistoryContext";
 
 interface Message {
   sender: "user" | "ai";
@@ -15,41 +16,24 @@ interface ChatFormProps {
 }
 
 export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
-  const CHAT_HISTORY_KEY = `my-code-chat-history-${sectionId}`;
+  const { chatHistories, setChatHistory } = useChatHistory();
+  const messages = chatHistories[sectionId] || [];
 
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    try {
-      const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
-      if (savedHistory) {
-        setMessages(JSON.parse(savedHistory));
-      } else {
-        setMessages([]);
-      }
-    } catch (error) {
-      console.error("Failed to load chat history from localStorage", error);
-      setMessages([]);
-    }
-  }, [CHAT_HISTORY_KEY]);
-
-  useEffect(() => {
-    if (messages.length === 0) {
-      localStorage.removeItem(CHAT_HISTORY_KEY);
-    } else {
-      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
-    }
-  }, [messages, CHAT_HISTORY_KEY]);
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     const userMessage: Message = { sender: "user", text: inputValue };
-    setMessages([userMessage]);
+    setChatHistory(sectionId, [userMessage]);
 
     const result = await askAI({
       userQuestion: inputValue,
@@ -58,10 +42,10 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
 
     if (result.error) {
       const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}` };
-      setMessages([userMessage, errorMessage]);
+      setChatHistory(sectionId, [userMessage, errorMessage]);
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
-      setMessages([userMessage, aiMessage]);
+      setChatHistory(sectionId, [userMessage, aiMessage]);
     }
 
     setInputValue("");
@@ -118,7 +102,7 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
         </button>
       )}
 
-      {messages.length > 0 && (
+      {isMounted && messages.length > 0 && (
         <article className="mt-4">
           <h3 className="text-lg font-semibold mb-2">AIとのチャット</h3>
           {messages.map((msg, index) => (
