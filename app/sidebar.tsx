@@ -1,11 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { split } from "react-ace";
 import useSWR from 'swr'
 import { splitMarkdownClient } from "./[docs_id]/splitMarkdownClient";
-import { Section } from "./[docs_id]/section";
 
 
 
