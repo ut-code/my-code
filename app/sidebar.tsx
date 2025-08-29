@@ -41,7 +41,7 @@ export function Sidebar() {
       </h2>
       
       <ol className="menu w-full list-decimal list-outside">
-        {pages.map((page,i) => (
+        {pages.map((page) => (
           <li key={page.id}>
             <Link href={`/${page.id}`}>{page.title}</Link>
             {page.id === docs_id && (
