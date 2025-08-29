@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import useSWR from 'swr'
-import { splitMarkdownClient } from "./[docs_id]/splitMarkdownClient";
+import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 
 
 
@@ -31,7 +31,7 @@ export function Sidebar() {
   ];
 
 
-  const splitmdcontent = splitMarkdownClient(data ?? "")
+  const splitmdcontent = splitMarkdown(data ?? "")
   return (
     <div className="bg-base-200 min-h-full w-80 p-4">
       {/* todo: 背景色ほんとにこれでいい？ */}
