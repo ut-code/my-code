@@ -63,7 +63,9 @@ export function Sidebar() {
                 {splitmdcontent
                   .filter(section => section.level !== 1)
                   .map((section, idx) => (
-                    <li key={idx}>{section.title}</li>
+                    <li key={idx}>
+                      <Link href={`#${idx+1}`}>{section.title}</Link>
+                    </li>
                   ))}
               </ul>
             )}
