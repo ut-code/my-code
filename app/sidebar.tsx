@@ -14,9 +14,6 @@ export function Sidebar() {
     fetcher
   )
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
-
   const pages = [
     { id: "python-1", title: "1. 環境構築と基本思想" },
     { id: "python-2", title: "2. 基本構文とデータ型" },
@@ -28,6 +25,25 @@ export function Sidebar() {
     { id: "python-8", title: "8. 例外処理" },
     { id: "python-9", title: "9. ジェネレータとデコレータ" },
   ];
+
+  if (isLoading) return (
+    <div className="bg-base-200 min-h-full w-80 p-4">
+      <h2 className="hidden text-xl font-bold mb-4">
+        {/* サイドバーが常時表示されている場合のみ */}
+        Navbar Title
+      </h2>
+      <ol className="menu w-full list-outside">
+        {pages.map((page) =>
+        <li key={page.id}>
+          <Link href={`/${page.id}`}>{page.title}</Link>
+        </li>
+        )}
+      </ol>
+    </div>
+    )
+  if (error) return console.error()
+
+  
 
   const splitmdcontent = splitMarkdown(data ?? "")
   return (
