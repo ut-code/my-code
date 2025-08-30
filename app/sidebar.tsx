@@ -53,11 +53,9 @@ export function Sidebar() {
                       <Link href={`#${idx+1}`}>{section.title}</Link>
                     </li>
                     :
-                    <ul key={idx} className="ml-3 mt-2 text-sm">
-                      <li>
-                        <Link href={`#${idx+1}`}>{section.title}</Link>
-                      </li>
-                    </ul>
+                    <li key={idx} style={{ marginLeft: '1em' }}>
+                      <Link href={`#${idx+1}`}>{section.title}</Link>
+                    </li>
                   ))}
               </ul>
             )}
