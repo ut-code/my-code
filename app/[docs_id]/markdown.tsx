@@ -34,6 +34,11 @@ const components: Components = {
   strong: ({ node, ...props }) => (
     <strong className="text-primary" {...props} />
   ),
+  table: ({ node, ...props }) => (
+    <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-lg border border-base-content/5 shadow-sm">
+      <table className="table w-max" {...props} />
+    </div>
+  ),
   hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => {
