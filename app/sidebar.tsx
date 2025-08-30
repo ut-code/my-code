@@ -48,12 +48,8 @@ export function Sidebar() {
               <ul className="ml-4 mt-2 text-sm">
                 {splitmdcontent
                   .slice(1)
-                  .map((section, idx) => ( section.level===2 ?
-                    <li key={idx}>
-                      <Link href={`#${idx+1}`}>{section.title}</Link>
-                    </li>
-                    :
-                    <li key={idx} style={{ marginLeft: '1em' }}>
+                  .map((section, idx) => (
+                    <li key={idx} style={{ marginLeft: section.level===2 ? undefined : "1em" }}>
                       <Link href={`#${idx+1}`}>{section.title}</Link>
                     </li>
                   ))}
