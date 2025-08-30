@@ -49,7 +49,7 @@ export function Sidebar() {
                 {splitmdcontent
                   .slice(1)
                   .map((section, idx) => (
-                    <li key={idx} style={{ marginLeft: section.level===2 ? undefined : "1em" }}>
+                    <li key={idx} style={{ marginLeft: (section.level - 2) + "em"}}>
                       <Link href={`#${idx+1}`}>{section.title}</Link>
                     </li>
                   ))}
