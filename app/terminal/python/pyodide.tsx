@@ -289,7 +289,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         return output;
       });
     },
-    [files]
+    [files, writeFile]
   );
 
   /**

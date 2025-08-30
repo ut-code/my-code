@@ -1,5 +1,3 @@
-"use server";
-
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -13,9 +11,9 @@ export interface MarkdownSection {
  * Markdownコンテンツを見出しごとに分割し、
  * 見出しのレベルとタイトル、内容を含むオブジェクトの配列を返す。
  */
-export async function splitMarkdown(
+export function splitMarkdown(
   content: string
-): Promise<MarkdownSection[]> {
+): MarkdownSection[] {
   const tree = unified().use(remarkParse).use(remarkGfm).parse(content);
   // console.log(tree.children.map(({ type, position }) => ({ type, position: JSON.stringify(position) })));
   const headingNodes = tree.children.filter((node) => node.type === "heading");
