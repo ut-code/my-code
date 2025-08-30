@@ -26,6 +26,7 @@ export function Sidebar() {
     { id: "python-9", title: "9. ジェネレータとデコレータ" },
   ];
 
+  if (error) return console.error(error)
   if (isLoading) return (
     <div className="bg-base-200 min-h-full w-80 p-4">
       <h2 className="hidden text-xl font-bold mb-4">
@@ -40,8 +41,7 @@ export function Sidebar() {
         )}
       </ol>
     </div>
-    )
-  if (error) return console.error()
+  )
 
   
 
