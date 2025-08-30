@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import useSWR from 'swr'
+import useSWR, { Fetcher } from 'swr'
 import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 
-
+const fetcher: Fetcher<string, string> = (url) => fetch(url).then((r) => r.text())
 
 export function Sidebar() {
-  const fetcher = (url: string | URL | Request<unknown, CfProperties<unknown>>) => fetch(url).then((r) => r.text())
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
   const { data, error, isLoading } = useSWR(
@@ -30,7 +29,6 @@ export function Sidebar() {
     { id: "python-9", title: "9. ジェネレータとデコレータ" },
   ];
 
-
   const splitmdcontent = splitMarkdown(data ?? "")
   return (
     <div className="bg-base-200 min-h-full w-80 p-4">
@@ -40,12 +38,12 @@ export function Sidebar() {
         Navbar Title
       </h2>
       
-      <ol className="menu w-full list-decimal list-outside">
+      <ol className="menu w-full list-outside">
         {pages.map((page) => (
           <li key={page.id}>
             <Link href={`/${page.id}`}>{page.title}</Link>
             {page.id === docs_id && (
-              <ul className="ml-4 mt-2 list-disc text-sm">
+              <ul className="ml-4 mt-2 text-sm">
                 {splitmdcontent
                   .filter(section => section.level !== 1)
                   .map((section, idx) => (
