@@ -27,21 +27,7 @@ export function Sidebar() {
   ];
 
   if (error) console.error("Sidebar fetch error:", error)
-  if (isLoading) return (
-    <div className="bg-base-200 min-h-full w-80 p-4">
-      <h2 className="hidden text-xl font-bold mb-4">
-        {/* サイドバーが常時表示されている場合のみ */}
-        Navbar Title
-      </h2>
-      <ol className="menu w-full list-outside">
-        {pages.map((page) =>
-        <li key={page.id}>
-          <Link href={`/${page.id}`}>{page.title}</Link>
-        </li>
-        )}
-      </ol>
-    </div>
-  )
+  
 
   
 
@@ -58,14 +44,20 @@ export function Sidebar() {
         {pages.map((page) => (
           <li key={page.id}>
             <Link href={`/${page.id}`}>{page.title}</Link>
-            {page.id === docs_id && (
+            {page.id === docs_id && !isLoading &&(
               <ul className="ml-4 mt-2 text-sm">
                 {splitmdcontent
-                  .filter(section => section.level !== 1)
-                  .map((section, idx) => (
+                  .slice(1)
+                  .map((section, idx) => ( section.level===2 ?
                     <li key={idx}>
                       <Link href={`#${idx+1}`}>{section.title}</Link>
                     </li>
+                    :
+                    <ul key={idx} className="ml-3 mt-2 text-sm">
+                      <li>
+                        <Link href={`#${idx+1}`}>{section.title}</Link>
+                      </li>
+                    </ul>
                   ))}
               </ul>
             )}
