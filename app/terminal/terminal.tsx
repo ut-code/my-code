@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
+import chalk from "chalk";
 
 /**
  * 文字列の幅を計算する。
@@ -48,6 +49,8 @@ export function hideCursor(term: Terminal) {
 export function showCursor(term: Terminal) {
   term.write("\x1b[?25h");
 }
+
+export const systemMessageColor = chalk.blue.bold.italic;
 
 interface TerminalProps {
   getRows?: (cols: number) => number;

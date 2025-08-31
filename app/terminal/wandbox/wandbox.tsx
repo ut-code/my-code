@@ -251,20 +251,49 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         }
       ).then((res) => res.json());
 
-      return [
-        ...(result.compiler_output
-          ? [{ type: "stdout" as const, message: result.compiler_output }]
-          : []),
-        ...(result.compiler_error
-          ? [{ type: "error" as const, message: result.compiler_error }]
-          : []),
-        ...(result.program_output
-          ? [{ type: "stdout" as const, message: result.program_output }]
-          : []),
-        ...(result.program_error
-          ? [{ type: "error" as const, message: result.program_error }]
-          : []),
-      ] satisfies ReplOutput[];
+      let outputs: ReplOutput[] = [];
+      if (result.compiler_output) {
+        outputs = outputs.concat(
+          result.compiler_output
+            .trim()
+            .split("\n")
+            .map((line) => ({ type: "stdout" as const, message: line }))
+        );
+      }
+      if (result.compiler_error) {
+        outputs = outputs.concat(
+          result.compiler_error
+            .trim()
+            .split("\n")
+            .map((line) => ({ type: "error" as const, message: line }))
+        );
+      }
+      if (result.program_output) {
+        outputs = outputs.concat(
+          result.program_output
+            .trim()
+            .split("\n")
+            .map((line) => ({ type: "stdout" as const, message: line }))
+        );
+      }
+      if (result.program_error) {
+        outputs = outputs.concat(
+          result.program_error
+            .trim()
+            .split("\n")
+            .map((line) => ({ type: "error" as const, message: line }))
+        );
+      }
+      if (result.status !== "0") {
+        outputs.push({
+          type: "system" as const,
+          message: `ステータス ${result.status} で異常終了しました`,
+        });
+      }
+      // TODO: result.signal はいつ使われるのか？
+
+      console.log(outputs);
+      return outputs;
     },
     [files, cppOptions]
   );
