@@ -3,6 +3,8 @@ export const pagesList = [
   {
     id: "python",
     lang: "Python",
+    // TODO: これをいい感じの文章に変える↓
+    description: "Pythonの基礎から応用までを学べるチュートリアル",
     pages: [
       { id: 1, title: "環境構築と基本思想" },
       { id: 2, title: "基本構文とデータ型" },
@@ -21,6 +23,7 @@ export const pagesList = [
   {
     id: "cpp",
     lang: "C++",
+    description: "C++の基本から高度な機能までを学べるチュートリアル",
     pages: [
       { id: 2, title: "型システムとメモリ" },
       { id: 3, title: "関数と参照" },
