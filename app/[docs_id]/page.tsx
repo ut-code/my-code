@@ -41,7 +41,9 @@ export default async function Page({
   return (
     <div className="p-4">
       {splitMdContent.map((section, index) => (
-        <Section key={index} section={section} />
+        <div key={index} id={`${index}`}>
+          <Section key={index} section={section} />
+        </div>
       ))}
     </div>
   );
