@@ -108,7 +108,8 @@ export function ExecFile(props: ExecProps) {
               break;
           }
         }
-        sectionContext?.setExecResult(props.filename!, outputs);
+        // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
+        sectionContext?.setExecResult(props.filenames.join(","), outputs);
       };
       break;
     default:
