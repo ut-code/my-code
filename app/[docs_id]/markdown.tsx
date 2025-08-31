@@ -3,8 +3,8 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 import { Heading } from "./section";
-import { EditorComponent } from "../terminal/editor";
-import { ExecFile } from "../terminal/exec";
+import { AceLang, EditorComponent } from "../terminal/editor";
+import { ExecFile, ExecLang } from "../terminal/exec";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -34,6 +34,11 @@ const components: Components = {
   strong: ({ node, ...props }) => (
     <strong className="text-primary" {...props} />
   ),
+  table: ({ node, ...props }) => (
+    <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-lg border border-base-content/5 shadow-sm">
+      <table className="table w-max" {...props} />
+    </div>
+  ),
   hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => {
@@ -52,21 +57,59 @@ const components: Components = {
           hello, world!
         ---------------------------
         */
-        return (
-          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
-            <ExecFile
-              language={match[1]}
-              filename={match[3]}
-              content={String(props.children || "").replace(/\n$/, "")}
-            />
-          </div>
-        );
+        let execLang: ExecLang | undefined = undefined;
+        switch (match[1]) {
+          case "python":
+            execLang = "python";
+            break;
+          case "cpp":
+          case "c++":
+            execLang = "cpp";
+            break;
+          default:
+            console.warn(`Unsupported language for exec: ${match[1]}`);
+            break;
+        }
+        if (execLang) {
+          return (
+            <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
+              <ExecFile
+                language={execLang}
+                filenames={match[3].split(",")}
+                content={String(props.children || "").replace(/\n$/, "")}
+              />
+            </div>
+          );
+        }
       } else if (match[3]) {
         // ファイル名指定がある場合、ファイルエディター
+        let aceLang: AceLang | undefined = undefined;
+        switch (match[1]) {
+          case "python":
+            aceLang = "python";
+            break;
+          case "cpp":
+          case "c++":
+            aceLang = "c_cpp";
+            break;
+          case "json":
+            aceLang = "json";
+            break;
+          case "csv":
+            aceLang = "csv";
+            break;
+          case "text":
+          case "txt":
+            aceLang = "text";
+            break;
+          default:
+            console.warn(`Unsupported language for editor: ${match[1]}`);
+            break;
+        }
         return (
           <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
             <EditorComponent
-              language={match[1]}
+              language={aceLang}
               tabSize={4}
               filename={match[3]}
               readonly={match[2] === "-readonly"}

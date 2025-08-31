@@ -4,11 +4,19 @@ import { useCallback, useEffect, useRef } from "react";
 import { highlightCodeToAnsi } from "./highlight";
 import chalk from "chalk";
 import { MutexInterface } from "async-mutex";
-import { clearTerminal, getRows, hideCursor, showCursor, useTerminal } from "./terminal";
+import {
+  clearTerminal,
+  getRows,
+  hideCursor,
+  showCursor,
+  systemMessageColor,
+  useTerminal,
+} from "./terminal";
 import { useSectionCode } from "../[docs_id]/section";
+import { Terminal } from "@xterm/xterm";
 
 export interface ReplOutput {
-  type: "stdout" | "stderr" | "error" | "return"; // 出力の種類
+  type: "stdout" | "stderr" | "error" | "return" | "system"; // 出力の種類
   message: string; // 出力メッセージ
 }
 export interface ReplCommand {
@@ -16,6 +24,35 @@ export interface ReplCommand {
   output: ReplOutput[];
 }
 export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
+
+export function writeOutput(
+  term: Terminal,
+  outputs: ReplOutput[],
+  endNewLine: boolean
+) {
+  for (let i = 0; i < outputs.length; i++) {
+    const output = outputs[i];
+    if (i > 0) {
+      term.writeln("");
+    }
+    // 出力内容に応じて色を変える
+    const message = String(output.message).replace(/\n/g, "\r\n");
+    switch (output.type) {
+      case "error":
+        term.write(chalk.red(message));
+        break;
+      case "system":
+        term.write(systemMessageColor(message));
+        break;
+      default:
+        term.write(message);
+        break;
+    }
+  }
+  if (endNewLine && outputs.length > 0) {
+    term.writeln("");
+  }
+}
 
 interface ReplComponentProps {
   initRuntime: () => void;
@@ -125,18 +162,7 @@ export function ReplTerminal(props: ReplComponentProps) {
   const onOutput = useCallback(
     (outputs: ReplOutput[]) => {
       if (terminalInstanceRef.current) {
-        for (const output of outputs) {
-          // 出力内容に応じて色を変える
-          const message = String(output.message).replace(/\n/g, "\r\n");
-          switch (output.type) {
-            case "error":
-              terminalInstanceRef.current.writeln(chalk.red(message));
-              break;
-            default:
-              terminalInstanceRef.current.writeln(message);
-              break;
-          }
-        }
+        writeOutput(terminalInstanceRef.current, outputs, true);
         // 出力が終わったらプロンプトを表示
         updateBuffer(() => [""]);
       }
@@ -296,7 +322,7 @@ export function ReplTerminal(props: ReplComponentProps) {
               initRuntime();
               hideCursor(terminalInstanceRef.current);
               terminalInstanceRef.current.write(
-                chalk.dim.bold.italic(
+                systemMessageColor(
                   "(初期化しています...しばらくお待ちください)"
                 )
               );

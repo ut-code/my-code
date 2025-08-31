@@ -9,6 +9,7 @@ import "ace-builds/src-min-noconflict/theme-twilight";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import "ace-builds/src-min-noconflict/mode-python";
+import "ace-builds/src-min-noconflict/mode-c_cpp";
 import "ace-builds/src-min-noconflict/mode-json";
 import "ace-builds/src-min-noconflict/mode-csv";
 import "ace-builds/src-min-noconflict/mode-text";
@@ -17,8 +18,11 @@ import { useSectionCode } from "../[docs_id]/section";
 import clsx from "clsx";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
+// mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
+export type AceLang = "python" | "c_cpp" | "json" | "csv" | "text";
+
 interface EditorProps {
-  language?: string;
+  language?: AceLang;
   tabSize: number;
   filename: string;
   initContent: string;
