@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import useSWR, { Fetcher } from "swr";
 import { splitMarkdown } from "./[docs_id]/splitMarkdown";
+import { pagesList } from "./pagesList";
 
 const fetcher: Fetcher<string, string> = (url) =>
   fetch(url).then((r) => r.text());
@@ -11,35 +12,6 @@ export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
   const { data, error, isLoading } = useSWR(`/docs/${docs_id}.md`, fetcher);
-
-  const pages = [
-    {
-      id: "python",
-      lang: "Python",
-      pages: [
-        { id: 1, title: "環境構築と基本思想" },
-        { id: 2, title: "基本構文とデータ型" },
-        { id: 3, title: "リスト、タプル、辞書、セット" },
-        { id: 4, title: "制御構文と関数" },
-        { id: 5, title: "モジュールとパッケージ" },
-        { id: 6, title: "オブジェクト指向プログラミング" },
-        {
-          id: 7,
-          title: "ファイルの入出力とコンテキストマネージャ",
-        },
-        { id: 8, title: "例外処理" },
-        { id: 9, title: "ジェネレータとデコレータ" },
-      ],
-    },
-    {
-      id: "cpp",
-      lang: "C++",
-      pages: [
-        { id: 2, title: "型システムとメモリ" },
-        { id: 3, title: "関数と参照" },
-      ],
-    },
-  ];
 
   if (error) console.error("Sidebar fetch error:", error);
 
@@ -53,7 +25,7 @@ export function Sidebar() {
       </h2>
 
       <ul className="menu w-full">
-        {pages.map((group) => (
+        {pagesList.map((group) => (
           <li key={group.id}>
             <details open={docs_id.startsWith(`${group.id}-`)}>
               <summary>{group.lang}</summary>
