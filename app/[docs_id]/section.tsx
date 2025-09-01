@@ -25,7 +25,13 @@ const SectionCodeContext = createContext<ISectionCodeContext | null>(null);
 export const useSectionCode = () => useContext(SectionCodeContext);
 
 // 1つのセクションのタイトルと内容を表示する。内容はMarkdownとしてレンダリングする
-export function Section({ section }: { section: MarkdownSection }) {
+export function Section({
+  docs_id,
+  section,
+}: {
+  docs_id: string;
+  section: MarkdownSection;
+}) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [replOutputs, setReplOutputs] = useState<ReplCommand[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -71,7 +77,7 @@ export function Section({ section }: { section: MarkdownSection }) {
       <div>
         <Heading level={section.level}>{section.title}</Heading>
         <StyledMarkdown content={section.content} />
-        <ChatForm documentContent={section.content} />
+        <ChatForm docs_id={docs_id} documentContent={section.content} />
       </div>
     </SectionCodeContext.Provider>
   );

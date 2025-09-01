@@ -3,20 +3,54 @@
 import { useState, FormEvent } from "react";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
+import useSWR from "swr";
+import { getQuestionExample } from "../actions/questionExample";
 
-export function ChatForm({ documentContent }: { documentContent: string }) {
+export function ChatForm({
+  docs_id,
+  documentContent,
+}: {
+  docs_id: string;
+  documentContent: string;
+}) {
   const [inputValue, setInputValue] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+
+  const lang = docs_id.split("-")[0];
+  const { data: exampleData, error: exampleError } = useSWR(
+    // 質問フォームを開いたときだけで良い
+    isFormVisible ? { lang, documentContent } : null,
+    getQuestionExample,
+    {
+      // リクエストは古くても構わないので1回でいい
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+  if (exampleError) {
+    console.error("Error getting question example:", exampleError);
+  }
+  // 質問フォームを開くたびにランダムに選び直し、
+  // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
+  const [exampleChoice, setExampleChoice] = useState<number>(0); // 0〜1
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setResponse("");
 
+    let userQuestion = inputValue;
+    if(!userQuestion && exampleData){
+      // 質問が空欄なら、質問例を使用
+      userQuestion = exampleData[Math.floor(exampleChoice * exampleData.length)];
+      setInputValue(userQuestion);
+    }
+
     const result = await askAI({
-      userQuestion: inputValue,
+      userQuestion,
       documentContent: documentContent,
     });
 
@@ -35,8 +69,18 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
         <div className="input-area">
             <textarea
               className="textarea textarea-ghost textarea-md rounded-lg"
-              placeholder="質問を入力してください"
-            style={{width: "100%", height: "110px", resize: "none", outlineStyle: "none"}}
+              placeholder={
+                "質問を入力してください" +
+                (exampleData
+                  ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
+                  : "")
+              }
+              style={{
+                width: "100%",
+                height: "110px",
+                resize: "none",
+                outlineStyle: "none",
+              }}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               disabled={isLoading}
@@ -68,7 +112,10 @@ export function ChatForm({ documentContent }: { documentContent: string }) {
       {!isFormVisible && (
         <button
           className="btn btn-soft btn-secondary rounded-full"
-          onClick={() => setIsFormVisible(true)}
+          onClick={() => {
+            setIsFormVisible(true);
+            setExampleChoice(Math.random());
+          }}
         >
           チャットを開く
         </button>
