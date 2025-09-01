@@ -5,6 +5,7 @@ import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
 import useSWR from "swr";
 import { getQuestionExample } from "../actions/questionExample";
+import { getLanguageName } from "../pagesList";
 
 export function ChatForm({
   docs_id,
@@ -18,7 +19,7 @@ export function ChatForm({
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
 
-  const lang = docs_id.split("-")[0];
+  const lang = getLanguageName(docs_id);
   const { data: exampleData, error: exampleError } = useSWR(
     // 質問フォームを開いたときだけで良い
     isFormVisible ? { lang, documentContent } : null,
