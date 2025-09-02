@@ -30,3 +30,13 @@ export const pagesList = [
     ],
   },
 ] as const;
+
+// ${lang_id}-${page_id} から言語名を取得
+export function getLanguageName(docs_id: string){
+  const lang_id = docs_id.split("-")[0];
+  const lang = pagesList.find((lang) => lang.id === lang_id)?.lang;
+  if(!lang){
+    throw new Error(`Unknown language id: ${lang_id}`);
+  }
+  return lang;
+}
