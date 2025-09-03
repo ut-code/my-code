@@ -3,7 +3,7 @@ import remarkGfm from "remark-gfm";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 import { Heading } from "./section";
-import { AceLang, EditorComponent } from "../terminal/editor";
+import { type AceLang, EditorComponent } from "../terminal/editor";
 import { ExecFile, ExecLang } from "../terminal/exec";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
