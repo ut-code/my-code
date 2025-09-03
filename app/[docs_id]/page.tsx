@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
 import { Section } from "./section";
-import * as pyodideLock from "pyodide/pyodide-lock.json";
+import pyodideLock from "pyodide/pyodide-lock.json";
 
 export default async function Page({
   params,
