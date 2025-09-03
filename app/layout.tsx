@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/noto-sans-jp";
+import "@fontsource-variable/inconsolata";
 import "./globals.css";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";

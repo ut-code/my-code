@@ -83,10 +83,13 @@ npm run lint
 
 - [Next.js](https://nextjs.org/docs)
     - 検索する際は「App Router」を含めることで古い記事に惑わされることが少なくなります。
+- [OpenNext](https://opennext.js.org/cloudflare)
 - [DaisyUI](https://daisyui.com/docs/use/) / [Tailwind CSS](https://tailwindcss.com/docs)
     - buttonやinputやメニューなどの基本的なコンポーネントのデザインはDaisyUIにあるものを使うと楽です
     - 細かくスタイルを調整したい場合はTailwind CSSを使います (CSS直接指定(`style={{...}}`)よりもちょっと楽に書ける)
     - よくわからなかったらstyle直接指定でも良い
+- [SWR](https://swr.vercel.app/ja)
 - [react-markdown](https://www.npmjs.com/package/react-markdown)
-    - オプションがいろいろあり、今はほぼデフォルト設定で突っ込んでいるがあとでなんとかする
-- [OpenNext](https://opennext.js.org/cloudflare)
+- REPL・実行結果表示: [xterm.js](https://xtermjs.org/)
+- コードエディター: [react-ace](https://github.com/securingsincity/react-ace)
+- それ以外のコードブロック: [react-syntax-highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)

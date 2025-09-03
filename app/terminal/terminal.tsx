@@ -71,19 +71,9 @@ export function useTerminal(props: TerminalProps) {
   useEffect(() => {
     const abortController = new AbortController();
 
-    (async () => {
-      // globals.cssでフォントを指定し読み込んでいるが、
-      // それが読み込まれる前にterminalを初期化してしまうとバグる。
-      // なのでここでフォントをfetchし成功するまでterminalの初期化は待つ
-      try {
-        await fetch(
-          "https://cdn.jsdelivr.net/fontsource/fonts/inconsolata:vf@latest/latin-wght-normal.woff2",
-          { signal: abortController.signal }
-        );
-      } catch {
-        // ignore
-      }
-
+    // globals.cssでフォントを指定し読み込んでいるが、
+    // それが読み込まれる前にterminalを初期化してしまうとバグる。
+    document.fonts.load("0.875rem Inconsolata Variable").then(() => {
       if (!abortController.signal.aborted) {
         const fromCSS = (varName: string) =>
           window.getComputedStyle(document.body).getPropertyValue(varName);
@@ -96,7 +86,7 @@ export function useTerminal(props: TerminalProps) {
           fontSize: 14,
           lineHeight: 1.4,
           letterSpacing: 0,
-          fontFamily: "Inconsolata Variable",
+          fontFamily: "'Inconsolata Variable','Noto Sans JP Variable'",
           theme: {
             // DaisyUIの変数を使用してテーマを設定している
             // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
@@ -134,7 +124,7 @@ export function useTerminal(props: TerminalProps) {
         setTermReady(true);
         onReadyRef.current?.();
       }
-    })();
+    });
 
     const observer = new ResizeObserver(() => {
       // fitAddon.fit();

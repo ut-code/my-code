@@ -1,10 +1,11 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import SyntaxHighlighter from "react-syntax-highlighter";
 import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 import { Heading } from "./section";
 import { AceLang, EditorComponent } from "../terminal/editor";
 import { ExecFile, ExecLang } from "../terminal/exec";
+import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -138,8 +139,8 @@ const components: Components = {
         <SyntaxHighlighter
           language={match[1]}
           PreTag="div"
-          className="border border-base-300 mx-2 my-2 rounded-lg text-sm! m-2! p-4!"
-          // style={todo dark theme?}
+          className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
+          style={tomorrow} // todo dark theme (editor.tsx で指定したのと同じテーマを選ぶようにすること)
           {...props}
         >
           {String(props.children || "").replace(/\n$/, "")}
@@ -150,8 +151,8 @@ const components: Components = {
       return (
         <SyntaxHighlighter
           PreTag="div"
-          className="border border-base-300 mx-2 my-2 rounded-lg text-sm! m-2! p-4!"
-          // style={todo dark theme?}
+          className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
+          style={tomorrow} // todo dark theme
           {...props}
         >
           {String(props.children || "").replace(/\n$/, "")}

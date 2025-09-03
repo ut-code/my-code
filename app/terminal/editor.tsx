@@ -87,7 +87,7 @@ export function EditorComponent(props: EditorProps) {
       <AceEditor
         name={`ace-editor-${props.filename}`}
         mode={props.language}
-        theme="tomorrow" // TODO dark theme
+        theme="tomorrow" // TODO dark theme (twilightがいいんじゃないかと勝手に思っている)
         tabSize={props.tabSize}
         width="100%"
         height={
