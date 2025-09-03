@@ -22,9 +22,14 @@ export default async function Page({
       );
     } else {
       const cfAssets = getCloudflareContext().env.ASSETS;
-      mdContent = await cfAssets!
-        .fetch(`https://assets.local/docs/${docs_id}.md`)
-        .then((res) => res.text());
+      const mdRes = await cfAssets!.fetch(
+        `https://assets.local/docs/${docs_id}.md`
+      );
+      if (mdRes.ok) {
+        mdContent = await mdRes.text();
+      } else {
+        notFound();
+      }
     }
   } catch (error) {
     console.error(error);
