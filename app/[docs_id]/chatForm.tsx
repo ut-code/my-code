@@ -41,9 +41,9 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
       updateChatHistory([userMessage, aiMessage]);
+      setInputValue("");
     }
 
-    setInputValue("");
     setIsLoading(false);
   };
 
