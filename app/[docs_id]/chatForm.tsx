@@ -17,6 +17,11 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,7 +102,7 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
         </button>
       )}
 
-      {messages.length > 0 && (
+      {isMounted && messages.length > 0 && (
         <article className="mt-4">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-semibold">AIとのチャット</h3>
