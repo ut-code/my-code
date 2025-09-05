@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 export interface Message {
   sender: "user" | "ai";
   text: string;
+  isError?: boolean;
 }
 
 export const useChatHistory = (sectionId: string) => {

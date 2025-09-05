@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent, useEffect } from "react";
+import clsx from "clsx";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
 import { useChatHistory, type Message } from "../hooks/useChathistory";
@@ -35,7 +36,7 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     });
 
     if (result.error) {
-      const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}` };
+      const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}`, isError: true };
       updateChatHistory([userMessage, errorMessage]);
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
@@ -49,10 +50,6 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
   const handleClearHistory = () => {
     updateChatHistory([]);
   };
-  
-  if (!isMounted) {
-    return null;
-  }
   
   return (
     <>
@@ -119,7 +116,15 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
           </div>
           {messages.map((msg, index) => (
             <div key={index} className={`chat ${msg.sender === 'user' ? 'chat-end' : 'chat-start'}`}>
-              <div className={`chat-bubble ${msg.sender === 'user' ? 'bg-primary text-primary-content' : 'bg-secondary-content text-black'}`} style={{maxWidth: "100%", wordBreak: "break-word"}}>
+              <div 
+                className={clsx(
+                  "chat-bubble",
+                  { "bg-primary text-primary-content": msg.sender === 'user' },
+                  { "bg-secondary-content text-black": msg.sender === 'ai' && !msg.isError },
+                  { "chat-bubble-error": msg.isError }
+                )} 
+                style={{maxWidth: "100%", wordBreak: "break-word"}}
+              >
                 <StyledMarkdown content={msg.text} />
               </div>
             </div>
