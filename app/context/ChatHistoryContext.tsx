@@ -38,23 +38,21 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    if (Object.keys(chatHistories).length > 0) {
-      localStorage.setItem(CHAT_HISTORY_STORAGE_KEY, JSON.stringify(chatHistories));
-    } else {
-      const saved = localStorage.getItem(CHAT_HISTORY_STORAGE_KEY);
-      if(saved) localStorage.removeItem(CHAT_HISTORY_STORAGE_KEY);
-    }
-  }, [chatHistories]);
-
   const setChatHistory = useCallback((sectionId: string, messages: Message[]) => {
-    setChatHistories((prevHistories) => {
+    setChatHistories(prevHistories => {
       const newHistories = { ...prevHistories };
       if (messages.length === 0) {
         delete newHistories[sectionId];
       } else {
         newHistories[sectionId] = messages;
       }
+
+      if (Object.keys(newHistories).length > 0) {
+        localStorage.setItem(CHAT_HISTORY_STORAGE_KEY, JSON.stringify(newHistories));
+      } else {
+        localStorage.removeItem(CHAT_HISTORY_STORAGE_KEY);
+      }
+
       return newHistories;
     });
   }, []);
