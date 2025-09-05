@@ -16,7 +16,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" data-theme="light">
       <body className="w-screen h-screen">
         <div className="drawer lg:drawer-open">
           <input id="drawer-toggle" type="checkbox" className="drawer-toggle" />

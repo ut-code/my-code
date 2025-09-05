@@ -16,6 +16,7 @@ import "ace-builds/src-min-noconflict/mode-text";
 import { useEffect } from "react";
 import { useSectionCode } from "../[docs_id]/section";
 import clsx from "clsx";
+import { ChangeTheme } from "../[docs_id]/themeToggle";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
@@ -87,7 +88,7 @@ export function EditorComponent(props: EditorProps) {
       <AceEditor
         name={`ace-editor-${props.filename}`}
         mode={props.language}
-        theme="tomorrow" // TODO dark theme
+        theme={ChangeTheme()}
         tabSize={props.tabSize}
         width="100%"
         height={
