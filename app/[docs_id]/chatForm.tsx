@@ -3,12 +3,7 @@
 import { useState, FormEvent, useEffect } from "react";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
-import { useChatHistory } from "../context/ChatHistoryContext";
-
-interface Message {
-  sender: "user" | "ai";
-  text: string;
-}
+import { useChatHistory, type Message } from "../hooks/useChathistory";
 
 interface ChatFormProps {
   documentContent: string;
@@ -16,8 +11,7 @@ interface ChatFormProps {
 }
 
 export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
-  const { chatHistories, setChatHistory } = useChatHistory();
-  const messages = chatHistories[sectionId] || [];
+  const [messages, updateChatHistory] = useChatHistory(sectionId);
 
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +27,7 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     setIsLoading(true);
 
     const userMessage: Message = { sender: "user", text: inputValue };
-    setChatHistory(sectionId, [userMessage]);
+    updateChatHistory([userMessage]);
 
     const result = await askAI({
       userQuestion: inputValue,
@@ -42,15 +36,24 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
 
     if (result.error) {
       const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}` };
-      setChatHistory(sectionId, [userMessage, errorMessage]);
+      updateChatHistory([userMessage, errorMessage]);
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
-      setChatHistory(sectionId, [userMessage, aiMessage]);
+      updateChatHistory([userMessage, aiMessage]);
     }
 
     setInputValue("");
     setIsLoading(false);
   };
+
+  const handleClearHistory = () => {
+    updateChatHistory([]);
+  };
+  
+  if (!isMounted) {
+    return null;
+  }
+  
   return (
     <>
       {isFormVisible && (
@@ -104,7 +107,16 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
 
       {isMounted && messages.length > 0 && (
         <article className="mt-4">
-          <h3 className="text-lg font-semibold mb-2">AIとのチャット</h3>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold">AIとのチャット</h3>
+            <button
+              onClick={handleClearHistory}
+              className="btn btn-ghost btn-sm text-xs"
+              aria-label="チャット履歴を削除"
+            >
+              履歴を削除
+            </button>
+          </div>
           {messages.map((msg, index) => (
             <div key={index} className={`chat ${msg.sender === 'user' ? 'chat-end' : 'chat-start'}`}>
               <div className={`chat-bubble ${msg.sender === 'user' ? 'bg-primary text-primary-content' : 'bg-secondary-content text-black'}`} style={{maxWidth: "100%", wordBreak: "break-word"}}>

@@ -5,7 +5,6 @@ import { Sidebar } from "./sidebar";
 import { ReactNode } from "react";
 import { PyodideProvider } from "./terminal/python/pyodide";
 import { FileProvider } from "./terminal/file";
-import { ChatHistoryProvider } from "./context/ChatHistoryContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,11 +21,9 @@ export default function RootLayout({
           <input id="drawer-toggle" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col">
             <Navbar />
-            <ChatHistoryProvider>
               <FileProvider>
                 <PyodideProvider>{children}</PyodideProvider>
               </FileProvider>
-            </ChatHistoryProvider>
           </div>
           <div className="drawer-side shadow-md">
             <label
