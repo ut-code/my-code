@@ -22,14 +22,14 @@ interface ISectionCodeContext {
 }
 const SectionCodeContext = createContext<ISectionCodeContext | null>(null);
 export const useSectionCode = () => useContext(SectionCodeContext);
+
 interface SectionProps {
   section: MarkdownSection;
-  docs_id: string;
-  sectionIndex: number;
+  sectionId: string;
 }
 
 // 1つのセクションのタイトルと内容を表示する。内容はMarkdownとしてレンダリングする
-export function Section({ section, docs_id, sectionIndex }: SectionProps) {
+export function Section({ section, sectionId }: SectionProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [replOutputs, setReplOutputs] = useState<ReplCommand[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,7 +67,6 @@ export function Section({ section, docs_id, sectionIndex }: SectionProps) {
   // fileContents: section内にあるファイルエディターの内容
   // execResults: section内にあるファイルの実行結果
   // console.log(section.title, replOutputs, fileContents, execResults);
-  const sectionId = `${docs_id}-${sectionIndex}`;
 
   return (
     <SectionCodeContext.Provider
