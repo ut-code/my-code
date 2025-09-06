@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent } from "react";
 import clsx from "clsx";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
