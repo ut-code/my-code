@@ -26,6 +26,9 @@ interface WandboxOptions {
   compilerName: string;
   compilerOptions: string[];
   commandline: string;
+  compilerOptionsRaw: string[];
+  additionalFiles: Record<string, string>;
+  additionalSources: string[];
 }
 
 const WandboxContext = createContext<IWandboxContext>(null!);
@@ -111,6 +114,36 @@ interface CompileResult {
   url: string;
 }
 
+const CPP_STACKTRACE_HANDLER = `
+#define BOOST_STACKTRACE_USE_ADDR2LINE
+#include <boost/stacktrace.hpp>
+#include <iostream>
+#include <signal.h>
+void signal_handler(int signum) {
+    signal(signum, SIG_DFL);
+    switch(signum) {
+    case SIGABRT:
+        std::cerr << "Aborted" << std::endl;
+        break;
+    case SIGSEGV:
+        std::cerr << "Segmentation fault" << std::endl;
+        break;
+    default:
+        std::cerr << "Signal " << signum << " received" << std::endl;
+        break;
+    }
+    std::cerr << "Stack trace:" << std::endl;
+    std::cerr << boost::stacktrace::stacktrace();
+    raise(signum);
+}
+struct _init_signal_handler {
+    _init_signal_handler() {
+        signal(SIGABRT, signal_handler);
+        signal(SIGSEGV, signal_handler);
+    }
+} _init_signal_handler_instance;
+`;
+
 const compilerInfoFetcher: Fetcher<CompilerInfo[]> = () =>
   fetch(new URL("/api/list.json", WANDBOX)).then(
     (res) => res.json() as Promise<CompilerInfo[]>
@@ -158,16 +191,17 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     for (const switchSelect of selectedCompiler.switches.filter(
       (s) => s.type === "select"
     )) {
-      // boostはnothing、stdは最新を選ぶ ほかはデフォルト
+      // boost最新、stdは最新を選ぶ ほかはデフォルト
       if (switchSelect.name.includes("boost")) {
-        const boostNothingOption = switchSelect.options.find((o) =>
-          o.name.includes("nothing")
-        );
-        if (boostNothingOption) {
-          compilerOptions.push(boostNothingOption.name);
-          commandlineArgs.push(boostNothingOption["display-flags"]);
+        const boostLatestOption = switchSelect.options
+          .filter((o) => !o.name.includes("nothing"))
+          .sort()
+          .reverse()[0];
+        if (boostLatestOption) {
+          compilerOptions.push(boostLatestOption.name);
+          // commandlineArgs.push(boostLatestOption["display-flags"]);
         } else {
-          console.warn("boost nothing option not found");
+          console.warn("boost option not found");
         }
       } else if (switchSelect.name.includes("std")) {
         const stdLatestOption = switchSelect.options
@@ -189,10 +223,18 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    // その他オプション
+    // commandlineArgs.push("-g");
+
     return {
       compilerName,
       compilerOptions,
       commandline: commandlineArgs.join(" "),
+      compilerOptionsRaw: ["-g"],
+      additionalFiles: {
+        "_stacktrace.cpp": CPP_STACKTRACE_HANDLER,
+      },
+      additionalSources: ["_stacktrace.cpp"],
     } satisfies WandboxOptions;
   }, [compilerList]);
 
@@ -240,10 +282,22 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
                   file: name,
                   code: files[name] || "",
                 }))
+              )
+              .concat(
+                Object.entries(options.additionalFiles).map(([file, code]) => ({
+                  file,
+                  code,
+                }))
               ),
             options: options.compilerOptions.join(","),
             stdin: "",
-            "compiler-option-raw": namesSource.join("\n"),
+            "compiler-option-raw": [
+              options.compilerOptionsRaw,
+              namesSource,
+              options.additionalSources,
+            ]
+              .flat()
+              .join("\n"),
             "runtime-option-raw": "",
             save: false,
             is_private: true,
@@ -277,12 +331,31 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         );
       }
       if (result.program_error) {
+        const errorBeforeTrace =
+          result.program_error.split("Stack trace:\n")[0];
         outputs = outputs.concat(
-          result.program_error
+          errorBeforeTrace
             .trim()
             .split("\n")
             .map((line) => ({ type: "error" as const, message: line }))
         );
+        if (result.program_error.includes("Stack trace:")) {
+          // CPP_STACKTRACE_HANDLER のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
+          const stackTrace = result.program_error.split("Stack trace:\n")[1];
+          outputs = outputs.concat({
+            type: "trace" as const,
+            message: "Stack trace (filtered):",
+          });
+          for (const line of stackTrace.trim().split("\n")) {
+            // ユーザーのソースコードだけを対象にする
+            if (line.includes("/home/wandbox")) {
+              outputs = outputs.concat({
+                type: "trace" as const,
+                message: line.replace("/home/wandbox/", ""),
+              });
+            }
+          }
+        }
       }
       if (result.status !== "0") {
         outputs.push({
