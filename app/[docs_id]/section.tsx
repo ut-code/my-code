@@ -76,7 +76,7 @@ export function Section({ section, sectionId }: SectionProps) {
       <div>
         <Heading level={section.level}>{section.title}</Heading>
         <StyledMarkdown content={section.content} />
-        <ChatForm key={sectionId} documentContent={section.content} sectionId={sectionId} />
+         <ChatForm documentContent={section.content} sectionId={sectionId} />
       </div>
     </SectionCodeContext.Provider>
   );
