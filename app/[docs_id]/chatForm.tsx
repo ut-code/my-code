@@ -113,8 +113,7 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
                 type="submit"
                 className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
                 title="送信"
-              style={{marginTop:"10px"}}
-                disabled={isLoading || !inputValue.trim()}
+                disabled={isLoading}
               >
                 <span className="icon">➤</span>
               </button>
