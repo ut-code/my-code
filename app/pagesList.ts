@@ -27,6 +27,9 @@ export const pagesList = [
     pages: [
       { id: 2, title: "型システムとメモリ" },
       { id: 3, title: "関数と参照" },
+      { id: 4, title: "ポインタと動的メモリ" },
+      { id: 5, title: "クラスの基礎" },
+      { id: 6, title: "クラスを使いこなす" },
     ],
   },
 ] as const;
