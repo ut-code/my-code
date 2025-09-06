@@ -5,6 +5,9 @@ import clsx from "clsx";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
 import { useChatHistory, type Message } from "../hooks/useChathistory";
+import useSWR from "swr";
+import { getQuestionExample } from "../actions/questionExample";
+import { getLanguageName } from "../pagesList";
 
 interface ChatFormProps {
   documentContent: string;
@@ -13,7 +16,6 @@ interface ChatFormProps {
 
 export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
   const [messages, updateChatHistory] = useChatHistory(sectionId);
-
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -23,6 +25,25 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     setIsMounted(true);
   }, []);
 
+  const lang = getLanguageName(docs_id);
+  const { data: exampleData, error: exampleError } = useSWR(
+    // 質問フォームを開いたときだけで良い
+    isFormVisible ? { lang, documentContent } : null,
+    getQuestionExample,
+    {
+      // リクエストは古くても構わないので1回でいい
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+  if (exampleError) {
+    console.error("Error getting question example:", exampleError);
+  }
+  // 質問フォームを開くたびにランダムに選び直し、
+  // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
+  const [exampleChoice, setExampleChoice] = useState<number>(0); // 0〜1
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -30,8 +51,15 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     const userMessage: Message = { sender: "user", text: inputValue };
     updateChatHistory([userMessage]);
 
+    let userQuestion = inputValue;
+    if(!userQuestion && exampleData){
+      // 質問が空欄なら、質問例を使用
+      userQuestion = exampleData[Math.floor(exampleChoice * exampleData.length)];
+      setInputValue(userQuestion);
+    }
+
     const result = await askAI({
-      userQuestion: inputValue,
+      userQuestion,
       documentContent: documentContent,
     });
 
@@ -54,22 +82,28 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
   return (
     <>
       {isFormVisible && (
-      <form className="border border-2 border-secondary shadow-xl p-6 rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
-          <h2 className="text-xl font-bold mb-4 text-left relative -top-2 font-mono h-2">
-            AIへ質問
-          </h2>
-        <div className="input-area" style={{height:"80px"}}>
+      <form className="border border-2 border-secondary shadow-md rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
+        <div className="input-area">
             <textarea
-              className="textarea textarea-white textarea-md"
-              placeholder="質問を入力してください"
-            style={{width: "100%", height: "110px", resize: "none"}}
+              className="textarea textarea-ghost textarea-md rounded-lg"
+              placeholder={
+                "質問を入力してください" +
+                (exampleData
+                  ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
+                  : "")
+              }
+              style={{
+                width: "100%",
+                height: "110px",
+                resize: "none",
+                outlineStyle: "none",
+              }}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               disabled={isLoading}
             ></textarea>
           </div>
-          <br />
-        <div className="controls" style={{position:"relative", top:"22px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+        <div className="controls" style={{margin:"10px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
             <div className="left-icons">
               <button
                 className="btn btn-soft btn-secondary rounded-full"
@@ -96,7 +130,10 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
       {!isFormVisible && (
         <button
           className="btn btn-soft btn-secondary rounded-full"
-          onClick={() => setIsFormVisible(true)}
+          onClick={() => {
+            setIsFormVisible(true);
+            setExampleChoice(Math.random());
+          }}
         >
           チャットを開く
         </button>

@@ -1,42 +1,60 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import useSWR, { Fetcher } from "swr";
+import { splitMarkdown } from "./[docs_id]/splitMarkdown";
+import { pagesList } from "./pagesList";
+
+const fetcher: Fetcher<string, string> = (url) =>
+  fetch(url).then((r) => r.text());
 
 export function Sidebar() {
+  const pathname = usePathname();
+  const docs_id = pathname.replace(/^\//, "");
+  const { data, error, isLoading } = useSWR(`/docs/${docs_id}.md`, fetcher);
+
+  if (error) console.error("Sidebar fetch error:", error);
+
+  const splitmdcontent = splitMarkdown(data ?? "");
   return (
-    <div className="bg-base-200 min-h-full w-80 p-4">
+    <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}
-      <h2 className="hidden lg:block text-xl font-bold mb-4">
+      <h2 className="hidden lg:block text-xl font-bold p-4">
         {/* サイドバーが常時表示されている場合のみ */}
         Navbar Title
       </h2>
-      <ol className="menu w-full list-decimal list-outside">
-        <li>
-          <Link href="/python-1">1. 環境構築と基本思想</Link>
-        </li>
-        <li>
-          <Link href="/python-2">2. 基本構文とデータ型</Link>
-        </li>
-        <li>
-          <Link href="/python-3">3. リスト、タプル、辞書、セット</Link>
-        </li>
-        <li>
-          <Link href="/python-4">4. 制御構文と関数</Link>
-        </li>
-        <li>
-          <Link href="/python-5">5. モジュールとパッケージ</Link>
-        </li>
-        <li>
-          <Link href="/python-6">6. オブジェクト指向プログラミング</Link>
-        </li>
-        <li>
-          <Link href="/python-7">7. ファイルの入出力とコンテキストマネージャ</Link>
-        </li>
-        <li>
-          <Link href="/python-8">8. 例外処理</Link>
-        </li>
-        <li>
-          <Link href="/python-9">9. ジェネレータとデコレータ</Link>
-        </li>
-      </ol>
+
+      <ul className="menu w-full">
+        {pagesList.map((group) => (
+          <li key={group.id}>
+            <details open={docs_id.startsWith(`${group.id}-`)}>
+              <summary>{group.lang}</summary>
+              <ul>
+                {group.pages.map((page) => (
+                  <li key={page.id}>
+                    <Link href={`${group.id}-${page.id}`}>
+                      <span className="mr-0">{page.id}.</span>
+                      {page.title}
+                    </Link>
+                    {`${group.id}-${page.id}` === docs_id && !isLoading && (
+                      <ul className="ml-4 text-sm">
+                        {splitmdcontent.slice(1).map((section, idx) => (
+                          <li
+                            key={idx}
+                            style={{ marginLeft: section.level - 2 + "em" }}
+                          >
+                            <Link href={`#${idx + 1}`}>{section.title}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

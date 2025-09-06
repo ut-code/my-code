@@ -29,7 +29,7 @@ export default function PythonPage() {
         filename="main.py"
         initContent="print('hello, world!')"
       />
-      <ExecFile filename="main.py" language="python" content="" />
+      <ExecFile filenames={["main.py"]} language="python" content="" />
     </div>
   );
 }

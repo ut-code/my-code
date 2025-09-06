@@ -15,6 +15,7 @@ import { useFile } from "../terminal/file";
 
 // セクション内に埋め込まれているターミナルとファイルエディターの内容をSection側から取得できるよう、
 // Contextに保存する
+// TODO: C++では複数ファイルを実行する場合がありうるが、ここではfilenameを1つしか受け付けない想定になっている
 interface ISectionCodeContext {
   addReplOutput: (command: string, output: ReplOutput[]) => void;
   addFile: (filename: string) => void;
