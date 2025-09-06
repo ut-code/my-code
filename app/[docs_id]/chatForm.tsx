@@ -19,11 +19,6 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const lang = getLanguageName(sectionId);
   const { data: exampleData, error: exampleError } = useSWR(
@@ -139,7 +134,7 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
         </button>
       )}
 
-      {isMounted && messages.length > 0 && (
+      {messages.length > 0 && (
         <article className="mt-4">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-semibold">AIとのチャット</h3>
