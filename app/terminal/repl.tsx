@@ -16,7 +16,7 @@ import { useSectionCode } from "../[docs_id]/section";
 import { Terminal } from "@xterm/xterm";
 
 export interface ReplOutput {
-  type: "stdout" | "stderr" | "error" | "return" | "system"; // 出力の種類
+  type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
   message: string; // 出力メッセージ
 }
 export interface ReplCommand {
@@ -40,6 +40,9 @@ export function writeOutput(
     switch (output.type) {
       case "error":
         term.write(chalk.red(message));
+        break;
+      case "trace":
+        term.write(chalk.blue.italic(message));
         break;
       case "system":
         term.write(systemMessageColor(message));
