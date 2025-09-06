@@ -25,7 +25,7 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     setIsMounted(true);
   }, []);
 
-  const lang = getLanguageName(docs_id);
+  const lang = getLanguageName(sectionId);
   const { data: exampleData, error: exampleError } = useSWR(
     // 質問フォームを開いたときだけで良い
     isFormVisible ? { lang, documentContent } : null,
