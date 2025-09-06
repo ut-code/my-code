@@ -1,25 +1,26 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import clsx from "clsx";
 import { askAI } from "@/app/actions/chatActions";
 import { StyledMarkdown } from "./markdown";
+import { useChatHistory, type Message } from "../hooks/useChathistory";
 import useSWR from "swr";
 import { getQuestionExample } from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
 
-export function ChatForm({
-  docs_id,
-  documentContent,
-}: {
-  docs_id: string;
+interface ChatFormProps {
   documentContent: string;
-}) {
+  sectionId: string;
+}
+
+export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
+  const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
-  const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
 
-  const lang = getLanguageName(docs_id);
+  const lang = getLanguageName(sectionId);
   const { data: exampleData, error: exampleError } = useSWR(
     // 質問フォームを開いたときだけで良い
     isFormVisible ? { lang, documentContent } : null,
@@ -41,7 +42,9 @@ export function ChatForm({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setResponse("");
+
+    const userMessage: Message = { sender: "user", text: inputValue };
+    updateChatHistory([userMessage]);
 
     let userQuestion = inputValue;
     if(!userQuestion && exampleData){
@@ -56,13 +59,21 @@ export function ChatForm({
     });
 
     if (result.error) {
-      setResponse(`エラー: ${result.error}`);
+      const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}`, isError: true };
+      updateChatHistory([userMessage, errorMessage]);
     } else {
-      setResponse(result.response);
+      const aiMessage: Message = { sender: "ai", text: result.response };
+      updateChatHistory([userMessage, aiMessage]);
+      setInputValue("");
     }
 
     setIsLoading(false);
   };
+
+  const handleClearHistory = () => {
+    updateChatHistory([]);
+  };
+  
   return (
     <>
       {isFormVisible && (
@@ -92,8 +103,8 @@ export function ChatForm({
               <button
                 className="btn btn-soft btn-secondary rounded-full"
                 onClick={() => setIsFormVisible(false)}
+                type="button"
               >
-
                 閉じる
               </button>
             </div>
@@ -122,14 +133,33 @@ export function ChatForm({
         </button>
       )}
 
-      {response && (
-        <article>
-          <h3 className="text-lg font-semibold mb-2">AIの回答</h3>
-          <div className="chat chat-start">
-            <div className="chat-bubble bg-secondary-content text-black" style={{maxWidth: "100%", wordBreak: "break-word"}}>
-              <div className="response-container"><StyledMarkdown content={response}/></div>
-            </div>
+      {messages.length > 0 && (
+        <article className="mt-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold">AIとのチャット</h3>
+            <button
+              onClick={handleClearHistory}
+              className="btn btn-ghost btn-sm text-xs"
+              aria-label="チャット履歴を削除"
+            >
+              履歴を削除
+            </button>
           </div>
+          {messages.map((msg, index) => (
+            <div key={index} className={`chat ${msg.sender === 'user' ? 'chat-end' : 'chat-start'}`}>
+              <div 
+                className={clsx(
+                  "chat-bubble",
+                  { "bg-primary text-primary-content": msg.sender === 'user' },
+                  { "bg-secondary-content text-black": msg.sender === 'ai' && !msg.isError },
+                  { "chat-bubble-error": msg.isError }
+                )} 
+                style={{maxWidth: "100%", wordBreak: "break-word"}}
+              >
+                <StyledMarkdown content={msg.text} />
+              </div>
+            </div>
+          ))}
         </article>
       )}
 
