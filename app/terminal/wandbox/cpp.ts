@@ -127,10 +127,9 @@ export function getCppCommandlineStr(
   compilerList: CompilerInfo[],
   filenames: string[]
 ) {
-  const namesSource = filenames.filter((name) => name.endsWith(".cpp"));
   return [
     ...cppOptions(compilerList).commandline,
-    ...namesSource,
+    ...filenames,
     "&&",
     "./a.out",
   ].join(" ");
@@ -142,24 +141,18 @@ export async function cppRunFiles(
   filenames: string[]
 ) {
   const options = cppOptions(compilerList);
-  const namesSource = filenames.filter((name) => name.endsWith(".cpp"));
-  const namesAdditional = filenames.filter((name) => !name.endsWith(".cpp"));
   const result = await compileAndRun({
     compilerName: options.compilerName,
     compilerOptions: options.compilerOptions,
     compilerOptionsRaw: [
       ...options.compilerOptionsRaw,
-      ...namesSource,
+      ...filenames,
       "_stacktrace.cpp",
     ],
     codes: [
-      ...namesSource.map((name) => ({
+      ...Object.entries(files).map(([name, code]) => ({
         file: name,
-        code: files[name] || "",
-      })),
-      ...namesAdditional.map((name) => ({
-        file: name,
-        code: files[name] || "",
+        code: code || "",
       })),
       { file: "_stacktrace.cpp", code: CPP_STACKTRACE_HANDLER },
     ],

@@ -34,6 +34,9 @@ export const pagesList = [
       { id: 7, title: "継承とポリモーフィズム" },
       { id: 8, title: "テンプレート" },
       { id: 9, title: "STL ①:コンテナ" },
+      { id: 10, title: "STL ②:アルゴリズムとラムダ式"},
+      { id: 11, title: "RAIIとスマートポインタ" },
+      { id: 12, title: "プロジェクトの分割とビルド" },
     ],
   },
 ] as const;

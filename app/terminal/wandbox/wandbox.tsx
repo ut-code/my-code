@@ -56,6 +56,7 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
           { type: "error" as const, message: "Wandbox is not ready yet." },
         ];
       }
+      console.log(files)
       switch (lang) {
         case "C++":
           return cppRunFiles(compilerList, files, filenames);

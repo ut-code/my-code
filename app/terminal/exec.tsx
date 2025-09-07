@@ -18,7 +18,7 @@ export type ExecLang = "python" | "cpp";
 interface ExecProps {
   /*
    * Pythonの場合はメインファイル1つのみを指定する。
-   * C++の場合はソースコード(.cpp)とヘッダー(.h)を全部指定し、cppRunFiles()内で拡張子を元にソースコードと追加コードが分けられる。
+   * C++の場合はソースコード(.cpp)を全部指定する。
    */
   filenames: string[];
   language: ExecLang;

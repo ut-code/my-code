@@ -77,6 +77,14 @@ g++ main.cpp -o main
 ./main
 ```
 
+```powershell
+# Visual C++ (MSVC) を使う場合
+cl main.cpp /Fe:main.exe
+
+# 生成された実行可能ファイルを実行
+main.exe
+```
+
 このウェブサイト上の実行環境で動かす場合は、以下の実行ボタンをクリックしてください。
 実行すると、ターミナルに以下のように表示されるはずです。
 
