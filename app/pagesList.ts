@@ -25,8 +25,18 @@ export const pagesList = [
     lang: "C++",
     description: "C++の基本から高度な機能までを学べるチュートリアル",
     pages: [
+      { id: 1, title: "C++の世界へようこそ" },
       { id: 2, title: "型システムとメモリ" },
       { id: 3, title: "関数と参照" },
+      { id: 4, title: "ポインタと動的メモリ" },
+      { id: 5, title: "クラスの基礎" },
+      { id: 6, title: "クラスを使いこなす" },
+      { id: 7, title: "継承とポリモーフィズム" },
+      { id: 8, title: "テンプレート" },
+      { id: 9, title: "STL ①:コンテナ" },
+      { id: 10, title: "STL ②:アルゴリズムとラムダ式"},
+      { id: 11, title: "RAIIとスマートポインタ" },
+      { id: 12, title: "プロジェクトの分割とビルド" },
     ],
   },
 ] as const;
