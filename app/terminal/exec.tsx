@@ -18,7 +18,7 @@ export type ExecLang = "python" | "cpp";
 interface ExecProps {
   /*
    * Pythonの場合はメインファイル1つのみを指定する。
-   * C++の場合はソースコード(.cpp)とヘッダー(.h)を全部指定し、ExecFile内で拡張子を元にソースコードと追加コードを分ける。
+   * C++の場合はソースコード(.cpp)を全部指定する。
    */
   filenames: string[];
   language: ExecLang;
@@ -63,17 +63,9 @@ export function ExecFile(props: ExecProps) {
       if (!props.filenames || props.filenames.length === 0) {
         throw new Error("C++の実行には filenames プロパティが必要です");
       }
-      commandline = wandbox.cppOptions
-        ? `${wandbox.cppOptions.commandline} ${props.filenames.join(" ")} && ./a.out`
-        : "";
+      commandline = wandbox.getCommandlineStr("C++", props.filenames);
       runtimeInitializing = false;
-      const namesSource = props.filenames!.filter((name) =>
-        name.endsWith(".cpp")
-      );
-      const namesAdditional = props.filenames!.filter(
-        (name) => !name.endsWith(".cpp")
-      );
-      exec = () => wandbox.runFiles("C++", namesSource, namesAdditional);
+      exec = () => wandbox.runFiles("C++", props.filenames);
       break;
     default:
       props.language satisfies never;

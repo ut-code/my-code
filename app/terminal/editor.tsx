@@ -1,18 +1,23 @@
 "use client";
 
-import { useFile } from "./file";
-import AceEditor from "react-ace";
+import dynamic from "next/dynamic";
+// https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
+const AceEditor = dynamic(async () => {
+  const ace = await import("react-ace");
+  // テーマは色分けが今のTerminal側のハイライト(highlight.js)の実装に近いものを適当に選んだ
+  await import("ace-builds/src-min-noconflict/theme-tomorrow");
+  await import("ace-builds/src-min-noconflict/theme-twilight");
+  await import("ace-builds/src-min-noconflict/ext-language_tools");
+  await import("ace-builds/src-min-noconflict/ext-searchbox");
+  await import("ace-builds/src-min-noconflict/mode-python");
+  await import("ace-builds/src-min-noconflict/mode-c_cpp");
+  await import("ace-builds/src-min-noconflict/mode-json");
+  await import("ace-builds/src-min-noconflict/mode-csv");
+  await import("ace-builds/src-min-noconflict/mode-text");
+  return ace;
+}, { ssr: false });
 import "./editor.css";
-// テーマは色分けが今のTerminal側のハイライト(highlight.js)の実装に近いものを適当に選んだ
-import "ace-builds/src-min-noconflict/theme-tomorrow";
-import "ace-builds/src-min-noconflict/theme-twilight";
-import "ace-builds/src-min-noconflict/ext-language_tools";
-import "ace-builds/src-min-noconflict/ext-searchbox";
-import "ace-builds/src-min-noconflict/mode-python";
-import "ace-builds/src-min-noconflict/mode-c_cpp";
-import "ace-builds/src-min-noconflict/mode-json";
-import "ace-builds/src-min-noconflict/mode-csv";
-import "ace-builds/src-min-noconflict/mode-text";
+import { useFile } from "./file";
 import { useEffect } from "react";
 import { useSectionCode } from "../[docs_id]/section";
 import clsx from "clsx";
@@ -39,13 +44,7 @@ export function EditorComponent(props: EditorProps) {
       writeFile(props.filename, props.initContent);
     }
     addSectionFile?.(props.filename);
-  }, [
-    files,
-    props.filename,
-    props.initContent,
-    writeFile,
-    addSectionFile,
-  ]);
+  }, [files, props.filename, props.initContent, writeFile, addSectionFile]);
 
   return (
     <div className="embedded-editor">
