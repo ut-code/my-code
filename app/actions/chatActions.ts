@@ -1,7 +1,7 @@
 'use server';
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
+import { generateContent } from "./gemini";
 
 interface FormState {
   response: string;
@@ -12,8 +12,6 @@ const ChatSchema = z.object({
   userQuestion: z.string().min(1, { message: "メッセージを入力してください。" }),
   documentContent: z.string().min(1, { message: "コンテキストとなるドキュメントがありません。"}),
 });
-
-const genAI = new GoogleGenerativeAI(process.env.API_KEY!);
 
 type ChatParams = z.input<typeof ChatSchema>;
 
@@ -30,7 +28,7 @@ export async function askAI(params: ChatParams): Promise<FormState> {
   const { userQuestion, documentContent } = parseResult.data;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
     const prompt = `
 以下のPythonチュートリアルのドキュメントの内容を正確に理解し、ユーザーからの質問に対して、初心者にも分かりやすく、丁寧な解説を提供してください。
 
@@ -48,7 +46,7 @@ ${userQuestion}
 - 
 
 `;
-    const result = await model.generateContent(prompt);
+    const result = await generateContent(prompt);
     const response = result.response;
     const text = response.text();
     return { response: text, error: null };
