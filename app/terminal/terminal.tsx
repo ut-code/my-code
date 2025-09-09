@@ -121,6 +121,22 @@ export function useTerminal(props: TerminalProps) {
 
         term.open(terminalRef.current);
 
+        // https://github.com/xtermjs/xterm.js/issues/2478
+        // my.code();ではCtrl+Cでのkeyboardinterruptは要らないので、コピーペーストに置き換えてしまう
+        term.attachCustomKeyEventHandler((arg) => {
+          if (arg.ctrlKey && (arg.key === "c" || arg.key === "x") && arg.type === "keydown") {
+            const selection = term.getSelection();
+            if (selection) {
+              navigator.clipboard.writeText(selection);
+              return false;
+            }
+          }
+          if (arg.ctrlKey && arg.key === "v" && arg.type === "keydown") {
+            return false;
+          }
+          return true;
+        });
+
         setTermReady(true);
         onReadyRef.current?.();
       }
