@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import useSWR, { Fetcher } from "swr";
 import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 import { pagesList } from "./pagesList";
+import { ThemeToggle } from "./[docs_id]/themeToggle";
 
 const fetcher: Fetcher<string, string> = (url) =>
   fetch(url).then((r) => r.text());
@@ -12,7 +13,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
   const { data, error, isLoading } = useSWR(`/docs/${docs_id}.md`, fetcher);
-
+  
   if (error) console.error("Sidebar fetch error:", error);
 
   const splitmdcontent = splitMarkdown(data ?? "");
@@ -22,6 +23,7 @@ export function Sidebar() {
       <h2 className="hidden lg:block text-xl font-bold p-4">
         {/* サイドバーが常時表示されている場合のみ */}
         Navbar Title
+        <ThemeToggle />
       </h2>
 
       <ul className="menu w-full">
