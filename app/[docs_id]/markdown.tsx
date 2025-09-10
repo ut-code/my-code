@@ -5,7 +5,7 @@ import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 import { Heading } from "./section";
 import { type AceLang, EditorComponent } from "../terminal/editor";
 import { ExecFile, ExecLang } from "../terminal/exec";
-import { ChangeTheme } from "./themeToggle";
+import { useChangeTheme } from "./themeToggle";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { twilight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -45,130 +45,133 @@ const components: Components = {
   ),
   hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
-  code: ({ node, className, ref, style, ...props }) => {
-    const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
-      className || ""
-    );
-    if (match) {
-      if (match[2] === "-exec" && match[3]) {
-        /*
-        ```python-exec:main.py
+  code: ({ node, className, ref, style, ...props }) => <CodeComponent {...{ node, className, ref, style, ...props }} />,
+};
+function CodeComponent({ node,  className, ref, style, ...props }: { node: any; className?: string; ref?: any; style?: any; [key: string]: any }) {
+  const theme = useChangeTheme();
+  const codetheme= theme === "tomorrow" ? tomorrow : twilight;
+  const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
+    className || ""
+  );
+  if (match) {
+    if (match[2] === "-exec" && match[3]) {
+      /*
+      ```python-exec:main.py
+      hello, world!
+      ```
+      ↓
+      ---------------------------
+       [▶ 実行] `python main.py`
         hello, world!
-        ```
-        ↓
-        ---------------------------
-         [▶ 実行] `python main.py`
-          hello, world!
-        ---------------------------
-        */
-        let execLang: ExecLang | undefined = undefined;
-        switch (match[1]) {
-          case "python":
-            execLang = "python";
-            break;
-          case "cpp":
-          case "c++":
-            execLang = "cpp";
-            break;
-          default:
-            console.warn(`Unsupported language for exec: ${match[1]}`);
-            break;
-        }
-        if (execLang) {
+      ---------------------------
+      */
+      let execLang: ExecLang | undefined = undefined;
+      switch (match[1]) {
+        case "python":
+          execLang = "python";
+          break;
+        case "cpp":
+        case "c++":
+          execLang = "cpp";
+          break;
+        default:
+          console.warn(`Unsupported language for exec: ${match[1]}`);
+          break;
+      }
+      if (execLang) {
+        return (
+          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
+            <ExecFile
+              language={execLang}
+              filenames={match[3].split(",")}
+              content={String(props.children || "").replace(/\n$/, "")}
+            />
+          </div>
+        );
+      }
+    } else if (match[3]) {
+      // ファイル名指定がある場合、ファイルエディター
+      let aceLang: AceLang | undefined = undefined;
+      switch (match[1]) {
+        case "python":
+          aceLang = "python";
+          break;
+        case "cpp":
+        case "c++":
+          aceLang = "c_cpp";
+          break;
+        case "json":
+          aceLang = "json";
+          break;
+        case "csv":
+          aceLang = "csv";
+          break;
+        case "text":
+        case "txt":
+          aceLang = "text";
+          break;
+        default:
+          console.warn(`Unsupported language for editor: ${match[1]}`);
+          break;
+      }
+      return (
+        <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
+          <EditorComponent
+            language={aceLang}
+            tabSize={4}
+            filename={match[3]}
+            readonly={match[2] === "-readonly"}
+            initContent={String(props.children || "").replace(/\n$/, "")}
+          />
+        </div>
+      );
+    } else if (match[2] === "-repl") {
+      // repl付きの言語指定
+      // 現状はPythonのみ対応
+      switch (match[1]) {
+        case "python":
           return (
-            <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
-              <ExecFile
-                language={execLang}
-                filenames={match[3].split(",")}
+            <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
+              <PythonEmbeddedTerminal
                 content={String(props.children || "").replace(/\n$/, "")}
               />
             </div>
           );
-        }
-      } else if (match[3]) {
-        // ファイル名指定がある場合、ファイルエディター
-        let aceLang: AceLang | undefined = undefined;
-        switch (match[1]) {
-          case "python":
-            aceLang = "python";
-            break;
-          case "cpp":
-          case "c++":
-            aceLang = "c_cpp";
-            break;
-          case "json":
-            aceLang = "json";
-            break;
-          case "csv":
-            aceLang = "csv";
-            break;
-          case "text":
-          case "txt":
-            aceLang = "text";
-            break;
-          default:
-            console.warn(`Unsupported language for editor: ${match[1]}`);
-            break;
-        }
-        return (
-          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
-            <EditorComponent
-              language={aceLang}
-              tabSize={4}
-              filename={match[3]}
-              readonly={match[2] === "-readonly"}
-              initContent={String(props.children || "").replace(/\n$/, "")}
-            />
-          </div>
-        );
-      } else if (match[2] === "-repl") {
-        // repl付きの言語指定
-        // 現状はPythonのみ対応
-        switch (match[1]) {
-          case "python":
-            return (
-              <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
-                <PythonEmbeddedTerminal
-                  content={String(props.children || "").replace(/\n$/, "")}
-                />
-              </div>
-            );
-          default:
-            console.warn(`Unsupported language for repl: ${match[1]}`);
-            break;
-        }
+        default:
+          console.warn(`Unsupported language for repl: ${match[1]}`);
+          break;
       }
-      return (
-        <SyntaxHighlighter
-          language={match[1]}
-          PreTag="div"
-          className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
-          style={tomorrow} // todo dark theme (editor.tsx で指定したのと同じテーマを選ぶようにすること)
-          {...props}
-        >
-          {String(props.children || "").replace(/\n$/, "")}
-        </SyntaxHighlighter>
-      );
-    } else if (String(props.children).includes("\n")) {
-      // 言語指定なしコードブロック
-      return (
-        <SyntaxHighlighter
-          PreTag="div"
-          className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
-          style={tomorrow} // todo dark theme
-          {...props}
-        >
-          {String(props.children || "").replace(/\n$/, "")}
-        </SyntaxHighlighter>
-      );
-    } else {
-      // inline
-      return (
-        <code
-          className="bg-base-200/60 border border-base-300 px-1 py-0.5 rounded text-sm "
-          {...props}
-        />
-      );
     }
-  },
-};
+    return (
+      <SyntaxHighlighter
+        language={match[1]}
+        PreTag="div"
+        className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
+        style={codetheme}
+        {...props}
+      >
+        {String(props.children || "").replace(/\n$/, "")}
+      </SyntaxHighlighter>
+    );
+  } else if (String(props.children).includes("\n")) {
+    // 言語指定なしコードブロック
+    return (
+      <SyntaxHighlighter
+        PreTag="div"
+        className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
+        style={codetheme}
+        {...props}
+      >
+        {String(props.children || "").replace(/\n$/, "")}
+      </SyntaxHighlighter>
+    );
+  } else {
+    // inline
+    return (
+      <code
+        className="bg-base-200/60 border border-base-300 px-1 py-0.5 rounded text-sm "
+        {...props}
+      />
+    );
+  }
+}

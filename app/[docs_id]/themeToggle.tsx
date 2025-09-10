@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export function ChangeTheme(){
+export function useChangeTheme(){
     const [theme, setTheme] = useState("tomorrow");
       useEffect(() => {
         const updateTheme = () => {

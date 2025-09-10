@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import chalk from "chalk";
-
+import { useChangeTheme } from "../[docs_id]/themeToggle";
+import { th } from "zod/locales";
 /**
  * 文字列の幅を計算する。
  * 厳密にやるなら @xterm/xterm/src/common/input/UnicodeV6.ts を使うとよさそう
@@ -61,16 +62,15 @@ export function useTerminal(props: TerminalProps) {
   const terminalInstanceRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const [termReady, setTermReady] = useState<boolean>(false);
-
+  const theme = useChangeTheme();
   const getRowsRef = useRef<(cols: number) => number>(undefined);
   getRowsRef.current = props.getRows;
   const onReadyRef = useRef<() => void>(undefined);
   onReadyRef.current = props.onReady;
-
+  
   // ターミナルの初期化処理
   useEffect(() => {
     const abortController = new AbortController();
-
     // globals.cssでフォントを指定し読み込んでいるが、
     // それが読み込まれる前にterminalを初期化してしまうとバグる。
     document.fonts.load("0.875rem Inconsolata Variable").then(() => {
@@ -149,6 +149,22 @@ export function useTerminal(props: TerminalProps) {
       }
     };
   }, []);
+
+  // テーマが変わったときにterminalのテーマを更新する
+  useEffect(() => {
+  if (terminalInstanceRef.current) {
+    const fromCSS = (varName: string) =>
+      window.getComputedStyle(document.body).getPropertyValue(varName);
+
+    terminalInstanceRef.current.options = ({
+      theme: {
+        background: fromCSS(theme === "tomorrow" ? "--color-base-300" : "--color-neutral-900"),
+        foreground: fromCSS("--color-base-content")
+      }
+    });
+  }
+}, [theme]);
+
 
   return { terminalRef, terminalInstanceRef, termReady };
 }
