@@ -20,11 +20,13 @@ export function Sidebar() {
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}
-      <h2 className="hidden lg:block text-xl font-bold p-4">
+      <h2 className="hidden lg:flex flex-row items-center text-xl font-bold p-4">
         {/* サイドバーが常時表示されている場合のみ */}
-        Navbar Title
+        <span className="flex-1">Navbar Title</span>
         <ThemeToggle />
       </h2>
+
+      
 
       <ul className="menu w-full">
         {pagesList.map((group) => (

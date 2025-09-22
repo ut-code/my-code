@@ -1,3 +1,4 @@
+import { ThemeToggle } from "./[docs_id]/themeToggle";
 export function Navbar() {
   return (
     <div className="navbar bg-base-200 w-full">
@@ -23,9 +24,10 @@ export function Navbar() {
           </svg>
         </label>
       </div>
-      <div className="mx-2 flex-1 px-2 font-bold text-xl lg:hidden">
-        {/* タイトル(サイドバー非表示の場合のみ) */}
-        Navbar Title
+      <div className="mx-2 flex flex-row items-center px-2 font-bold text-xl lg:hidden">
+        {/* サイドバーが常時表示されている場合のみ */}
+        <span className="flex-1">Navbar Title</span>
+        <ThemeToggle />
       </div>
     </div>
   );

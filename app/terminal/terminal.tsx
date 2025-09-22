@@ -1,12 +1,12 @@
 "use client";
 
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import chalk from "chalk";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
-import { th } from "zod/locales";
+
 /**
  * 文字列の幅を計算する。
  * 厳密にやるなら @xterm/xterm/src/common/input/UnicodeV6.ts を使うとよさそう
