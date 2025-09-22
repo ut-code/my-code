@@ -47,7 +47,7 @@ const components: Components = {
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => <CodeComponent {...{ node, className, ref, style, ...props }} />,
 };
-function CodeComponent({ node,  className, ref, style, ...props }: { node: any; className?: string; ref?: any; style?: any; [key: string]: any }) {
+function CodeComponent({ node,  className, ref, style, ...props }: { node: unknown; className?: string; ref?: unknown; style?: unknown; [key: string]: unknown }) {
   const theme = useChangeTheme();
   const codetheme= theme === "tomorrow" ? tomorrow : twilight;
   const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
