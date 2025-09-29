@@ -47,8 +47,10 @@ ${userQuestion}
 
 `;
     const result = await generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const text = result.text;
+    if (!text) {
+      throw new Error("AIからの応答が空でした");
+    }
     return { response: text, error: null };
   } catch (error: unknown) {
     console.error("Error calling Generative AI:", error);
