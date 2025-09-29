@@ -1,22 +1,27 @@
 "use server";
 
-import { GoogleGenerativeAI, ModelParams } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export async function generateContent(prompt: string) {
-  const params: ModelParams = {
-    model: "gemini-1.5-flash",
+  const params = {
+    model: "gemini-2.5-flash",
+    contents: prompt,
   };
 
-  const genAI = new GoogleGenerativeAI(process.env.API_KEY!);
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+  
   try {
-    const model = genAI.getGenerativeModel(params);
-    return await model.generateContent(prompt);
+    return await ai.models.generateContent(params);
   } catch (e: unknown) {
     if (String(e).includes("User location is not supported")) {
-      const model = genAI.getGenerativeModel(params, {
-        baseUrl: "https://gemini-proxy.utcode.net",
+      // For the new API, we can use httpOptions to set a custom baseUrl
+      const aiWithProxy = new GoogleGenAI({ 
+        apiKey: process.env.API_KEY!,
+        httpOptions: {
+          baseUrl: "https://gemini-proxy.utcode.net",
+        },
       });
-      return await model.generateContent(prompt);
+      return await aiWithProxy.models.generateContent(params);
     } else {
       throw e;
     }

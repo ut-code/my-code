@@ -34,7 +34,9 @@ export async function getQuestionExample(
 ${documentContent}
 `;
   const result = await generateContent(prompt);
-  const response = result.response;
-  const text = response.text();
+  const text = result.text;
+  if (!text) {
+    throw new Error("AIからの応答が空でした");
+  }
   return text.trim().split("\n");
 }
