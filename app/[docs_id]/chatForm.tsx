@@ -8,25 +8,17 @@ import { useChatHistory, type Message } from "../hooks/useChathistory";
 import useSWR from "swr";
 import { getQuestionExample } from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
+import { ReplCommand, ReplOutput } from "../terminal/repl";
 
 interface ChatFormProps {
   documentContent: string;
   sectionId: string;
-  replOutputs: Array<{
-    command: string;
-    output: Array<{
-      type: "stdout" | "stderr" | "error" | "return" | "trace" | "system";
-      message: string;
-    }>;
-  }>;
+  replOutputs: ReplCommand[];
   fileContents: Array<{
     name: string;
     content: string;
   }>;
-  execResults: Record<string, Array<{
-    type: "stdout" | "stderr" | "error" | "return" | "trace" | "system";
-    message: string;
-  }>>;
+  execResults: Record<string, ReplOutput[]>;
 }
 
 export function ChatForm({ documentContent, sectionId, replOutputs, fileContents, execResults }: ChatFormProps) {
