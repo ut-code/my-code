@@ -4,6 +4,7 @@
   themes: light --default, dark --prefersdark;
 };
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */

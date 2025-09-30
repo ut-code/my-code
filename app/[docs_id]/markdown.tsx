@@ -6,8 +6,7 @@ import { Heading } from "./section";
 import { type AceLang, EditorComponent } from "../terminal/editor";
 import { ExecFile, ExecLang } from "../terminal/exec";
 import { useChangeTheme } from "./themeToggle";
-import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { twilight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { tomorrow, atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -36,7 +35,7 @@ const components: Components = {
   li: ({ node, ...props }) => <li className="my-1" {...props} />,
   a: ({ node, ...props }) => <a className="link link-info" {...props} />,
   strong: ({ node, ...props }) => (
-    <strong className="text-primary" {...props} />
+    <strong className="text-primary dark:text-secondary" {...props} />
   ),
   table: ({ node, ...props }) => (
     <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-lg border border-base-content/5 shadow-sm">
@@ -49,7 +48,7 @@ const components: Components = {
 };
 function CodeComponent({ node,  className, ref, style, ...props }: { node: unknown; className?: string; ref?: unknown; style?: unknown; [key: string]: unknown }) {
   const theme = useChangeTheme();
-  const codetheme= theme === "tomorrow" ? tomorrow : twilight;
+  const codetheme= theme === "tomorrow" ? tomorrow : atomOneDark;
   const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
     className || ""
   );

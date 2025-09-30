@@ -1,14 +1,12 @@
 "use server";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
+import { generateContent } from "./gemini";
 
 const QuestionExampleSchema = z.object({
   lang: z.string().min(1),
   documentContent: z.string().min(1),
 });
-
-const genAI = new GoogleGenerativeAI(process.env.API_KEY!);
 
 type QuestionExampleParams = z.input<typeof QuestionExampleSchema>;
 
@@ -28,7 +26,6 @@ export async function getQuestionExample(
 
   const { lang, documentContent } = parseResult.data;
 
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   const prompt = `
 以下の${lang}チュートリアルのドキュメントに対して、想定される初心者のユーザーからの質問の例を箇条書きで複数挙げてください。
 強調などはせずテキストだけで1行ごとに1つ出力してください。
@@ -36,8 +33,10 @@ export async function getQuestionExample(
 # ドキュメント
 ${documentContent}
 `;
-  const result = await model.generateContent(prompt);
-  const response = result.response;
-  const text = response.text();
+  const result = await generateContent(prompt);
+  const text = result.text;
+  if (!text) {
+    throw new Error("AIからの応答が空でした");
+  }
   return text.trim().split("\n");
 }
