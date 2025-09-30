@@ -8,13 +8,20 @@ import { useChatHistory, type Message } from "../hooks/useChathistory";
 import useSWR from "swr";
 import { getQuestionExample } from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
+import { ReplCommand, ReplOutput } from "../terminal/repl";
 
 interface ChatFormProps {
   documentContent: string;
   sectionId: string;
+  replOutputs: ReplCommand[];
+  fileContents: Array<{
+    name: string;
+    content: string;
+  }>;
+  execResults: Record<string, ReplOutput[]>;
 }
 
-export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
+export function ChatForm({ documentContent, sectionId, replOutputs, fileContents, execResults }: ChatFormProps) {
   const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +63,9 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     const result = await askAI({
       userQuestion,
       documentContent: documentContent,
+      replOutputs,
+      fileContents,
+      execResults,
     });
 
     if (result.error) {

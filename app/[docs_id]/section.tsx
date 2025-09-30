@@ -31,15 +31,12 @@ interface SectionProps {
 
 // 1つのセクションのタイトルと内容を表示する。内容はMarkdownとしてレンダリングする
 export function Section({ section, sectionId }: SectionProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [replOutputs, setReplOutputs] = useState<ReplCommand[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [execResults, setExecResults] = useState<Record<string, ReplOutput[]>>(
     {}
   );
   const [filenames, setFilenames] = useState<string[]>([]);
   const { files } = useFile();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fileContents: { name: string; content: string }[] = filenames.map(
     (name) => ({ name, content: files[name] || "" })
   );
@@ -76,7 +73,13 @@ export function Section({ section, sectionId }: SectionProps) {
       <div>
         <Heading level={section.level}>{section.title}</Heading>
         <StyledMarkdown content={section.content} />
-         <ChatForm documentContent={section.content} sectionId={sectionId} />
+         <ChatForm 
+           documentContent={section.content} 
+           sectionId={sectionId}
+           replOutputs={replOutputs}
+           fileContents={fileContents}
+           execResults={execResults}
+         />
       </div>
     </SectionCodeContext.Provider>
   );
