@@ -12,9 +12,24 @@ import { getLanguageName } from "../pagesList";
 interface ChatFormProps {
   documentContent: string;
   sectionId: string;
+  replOutputs: Array<{
+    command: string;
+    output: Array<{
+      type: "stdout" | "stderr" | "error" | "return" | "trace" | "system";
+      message: string;
+    }>;
+  }>;
+  fileContents: Array<{
+    name: string;
+    content: string;
+  }>;
+  execResults: Record<string, Array<{
+    type: "stdout" | "stderr" | "error" | "return" | "trace" | "system";
+    message: string;
+  }>>;
 }
 
-export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
+export function ChatForm({ documentContent, sectionId, replOutputs, fileContents, execResults }: ChatFormProps) {
   const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +71,9 @@ export function ChatForm({ documentContent, sectionId }: ChatFormProps) {
     const result = await askAI({
       userQuestion,
       documentContent: documentContent,
+      replOutputs,
+      fileContents,
+      execResults,
     });
 
     if (result.error) {
