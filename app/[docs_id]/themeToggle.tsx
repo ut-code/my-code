@@ -1,9 +1,16 @@
 "use client";
-import { useState, useEffect} from "react";
+import { useState, useEffect, use} from "react";
+import { set } from "zod";
 
 export function useChangeTheme(){
     const [theme, setTheme] = useState("tomorrow");
       useEffect(() => {
+        const checkIsDarkSchemePreferred = () =>
+          window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ?? false;
+        const initialTheme = checkIsDarkSchemePreferred() ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", initialTheme);
+        setTheme(initialTheme === "dark" ? "twilight" : "tomorrow");
+
         const updateTheme = () => {
           const theme = document.documentElement.getAttribute("data-theme");
           setTheme(theme === "dark" ? "twilight" : "tomorrow");
@@ -15,7 +22,6 @@ export function useChangeTheme(){
           attributeFilter: ["data-theme"],
         });
     
-        updateTheme(); // 初回実行
     
         return () => observer.disconnect();
       }, []);
@@ -24,25 +30,11 @@ export function useChangeTheme(){
 };
 export function ThemeToggle() {
   const [isChecked, setIsChecked] = useState(false);
+  const theme = useChangeTheme();
   useEffect(() => {
-    const checkIsDarkSchemePreferred = () =>
-      window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ?? false;
-    setIsChecked(checkIsDarkSchemePreferred());
-
-    const updateChecked =() =>{
-      const theme= document.documentElement.getAttribute("data-theme");
-      setIsChecked(theme === "dark");
-    }
-
-    const observer = new MutationObserver(updateChecked);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
+    setIsChecked(theme === "twilight");
+  }, [theme]);
+  
   return (
     <label className="flex cursor-pointer gap-2" style={{ marginLeft: "1em" }}>
   <svg
