@@ -27,7 +27,20 @@ export function ThemeToggle() {
   useEffect(() => {
     const checkIsDarkSchemePreferred = () =>
       window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ?? false;
-      setIsChecked(checkIsDarkSchemePreferred());
+    setIsChecked(checkIsDarkSchemePreferred());
+
+    const updateChecked =() =>{
+      const theme= document.documentElement.getAttribute("data-theme");
+      setIsChecked(theme === "dark");
+    }
+
+    const observer = new MutationObserver(updateChecked);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
