@@ -1,6 +1,5 @@
 "use client";
-import { useState, useEffect, use} from "react";
-import { set } from "zod";
+import { useState, useEffect} from "react";
 
 export function useChangeTheme(){
     const [theme, setTheme] = useState("tomorrow");
