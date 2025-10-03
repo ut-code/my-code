@@ -161,7 +161,7 @@ export function ChatForm({ documentContent, sectionId, replOutputs, fileContents
                 className={clsx(
                   "chat-bubble",
                   { "bg-primary text-primary-content": msg.sender === 'user' },
-                  { "bg-secondary-content text-black": msg.sender === 'ai' && !msg.isError },
+                  { "bg-secondary-content dark:bg-neutral text-black dark:text-white": msg.sender === 'ai' && !msg.isError },
                   { "chat-bubble-error": msg.isError }
                 )} 
                 style={{maxWidth: "100%", wordBreak: "break-word"}}
