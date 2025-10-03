@@ -4,11 +4,6 @@ import { useState, useEffect} from "react";
 export function useChangeTheme(){
     const [theme, setTheme] = useState("tomorrow");
       useEffect(() => {
-        const checkIsDarkSchemePreferred = () =>
-          window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ?? false;
-        const initialTheme = checkIsDarkSchemePreferred() ? "dark" : "light";
-        document.documentElement.setAttribute("data-theme", initialTheme);
-        setTheme(initialTheme === "dark" ? "twilight" : "tomorrow");
 
         const updateTheme = () => {
           const theme = document.documentElement.getAttribute("data-theme");
@@ -28,11 +23,14 @@ export function useChangeTheme(){
 
 };
 export function ThemeToggle() {
-  const [isChecked, setIsChecked] = useState(false);
   const theme = useChangeTheme();
+  const isChecked = theme === "twilight";
   useEffect(() => {
-    setIsChecked(theme === "twilight");
-  }, [theme]);
+    const checkIsDarkSchemePreferred = () =>
+          window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ?? false;
+    const initialTheme = checkIsDarkSchemePreferred() ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", initialTheme);
+  }, []);
   
   return (
     <label className="flex cursor-pointer gap-2" style={{ marginLeft: "1em" }}>
@@ -56,7 +54,6 @@ export function ThemeToggle() {
       className="toggle theme-controller"
       onChange={(e) => {
         const isdark = e.target.checked;
-        setIsChecked(isdark);
         const theme = isdark ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", theme);
       }}
