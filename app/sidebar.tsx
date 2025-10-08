@@ -13,7 +13,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
   const { data, error, isLoading } = useSWR(`/docs/${docs_id}.md`, fetcher);
-  
+
   if (error) console.error("Sidebar fetch error:", error);
 
   const splitmdcontent = splitMarkdown(data ?? "");
@@ -25,8 +25,6 @@ export function Sidebar() {
         <span className="flex-1">Navbar Title</span>
         <ThemeToggle />
       </h2>
-
-      
 
       <ul className="menu w-full">
         {pagesList.map((group) => (

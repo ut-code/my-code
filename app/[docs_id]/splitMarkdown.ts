@@ -11,9 +11,7 @@ export interface MarkdownSection {
  * Markdownコンテンツを見出しごとに分割し、
  * 見出しのレベルとタイトル、内容を含むオブジェクトの配列を返す。
  */
-export function splitMarkdown(
-  content: string
-): MarkdownSection[] {
+export function splitMarkdown(content: string): MarkdownSection[] {
   const tree = unified().use(remarkParse).use(remarkGfm).parse(content);
   // console.log(tree.children.map(({ type, position }) => ({ type, position: JSON.stringify(position) })));
   const headingNodes = tree.children.filter((node) => node.type === "heading");

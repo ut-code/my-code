@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 export interface Message {
   sender: "user" | "ai";
@@ -10,7 +10,7 @@ export interface Message {
 
 export const useChatHistory = (sectionId: string) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  
+
   const CHAT_HISTORY_KEY = `my-code-chat-history-${sectionId}`;
 
   useEffect(() => {
@@ -27,14 +27,17 @@ export const useChatHistory = (sectionId: string) => {
     }
   }, [CHAT_HISTORY_KEY]);
 
-  const updateChatHistory = useCallback((newMessages: Message[]) => {
-    setMessages(newMessages);
-    if (newMessages.length > 0) {
-      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(newMessages));
-    } else {
-      localStorage.removeItem(CHAT_HISTORY_KEY);
-    }
-  }, [CHAT_HISTORY_KEY]);
+  const updateChatHistory = useCallback(
+    (newMessages: Message[]) => {
+      setMessages(newMessages);
+      if (newMessages.length > 0) {
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(newMessages));
+      } else {
+        localStorage.removeItem(CHAT_HISTORY_KEY);
+      }
+    },
+    [CHAT_HISTORY_KEY]
+  );
 
   return [messages, updateChatHistory] as const;
 };
