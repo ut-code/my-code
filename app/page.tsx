@@ -29,23 +29,19 @@ export default function Home() {
       >
         {pagesList.map((group) => {
           return (
-            <div
+            <Link
               key={group.id}
+              href={`${group.id}-${group.pages[0].id}`}
               className="card card-border bg-base-100 card-md shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
               <div className="card-body">
                 <h2 className="card-title">{group.lang}</h2>
                 <p>{group.description}</p>
                 <div className="justify-end card-actions">
-                  <Link
-                    href={`${group.id}-${group.pages[0].id}`}
-                    className="btn btn-primary"
-                  >
-                    はじめる
-                  </Link>
+                  <div className="btn btn-primary">はじめる</div>
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
