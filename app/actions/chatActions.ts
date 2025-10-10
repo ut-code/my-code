@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { z } from "zod";
 import { generateContent } from "./gemini";
@@ -9,23 +9,58 @@ interface FormState {
 }
 
 const ChatSchema = z.object({
-  userQuestion: z.string().min(1, { message: "メッセージを入力してください。" }),
-  documentContent: z.string().min(1, { message: "コンテキストとなるドキュメントがありません。"}),
-  replOutputs: z.array(z.object({
-    command: z.string(),
-    output: z.array(z.object({
-      type: z.enum(["stdout", "stderr", "error", "return", "trace", "system"]),
-      message: z.string(),
-    })),
-  })).optional(),
-  fileContents: z.array(z.object({
-    name: z.string(),
-    content: z.string(),
-  })).optional(),
-  execResults: z.record(z.string(), z.array(z.object({
-    type: z.enum(["stdout", "stderr", "error", "return", "trace", "system"]),
-    message: z.string(),
-  }))).optional(),
+  userQuestion: z
+    .string()
+    .min(1, { message: "メッセージを入力してください。" }),
+  documentContent: z
+    .string()
+    .min(1, { message: "コンテキストとなるドキュメントがありません。" }),
+  replOutputs: z
+    .array(
+      z.object({
+        command: z.string(),
+        output: z.array(
+          z.object({
+            type: z.enum([
+              "stdout",
+              "stderr",
+              "error",
+              "return",
+              "trace",
+              "system",
+            ]),
+            message: z.string(),
+          })
+        ),
+      })
+    )
+    .optional(),
+  fileContents: z
+    .array(
+      z.object({
+        name: z.string(),
+        content: z.string(),
+      })
+    )
+    .optional(),
+  execResults: z
+    .record(
+      z.string(),
+      z.array(
+        z.object({
+          type: z.enum([
+            "stdout",
+            "stderr",
+            "error",
+            "return",
+            "trace",
+            "system",
+          ]),
+          message: z.string(),
+        })
+      )
+    )
+    .optional(),
 });
 
 type ChatParams = z.input<typeof ChatSchema>;
@@ -39,14 +74,21 @@ export async function askAI(params: ChatParams): Promise<FormState> {
       error: parseResult.error.issues.map((e) => e.message).join(", "),
     };
   }
-  
-  const { userQuestion, documentContent, replOutputs, fileContents, execResults } = parseResult.data;
+
+  const {
+    userQuestion,
+    documentContent,
+    replOutputs,
+    fileContents,
+    execResults,
+  } = parseResult.data;
 
   try {
     // ターミナルログの文字列を構築
     let terminalLogsSection = "";
     if (replOutputs && replOutputs.length > 0) {
-      terminalLogsSection = "\n# ターミナルのログ（ユーザーが入力したコマンドとその実行結果）\n";
+      terminalLogsSection =
+        "\n# ターミナルのログ（ユーザーが入力したコマンドとその実行結果）\n";
       for (const replCmd of replOutputs) {
         terminalLogsSection += `\n## コマンド: ${replCmd.command}\n`;
         terminalLogsSection += "```\n";
@@ -82,7 +124,7 @@ export async function askAI(params: ChatParams): Promise<FormState> {
         execResultsSection += "```\n";
       }
     }
-    
+
     const prompt = `
 以下のPythonチュートリアルのドキュメントの内容を正確に理解し、ユーザーからの質問に対して、初心者にも分かりやすく、丁寧な解説を提供してください。
 
@@ -110,8 +152,11 @@ ${userQuestion}
   } catch (error: unknown) {
     console.error("Error calling Generative AI:", error);
     if (error instanceof Error) {
-      return { response: '', error: `AIへのリクエスト中にエラーが発生しました: ${error.message}` };
+      return {
+        response: "",
+        error: `AIへのリクエスト中にエラーが発生しました: ${error.message}`,
+      };
     }
-    return { response: '', error: '予期せぬエラーが発生しました。' };
+    return { response: "", error: "予期せぬエラーが発生しました。" };
   }
 }

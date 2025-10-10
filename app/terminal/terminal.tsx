@@ -67,7 +67,7 @@ export function useTerminal(props: TerminalProps) {
   getRowsRef.current = props.getRows;
   const onReadyRef = useRef<() => void>(undefined);
   onReadyRef.current = props.onReady;
-  
+
   // ターミナルの初期化処理
   useEffect(() => {
     const abortController = new AbortController();
@@ -124,7 +124,11 @@ export function useTerminal(props: TerminalProps) {
         // https://github.com/xtermjs/xterm.js/issues/2478
         // my.code();ではCtrl+Cでのkeyboardinterruptは要らないので、コピーペーストに置き換えてしまう
         term.attachCustomKeyEventHandler((arg) => {
-          if (arg.ctrlKey && (arg.key === "c" || arg.key === "x") && arg.type === "keydown") {
+          if (
+            arg.ctrlKey &&
+            (arg.key === "c" || arg.key === "x") &&
+            arg.type === "keydown"
+          ) {
             const selection = term.getSelection();
             if (selection) {
               navigator.clipboard.writeText(selection);
@@ -168,19 +172,20 @@ export function useTerminal(props: TerminalProps) {
 
   // テーマが変わったときにterminalのテーマを更新する
   useEffect(() => {
-  if (terminalInstanceRef.current) {
-    const fromCSS = (varName: string) =>
-      window.getComputedStyle(document.body).getPropertyValue(varName);
+    if (terminalInstanceRef.current) {
+      const fromCSS = (varName: string) =>
+        window.getComputedStyle(document.body).getPropertyValue(varName);
 
-    terminalInstanceRef.current.options = ({
-      theme: {
-        background: fromCSS(theme === "tomorrow" ? "--color-base-300" : "--color-neutral-900"),
-        foreground: fromCSS("--color-base-content")
-      }
-    });
-  }
-}, [theme]);
-
+      terminalInstanceRef.current.options = {
+        theme: {
+          background: fromCSS(
+            theme === "tomorrow" ? "--color-base-300" : "--color-neutral-900"
+          ),
+          foreground: fromCSS("--color-base-content"),
+        },
+      };
+    }
+  }, [theme]);
 
   return { terminalRef, terminalInstanceRef, termReady };
 }

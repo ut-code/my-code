@@ -21,7 +21,13 @@ interface ChatFormProps {
   execResults: Record<string, ReplOutput[]>;
 }
 
-export function ChatForm({ documentContent, sectionId, replOutputs, fileContents, execResults }: ChatFormProps) {
+export function ChatForm({
+  documentContent,
+  sectionId,
+  replOutputs,
+  fileContents,
+  execResults,
+}: ChatFormProps) {
   const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -54,9 +60,10 @@ export function ChatForm({ documentContent, sectionId, replOutputs, fileContents
     updateChatHistory([userMessage]);
 
     let userQuestion = inputValue;
-    if(!userQuestion && exampleData){
+    if (!userQuestion && exampleData) {
       // 質問が空欄なら、質問例を使用
-      userQuestion = exampleData[Math.floor(exampleChoice * exampleData.length)];
+      userQuestion =
+        exampleData[Math.floor(exampleChoice * exampleData.length)];
       setInputValue(userQuestion);
     }
 
@@ -69,7 +76,11 @@ export function ChatForm({ documentContent, sectionId, replOutputs, fileContents
     });
 
     if (result.error) {
-      const errorMessage: Message = { sender: "ai", text: `エラー: ${result.error}`, isError: true };
+      const errorMessage: Message = {
+        sender: "ai",
+        text: `エラー: ${result.error}`,
+        isError: true,
+      };
       updateChatHistory([userMessage, errorMessage]);
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
@@ -83,12 +94,20 @@ export function ChatForm({ documentContent, sectionId, replOutputs, fileContents
   const handleClearHistory = () => {
     updateChatHistory([]);
   };
-  
+
   return (
     <>
       {isFormVisible && (
-      <form className="border border-2 border-secondary shadow-md rounded-lg bg-base-100" style={{width:"100%", textAlign:"center", boxShadow:"-moz-initial"}} onSubmit={handleSubmit}>
-        <div className="input-area">
+        <form
+          className="border border-2 border-secondary shadow-md rounded-lg bg-base-100"
+          style={{
+            width: "100%",
+            textAlign: "center",
+            boxShadow: "-moz-initial",
+          }}
+          onSubmit={handleSubmit}
+        >
+          <div className="input-area">
             <textarea
               className="textarea textarea-ghost textarea-md rounded-lg"
               placeholder={
@@ -108,7 +127,15 @@ export function ChatForm({ documentContent, sectionId, replOutputs, fileContents
               disabled={isLoading}
             ></textarea>
           </div>
-        <div className="controls" style={{margin:"10px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+          <div
+            className="controls"
+            style={{
+              margin: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <div className="left-icons">
               <button
                 className="btn btn-soft btn-secondary rounded-full"
@@ -156,15 +183,21 @@ export function ChatForm({ documentContent, sectionId, replOutputs, fileContents
             </button>
           </div>
           {messages.map((msg, index) => (
-            <div key={index} className={`chat ${msg.sender === 'user' ? 'chat-end' : 'chat-start'}`}>
-              <div 
+            <div
+              key={index}
+              className={`chat ${msg.sender === "user" ? "chat-end" : "chat-start"}`}
+            >
+              <div
                 className={clsx(
                   "chat-bubble",
-                  { "bg-primary text-primary-content": msg.sender === 'user' },
-                  { "bg-secondary-content dark:bg-neutral text-black dark:text-white": msg.sender === 'ai' && !msg.isError },
+                  { "bg-primary text-primary-content": msg.sender === "user" },
+                  {
+                    "bg-secondary-content dark:bg-neutral text-black dark:text-white":
+                      msg.sender === "ai" && !msg.isError,
+                  },
                   { "chat-bubble-error": msg.isError }
-                )} 
-                style={{maxWidth: "100%", wordBreak: "break-word"}}
+                )}
+                style={{ maxWidth: "100%", wordBreak: "break-word" }}
               >
                 <StyledMarkdown content={msg.text} />
               </div>
@@ -178,7 +211,6 @@ export function ChatForm({ documentContent, sectionId, replOutputs, fileContents
           AIが考え中です…
         </div>
       )}
-
     </>
   );
 }

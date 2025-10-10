@@ -34,7 +34,7 @@ export const pagesList = [
       { id: 7, title: "継承とポリモーフィズム" },
       { id: 8, title: "テンプレート" },
       { id: 9, title: "STL ①:コンテナ" },
-      { id: 10, title: "STL ②:アルゴリズムとラムダ式"},
+      { id: 10, title: "STL ②:アルゴリズムとラムダ式" },
       { id: 11, title: "RAIIとスマートポインタ" },
       { id: 12, title: "プロジェクトの分割とビルド" },
     ],
@@ -42,10 +42,10 @@ export const pagesList = [
 ] as const;
 
 // ${lang_id}-${page_id} から言語名を取得
-export function getLanguageName(docs_id: string){
+export function getLanguageName(docs_id: string) {
   const lang_id = docs_id.split("-")[0];
   const lang = pagesList.find((lang) => lang.id === lang_id)?.lang;
-  if(!lang){
+  if (!lang) {
     throw new Error(`Unknown language id: ${lang_id}`);
   }
   return lang;

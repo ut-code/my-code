@@ -6,7 +6,10 @@ import { Heading } from "./section";
 import { type AceLang, EditorComponent } from "../terminal/editor";
 import { ExecFile, ExecLang } from "../terminal/exec";
 import { useChangeTheme } from "./themeToggle";
-import { tomorrow, atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import {
+  tomorrow,
+  atomOneDark,
+} from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -15,7 +18,6 @@ export function StyledMarkdown({ content }: { content: string }) {
     </Markdown>
   );
 }
-
 
 // TailwindCSSがh1などのタグのスタイルを消してしまうので、手動でスタイルを指定する必要がある
 const components: Components = {
@@ -44,11 +46,25 @@ const components: Components = {
   ),
   hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
-  code: ({ node, className, ref, style, ...props }) => <CodeComponent {...{ node, className, ref, style, ...props }} />,
+  code: ({ node, className, ref, style, ...props }) => (
+    <CodeComponent {...{ node, className, ref, style, ...props }} />
+  ),
 };
-function CodeComponent({ node,  className, ref, style, ...props }: { node: unknown; className?: string; ref?: unknown; style?: unknown; [key: string]: unknown }) {
+function CodeComponent({
+  node,
+  className,
+  ref,
+  style,
+  ...props
+}: {
+  node: unknown;
+  className?: string;
+  ref?: unknown;
+  style?: unknown;
+  [key: string]: unknown;
+}) {
   const theme = useChangeTheme();
-  const codetheme= theme === "tomorrow" ? tomorrow : atomOneDark;
+  const codetheme = theme === "tomorrow" ? tomorrow : atomOneDark;
   const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
     className || ""
   );

@@ -1,5 +1,3 @@
 "use server";
 
-export async function hello() {
-    
-}
+export async function hello() {}

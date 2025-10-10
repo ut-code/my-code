@@ -2,20 +2,23 @@
 
 import dynamic from "next/dynamic";
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
-const AceEditor = dynamic(async () => {
-  const ace = await import("react-ace");
-  // テーマは色分けが今のTerminal側のハイライト(highlight.js)の実装に近いものを適当に選んだ
-  await import("ace-builds/src-min-noconflict/theme-tomorrow");
-  await import("ace-builds/src-min-noconflict/theme-twilight");
-  await import("ace-builds/src-min-noconflict/ext-language_tools");
-  await import("ace-builds/src-min-noconflict/ext-searchbox");
-  await import("ace-builds/src-min-noconflict/mode-python");
-  await import("ace-builds/src-min-noconflict/mode-c_cpp");
-  await import("ace-builds/src-min-noconflict/mode-json");
-  await import("ace-builds/src-min-noconflict/mode-csv");
-  await import("ace-builds/src-min-noconflict/mode-text");
-  return ace;
-}, { ssr: false });
+const AceEditor = dynamic(
+  async () => {
+    const ace = await import("react-ace");
+    // テーマは色分けが今のTerminal側のハイライト(highlight.js)の実装に近いものを適当に選んだ
+    await import("ace-builds/src-min-noconflict/theme-tomorrow");
+    await import("ace-builds/src-min-noconflict/theme-twilight");
+    await import("ace-builds/src-min-noconflict/ext-language_tools");
+    await import("ace-builds/src-min-noconflict/ext-searchbox");
+    await import("ace-builds/src-min-noconflict/mode-python");
+    await import("ace-builds/src-min-noconflict/mode-c_cpp");
+    await import("ace-builds/src-min-noconflict/mode-json");
+    await import("ace-builds/src-min-noconflict/mode-csv");
+    await import("ace-builds/src-min-noconflict/mode-text");
+    return ace;
+  },
+  { ssr: false }
+);
 import "./editor.css";
 import { useFile } from "./file";
 import { useEffect } from "react";
@@ -35,7 +38,7 @@ interface EditorProps {
   readonly?: boolean;
 }
 export function EditorComponent(props: EditorProps) {
-  const theme= useChangeTheme();
+  const theme = useChangeTheme();
   const { files, writeFile } = useFile();
   const code = files[props.filename] || props.initContent;
   const sectionContext = useSectionCode();

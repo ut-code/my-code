@@ -42,7 +42,7 @@ export function FileProvider({ children }: { children: ReactNode }) {
         if (files[pathname][name] !== content) {
           files[pathname][name] = content;
           // Reactが変更を検知できるようfiles[pathname]をコピーした別オブジェクトに置き換え
-          files[pathname] = {...files[pathname]};
+          files[pathname] = { ...files[pathname] };
           return { ...files };
         } else {
           return files;

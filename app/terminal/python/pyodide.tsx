@@ -209,9 +209,9 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
           });
         }
       }
-      
+
       const pyReadFile = pyodide.runPython(READALLFILE_CODE) as PyCallable;
-      for(const [file, content] of pyReadFile() as [string, string][]){
+      for (const [file, content] of pyReadFile() as [string, string][]) {
         writeFile(file, content);
       }
 
@@ -280,10 +280,10 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         }
 
         const pyReadFile = pyodide.runPython(READALLFILE_CODE) as PyCallable;
-        for(const [file, content] of pyReadFile() as [string, string][]){
+        for (const [file, content] of pyReadFile() as [string, string][]) {
           writeFile(file, content);
         }
-        
+
         const output = [...pyodideOutput.current];
         pyodideOutput.current = []; // 出力をクリア
         return output;
