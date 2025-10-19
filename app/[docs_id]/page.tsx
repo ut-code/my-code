@@ -44,9 +44,5 @@ export default async function Page({
 
   const splitMdContent: MarkdownSection[] = await splitMarkdown(mdContent);
 
-  return (
-    <div className="p-4">
-      <PageContent splitMdContent={splitMdContent} docs_id={docs_id} />
-    </div>
-  );
+  return <PageContent splitMdContent={splitMdContent} docs_id={docs_id} />;
 }

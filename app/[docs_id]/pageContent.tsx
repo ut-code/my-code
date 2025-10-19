@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Section } from "./section";
 import { MarkdownSection } from "./splitMarkdown";
+import { ChatForm } from "./chatForm";
 
 interface PageContentProps {
   splitMdContent: MarkdownSection[];
@@ -39,18 +40,41 @@ export function PageContent(props: PageContentProps) {
     };
   }, []);
 
-  return props.splitMdContent.map((section, index) => {
-    const sectionId = `${props.docs_id}-${index}`;
-    return (
-      <div
-        key={index}
-        id={`${index}`}  // 目次からaタグで飛ぶために必要
-        ref={(el) => {
-          sectionRefs.current[index] = el;
-        }}
-      >
-        <Section section={section} sectionId={sectionId} />
-      </div>
-    );
-  });
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  return (
+    <div className="p-4">
+      {props.splitMdContent.map((section, index) => {
+        const sectionId = `${props.docs_id}-${index}`;
+        return (
+          <div
+            key={index}
+            id={`${index}`} // 目次からaタグで飛ぶために必要
+            ref={(el) => {
+              sectionRefs.current[index] = el;
+            }}
+          >
+            <Section section={section} sectionId={sectionId} />
+          </div>
+        );
+      })}
+      {isFormVisible ? (
+        <div className="fixed bottom-4 inset-x-4 z-50">
+          <ChatForm
+            splitMdContent={props.splitMdContent}
+            sectionInView={sectionInView}
+            docs_id={props.docs_id}
+            onClose={() => setIsFormVisible(false)}
+          />
+        </div>
+      ) : (
+        <button
+          className="fixed bottom-4 right-4 btn btn-soft btn-secondary rounded-full shadow-md z-50"
+          onClick={() => setIsFormVisible(true)}
+        >
+          AIに質問
+        </button>
+      )}
+    </div>
+  );
 }
