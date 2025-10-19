@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
 import { Section } from "./section";
 import pyodideLock from "pyodide/pyodide-lock.json";
+import { PageContent } from "./pageContent";
 
 export default async function Page({
   params,
@@ -45,14 +46,7 @@ export default async function Page({
 
   return (
     <div className="p-4">
-      {splitMdContent.map((section, index) => {
-        const sectionId = `${docs_id}-${index}`;
-        return (
-          <div key={index} id={`${index}`}>
-            <Section section={section} sectionId={sectionId} />
-          </div>
-        );
-      })}
+      <PageContent splitMdContent={splitMdContent} docs_id={docs_id} />
     </div>
   );
 }
