@@ -8,10 +8,10 @@ import {
   systemMessageColor,
   useTerminal,
 } from "./terminal";
-import { useSectionCode } from "../[docs_id]/section";
 import { useWandbox } from "./wandbox/wandbox";
 import { ReplOutput, writeOutput } from "./repl";
 import { useState } from "react";
+import { useEmbed } from "../[docs_id]/embedContext";
 
 export type ExecLang = "python" | "cpp";
 
@@ -34,7 +34,7 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const sectionContext = useSectionCode();
+  const sectionContext = useEmbed();
 
   const pyodide = usePyodide();
   const wandbox = useWandbox();

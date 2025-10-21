@@ -12,8 +12,8 @@ import {
   systemMessageColor,
   useTerminal,
 } from "./terminal";
-import { useSectionCode } from "../[docs_id]/section";
 import { Terminal } from "@xterm/xterm";
+import { useEmbed } from "../[docs_id]/embedContext";
 
 export interface ReplOutput {
   type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
@@ -58,6 +58,7 @@ export function writeOutput(
 }
 
 interface ReplComponentProps {
+  terminalId: string;
   initRuntime: () => void;
   runtimeInitializing: boolean;
   runtimeReady: boolean;
@@ -79,10 +80,11 @@ export function ReplTerminal(props: ReplComponentProps) {
   const inputBuffer = useRef<string[]>([]);
   const initDone = useRef<boolean>(false);
 
-  const sectionContext = useSectionCode();
+  const sectionContext = useEmbed();
   const addReplOutput = sectionContext?.addReplOutput;
 
   const {
+    terminalId,
     initRuntime,
     runtimeInitializing,
     runtimeReady,
@@ -256,7 +258,7 @@ export function ReplTerminal(props: ReplComponentProps) {
                 sendCommand(command)
               );
               onOutput(outputs);
-              addReplOutput?.(command, outputs);
+              addReplOutput?.(terminalId, command, outputs);
             }
           } else if (code === 127) {
             // Backspace
@@ -293,6 +295,7 @@ export function ReplTerminal(props: ReplComponentProps) {
       }
     },
     [
+      terminalId,
       updateBuffer,
       sendCommand,
       onOutput,

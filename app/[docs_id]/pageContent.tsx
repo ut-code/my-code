@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Section } from "./section";
 import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
+import { useEmbed } from "./embedContext";
 
 interface PageContentProps {
   splitMdContent: MarkdownSection[];

@@ -1,27 +1,20 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import clsx from "clsx";
+import { useState, FormEvent, useEffect } from "react";
 import { askAI } from "@/app/actions/chatActions";
-import { StyledMarkdown } from "./markdown";
-import { useChatHistory, type Message } from "../hooks/useChathistory";
+import { type Message } from "../hooks/useChathistory";
 import useSWR from "swr";
 import { getQuestionExample } from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
-import { ReplCommand, ReplOutput } from "../terminal/repl";
 import { MarkdownSection } from "./splitMarkdown";
+import { useEmbed } from "./embedContext";
+import { useFile } from "../terminal/file";
 
 interface ChatFormProps {
   docs_id: string;
   splitMdContent: MarkdownSection[];
   sectionInView: boolean[];
   onClose: () => void;
-  replOutputs: ReplCommand[];
-  fileContents: Array<{
-    name: string;
-    content: string;
-  }>;
-  execResults: Record<string, ReplOutput[]>;
 }
 
 export function ChatForm({
@@ -29,15 +22,15 @@ export function ChatForm({
   splitMdContent,
   sectionInView,
   onClose,
-  replOutputs,
-  fileContents,
-  execResults,
 }: ChatFormProps) {
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const lang = getLanguageName(docs_id);
+
+  const { replOutputs, execResults } = useEmbed()!;
+  const { files } = useFile();
 
   const documentContentInView = splitMdContent
     .filter((_, index) => sectionInView[index])
@@ -63,13 +56,18 @@ export function ChatForm({
   // 質問フォームを開くたびにランダムに選び直し、
   // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
   const [exampleChoice, setExampleChoice] = useState<number>(0); // 0〜1
+  useEffect(() => {
+    if (exampleChoice === 0) {
+      setExampleChoice(Math.random());
+    }
+  }, [exampleChoice]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     const userMessage: Message = { sender: "user", text: inputValue };
-    updateChatHistory([userMessage]);
+    // updateChatHistory([userMessage]);
 
     let userQuestion = inputValue;
     if (!userQuestion && exampleData) {
@@ -81,9 +79,10 @@ export function ChatForm({
 
     const result = await askAI({
       userQuestion,
-      documentContent: documentContent,
+      splitMdContent,
+      sectionInView,
       replOutputs,
-      fileContents,
+      files,
       execResults,
     });
 
@@ -93,10 +92,10 @@ export function ChatForm({
         text: `エラー: ${result.error}`,
         isError: true,
       };
-      updateChatHistory([userMessage, errorMessage]);
+      // updateChatHistory([userMessage, errorMessage]);
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
-      updateChatHistory([userMessage, aiMessage]);
+      // updateChatHistory([userMessage, aiMessage]);
       setInputValue("");
     }
 
@@ -109,7 +108,6 @@ export function ChatForm({
       style={{
         width: "100%",
         textAlign: "center",
-        boxShadow: "-moz-initial",
       }}
       onSubmit={handleSubmit}
     >

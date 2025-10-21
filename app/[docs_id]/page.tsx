@@ -3,9 +3,9 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
-import { Section } from "./section";
 import pyodideLock from "pyodide/pyodide-lock.json";
 import { PageContent } from "./pageContent";
+import { EmbedContextProvider } from "./embedContext";
 
 export default async function Page({
   params,
@@ -44,5 +44,9 @@ export default async function Page({
 
   const splitMdContent: MarkdownSection[] = await splitMarkdown(mdContent);
 
-  return <PageContent splitMdContent={splitMdContent} docs_id={docs_id} />;
+  return (
+    <EmbedContextProvider>
+      <PageContent splitMdContent={splitMdContent} docs_id={docs_id} />
+    </EmbedContextProvider>
+  );
 }

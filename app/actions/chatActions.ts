@@ -12,7 +12,7 @@ const ChatSchema = z.object({
   userQuestion: z
     .string()
     .min(1, { message: "メッセージを入力してください。" }),
-  documentContent: z
+  splitMdContent: z
     .string()
     .min(1, { message: "コンテキストとなるドキュメントがありません。" }),
   replOutputs: z
