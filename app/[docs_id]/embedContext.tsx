@@ -35,10 +35,17 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   );
   const addReplOutput = useCallback(
     (terminalId: string, command: string, output: ReplOutput[]) =>
-      setReplOutputs((outs) => ({
-        ...outs,
-        terminalId: [...(outs[terminalId] ?? []), { command, output }],
-      })),
+      setReplOutputs((outs) => {
+        outs = { ...outs };
+        if (!(terminalId in outs)) {
+          outs[terminalId] = [];
+        }
+        outs[terminalId] = [
+          ...outs[terminalId],
+          { command: command, output: output },
+        ];
+        return outs;
+      }),
     []
   );
   const setExecResult = useCallback(

@@ -104,6 +104,23 @@ function CodeComponent({
           </div>
         );
       }
+    } else if (match[2] === "-repl") {
+      // repl付きの言語指定
+      // 現状はPythonのみ対応
+      switch (match[1]) {
+        case "python":
+          return (
+            <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
+              <PythonEmbeddedTerminal
+                terminalId={match[3]}
+                content={String(props.children || "").replace(/\n$/, "")}
+              />
+            </div>
+          );
+        default:
+          console.warn(`Unsupported language for repl: ${match[1]}`);
+          break;
+      }
     } else if (match[3]) {
       // ファイル名指定がある場合、ファイルエディター
       let aceLang: AceLang | undefined = undefined;
@@ -140,22 +157,6 @@ function CodeComponent({
           />
         </div>
       );
-    } else if (match[2] === "-repl") {
-      // repl付きの言語指定
-      // 現状はPythonのみ対応
-      switch (match[1]) {
-        case "python":
-          return (
-            <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
-              <PythonEmbeddedTerminal
-                content={String(props.children || "").replace(/\n$/, "")}
-              />
-            </div>
-          );
-        default:
-          console.warn(`Unsupported language for repl: ${match[1]}`);
-          break;
-      }
     }
     return (
       <SyntaxHighlighter

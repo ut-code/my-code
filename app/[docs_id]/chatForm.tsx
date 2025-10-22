@@ -12,6 +12,7 @@ import { useFile } from "../terminal/file";
 
 interface ChatFormProps {
   docs_id: string;
+  documentContent: string;
   splitMdContent: MarkdownSection[];
   sectionInView: boolean[];
   onClose: () => void;
@@ -19,6 +20,7 @@ interface ChatFormProps {
 
 export function ChatForm({
   docs_id,
+  documentContent,
   splitMdContent,
   sectionInView,
   onClose,
@@ -79,6 +81,7 @@ export function ChatForm({
 
     const result = await askAI({
       userQuestion,
+      documentContent,
       splitMdContent,
       sectionInView,
       replOutputs,
@@ -95,6 +98,7 @@ export function ChatForm({
       // updateChatHistory([userMessage, errorMessage]);
     } else {
       const aiMessage: Message = { sender: "ai", text: result.response };
+      console.log(aiMessage);
       // updateChatHistory([userMessage, aiMessage]);
       setInputValue("");
     }

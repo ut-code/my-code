@@ -7,6 +7,7 @@ import { ChatForm } from "./chatForm";
 import { useEmbed } from "./embedContext";
 
 interface PageContentProps {
+  documentContent: string;
   splitMdContent: MarkdownSection[];
   docs_id: string;
 }
@@ -62,6 +63,7 @@ export function PageContent(props: PageContentProps) {
       {isFormVisible ? (
         <div className="fixed bottom-4 inset-x-4 z-50">
           <ChatForm
+            documentContent={props.documentContent}
             splitMdContent={props.splitMdContent}
             sectionInView={sectionInView}
             docs_id={props.docs_id}

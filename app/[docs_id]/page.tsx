@@ -46,7 +46,11 @@ export default async function Page({
 
   return (
     <EmbedContextProvider>
-      <PageContent splitMdContent={splitMdContent} docs_id={docs_id} />
+      <PageContent
+        documentContent={mdContent}
+        splitMdContent={splitMdContent}
+        docs_id={docs_id}
+      />
     </EmbedContextProvider>
   );
 }
