@@ -11,7 +11,7 @@ import {
 import { useWandbox } from "./wandbox/wandbox";
 import { ReplOutput, writeOutput } from "./repl";
 import { useState } from "react";
-import { useEmbed } from "../[docs_id]/embedContext";
+import { useEmbedContext } from "./embedContext";
 
 export type ExecLang = "python" | "cpp";
 
@@ -34,7 +34,7 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const sectionContext = useEmbed();
+  const sectionContext = useEmbedContext();
 
   const pyodide = usePyodide();
   const wandbox = useWandbox();

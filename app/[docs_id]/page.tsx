@@ -5,7 +5,6 @@ import { join } from "node:path";
 import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
 import pyodideLock from "pyodide/pyodide-lock.json";
 import { PageContent } from "./pageContent";
-import { EmbedContextProvider } from "./embedContext";
 
 export default async function Page({
   params,
@@ -42,15 +41,13 @@ export default async function Page({
     String(pyodideLock.info.python)
   );
 
-  const splitMdContent: MarkdownSection[] = await splitMarkdown(mdContent);
+  const splitMdContent: MarkdownSection[] = splitMarkdown(mdContent);
 
   return (
-    <EmbedContextProvider>
-      <PageContent
-        documentContent={mdContent}
-        splitMdContent={splitMdContent}
-        docs_id={docs_id}
-      />
-    </EmbedContextProvider>
+    <PageContent
+      documentContent={mdContent}
+      splitMdContent={splitMdContent}
+      docs_id={docs_id}
+    />
   );
 }

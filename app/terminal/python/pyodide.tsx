@@ -13,7 +13,7 @@ import {
 import { SyntaxStatus, ReplOutput } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
 import { PyCallable } from "pyodide/ffi";
-import { useFile } from "../file";
+import { useEmbedContext } from "../embedContext";
 
 declare global {
   interface Window {
@@ -103,7 +103,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
   const [initializing, setInitializing] = useState<boolean>(false);
   const pyodideOutput = useRef<ReplOutput[]>([]);
   const mutex = useRef<MutexInterface>(new Mutex());
-  const { files, writeFile } = useFile();
+  const { files, writeFile } = useEmbedContext();
 
   const init = useCallback(async () => {
     // next.config.ts 内でpyodideをimportし、バージョンを取得している

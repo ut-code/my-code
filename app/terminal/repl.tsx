@@ -13,7 +13,7 @@ import {
   useTerminal,
 } from "./terminal";
 import { Terminal } from "@xterm/xterm";
-import { useEmbed } from "../[docs_id]/embedContext";
+import { useEmbedContext } from "./embedContext";
 
 export interface ReplOutput {
   type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
@@ -80,7 +80,7 @@ export function ReplTerminal(props: ReplComponentProps) {
   const inputBuffer = useRef<string[]>([]);
   const initDone = useRef<boolean>(false);
 
-  const sectionContext = useEmbed();
+  const sectionContext = useEmbedContext();
   const addReplOutput = sectionContext?.addReplOutput;
 
   const {

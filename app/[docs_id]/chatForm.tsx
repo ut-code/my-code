@@ -6,24 +6,21 @@ import { type Message } from "../hooks/useChathistory";
 import useSWR from "swr";
 import { getQuestionExample } from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
-import { MarkdownSection } from "./splitMarkdown";
-import { useEmbed } from "./embedContext";
-import { useFile } from "../terminal/file";
+import { DynamicMarkdownSection } from "./pageContent";
+import { useEmbedContext } from "../terminal/embedContext";
 
 interface ChatFormProps {
   docs_id: string;
   documentContent: string;
-  splitMdContent: MarkdownSection[];
-  sectionInView: boolean[];
-  onClose: () => void;
+  sectionContent: DynamicMarkdownSection[];
+  close: () => void;
 }
 
 export function ChatForm({
   docs_id,
   documentContent,
-  splitMdContent,
-  sectionInView,
-  onClose,
+  sectionContent,
+  close,
 }: ChatFormProps) {
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
@@ -31,15 +28,11 @@ export function ChatForm({
 
   const lang = getLanguageName(docs_id);
 
-  const { replOutputs, execResults } = useEmbed()!;
-  const { files } = useFile();
+  const { files, replOutputs, execResults } = useEmbedContext();
 
-  const documentContentInView = splitMdContent
-    .filter((_, index) => sectionInView[index])
-    .map(
-      (section) =>
-        `${"#".repeat(section.level)} ${section.title}\n${section.content}`
-    )
+  const documentContentInView = sectionContent
+    .filter((s) => s.inView)
+    .map((s) => s.rawContent)
     .join("\n\n");
   const { data: exampleData, error: exampleError } = useSWR(
     // 質問フォームを開いたときだけで良い
@@ -68,7 +61,7 @@ export function ChatForm({
     e.preventDefault();
     setIsLoading(true);
 
-    const userMessage: Message = { sender: "user", text: inputValue };
+    // const userMessage: Message = { sender: "user", text: inputValue };
     // updateChatHistory([userMessage]);
 
     let userQuestion = inputValue;
@@ -82,8 +75,7 @@ export function ChatForm({
     const result = await askAI({
       userQuestion,
       documentContent,
-      splitMdContent,
-      sectionInView,
+      sectionContent,
       replOutputs,
       files,
       execResults,
@@ -147,7 +139,7 @@ export function ChatForm({
         <div className="left-icons">
           <button
             className="btn btn-soft btn-secondary rounded-full"
-            onClick={onClose}
+            onClick={close}
             type="button"
           >
             閉じる

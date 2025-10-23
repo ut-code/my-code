@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Section } from "./section";
 import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
-import { useEmbed } from "./embedContext";
+
+// MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
+export type DynamicMarkdownSection = MarkdownSection & {
+  inView: boolean;
+  sectionId: string;
+};
 
 interface PageContentProps {
   documentContent: string;
@@ -12,28 +17,46 @@ interface PageContentProps {
   docs_id: string;
 }
 export function PageContent(props: PageContentProps) {
-  // 各セクションが画面内にあるかどうかを調べる
-  const [sectionInView, setSectionInView] = useState<boolean[]>([]);
+  const [dynamicMdContent, setDynamicMdContent] = useState<
+    DynamicMarkdownSection[]
+  >(
+    // useEffectで更新するのとは別に、SSRのための初期値
+    props.splitMdContent.map((section, i) => ({
+      ...section,
+      inView: false,
+      sectionId: `${props.docs_id}-${i}`,
+    }))
+  );
+  useEffect(() => {
+    // props.splitMdContentが変わったときにdynamicMdContentを更新
+    setDynamicMdContent(
+      props.splitMdContent.map((section, i) => ({
+        ...section,
+        inView: false,
+        sectionId: `${props.docs_id}-${i}`,
+      }))
+    );
+  }, [props.splitMdContent, props.docs_id]);
+
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
   while (sectionRefs.current.length < props.splitMdContent.length) {
     sectionRefs.current.push(null);
   }
-  sectionRefs.current = sectionRefs.current.slice(
-    0,
-    props.splitMdContent.length
-  );
 
   useEffect(() => {
     const handleScroll = () => {
-      const newSectionInView = sectionRefs.current.map((sectionRef) => {
-        if (sectionRef) {
-          const rect = sectionRef.getBoundingClientRect();
-          return rect.top < window.innerHeight && rect.bottom >= 0;
+      setDynamicMdContent((prevDynamicMdContent) => {
+        const dynMdContent = prevDynamicMdContent.slice(); // Reactの変更検知のために新しい配列を作成
+        for (let i = 0; i < sectionRefs.current.length; i++) {
+          if (sectionRefs.current.at(i) && dynMdContent.at(i)) {
+            const rect = sectionRefs.current.at(i)!.getBoundingClientRect();
+            dynMdContent.at(i)!.inView =
+              rect.top < window.innerHeight && rect.bottom >= 0;
+          }
         }
-        return false;
+        return dynMdContent;
       });
-      setSectionInView(newSectionInView);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
@@ -46,9 +69,7 @@ export function PageContent(props: PageContentProps) {
 
   return (
     <div className="p-4">
-      {props.splitMdContent.map((section, index) => {
-        const sectionId = `${props.docs_id}-${index}`;
-        return (
+      {dynamicMdContent.map((section, index) => 
           <div
             key={index}
             id={`${index}`} // 目次からaタグで飛ぶために必要
@@ -56,18 +77,16 @@ export function PageContent(props: PageContentProps) {
               sectionRefs.current[index] = el;
             }}
           >
-            <Section section={section} sectionId={sectionId} />
+            <Section section={section} sectionId={section.sectionId} />
           </div>
-        );
-      })}
+      )}
       {isFormVisible ? (
         <div className="fixed bottom-4 inset-x-4 z-50">
           <ChatForm
             documentContent={props.documentContent}
-            splitMdContent={props.splitMdContent}
-            sectionInView={sectionInView}
+            sectionContent={dynamicMdContent}
             docs_id={props.docs_id}
-            onClose={() => setIsFormVisible(false)}
+            close={() => setIsFormVisible(false)}
           />
         </div>
       ) : (
