@@ -62,7 +62,7 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
     newChatHistories[sectionId][chatId] = messages;
     setChatHistories(newChatHistories);
     localStorage.setItem(
-      `chat-${sectionId}-${chatId}`,
+      `chat/${sectionId}/${chatId}`,
       JSON.stringify(messages)
     );
     return chatId;
@@ -80,7 +80,7 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
       ];
       setChatHistories(newChatHistories);
       localStorage.setItem(
-        `chat-${sectionId}-${chatId}`,
+        `chat/${sectionId}/${chatId}`,
         JSON.stringify(newChatHistories[sectionId][chatId])
       );
     }
