@@ -51,7 +51,6 @@ const components: Components = {
   ),
 };
 
-
 export function Heading({
   level,
   children,
@@ -133,6 +132,11 @@ function CodeComponent({
     } else if (match[2] === "-repl") {
       // repl付きの言語指定
       // 現状はPythonのみ対応
+      if (!match[3]) {
+        console.warn(
+          `${match[1]}-repl without terminal id! content: ${String(props.children).slice(0, 20)}...`
+        );
+      }
       switch (match[1]) {
         case "python":
           return (

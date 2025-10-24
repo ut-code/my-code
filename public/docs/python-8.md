@@ -8,7 +8,7 @@
 
 例えば、`0` で割り算をすると `ZeroDivisionError` という例外が発生します。
 
-```python-repl
+```python-repl:1
 >>> 10 / 0
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
@@ -17,7 +17,7 @@ ZeroDivisionError: division by zero
 
 このエラーを `try...except` で捕捉してみましょう。
 
-```python-repl
+```python-repl:2
 >>> try:
 ...   result = 10 / 0
 ... except ZeroDivisionError:
@@ -38,7 +38,7 @@ ZeroDivisionError: division by zero
 
 エラーの種類ごとに異なる処理を行いたい場合に適しています。
 
-```python-repl
+```python-repl:3
 >>> def calculate(a, b):
 ...   try:
 ...     a = int(a)
@@ -62,7 +62,7 @@ ZeroDivisionError: division by zero
 
 複数の例外に対して同じ処理を行いたい場合に便利です。
 
-```python-repl
+```python-repl:4
 >>> def calculate_v2(a, b):
 ...   try:
 ...     a = int(a)
@@ -86,7 +86,7 @@ ZeroDivisionError: division by zero
 
 例えば、負の値を受け付けない関数を考えてみましょう。
 
-```python-repl
+```python-repl:5
 >>> def process_positive_number(num):
 ...   if num < 0:
 ...     raise ValueError("負の値は処理できません。")
@@ -112,7 +112,7 @@ ValueError: 負の値は処理できません。
 
 すべての節を使った例を見てみましょう。
 
-```python-repl
+```python-repl:6
 >>> def divider(a, b):
 ...   print(f"--- {a} / {b} の計算を開始します ---")
 ...   try:
