@@ -11,6 +11,7 @@ export default function PythonPage() {
   return (
     <div className="p-4 flex flex-col gap-4">
       <ReplTerminal
+        terminalId=""
         initRuntime={init}
         runtimeInitializing={initializing}
         runtimeReady={ready}

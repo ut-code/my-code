@@ -3,7 +3,10 @@
 import { useState, FormEvent, useEffect } from "react";
 import { askAI } from "@/app/actions/chatActions";
 import useSWR from "swr";
-import { getQuestionExample } from "../actions/questionExample";
+import {
+  getQuestionExample,
+  QuestionExampleParams,
+} from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
 import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "../terminal/embedContext";
@@ -38,7 +41,10 @@ export function ChatForm({
     .join("\n\n");
   const { data: exampleData, error: exampleError } = useSWR(
     // 質問フォームを開いたときだけで良い
-    { lang, documentContentInView },
+    {
+      lang,
+      documentContent: documentContentInView,
+    } satisfies QuestionExampleParams,
     getQuestionExample,
     {
       // リクエストは古くても構わないので1回でいい

@@ -1,10 +1,10 @@
 "use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
 import { Heading, StyledMarkdown } from "./markdown";
-import { ChatHistoryProvider, useChatHistoryContext } from "./chatHistory";
+import { useChatHistoryContext } from "./chatHistory";
 import clsx from "clsx";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
