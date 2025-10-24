@@ -8,7 +8,7 @@ const QuestionExampleSchema = z.object({
   documentContent: z.string().min(1),
 });
 
-type QuestionExampleParams = z.input<typeof QuestionExampleSchema>;
+export type QuestionExampleParams = z.input<typeof QuestionExampleSchema>;
 
 export async function getQuestionExample(
   params: QuestionExampleParams

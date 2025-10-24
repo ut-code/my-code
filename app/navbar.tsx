@@ -1,8 +1,13 @@
+import Link from "next/link";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
 export function Navbar() {
   return (
-    <div className="navbar bg-base-200 w-full">
-      <div className="flex-none lg:hidden">
+    <>
+    {/* fixedのヘッダーの分だけスクロールするコンテンツを下に移動するためのdiv */}
+    <div className="h-16 lg:hidden" />
+
+    <div className="h-16 navbar bg-base-200 w-full fixed lg:hidden flex gap-4 z-40 shadow-md">
+      <div className="flex-none">
         {/* サイドバーを開閉するボタン */}
         <label
           htmlFor="drawer-toggle"
@@ -24,11 +29,10 @@ export function Navbar() {
           </svg>
         </label>
       </div>
-      <div className="mx-2 flex flex-row items-center px-2 font-bold text-xl lg:hidden">
-        {/* サイドバーが常時表示されている場合のみ */}
-        <span className="flex-1">Navbar Title</span>
-        <ThemeToggle />
-      </div>
+      {/* サイドバーが常時表示されている場合のみ */}
+      <Link href="/" className="flex-1 font-bold text-xl">my.code();</Link>
+      <ThemeToggle />
     </div>
+    </>
   );
 }

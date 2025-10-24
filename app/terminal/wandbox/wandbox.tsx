@@ -2,10 +2,10 @@
 
 import { createContext, ReactNode, useCallback, useContext } from "react";
 import { ReplOutput } from "../repl";
-import { useFile } from "../file";
 import useSWR from "swr";
 import { compilerInfoFetcher } from "./api";
 import { cppRunFiles, getCppCommandlineStr } from "./cpp";
+import { useEmbedContext } from "../embedContext";
 
 type WandboxLang = "C++";
 
@@ -27,7 +27,7 @@ export function useWandbox() {
 }
 
 export function WandboxProvider({ children }: { children: ReactNode }) {
-  const { files } = useFile();
+  const { files } = useEmbedContext();
   const { data: compilerList, error } = useSWR("list", compilerInfoFetcher);
   if (error) {
     console.error("Failed to fetch compiler list from Wandbox:", error);

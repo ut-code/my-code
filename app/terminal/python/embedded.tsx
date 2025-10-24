@@ -4,13 +4,20 @@ import { useMemo } from "react";
 import { ReplTerminal, ReplOutput, ReplCommand } from "../repl";
 import { usePyodide } from "./pyodide";
 
-export function PythonEmbeddedTerminal({ content }: { content: string }) {
+export function PythonEmbeddedTerminal({
+  terminalId,
+  content,
+}: {
+  terminalId: string;
+  content: string;
+}) {
   const initCommands = useMemo(() => splitContents(content), [content]);
   const { init, initializing, ready, runPython, checkSyntax, mutex } =
     usePyodide();
 
   return (
     <ReplTerminal
+      terminalId={terminalId}
       initRuntime={init}
       runtimeInitializing={initializing}
       runtimeReady={ready}

@@ -3,8 +3,9 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
-import { Section } from "./section";
 import pyodideLock from "pyodide/pyodide-lock.json";
+import { PageContent } from "./pageContent";
+import { ChatHistoryProvider } from "./chatHistory";
 
 export default async function Page({
   params,
@@ -41,18 +42,15 @@ export default async function Page({
     String(pyodideLock.info.python)
   );
 
-  const splitMdContent: MarkdownSection[] = await splitMarkdown(mdContent);
+  const splitMdContent: MarkdownSection[] = splitMarkdown(mdContent);
 
   return (
-    <div className="p-4">
-      {splitMdContent.map((section, index) => {
-        const sectionId = `${docs_id}-${index}`;
-        return (
-          <div key={index} id={`${index}`}>
-            <Section section={section} sectionId={sectionId} />
-          </div>
-        );
-      })}
-    </div>
+    <ChatHistoryProvider>
+      <PageContent
+        documentContent={mdContent}
+        splitMdContent={splitMdContent}
+        docs_id={docs_id}
+      />
+    </ChatHistoryProvider>
   );
 }

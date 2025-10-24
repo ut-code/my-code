@@ -6,6 +6,7 @@ export interface MarkdownSection {
   level: number;
   title: string;
   content: string;
+  rawContent: string; // 見出しも含めたもとのmarkdownの内容
 }
 /**
  * Markdownコンテンツを見出しごとに分割し、
@@ -36,6 +37,10 @@ export function splitMarkdown(content: string): MarkdownSection[] {
         .join("\n")
         .trim(),
       level: headingNodes.at(i)!.depth,
+      rawContent: splitContent
+        .slice(startLine - 1, endLine ? endLine - 1 : undefined)
+        .join("\n")
+        .trim(),
     });
   }
   return sections;

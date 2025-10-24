@@ -1,42 +1,50 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import clsx from "clsx";
+import { useState, FormEvent, useEffect } from "react";
 import { askAI } from "@/app/actions/chatActions";
-import { StyledMarkdown } from "./markdown";
-import { useChatHistory, type Message } from "../hooks/useChathistory";
 import useSWR from "swr";
-import { getQuestionExample } from "../actions/questionExample";
+import {
+  getQuestionExample,
+  QuestionExampleParams,
+} from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
-import { ReplCommand, ReplOutput } from "../terminal/repl";
+import { DynamicMarkdownSection } from "./pageContent";
+import { useEmbedContext } from "../terminal/embedContext";
+import { ChatMessage, useChatHistoryContext } from "./chatHistory";
 
 interface ChatFormProps {
+  docs_id: string;
   documentContent: string;
-  sectionId: string;
-  replOutputs: ReplCommand[];
-  fileContents: Array<{
-    name: string;
-    content: string;
-  }>;
-  execResults: Record<string, ReplOutput[]>;
+  sectionContent: DynamicMarkdownSection[];
+  close: () => void;
 }
 
 export function ChatForm({
+  docs_id,
   documentContent,
-  sectionId,
-  replOutputs,
-  fileContents,
-  execResults,
+  sectionContent,
+  close,
 }: ChatFormProps) {
-  const [messages, updateChatHistory] = useChatHistory(sectionId);
+  // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isFormVisible, setIsFormVisible] = useState(false);
 
-  const lang = getLanguageName(sectionId);
+  const { addChat } = useChatHistoryContext();
+
+  const lang = getLanguageName(docs_id);
+
+  const { files, replOutputs, execResults } = useEmbedContext();
+
+  const documentContentInView = sectionContent
+    .filter((s) => s.inView)
+    .map((s) => s.rawContent)
+    .join("\n\n");
   const { data: exampleData, error: exampleError } = useSWR(
     // 質問フォームを開いたときだけで良い
-    isFormVisible ? { lang, documentContent } : null,
+    {
+      lang,
+      documentContent: documentContentInView,
+    } satisfies QuestionExampleParams,
     getQuestionExample,
     {
       // リクエストは古くても構わないので1回でいい
@@ -51,13 +59,17 @@ export function ChatForm({
   // 質問フォームを開くたびにランダムに選び直し、
   // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
   const [exampleChoice, setExampleChoice] = useState<number>(0); // 0〜1
+  useEffect(() => {
+    if (exampleChoice === 0) {
+      setExampleChoice(Math.random());
+    }
+  }, [exampleChoice]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const userMessage: Message = { sender: "user", text: inputValue };
-    updateChatHistory([userMessage]);
+    const userMessage: ChatMessage = { sender: "user", text: inputValue };
 
     let userQuestion = inputValue;
     if (!userQuestion && exampleData) {
@@ -69,148 +81,89 @@ export function ChatForm({
 
     const result = await askAI({
       userQuestion,
-      documentContent: documentContent,
+      documentContent,
+      sectionContent,
       replOutputs,
-      fileContents,
+      files,
       execResults,
     });
 
     if (result.error) {
-      const errorMessage: Message = {
-        sender: "ai",
+      const errorMessage: ChatMessage = {
+        sender: "error",
         text: `エラー: ${result.error}`,
-        isError: true,
       };
-      updateChatHistory([userMessage, errorMessage]);
+      console.log(result.error);
+      // TODO: ユーザーに表示
     } else {
-      const aiMessage: Message = { sender: "ai", text: result.response };
-      updateChatHistory([userMessage, aiMessage]);
+      const aiMessage: ChatMessage = { sender: "ai", text: result.response };
+      const chatId = addChat(result.targetSectionId, [userMessage, aiMessage]);
+      // TODO: chatIdが指す対象の回答にフォーカス
       setInputValue("");
+      close();
     }
 
     setIsLoading(false);
   };
 
-  const handleClearHistory = () => {
-    updateChatHistory([]);
-  };
-
   return (
-    <>
-      {isFormVisible && (
-        <form
-          className="border border-2 border-secondary shadow-md rounded-lg bg-base-100"
+    <form
+      className="border border-2 border-secondary shadow-lg rounded-lg bg-base-100"
+      style={{
+        width: "100%",
+        textAlign: "center",
+      }}
+      onSubmit={handleSubmit}
+    >
+      <div className="input-area">
+        <textarea
+          className="textarea textarea-ghost textarea-md rounded-lg"
+          placeholder={
+            "質問を入力してください" +
+            (exampleData
+              ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
+              : "")
+          }
           style={{
             width: "100%",
-            textAlign: "center",
-            boxShadow: "-moz-initial",
+            height: "110px",
+            resize: "none",
+            outlineStyle: "none",
           }}
-          onSubmit={handleSubmit}
-        >
-          <div className="input-area">
-            <textarea
-              className="textarea textarea-ghost textarea-md rounded-lg"
-              placeholder={
-                "質問を入力してください" +
-                (exampleData
-                  ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
-                  : "")
-              }
-              style={{
-                width: "100%",
-                height: "110px",
-                resize: "none",
-                outlineStyle: "none",
-              }}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              disabled={isLoading}
-            ></textarea>
-          </div>
-          <div
-            className="controls"
-            style={{
-              margin: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          disabled={isLoading}
+        ></textarea>
+      </div>
+      <div
+        className="controls"
+        style={{
+          margin: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div className="left-icons">
+          <button
+            className="btn btn-soft btn-secondary rounded-full"
+            onClick={close}
+            type="button"
           >
-            <div className="left-icons">
-              <button
-                className="btn btn-soft btn-secondary rounded-full"
-                onClick={() => setIsFormVisible(false)}
-                type="button"
-              >
-                閉じる
-              </button>
-            </div>
-            <div className="right-controls">
-              <button
-                type="submit"
-                className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
-                title="送信"
-                disabled={isLoading}
-              >
-                <span className="icon">➤</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      )}
-      {!isFormVisible && (
-        <button
-          className="btn btn-soft btn-secondary rounded-full"
-          onClick={() => {
-            setIsFormVisible(true);
-            setExampleChoice(Math.random());
-          }}
-        >
-          チャットを開く
-        </button>
-      )}
-
-      {messages.length > 0 && (
-        <article className="mt-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-semibold">AIとのチャット</h3>
-            <button
-              onClick={handleClearHistory}
-              className="btn btn-ghost btn-sm text-xs"
-              aria-label="チャット履歴を削除"
-            >
-              履歴を削除
-            </button>
-          </div>
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`chat ${msg.sender === "user" ? "chat-end" : "chat-start"}`}
-            >
-              <div
-                className={clsx(
-                  "chat-bubble",
-                  { "bg-primary text-primary-content": msg.sender === "user" },
-                  {
-                    "bg-secondary-content dark:bg-neutral text-black dark:text-white":
-                      msg.sender === "ai" && !msg.isError,
-                  },
-                  { "chat-bubble-error": msg.isError }
-                )}
-                style={{ maxWidth: "100%", wordBreak: "break-word" }}
-              >
-                <StyledMarkdown content={msg.text} />
-              </div>
-            </div>
-          ))}
-        </article>
-      )}
-
-      {isLoading && (
-        <div className="mt-2 text-l text-gray-500 animate-pulse">
-          AIが考え中です…
+            閉じる
+          </button>
         </div>
-      )}
-    </>
+        <div className="right-controls">
+          <button
+            type="submit"
+            className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
+            title="送信"
+            disabled={isLoading}
+          >
+            <span className="icon">➤</span>
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }

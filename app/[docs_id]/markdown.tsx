@@ -2,7 +2,6 @@ import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
-import { Heading } from "./section";
 import { type AceLang, EditorComponent } from "../terminal/editor";
 import { ExecFile, ExecLang } from "../terminal/exec";
 import { useChangeTheme } from "./themeToggle";
@@ -10,6 +9,7 @@ import {
   tomorrow,
   atomOneDark,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { ReactNode } from "react";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -50,6 +50,32 @@ const components: Components = {
     <CodeComponent {...{ node, className, ref, style, ...props }} />
   ),
 };
+
+
+export function Heading({
+  level,
+  children,
+}: {
+  level: number;
+  children: ReactNode;
+}) {
+  switch (level) {
+    case 1:
+      return <h1 className="text-2xl font-bold my-4">{children}</h1>;
+    case 2:
+      return <h2 className="text-xl font-bold mt-4 mb-3 ">{children}</h2>;
+    case 3:
+      return <h3 className="text-lg font-bold mt-4 mb-2">{children}</h3>;
+    case 4:
+      return <h4 className="text-base font-bold mt-3 mb-2">{children}</h4>;
+    case 5:
+      // TODO: これ以下は4との差がない (全体的に大きくする必要がある？)
+      return <h5 className="text-base font-bold mt-3 mb-2">{children}</h5>;
+    case 6:
+      return <h6 className="text-base font-bold mt-3 mb-2">{children}</h6>;
+  }
+}
+
 function CodeComponent({
   node,
   className,
@@ -104,6 +130,23 @@ function CodeComponent({
           </div>
         );
       }
+    } else if (match[2] === "-repl") {
+      // repl付きの言語指定
+      // 現状はPythonのみ対応
+      switch (match[1]) {
+        case "python":
+          return (
+            <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
+              <PythonEmbeddedTerminal
+                terminalId={match[3]}
+                content={String(props.children || "").replace(/\n$/, "")}
+              />
+            </div>
+          );
+        default:
+          console.warn(`Unsupported language for repl: ${match[1]}`);
+          break;
+      }
     } else if (match[3]) {
       // ファイル名指定がある場合、ファイルエディター
       let aceLang: AceLang | undefined = undefined;
@@ -140,22 +183,6 @@ function CodeComponent({
           />
         </div>
       );
-    } else if (match[2] === "-repl") {
-      // repl付きの言語指定
-      // 現状はPythonのみ対応
-      switch (match[1]) {
-        case "python":
-          return (
-            <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
-              <PythonEmbeddedTerminal
-                content={String(props.children || "").replace(/\n$/, "")}
-              />
-            </div>
-          );
-        default:
-          console.warn(`Unsupported language for repl: ${match[1]}`);
-          break;
-      }
     }
     return (
       <SyntaxHighlighter

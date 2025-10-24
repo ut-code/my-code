@@ -20,11 +20,10 @@ const AceEditor = dynamic(
   { ssr: false }
 );
 import "./editor.css";
-import { useFile } from "./file";
 import { useEffect } from "react";
-import { useSectionCode } from "../[docs_id]/section";
 import clsx from "clsx";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
+import { useEmbedContext } from "./embedContext";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
@@ -39,16 +38,13 @@ interface EditorProps {
 }
 export function EditorComponent(props: EditorProps) {
   const theme = useChangeTheme();
-  const { files, writeFile } = useFile();
+  const { files, writeFile } = useEmbedContext();
   const code = files[props.filename] || props.initContent;
-  const sectionContext = useSectionCode();
-  const addSectionFile = sectionContext?.addFile;
   useEffect(() => {
     if (!files[props.filename]) {
       writeFile(props.filename, props.initContent);
     }
-    addSectionFile?.(props.filename);
-  }, [files, props.filename, props.initContent, writeFile, addSectionFile]);
+  }, [files, props.filename, props.initContent, writeFile]);
 
   return (
     <div className="embedded-editor">

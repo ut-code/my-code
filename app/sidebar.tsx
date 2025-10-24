@@ -20,11 +20,36 @@ export function Sidebar() {
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}
-      <h2 className="hidden lg:flex flex-row items-center text-xl font-bold p-4">
+      <h2 className="hidden lg:flex flex-row items-center p-4">
         {/* サイドバーが常時表示されている場合のみ */}
-        <span className="flex-1">Navbar Title</span>
+        <Link href="/" className="flex-1 text-xl font-bold">
+          my.code();
+        </Link>
         <ThemeToggle />
       </h2>
+      <span className="block lg:hidden p-4 pb-0">
+        <label
+          htmlFor="drawer-toggle"
+          aria-label="open sidebar"
+          className="btn btn-ghost"
+        >
+          <svg
+            className="w-8 h-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 17L13 12L18 7M11 17L6 12L11 7"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="text-lg">Close</span>
+        </label>
+      </span>
 
       <ul className="menu w-full">
         {pagesList.map((group) => (
