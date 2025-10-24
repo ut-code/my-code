@@ -30,7 +30,7 @@ export default function RootLayout({
               </PyodideProvider>
             </EmbedContextProvider>
           </div>
-          <div className="drawer-side shadow-md">
+          <div className="drawer-side shadow-md z-50">
             <label
               htmlFor="drawer-toggle"
               aria-label="close sidebar"

@@ -81,7 +81,9 @@ export function PageContent(props: PageContentProps) {
           </div>
       )}
       {isFormVisible ? (
-        <div className="fixed bottom-4 inset-x-4 z-50">
+        // sidebarの幅が80であることからleft-84 (sidebar.tsx参照)
+        // replがz-10を使用することからそれの上にするためz-20
+        <div className="fixed bottom-4 right-4 left-4 lg:left-84 z-20">
           <ChatForm
             documentContent={props.documentContent}
             sectionContent={dynamicMdContent}
