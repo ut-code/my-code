@@ -2,12 +2,12 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { askAI } from "@/app/actions/chatActions";
-import { type Message } from "../hooks/useChathistory";
 import useSWR from "swr";
 import { getQuestionExample } from "../actions/questionExample";
 import { getLanguageName } from "../pagesList";
 import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "../terminal/embedContext";
+import { ChatMessage, useChatHistoryContext } from "./chatHistory";
 
 interface ChatFormProps {
   docs_id: string;
@@ -25,6 +25,8 @@ export function ChatForm({
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const { addChat } = useChatHistoryContext();
 
   const lang = getLanguageName(docs_id);
 
@@ -61,8 +63,7 @@ export function ChatForm({
     e.preventDefault();
     setIsLoading(true);
 
-    // const userMessage: Message = { sender: "user", text: inputValue };
-    // updateChatHistory([userMessage]);
+    const userMessage: ChatMessage = { sender: "user", text: inputValue };
 
     let userQuestion = inputValue;
     if (!userQuestion && exampleData) {
@@ -82,17 +83,18 @@ export function ChatForm({
     });
 
     if (result.error) {
-      const errorMessage: Message = {
-        sender: "ai",
+      const errorMessage: ChatMessage = {
+        sender: "error",
         text: `エラー: ${result.error}`,
-        isError: true,
       };
-      // updateChatHistory([userMessage, errorMessage]);
+      console.log(result.error);
+      // TODO: ユーザーに表示
     } else {
-      const aiMessage: Message = { sender: "ai", text: result.response };
-      console.log(aiMessage);
-      // updateChatHistory([userMessage, aiMessage]);
+      const aiMessage: ChatMessage = { sender: "ai", text: result.response };
+      const chatId = addChat(result.targetSectionId, [userMessage, aiMessage]);
+      // TODO: chatIdが指す対象の回答にフォーカス
       setInputValue("");
+      close();
     }
 
     setIsLoading(false);

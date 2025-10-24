@@ -8,6 +8,7 @@ import { ReplCommand, ReplOutput } from "../terminal/repl";
 interface FormState {
   response: string;
   error: string | null;
+  targetSectionId: string;
 }
 
 type ChatParams = {
@@ -140,15 +141,25 @@ export async function askAI(params: ChatParams): Promise<FormState> {
     if (!text) {
       throw new Error("AIからの応答が空でした");
     }
-    return { response: text, error: null };
+    return {
+      response: text,
+      error: null,
+      // TODO: どのセクションへの回答にするかをAIに決めさせる
+      targetSectionId: sectionContent.find((s) => s.inView)?.sectionId || "",
+    };
   } catch (error: unknown) {
     console.error("Error calling Generative AI:", error);
     if (error instanceof Error) {
       return {
         response: "",
         error: `AIへのリクエスト中にエラーが発生しました: ${error.message}`,
+        targetSectionId: sectionContent.find((s) => s.inView)?.sectionId || "",
       };
     }
-    return { response: "", error: "予期せぬエラーが発生しました。" };
+    return {
+      response: "",
+      error: "予期せぬエラーが発生しました。",
+      targetSectionId: sectionContent.find((s) => s.inView)?.sectionId || "",
+    };
   }
 }
