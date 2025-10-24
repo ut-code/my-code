@@ -113,28 +113,25 @@ export function ChatForm({
       }}
       onSubmit={handleSubmit}
     >
-      <div className="input-area">
-        <textarea
-          className="textarea textarea-ghost textarea-md rounded-lg"
-          placeholder={
-            "質問を入力してください" +
-            (exampleData
-              ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
-              : "")
-          }
-          style={{
-            width: "100%",
-            height: "110px",
-            resize: "none",
-            outlineStyle: "none",
-          }}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          disabled={isLoading}
-        ></textarea>
-      </div>
+      <textarea
+        className="textarea textarea-ghost textarea-md rounded-lg"
+        placeholder={
+          "質問を入力してください" +
+          (exampleData
+            ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
+            : "")
+        }
+        style={{
+          width: "100%",
+          height: "110px",
+          resize: "none",
+          outlineStyle: "none",
+        }}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        disabled={isLoading}
+      ></textarea>
       <div
-        className="controls"
         style={{
           margin: "10px",
           display: "flex",
@@ -142,40 +139,33 @@ export function ChatForm({
           justifyContent: "space-between",
         }}
       >
-        <div className="left-icons">
-          <button
-            className="btn btn-soft btn-secondary rounded-full"
-            onClick={close}
-            type="button"
-          >
-            閉じる
-          </button>
-        </div>
+        <button
+          className="btn btn-soft btn-secondary rounded-full"
+          onClick={close}
+          type="button"
+        >
+          閉じる
+        </button>
         {errorMessage && (
           <div
-            className="error-message"
+            className="text-error text-left text-nowrap overflow-hidden text-ellipsis"
             style={{
-              color: "red",
-              fontSize: "14px",
               marginLeft: "10px",
               marginRight: "10px",
               flex: 1,
-              textAlign: "center",
             }}
           >
             {errorMessage}
           </div>
         )}
-        <div className="right-controls">
-          <button
-            type="submit"
-            className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
-            title="送信"
-            disabled={isLoading}
-          >
-            <span className="icon">➤</span>
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
+          title="送信"
+          disabled={isLoading}
+        >
+          <span className="icon">➤</span>
+        </button>
       </div>
     </form>
   );
