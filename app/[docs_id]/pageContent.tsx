@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Section } from "./section";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
+import { Heading, StyledMarkdown } from "./markdown";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
 export type DynamicMarkdownSection = MarkdownSection & {
@@ -68,18 +68,29 @@ export function PageContent(props: PageContentProps) {
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   return (
-    <div className="p-4">
-      {dynamicMdContent.map((section, index) => 
+    <div
+      className="p-4 mx-auto grid"
+      style={{
+        gridTemplateColumns: `1fr auto`,
+      }}
+    >
+      {dynamicMdContent.map((section, index) => (
+        <>
           <div
+            className="max-w-200"
             key={index}
             id={`${index}`} // 目次からaタグで飛ぶために必要
             ref={(el) => {
               sectionRefs.current[index] = el;
             }}
           >
-            <Section section={section} sectionId={section.sectionId} />
+            {/* ドキュメントのコンテンツ */}
+            <Heading level={section.level}>{section.title}</Heading>
+            <StyledMarkdown content={section.content} />
           </div>
-      )}
+          <div>{/* 右側に表示するチャット履歴欄 */}</div>
+        </>
+      ))}
       {isFormVisible ? (
         // sidebarの幅が80であることからleft-84 (sidebar.tsx参照)
         // replがz-10を使用することからそれの上にするためz-20
