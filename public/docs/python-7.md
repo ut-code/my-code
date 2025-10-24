@@ -15,7 +15,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
       * `'+'` を付けると読み書き両用になります（例: `'r+'`, `'w+'`）。
       * `'b'` を付けるとバイナリモードになります（例: `'rb'`, `'wb'`）。
 
-```python-repl
+```python-repl:1
 >>> # 'w' モードでファイルを開く（または新規作成する）
 >>> f = open('spam.txt', 'w', encoding='utf-8')
 >>> f
@@ -35,7 +35,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
 
 **`write()`** メソッドは、文字列をファイルに書き込みます。このメソッドは書き込んだ文字数を返します。
 
-```python-repl
+```python-repl:2
 >>> f = open('test.txt', 'w', encoding='utf-8')
 >>> f.write('こんにちは、世界！\n')
 9
@@ -59,7 +59,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
   * **`readline()`**: ファイルから1行だけを読み込み、文字列として返します。
   * **`readlines()`**: ファイルのすべての行を読み込み、各行を要素とするリストで返します。
 
-```python-repl
+```python-repl:3
 >>> # 先ほど書き込んだファイルを読み込む
 >>> f = open('test.txt', 'r', encoding='utf-8')
 >>> content = f.read()
@@ -87,7 +87,7 @@ Pythonでファイルを操作するには、まず組み込み関数の **`open
 
 **`with`** 文のブロックを抜けると、ファイルオブジェクトは自動的に `close()` されます。エラーが発生した場合でも同様です。これは「コンテキストマネージャ」という仕組みによって実現されており、ファイル操作の標準的な方法です。
 
-```python-repl
+```python-repl:4
 >>> # with文を使った書き込み
 >>> with open('spam.txt', 'w', encoding='utf-8') as f:
 ...     f.write('withブロックを使っています。\n')
@@ -123,7 +123,7 @@ withブロックを使っています。
 
 <!-- end list -->
 
-```python-repl
+```python-repl:5
 >>> import json
 
 >>> # 書き込むデータ（Pythonの辞書）
@@ -172,7 +172,7 @@ withブロックを使っています。
 
 **`csv.writer()`** を使ってライターオブジェクトを作成し、**`writerow()`** (1行) や **`writerows()`** (複数行) メソッドでデータを書き込みます。
 
-```python-repl
+```python-repl:6
 >>> import csv
 
 >>> # 書き込むデータ（リストのリスト）
@@ -201,7 +201,7 @@ ID,Name,Score
 
 **`csv.reader()`** を使ってリーダーオブジェクトを作成します。このオブジェクトをループで回すことで、1行ずつリストとしてデータを取得できます。
 
-```python-repl
+```python-repl:7
 >>> import csv
 
 >>> with open('scores.csv', 'r', newline='', encoding='-utf-8') as f:
