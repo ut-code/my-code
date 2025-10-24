@@ -28,6 +28,7 @@ export function ChatForm({
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { addChat } = useChatHistoryContext();
 
@@ -68,6 +69,7 @@ export function ChatForm({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null); // Clear previous error message
 
     const userMessage: ChatMessage = { sender: "user", text: inputValue };
 
@@ -89,12 +91,8 @@ export function ChatForm({
     });
 
     if (result.error) {
-      const errorMessage: ChatMessage = {
-        sender: "error",
-        text: `エラー: ${result.error}`,
-      };
+      setErrorMessage(result.error);
       console.log(result.error);
-      // TODO: ユーザーに表示
     } else {
       const aiMessage: ChatMessage = { sender: "ai", text: result.response };
       const chatId = addChat(result.targetSectionId, [userMessage, aiMessage]);
@@ -115,28 +113,25 @@ export function ChatForm({
       }}
       onSubmit={handleSubmit}
     >
-      <div className="input-area">
-        <textarea
-          className="textarea textarea-ghost textarea-md rounded-lg"
-          placeholder={
-            "質問を入力してください" +
-            (exampleData
-              ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
-              : "")
-          }
-          style={{
-            width: "100%",
-            height: "110px",
-            resize: "none",
-            outlineStyle: "none",
-          }}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          disabled={isLoading}
-        ></textarea>
-      </div>
+      <textarea
+        className="textarea textarea-ghost textarea-md rounded-lg"
+        placeholder={
+          "質問を入力してください" +
+          (exampleData
+            ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
+            : "")
+        }
+        style={{
+          width: "100%",
+          height: "110px",
+          resize: "none",
+          outlineStyle: "none",
+        }}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        disabled={isLoading}
+      ></textarea>
       <div
-        className="controls"
         style={{
           margin: "10px",
           display: "flex",
@@ -144,25 +139,33 @@ export function ChatForm({
           justifyContent: "space-between",
         }}
       >
-        <div className="left-icons">
-          <button
-            className="btn btn-soft btn-secondary rounded-full"
-            onClick={close}
-            type="button"
+        <button
+          className="btn btn-soft btn-secondary rounded-full"
+          onClick={close}
+          type="button"
+        >
+          閉じる
+        </button>
+        {errorMessage && (
+          <div
+            className="text-error text-left text-nowrap overflow-hidden text-ellipsis"
+            style={{
+              marginLeft: "10px",
+              marginRight: "10px",
+              flex: 1,
+            }}
           >
-            閉じる
-          </button>
-        </div>
-        <div className="right-controls">
-          <button
-            type="submit"
-            className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
-            title="送信"
-            disabled={isLoading}
-          >
-            <span className="icon">➤</span>
-          </button>
-        </div>
+            {errorMessage}
+          </div>
+        )}
+        <button
+          type="submit"
+          className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
+          title="送信"
+          disabled={isLoading}
+        >
+          <span className="icon">➤</span>
+        </button>
       </div>
     </form>
   );
