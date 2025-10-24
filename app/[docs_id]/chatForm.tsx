@@ -95,7 +95,8 @@ export function ChatForm({
       console.log(result.error);
     } else {
       const aiMessage: ChatMessage = { sender: "ai", text: result.response };
-      addChat(result.targetSectionId, [userMessage, aiMessage]);
+      const chatId = addChat(result.targetSectionId, [userMessage, aiMessage]);
+      // TODO: chatIdが指す対象の回答にフォーカス
       setInputValue("");
       close();
     }
