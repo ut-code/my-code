@@ -5,7 +5,6 @@ https://my-code.utcode.net
 ## インストール
 ```bash
 npm ci
-npx prisma generate
 ```
 
 ルートディレクトリに .env.local という名前のファイルを作成し、以下の内容を記述
