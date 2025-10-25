@@ -4,21 +4,15 @@
 import { generateContent } from "./gemini";
 import { DynamicMarkdownSection } from "../[docs_id]/pageContent";
 import { ReplCommand, ReplOutput } from "../terminal/repl";
-import { addChat, ChatWithMessages } from "@/lib/chatHistory";
 
-type ChatResult =
-  | {
-      error: string;
-    }
-  | {
-      error: null;
-      // サーバー側でデータベースに新しく追加されたチャットデータ
-      chat: ChatWithMessages;
-    };
+interface FormState {
+  response: string;
+  error: string | null;
+  targetSectionId: string;
+}
 
 type ChatParams = {
   userQuestion: string;
-  docsId: string;
   documentContent: string;
   sectionContent: DynamicMarkdownSection[];
   replOutputs: Record<string, ReplCommand[]>;
@@ -26,7 +20,7 @@ type ChatParams = {
   execResults: Record<string, ReplOutput[]>;
 };
 
-export async function askAI(params: ChatParams): Promise<ChatResult> {
+export async function askAI(params: ChatParams): Promise<FormState> {
   // const parseResult = ChatSchema.safeParse(params);
 
   // if (!parseResult.success) {
@@ -147,21 +141,25 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     if (!text) {
       throw new Error("AIからの応答が空でした");
     }
-    // TODO: どのセクションへの回答にするかをAIに決めさせる
-    const targetSectionId =
-      sectionContent.find((s) => s.inView)?.sectionId || "";
-    const newChat = await addChat(params.docsId, targetSectionId, [
-      { role: "user", content: userQuestion },
-      { role: "ai", content: text },
-    ]);
     return {
+      response: text,
       error: null,
-      chat: newChat,
+      // TODO: どのセクションへの回答にするかをAIに決めさせる
+      targetSectionId: sectionContent.find((s) => s.inView)?.sectionId || "",
     };
   } catch (error: unknown) {
     console.error("Error calling Generative AI:", error);
+    if (error instanceof Error) {
+      return {
+        response: "",
+        error: `AIへのリクエスト中にエラーが発生しました: ${error.message}`,
+        targetSectionId: sectionContent.find((s) => s.inView)?.sectionId || "",
+      };
+    }
     return {
-      error: String(error),
+      response: "",
+      error: "予期せぬエラーが発生しました。",
+      targetSectionId: sectionContent.find((s) => s.inView)?.sectionId || "",
     };
   }
 }

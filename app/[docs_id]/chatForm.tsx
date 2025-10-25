@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent, useEffect } from "react";
+import { askAI } from "@/app/actions/chatActions";
 import useSWR from "swr";
 import {
   getQuestionExample,
@@ -9,8 +10,7 @@ import {
 import { getLanguageName } from "../pagesList";
 import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "../terminal/embedContext";
-import { useChatHistoryContext } from "./chatHistory";
-import { askAI } from "@/actions/chatActions";
+import { ChatMessage, useChatHistoryContext } from "./chatHistory";
 
 interface ChatFormProps {
   docs_id: string;
@@ -71,6 +71,8 @@ export function ChatForm({
     setIsLoading(true);
     setErrorMessage(null); // Clear previous error message
 
+    const userMessage: ChatMessage = { sender: "user", text: inputValue };
+
     let userQuestion = inputValue;
     if (!userQuestion && exampleData) {
       // 質問が空欄なら、質問例を使用
@@ -81,7 +83,6 @@ export function ChatForm({
 
     const result = await askAI({
       userQuestion,
-      docsId: docs_id,
       documentContent,
       sectionContent,
       replOutputs,
@@ -89,11 +90,12 @@ export function ChatForm({
       execResults,
     });
 
-    if (result.error !== null) {
+    if (result.error) {
       setErrorMessage(result.error);
       console.log(result.error);
     } else {
-      addChat(result.chat);
+      const aiMessage: ChatMessage = { sender: "ai", text: result.response };
+      const chatId = addChat(result.targetSectionId, [userMessage, aiMessage]);
       // TODO: chatIdが指す対象の回答にフォーカス
       setInputValue("");
       close();

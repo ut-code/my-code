@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import useSWR, { Fetcher } from "swr";
 import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 import { pagesList } from "./pagesList";
-import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
 
 const fetcher: Fetcher<string, string> = (url) =>
@@ -21,13 +20,12 @@ export function Sidebar() {
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}
-      <h2 className="hidden lg:flex flex-row items-center p-4 gap-2">
+      <h2 className="hidden lg:flex flex-row items-center p-4">
         {/* サイドバーが常時表示されている場合のみ */}
         <Link href="/" className="flex-1 text-xl font-bold">
           my.code();
         </Link>
         <ThemeToggle />
-        <AccountMenu />
       </h2>
       <span className="block lg:hidden p-4 pb-0">
         <label

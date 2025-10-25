@@ -94,8 +94,8 @@ export function PageContent(props: PageContentProps) {
           </div>
           <div key={`${index}-chat`}>
             {/* 右側に表示するチャット履歴欄 */}
-            {chatHistories.filter((c) => c.sectionId === section.sectionId).map(
-              ({chatId, messages}) => (
+            {Object.entries(chatHistories[section.sectionId] ?? {}).map(
+              ([chatId, messages]) => (
                 <div
                   key={chatId}
                   className="max-w-xs mb-2 p-2 text-sm border border-base-content/10 rounded-sm shadow-sm bg-base-100"
@@ -104,20 +104,20 @@ export function PageContent(props: PageContentProps) {
                     {messages.map((msg, index) => (
                       <div
                         key={index}
-                        className={`chat ${msg.role === "user" ? "chat-end" : "chat-start"}`}
+                        className={`chat ${msg.sender === "user" ? "chat-end" : "chat-start"}`}
                       >
                         <div
                           className={clsx(
                             "chat-bubble p-1!",
-                            msg.role === "user" &&
+                            msg.sender === "user" &&
                               "bg-primary text-primary-content",
-                            msg.role === "ai" &&
+                            msg.sender === "ai" &&
                               "bg-secondary-content dark:bg-neutral text-black dark:text-white",
-                            msg.role === "error" && "chat-bubble-error"
+                            msg.sender === "error" && "chat-bubble-error"
                           )}
                           style={{ maxWidth: "100%", wordBreak: "break-word" }}
                         >
-                          <StyledMarkdown content={msg.content} />
+                          <StyledMarkdown content={msg.text} />
                         </div>
                       </div>
                     ))}
