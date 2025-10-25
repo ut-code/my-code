@@ -1,10 +1,9 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { PrismaClient } from "../generated/prisma/client";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { anonymous } from "better-auth/plugins";
-
-const prisma = new PrismaClient();
+import prisma from "./prisma";
+import { migrateChatUser } from "./chatHistory";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let cloudflareEnv: any;
@@ -20,9 +19,8 @@ export const auth = betterAuth({
   }),
   plugins: [
     anonymous({
-      onLinkAccount: async ({ anonymousUser, newUser }) => {
-        // TODO
-      },
+      onLinkAccount: ({ anonymousUser, newUser }) =>
+        migrateChatUser(anonymousUser.user.id, newUser.user.id),
     }),
   ],
   socialProviders: {

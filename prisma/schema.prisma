@@ -27,6 +27,8 @@ model User {
 
   isAnonymous Boolean?
 
+  Chat        Chat[]
+
   @@unique([email])
   @@map("user")
 }
@@ -74,4 +76,24 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+// ここまでbetter-authが使う
+
+model Chat {
+  chatId    Int @id @default(autoincrement())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  docsId    String
+  sectionId String
+
+  messages Message[]
+}
+
+model Message {
+  id        Int @id @default(autoincrement())
+  chatId    Int
+  chat      Chat     @relation(fields: [chatId], references: [chatId], onDelete: Cascade)
+  role      String
+  content   String
 }
