@@ -81,19 +81,21 @@ model Verification {
 // ここまでbetter-authが使う
 
 model Chat {
-  chatId    Int @id @default(autoincrement())
+  chatId    String @id @default(uuid())
   userId    String
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   docsId    String
   sectionId String
+  createdAt DateTime @default(now())
 
   messages Message[]
 }
 
 model Message {
-  id        Int @id @default(autoincrement())
-  chatId    Int
+  id        String   @id @default(uuid())
+  chatId    String
   chat      Chat     @relation(fields: [chatId], references: [chatId], onDelete: Cascade)
   role      String
   content   String
+  createdAt DateTime @default(now())
 }

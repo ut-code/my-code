@@ -50,12 +50,12 @@ export async function getChat(docsId: string) {
     include: {
       messages: {
         orderBy: {
-          id: "asc",
+          createdAt: "asc",
         },
       },
     },
     orderBy: {
-      chatId: "asc",
+      createdAt: "asc",
     },
   });
 }
