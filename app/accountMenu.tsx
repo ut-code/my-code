@@ -1,15 +1,27 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { useEffect } from "react";
 
-export const AccountMenu = () => {
+export function AutoAnonymousLogin() {
+  const { data: session, isPending } = authClient.useSession();
+  useEffect(() => {
+    if (!isPending && !session) {
+      authClient.signIn.anonymous();
+    }
+  }, [isPending, session]);
+
+  return null;
+}
+
+export function AccountMenu() {
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
     return <div className="w-10 h-10 skeleton rounded-full"></div>;
   }
 
-  if (session) {
+  if (session && !session.user.isAnonymous) {
     return (
       <div className="dropdown dropdown-end">
         <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
@@ -76,4 +88,4 @@ export const AccountMenu = () => {
       </ul>
     </div>
   );
-};
+}

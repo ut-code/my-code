@@ -5,6 +5,7 @@ https://my-code.utcode.net
 ## インストール
 ```bash
 npm ci
+npx prisma generate
 ```
 
 ルートディレクトリに .env.local という名前のファイルを作成し、以下の内容を記述
@@ -13,13 +14,17 @@ API_KEY=GeminiAPIキー
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
+<!-- 本番環境では BETTER_AUTH_SECRET と DATABASE_URL の設定も必要です。 -->
+
 prismaの開発環境を起動
 (.env にDATABASE_URLが自動的に追加される)
 ```bash
 npx prisma dev
 ```
-
-<!-- 本番環境では BETTER_AUTH_SECRET と DATABASE_URL の設定も必要です。 -->
+別ターミナルで
+```bash
+npx prisma db push
+```
 
 ## 開発環境
 
