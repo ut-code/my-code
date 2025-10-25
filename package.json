@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run cf-typegen && next dev --turbopack",
+    "dev": "npm run cf-typegen && next dev",
     "build": "npm run cf-typegen && next build",
     "start": "next start",
     "lint": "npm run cf-typegen && next lint",
