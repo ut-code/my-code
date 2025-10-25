@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export function AutoAnonymousLogin() {
@@ -16,6 +17,30 @@ export function AutoAnonymousLogin() {
 
 export function AccountMenu() {
   const { data: session, isPending } = authClient.useSession();
+  const pathname = usePathname();
+
+  const signout = () => {
+    if (
+      window.confirm(
+        "ログアウトしますか？\nチャット履歴はこの端末上で見られなくなりますが、再度ログインすることでアクセスできます。"
+      )
+    ) {
+      authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => window.location.reload(),
+        },
+      });
+    }
+  };
+  const signoutFromAnonymous = () => {
+    if (window.confirm("チャット履歴は削除され、アクセスできなくなります。")) {
+      authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => window.location.reload(),
+        },
+      });
+    }
+  };
 
   if (isPending) {
     return <div className="w-10 h-10 skeleton rounded-full"></div>;
@@ -40,7 +65,7 @@ export function AccountMenu() {
           className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
         >
           <li>
-            <a onClick={() => authClient.signOut()}>ログアウト</a>
+            <a onClick={signout}>ログアウト</a>
           </li>
         </ul>
       </div>
@@ -73,18 +98,38 @@ export function AccountMenu() {
         </li>
         <li>
           <button
-            onClick={() => authClient.signIn.social({ provider: "github" })}
+            onClick={() =>
+              authClient.signIn.social({
+                provider: "github",
+                callbackURL: pathname,
+              })
+            }
           >
             GitHub でログイン
           </button>
         </li>
         <li>
           <button
-            onClick={() => authClient.signIn.social({ provider: "google" })}
+            onClick={() =>
+              authClient.signIn.social({
+                provider: "google",
+                callbackURL: pathname,
+              })
+            }
           >
             Google でログイン
           </button>
         </li>
+        {session?.user && (
+          <>
+            <div className="divider my-0" />
+            <li>
+              <button onClick={signoutFromAnonymous}>
+                この端末上のデータを削除
+              </button>
+            </li>
+          </>
+        )}
       </ul>
     </div>
   );
