@@ -6,6 +6,7 @@ import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 import { pagesList } from "./pagesList";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
+import { useDynamicMdContextOptional } from "./[docs_id]/dynamicMdContext";
 
 const fetcher: Fetcher<string, string> = (url) =>
   fetch(url).then((r) => r.text());
@@ -13,11 +14,23 @@ const fetcher: Fetcher<string, string> = (url) =>
 export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
-  const { data, error, isLoading } = useSWR(`/docs/${docs_id}.md`, fetcher);
+  const dynamicMdContextValue = useDynamicMdContextOptional();
+  
+  // コンテキストが利用可能な場合はそれを使用し、そうでない場合はフェッチする
+  const { data, error, isLoading } = useSWR(
+    dynamicMdContextValue ? null : `/docs/${docs_id}.md`,
+    fetcher
+  );
 
   if (error) console.error("Sidebar fetch error:", error);
 
-  const splitmdcontent = splitMarkdown(data ?? "");
+  // コンテキストがある場合はそれを使用、ない場合はフェッチしたデータを使用
+  const splitmdcontent = dynamicMdContextValue?.dynamicMdContent ?? splitMarkdown(data ?? "");
+  
+  // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
+  const currentSectionIndex = dynamicMdContextValue?.dynamicMdContent.findIndex(
+    (section) => section.inView
+  ) ?? -1;
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}
@@ -67,14 +80,23 @@ export function Sidebar() {
                     </Link>
                     {`${group.id}-${page.id}` === docs_id && !isLoading && (
                       <ul className="ml-4 text-sm">
-                        {splitmdcontent.slice(1).map((section, idx) => (
-                          <li
-                            key={idx}
-                            style={{ marginLeft: section.level - 2 + "em" }}
-                          >
-                            <Link href={`#${idx + 1}`}>{section.title}</Link>
-                          </li>
-                        ))}
+                        {splitmdcontent.slice(1).map((section, idx) => {
+                          // idx + 1 は実際のsectionIndexに対応（slice(1)で最初を除外しているため）
+                          const isCurrentSection = idx + 1 === currentSectionIndex;
+                          return (
+                            <li
+                              key={idx}
+                              style={{ marginLeft: section.level - 2 + "em" }}
+                            >
+                              <Link
+                                href={`#${idx + 1}`}
+                                className={isCurrentSection ? "font-bold" : ""}
+                              >
+                                {section.title}
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     )}
                   </li>

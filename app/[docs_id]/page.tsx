@@ -6,6 +6,7 @@ import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
 import pyodideLock from "pyodide/pyodide-lock.json";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
+import { DynamicMdProvider } from "./dynamicMdContext";
 import { getChat } from "@/lib/chatHistory";
 
 export default async function Page({
@@ -52,13 +53,21 @@ export default async function Page({
 
   const initialChatHistories = getChat(docs_id);
 
+  const initialDynamicMdContent = (await splitMdContent).map((section, i) => ({
+    ...section,
+    inView: false,
+    sectionId: `${docs_id}-${i}`,
+  }));
+
   return (
     <ChatHistoryProvider initialChatHistories={await initialChatHistories}>
-      <PageContent
-        documentContent={await mdContent}
-        splitMdContent={await splitMdContent}
-        docs_id={docs_id}
-      />
+      <DynamicMdProvider initialContent={initialDynamicMdContent}>
+        <PageContent
+          documentContent={await mdContent}
+          splitMdContent={await splitMdContent}
+          docs_id={docs_id}
+        />
+      </DynamicMdProvider>
     </ChatHistoryProvider>
   );
 }

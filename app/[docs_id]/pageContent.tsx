@@ -5,6 +5,7 @@ import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
 import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
+import { useDynamicMdContext } from "./dynamicMdContext";
 import clsx from "clsx";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
@@ -19,16 +20,8 @@ interface PageContentProps {
   docs_id: string;
 }
 export function PageContent(props: PageContentProps) {
-  const [dynamicMdContent, setDynamicMdContent] = useState<
-    DynamicMarkdownSection[]
-  >(
-    // useEffectで更新するのとは別に、SSRのための初期値
-    props.splitMdContent.map((section, i) => ({
-      ...section,
-      inView: false,
-      sectionId: `${props.docs_id}-${i}`,
-    }))
-  );
+  const { dynamicMdContent, setDynamicMdContent } = useDynamicMdContext();
+
   useEffect(() => {
     // props.splitMdContentが変わったときにdynamicMdContentを更新
     setDynamicMdContent(
@@ -38,7 +31,7 @@ export function PageContent(props: PageContentProps) {
         sectionId: `${props.docs_id}-${i}`,
       }))
     );
-  }, [props.splitMdContent, props.docs_id]);
+  }, [props.splitMdContent, props.docs_id, setDynamicMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
@@ -65,7 +58,7 @@ export function PageContent(props: PageContentProps) {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [setDynamicMdContent]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
