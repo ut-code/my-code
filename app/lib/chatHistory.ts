@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import { auth } from "./auth";
-import prisma from "./prisma";
+import db from "./db";
+import { chat, message } from "../../db/schema";
+import { eq, and, asc } from "drizzle-orm";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -17,21 +19,30 @@ export async function addChat(
     throw new Error("Not authenticated");
   }
 
-  return await prisma.chat.create({
-    data: {
+  const [newChat] = await db
+    .insert(chat)
+    .values({
       userId: session.user.id,
       docsId,
       sectionId,
-      messages: {
-        createMany: {
-          data: messages,
-        },
-      },
-    },
-    include: {
-      messages: true,
-    },
-  });
+    })
+    .returning();
+
+  const chatMessages = await db
+    .insert(message)
+    .values(
+      messages.map((msg) => ({
+        chatId: newChat.chatId,
+        role: msg.role,
+        content: msg.content,
+      }))
+    )
+    .returning();
+
+  return {
+    ...newChat,
+    messages: chatMessages,
+  };
 }
 
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
@@ -42,31 +53,22 @@ export async function getChat(docsId: string) {
     return [];
   }
 
-  return await prisma.chat.findMany({
-    where: {
-      userId: session.user.id,
-      docsId,
-    },
-    include: {
+  const chats = await db.query.chat.findMany({
+    where: and(eq(chat.userId, session.user.id), eq(chat.docsId, docsId)),
+    with: {
       messages: {
-        orderBy: {
-          createdAt: "asc",
-        },
+        orderBy: [asc(message.createdAt)],
       },
     },
-    orderBy: {
-      createdAt: "asc",
-    },
+    orderBy: [asc(chat.createdAt)],
   });
+
+  return chats;
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {
-  await prisma.chat.updateMany({
-    where: {
-      userId: oldUserId,
-    },
-    data: {
-      userId: newUserId,
-    },
-  });
+  await db
+    .update(chat)
+    .set({ userId: newUserId })
+    .where(eq(chat.userId, oldUserId));
 }

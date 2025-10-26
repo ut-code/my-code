@@ -1,9 +1,10 @@
 import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { anonymous } from "better-auth/plugins";
-import prisma from "./prisma";
+import db from "./db";
 import { migrateChatUser } from "./chatHistory";
+import * as schema from "../../db/schema";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let cloudflareEnv: any;
@@ -14,8 +15,9 @@ try {
   cloudflareEnv = {};
 }
 export const auth = betterAuth({
-  database: prismaAdapter(prisma, {
-    provider: "postgresql",
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema,
   }),
   plugins: [
     anonymous({
