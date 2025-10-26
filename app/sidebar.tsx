@@ -6,7 +6,7 @@ import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 import { pagesList } from "./pagesList";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
-import { useDynamicMdContextOptional } from "./[docs_id]/dynamicMdContext";
+import { useDynamicMdContext } from "./[docs_id]/dynamicMdContext";
 
 const fetcher: Fetcher<string, string> = (url) =>
   fetch(url).then((r) => r.text());
@@ -14,23 +14,23 @@ const fetcher: Fetcher<string, string> = (url) =>
 export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
-  const dynamicMdContextValue = useDynamicMdContextOptional();
+  const { dynamicMdContent } = useDynamicMdContext();
   
-  // コンテキストが利用可能な場合はそれを使用し、そうでない場合はフェッチする
+  // コンテキストが空の場合（まだページがロードされていない場合）はフェッチする
   const { data, error, isLoading } = useSWR(
-    dynamicMdContextValue ? null : `/docs/${docs_id}.md`,
+    dynamicMdContent.length === 0 ? `/docs/${docs_id}.md` : null,
     fetcher
   );
 
   if (error) console.error("Sidebar fetch error:", error);
 
   // コンテキストがある場合はそれを使用、ない場合はフェッチしたデータを使用
-  const splitmdcontent = dynamicMdContextValue?.dynamicMdContent ?? splitMarkdown(data ?? "");
+  const splitmdcontent = dynamicMdContent.length > 0 ? dynamicMdContent : splitMarkdown(data ?? "");
   
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
-  const currentSectionIndex = dynamicMdContextValue?.dynamicMdContent.findIndex(
+  const currentSectionIndex = dynamicMdContent.findIndex(
     (section) => section.inView
-  ) ?? -1;
+  );
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}

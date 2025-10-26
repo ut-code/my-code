@@ -9,6 +9,7 @@ import { PyodideProvider } from "./terminal/python/pyodide";
 import { WandboxProvider } from "./terminal/wandbox/wandbox";
 import { EmbedContextProvider } from "./terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
+import { DynamicMdProvider } from "./[docs_id]/dynamicMdContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,25 +23,27 @@ export default function RootLayout({
     <html lang="ja">
       <body className="w-screen h-screen">
         <AutoAnonymousLogin />
-        <div className="drawer lg:drawer-open">
-          <input id="drawer-toggle" type="checkbox" className="drawer-toggle" />
-          <div className="drawer-content flex flex-col">
-            <Navbar />
-            <EmbedContextProvider>
-              <PyodideProvider>
-                <WandboxProvider>{children}</WandboxProvider>
-              </PyodideProvider>
-            </EmbedContextProvider>
+        <DynamicMdProvider>
+          <div className="drawer lg:drawer-open">
+            <input id="drawer-toggle" type="checkbox" className="drawer-toggle" />
+            <div className="drawer-content flex flex-col">
+              <Navbar />
+              <EmbedContextProvider>
+                <PyodideProvider>
+                  <WandboxProvider>{children}</WandboxProvider>
+                </PyodideProvider>
+              </EmbedContextProvider>
+            </div>
+            <div className="drawer-side shadow-md z-50">
+              <label
+                htmlFor="drawer-toggle"
+                aria-label="close sidebar"
+                className="drawer-overlay"
+              />
+              <Sidebar />
+            </div>
           </div>
-          <div className="drawer-side shadow-md z-50">
-            <label
-              htmlFor="drawer-toggle"
-              aria-label="close sidebar"
-              className="drawer-overlay"
-            />
-            <Sidebar />
-          </div>
-        </div>
+        </DynamicMdProvider>
       </body>
     </html>
   );

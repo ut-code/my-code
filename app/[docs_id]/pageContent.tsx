@@ -20,17 +20,28 @@ interface PageContentProps {
   docs_id: string;
 }
 export function PageContent(props: PageContentProps) {
-  const { dynamicMdContent, setDynamicMdContent } = useDynamicMdContext();
+  const { setDynamicMdContent } = useDynamicMdContext();
+  
+  // SSR用のローカルstate
+  const [localDynamicMdContent, setLocalDynamicMdContent] = useState<
+    DynamicMarkdownSection[]
+  >(
+    props.splitMdContent.map((section, i) => ({
+      ...section,
+      inView: false,
+      sectionId: `${props.docs_id}-${i}`,
+    }))
+  );
 
   useEffect(() => {
-    // props.splitMdContentが変わったときにdynamicMdContentを更新
-    setDynamicMdContent(
-      props.splitMdContent.map((section, i) => ({
-        ...section,
-        inView: false,
-        sectionId: `${props.docs_id}-${i}`,
-      }))
-    );
+    // props.splitMdContentが変わったときにローカルstateとcontextの両方を更新
+    const newContent = props.splitMdContent.map((section, i) => ({
+      ...section,
+      inView: false,
+      sectionId: `${props.docs_id}-${i}`,
+    }));
+    setLocalDynamicMdContent(newContent);
+    setDynamicMdContent(newContent);
   }, [props.splitMdContent, props.docs_id, setDynamicMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -41,7 +52,7 @@ export function PageContent(props: PageContentProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setDynamicMdContent((prevDynamicMdContent) => {
+      const updateContent = (prevDynamicMdContent: DynamicMarkdownSection[]) => {
         const dynMdContent = prevDynamicMdContent.slice(); // Reactの変更検知のために新しい配列を作成
         for (let i = 0; i < sectionRefs.current.length; i++) {
           if (sectionRefs.current.at(i) && dynMdContent.at(i)) {
@@ -51,7 +62,11 @@ export function PageContent(props: PageContentProps) {
           }
         }
         return dynMdContent;
-      });
+      };
+      
+      // ローカルstateとcontextの両方を更新
+      setLocalDynamicMdContent(updateContent);
+      setDynamicMdContent(updateContent);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
@@ -71,7 +86,7 @@ export function PageContent(props: PageContentProps) {
         gridTemplateColumns: `1fr auto`,
       }}
     >
-      {dynamicMdContent.map((section, index) => (
+      {localDynamicMdContent.map((section, index) => (
         <>
           <div
             className="max-w-200"
@@ -127,7 +142,7 @@ export function PageContent(props: PageContentProps) {
         <div className="fixed bottom-4 right-4 left-4 lg:left-84 z-20">
           <ChatForm
             documentContent={props.documentContent}
-            sectionContent={dynamicMdContent}
+            sectionContent={localDynamicMdContent}
             docs_id={props.docs_id}
             close={() => setIsFormVisible(false)}
           />

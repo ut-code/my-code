@@ -26,13 +26,11 @@ export function useDynamicMdContextOptional() {
 
 export function DynamicMdProvider({
   children,
-  initialContent,
 }: {
   children: ReactNode;
-  initialContent: DynamicMarkdownSection[];
 }) {
   const [dynamicMdContent, setDynamicMdContent] =
-    useState<DynamicMarkdownSection[]>(initialContent);
+    useState<DynamicMarkdownSection[]>([]);
 
   return (
     <DynamicMdContext.Provider value={{ dynamicMdContent, setDynamicMdContent }}>
