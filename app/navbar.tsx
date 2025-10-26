@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
 export function Navbar() {
   return (
@@ -32,6 +33,7 @@ export function Navbar() {
       {/* サイドバーが常時表示されている場合のみ */}
       <Link href="/" className="flex-1 font-bold text-xl">my.code();</Link>
       <ThemeToggle />
+      <AccountMenu />
     </div>
     </>
   );

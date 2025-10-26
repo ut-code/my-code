@@ -7,10 +7,30 @@ https://my-code.utcode.net
 npm ci
 ```
 
-ルートディレクトリに .env.local という名前のファイルを作成し、Gemini APIキーを設定してください
+ルートディレクトリに .env.local という名前のファイルを作成し、以下の内容を記述
 ```dotenv
-API_KEY="XXXXXXXX"
+API_KEY=GeminiAPIキー
+BETTER_AUTH_URL=http://localhost:3000
 ```
+
+prismaの開発環境を起動
+(.env にDATABASE_URLが自動的に追加される)
+```bash
+npx prisma dev
+```
+別ターミナルで
+```bash
+npx prisma db push
+```
+
+### 本番環境の場合
+
+上記の環境変数以外に、
+* BETTER_AUTH_SECRET に任意の文字列
+* DATABASE_URL に本番用のPostgreSQLデータベースURL
+* GOOGLE_CLIENT_IDとGOOGLE_CLIENT_SECRETにGoogle OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/google
+* GITHUB_CLIENT_IDとGITHUB_CLIENT_SECRETにGitHub OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/github
+
 
 ## 開発環境
 
