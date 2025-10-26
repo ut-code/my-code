@@ -3,16 +3,30 @@
 https://my-code.utcode.net
 
 ## インストール
+
 ```bash
 npm ci
 ```
 
-ルートディレクトリに .env.local という名前のファイルを作成し、Gemini APIキーを設定してください
+## 開発環境
+
+```bash
+npx prisma dev
+```
+を実行し、`t` キーを押して表示される DATABASE_URL をコピー
+
+ルートディレクトリに .env.local という名前のファイルを作成し、以下の内容を記述
 ```dotenv
-API_KEY="XXXXXXXX"
+API_KEY=GeminiAPIキー
+BETTER_AUTH_URL=http://localhost:3000
+DATABASE_URL="postgres://... (prisma devの出力)"
 ```
 
-## 開発環境
+別のターミナルで、
+```bash
+npx drizzle-kit migrate
+```
+でデータベースを初期化
 
 ```bash
 npm run dev
@@ -28,6 +42,18 @@ npm run format
 npm run lint
 ```
 でコードをチェックします。出てくるwarningやerrorはできるだけ直しましょう。
+
+* データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `npx drizzle-kit generate` でmigrationファイルを作成し、 `npx drizzle-kit migrate` でデータベースに反映します。
+    * また、mainにマージする際に本番環境のデータベースにもmigrateをする必要があります
+* スキーマのファイルを追加した場合は app/lib/drizzle.ts でimportを追加する必要があります(たぶん)
+* `npx prisma dev` で立ち上げたデータベースは `npx prisma dev ls` でデータベース名の確認・ `npx prisma dev rm default` で削除ができるらしい
+
+### 本番環境の場合
+
+上記の環境変数以外に、
+* BETTER_AUTH_SECRET に任意の文字列
+* GOOGLE_CLIENT_IDとGOOGLE_CLIENT_SECRETにGoogle OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/google
+* GITHUB_CLIENT_IDとGITHUB_CLIENT_SECRETにGitHub OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/github
 
 ## markdown仕様
 
