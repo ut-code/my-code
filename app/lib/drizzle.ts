@@ -2,6 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as authSchema from "../schema/auth";
+import * as chatSchema from "../schema/chat";
 
 export async function getDrizzle() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,6 +25,7 @@ export async function getDrizzle() {
     client: pool,
     schema: {
       ...authSchema,
+      ...chatSchema,
     },
   });
 }

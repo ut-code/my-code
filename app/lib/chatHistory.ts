@@ -1,5 +1,8 @@
 import { headers } from "next/headers";
 import { getAuthServer } from "./auth";
+import { getDrizzle } from "./drizzle";
+import { chat, message } from "@/schema/chat";
+import { and, asc, eq } from "drizzle-orm";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -11,66 +14,66 @@ export async function addChat(
   sectionId: string,
   messages: CreateChatMessage[]
 ) {
-  const prisma = await getPrismaClient();
-  const auth = await getAuthServer(prisma);
+  const drizzle = await getDrizzle();
+  const auth = await getAuthServer(drizzle);
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     throw new Error("Not authenticated");
   }
 
-  return await prisma.chat.create({
-    data: {
+  const [newChat] = await drizzle
+    .insert(chat)
+    .values({
       userId: session.user.id,
       docsId,
       sectionId,
-      messages: {
-        createMany: {
-          data: messages,
-        },
-      },
-    },
-    include: {
-      messages: true,
-    },
-  });
+    })
+    .returning();
+
+  const chatMessages = await drizzle
+    .insert(message)
+    .values(
+      messages.map((msg) => ({
+        chatId: newChat.chatId,
+        role: msg.role,
+        content: msg.content,
+      }))
+    )
+    .returning();
+
+  return {
+    ...newChat,
+    messages: chatMessages,
+  };
 }
 
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
 
 export async function getChat(docsId: string) {
-  const prisma = await getPrismaClient();
-  const auth = await getAuthServer(prisma);
+  const drizzle = await getDrizzle();
+  const auth = await getAuthServer(drizzle);
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return [];
   }
 
-  return await prisma.chat.findMany({
-    where: {
-      userId: session.user.id,
-      docsId,
-    },
-    include: {
+  const chats = await drizzle.query.chat.findMany({
+    where: and(eq(chat.userId, session.user.id), eq(chat.docsId, docsId)),
+    with: {
       messages: {
-        orderBy: {
-          createdAt: "asc",
-        },
+        orderBy: [asc(message.createdAt)],
       },
     },
-    orderBy: {
-      createdAt: "asc",
-    },
+    orderBy: [asc(chat.createdAt)],
   });
+
+  return chats;
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {
-  const prisma = await getPrismaClient();
-  await prisma.chat.updateMany({
-    where: {
-      userId: oldUserId,
-    },
-    data: {
-      userId: newUserId,
-    },
-  });
+  const drizzle = await getDrizzle();
+  await drizzle
+    .update(chat)
+    .set({ userId: newUserId })
+    .where(eq(chat.userId, oldUserId));
 }

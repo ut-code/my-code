@@ -5,7 +5,9 @@ import { anonymous } from "better-auth/plugins";
 import { migrateChatUser } from "./chatHistory";
 import { getDrizzle } from "./drizzle";
 
-export async function getAuthServer(drizzle: ReturnType<typeof getDrizzle>) {
+export async function getAuthServer(
+  drizzle: Awaited<ReturnType<typeof getDrizzle>>
+) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let cloudflareEnv: any;
   try {
