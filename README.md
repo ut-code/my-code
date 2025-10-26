@@ -11,16 +11,12 @@ npm ci
 ```dotenv
 API_KEY=GeminiAPIキー
 BETTER_AUTH_URL=http://localhost:3000
+DATABASE_URL=postgresql://your_database_url
 ```
 
-prismaの開発環境を起動
-(.env にDATABASE_URLが自動的に追加される)
+データベースのマイグレーション
 ```bash
-npx prisma dev
-```
-別ターミナルで
-```bash
-npx prisma db push
+npm run db:push
 ```
 
 ### 本番環境の場合
@@ -48,6 +44,16 @@ npm run format
 npm run lint
 ```
 でコードをチェックします。出てくるwarningやerrorはできるだけ直しましょう。
+
+## データベース管理
+
+Drizzle ORMを使用しています。
+
+```bash
+npm run db:generate  # スキーマからマイグレーションファイルを生成
+npm run db:push      # スキーマをデータベースに適用
+npm run db:studio    # Drizzle Studioを起動してデータを確認・編集
+```
 
 ## markdown仕様
 
