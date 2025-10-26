@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && npm run cf-typegen && next dev",
+    "dev": "prisma generate && npm run cf-typegen && next dev --turbopack",
     "build": "prisma generate && npm run cf-typegen && next build",
     "start": "next start",
     "lint": "prisma generate && npm run cf-typegen && next lint",
