@@ -76,7 +76,7 @@ export const chat = pgTable("chat", {
 
 export const message = pgTable("message", {
   id: uuid("id").primaryKey().defaultRandom(),
-  chatId: text("chatId").notNull(),
+  chatId: uuid("chatId").notNull(),
   role: text("role").notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
