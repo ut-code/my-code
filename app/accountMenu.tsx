@@ -125,7 +125,7 @@ export function AccountMenu() {
             <div className="divider my-0" />
             <li>
               <button onClick={signoutFromAnonymous}>
-                この端末上のデータを削除
+                この端末からのデータを削除
               </button>
             </li>
           </>
