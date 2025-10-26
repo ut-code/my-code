@@ -15,43 +15,48 @@ export default async function Page({
 }) {
   const { docs_id } = await params;
 
-  let mdContent: string;
-  try {
-    if (process.env.NODE_ENV === "development") {
-      mdContent = await readFile(
-        join(process.cwd(), "public", "docs", `${docs_id}.md`),
-        "utf-8"
-      );
-    } else {
-      const cfAssets = getCloudflareContext().env.ASSETS;
-      const mdRes = await cfAssets!.fetch(
-        `https://assets.local/docs/${docs_id}.md`
-      );
-      if (mdRes.ok) {
-        mdContent = await mdRes.text();
-      } else {
+  let mdContent: Promise<string>;
+  if (process.env.NODE_ENV === "development") {
+    mdContent = readFile(
+      join(process.cwd(), "public", "docs", `${docs_id}.md`),
+      "utf-8"
+    ).catch((e) => {
+      console.error(e);
+      notFound();
+    });
+  } else {
+    const cfAssets = getCloudflareContext().env.ASSETS;
+    mdContent = cfAssets!
+      .fetch(`https://assets.local/docs/${docs_id}.md`)
+      .then(async (res) => {
+        if (!res.ok) {
+          notFound();
+        }
+        return res.text();
+      })
+      .catch((e) => {
+        console.error(e);
         notFound();
-      }
-    }
-  } catch (error) {
-    console.error(error);
-    notFound();
+      });
   }
-
-  mdContent = mdContent.replaceAll(
-    "{process.env.PYODIDE_PYTHON_VERSION}",
-    String(pyodideLock.info.python)
+  mdContent = mdContent.then((text) =>
+    text.replaceAll(
+      "{process.env.PYODIDE_PYTHON_VERSION}",
+      String(pyodideLock.info.python)
+    )
   );
 
-  const splitMdContent: MarkdownSection[] = splitMarkdown(mdContent);
+  const splitMdContent: Promise<MarkdownSection[]> = mdContent.then((text) =>
+    splitMarkdown(text)
+  );
 
-  const initialChatHistories = await getChat(docs_id);
+  const initialChatHistories = getChat(docs_id);
 
   return (
-    <ChatHistoryProvider initialChatHistories={initialChatHistories}>
+    <ChatHistoryProvider initialChatHistories={await initialChatHistories}>
       <PageContent
-        documentContent={mdContent}
-        splitMdContent={splitMdContent}
+        documentContent={await mdContent}
+        splitMdContent={await splitMdContent}
         docs_id={docs_id}
       />
     </ChatHistoryProvider>

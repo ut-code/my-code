@@ -20,6 +20,12 @@ export async function getAuthServer(
     database: drizzleAdapter(drizzle, {
       provider: "pg",
     }),
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+      },
+    },
     plugins: [
       anonymous({
         onLinkAccount: ({ anonymousUser, newUser }) =>
