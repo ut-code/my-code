@@ -67,7 +67,7 @@ export const verification = pgTable("verification", {
 });
 
 export const chat = pgTable("chat", {
-  chatId: text("chatId").primaryKey().default("uuid_generate_v4()"),
+  chatId: uuid("chatId").primaryKey().defaultRandom(),
   userId: text("userId").notNull(),
   docsId: text("docsId").notNull(),
   sectionId: text("sectionId").notNull(),
