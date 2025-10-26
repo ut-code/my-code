@@ -1,11 +1,11 @@
 import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { anonymous } from "better-auth/plugins";
 import { migrateChatUser } from "./chatHistory";
-import { PrismaClient } from "@prisma/client";
+import { getDrizzle } from "./drizzle";
 
-export async function getAuthServer(prisma: PrismaClient) {
+export async function getAuthServer(drizzle: ReturnType<typeof getDrizzle>) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let cloudflareEnv: any;
   try {
@@ -15,8 +15,8 @@ export async function getAuthServer(prisma: PrismaClient) {
     cloudflareEnv = {};
   }
   return betterAuth({
-    database: prismaAdapter(prisma, {
-      provider: "sqlite",
+    database: drizzleAdapter(drizzle, {
+      provider: "pg",
     }),
     plugins: [
       anonymous({
@@ -42,3 +42,6 @@ export async function getAuthServer(prisma: PrismaClient) {
     },
   });
 }
+
+// @better-auth/cli を実行するときだけ以下のコメントアウトを解除
+// export const auth = await getAuthServer(await getDrizzle());

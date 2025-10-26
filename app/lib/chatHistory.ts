@@ -1,6 +1,5 @@
 import { headers } from "next/headers";
 import { getAuthServer } from "./auth";
-import { getPrismaClient } from "./prisma";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
