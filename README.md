@@ -5,6 +5,7 @@ https://my-code.utcode.net
 ## インストール
 ```bash
 npm ci
+npx wrangler d1 migrations apply wrapdb --local
 ```
 
 ルートディレクトリに .env.local という名前のファイルを作成し、以下の内容を記述
@@ -13,21 +14,10 @@ API_KEY=GeminiAPIキー
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
-prismaの開発環境を起動
-(.env にDATABASE_URLが自動的に追加される)
-```bash
-npx prisma dev
-```
-別ターミナルで
-```bash
-npx prisma db push
-```
-
 ### 本番環境の場合
 
 上記の環境変数以外に、
 * BETTER_AUTH_SECRET に任意の文字列
-* DATABASE_URL に本番用のPostgreSQLデータベースURL
 * GOOGLE_CLIENT_IDとGOOGLE_CLIENT_SECRETにGoogle OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/google
 * GITHUB_CLIENT_IDとGITHUB_CLIENT_SECRETにGitHub OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/github
 
@@ -48,6 +38,21 @@ npm run format
 npm run lint
 ```
 でコードをチェックします。出てくるwarningやerrorはできるだけ直しましょう。
+
+### prismaのスキーマを変更した場合
+
+データベースにD1を使っており、 ut.code(); Learn でやっていた `npx prisma db push` とは手順が異なるので注意！
+
+```bash
+npx wrangler d1 migrations create my-code-db [migrationの名前]
+npx prisma migrate diff --from-local-d1 --to-scheme-datamodel ./prisma/schema.prisma --script --output ./migrations/000x_[migrationの名前].sql
+npx wrangler d1 migrations apply my-code-db --local
+```
+
+変更をmainにマージした場合は、本番環境も更新する:
+```bash
+npx wrangler d1 migrations apply my-code-db --remote
+```
 
 ## markdown仕様
 

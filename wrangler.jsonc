@@ -2,13 +2,10 @@
   "main": ".open-next/worker.js",
   "name": "my-code",
   "compatibility_date": "2025-03-25",
-  "compatibility_flags": [
-    "nodejs_compat",
-    "global_fetch_strictly_public",
-  ],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "services": [
     {
@@ -23,5 +20,12 @@
     //   "binding": "NEXT_INC_CACHE_R2_BUCKET",
     //   "bucket_name": "<BUCKET_NAME>",
     // },
+  ],
+  "d1_databases": [
+    {
+      "binding": "my_code_db",
+      "database_name": "my-code-db",
+      "database_id": "d7dfea8a-4b0b-44c1-b29c-4ae03c980eac",
+    },
   ],
 }

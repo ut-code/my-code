@@ -2,6 +2,7 @@
 
 /.open-next
 /cloudflare-env.d.ts
+/.wrangler
 
 # dependencies
 /node_modules

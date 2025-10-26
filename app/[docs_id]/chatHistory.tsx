@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatWithMessages } from "@/lib/chatHistory";
+import { type ChatWithMessages } from "@/lib/chatHistory";
 import {
   createContext,
   ReactNode,
