@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
-import { auth } from "./auth";
-import prisma from "./prisma";
+import { getAuthServer } from "./auth";
+import { getPrismaClient } from "./prisma";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -12,6 +12,8 @@ export async function addChat(
   sectionId: string,
   messages: CreateChatMessage[]
 ) {
+  const prisma = await getPrismaClient();
+  const auth = await getAuthServer(prisma);
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     throw new Error("Not authenticated");
@@ -37,6 +39,8 @@ export async function addChat(
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
 
 export async function getChat(docsId: string) {
+  const prisma = await getPrismaClient();
+  const auth = await getAuthServer(prisma);
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return [];
@@ -61,6 +65,7 @@ export async function getChat(docsId: string) {
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {
+  const prisma = await getPrismaClient();
   await prisma.chat.updateMany({
     where: {
       userId: oldUserId,

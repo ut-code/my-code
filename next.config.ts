@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
   env: {
     PYODIDE_VERSION: pyodideVersion,
   },
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
 };
 
 export default nextConfig;
