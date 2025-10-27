@@ -1,23 +1,20 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import useSWR, { Fetcher } from "swr";
-import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 import { pagesList } from "./pagesList";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
-
-const fetcher: Fetcher<string, string> = (url) =>
-  fetch(url).then((r) => r.text());
+import { useSidebarMdContext } from "./[docs_id]/dynamicMdContext";
 
 export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
-  const { data, error, isLoading } = useSWR(`/docs/${docs_id}.md`, fetcher);
-
-  if (error) console.error("Sidebar fetch error:", error);
-
-  const splitmdcontent = splitMarkdown(data ?? "");
+  const { sidebarMdContent } = useSidebarMdContext();
+  
+  // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
+  const currentSectionIndex = sidebarMdContent.findIndex(
+    (section) => section.inView
+  );
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}
@@ -65,16 +62,25 @@ export function Sidebar() {
                       <span className="mr-0">{page.id}.</span>
                       {page.title}
                     </Link>
-                    {`${group.id}-${page.id}` === docs_id && !isLoading && (
+                    {`${group.id}-${page.id}` === docs_id && sidebarMdContent.length > 0 && (
                       <ul className="ml-4 text-sm">
-                        {splitmdcontent.slice(1).map((section, idx) => (
-                          <li
-                            key={idx}
-                            style={{ marginLeft: section.level - 2 + "em" }}
-                          >
-                            <Link href={`#${idx + 1}`}>{section.title}</Link>
-                          </li>
-                        ))}
+                        {sidebarMdContent.slice(1).map((section, idx) => {
+                          // idx + 1 は実際のsectionIndexに対応（slice(1)で最初を除外しているため）
+                          const isCurrentSection = idx + 1 === currentSectionIndex;
+                          return (
+                            <li
+                              key={idx}
+                              style={{ marginLeft: section.level - 2 + "em" }}
+                            >
+                              <Link
+                                href={`#${idx + 1}`}
+                                className={isCurrentSection ? "font-bold" : ""}
+                              >
+                                {section.title}
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     )}
                   </li>

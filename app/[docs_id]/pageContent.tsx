@@ -5,6 +5,7 @@ import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
 import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
+import { useSidebarMdContext } from "./dynamicMdContext";
 import clsx from "clsx";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
@@ -19,26 +20,34 @@ interface PageContentProps {
   docs_id: string;
 }
 export function PageContent(props: PageContentProps) {
+  const { setSidebarMdContent } = useSidebarMdContext();
+  
+  // SSR用のローカルstate
   const [dynamicMdContent, setDynamicMdContent] = useState<
     DynamicMarkdownSection[]
   >(
-    // useEffectで更新するのとは別に、SSRのための初期値
     props.splitMdContent.map((section, i) => ({
       ...section,
       inView: false,
       sectionId: `${props.docs_id}-${i}`,
     }))
   );
+
   useEffect(() => {
-    // props.splitMdContentが変わったときにdynamicMdContentを更新
-    setDynamicMdContent(
-      props.splitMdContent.map((section, i) => ({
-        ...section,
-        inView: false,
-        sectionId: `${props.docs_id}-${i}`,
-      }))
-    );
-  }, [props.splitMdContent, props.docs_id]);
+    // props.splitMdContentが変わったときにローカルstateとcontextの両方を更新
+    const newContent = props.splitMdContent.map((section, i) => ({
+      ...section,
+      inView: false,
+      sectionId: `${props.docs_id}-${i}`,
+    }));
+    setDynamicMdContent(newContent);
+    setSidebarMdContent(newContent);
+    
+    // クリーンアップ：コンポーネントがアンマウントされたらcontextをクリア
+    return () => {
+      setSidebarMdContent([]);
+    };
+  }, [props.splitMdContent, props.docs_id, setSidebarMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
@@ -48,7 +57,7 @@ export function PageContent(props: PageContentProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setDynamicMdContent((prevDynamicMdContent) => {
+      const updateContent = (prevDynamicMdContent: DynamicMarkdownSection[]) => {
         const dynMdContent = prevDynamicMdContent.slice(); // Reactの変更検知のために新しい配列を作成
         for (let i = 0; i < sectionRefs.current.length; i++) {
           if (sectionRefs.current.at(i) && dynMdContent.at(i)) {
@@ -58,14 +67,18 @@ export function PageContent(props: PageContentProps) {
           }
         }
         return dynMdContent;
-      });
+      };
+      
+      // ローカルstateとcontextの両方を更新
+      setDynamicMdContent(updateContent);
+      setSidebarMdContent(updateContent);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [setSidebarMdContent]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
