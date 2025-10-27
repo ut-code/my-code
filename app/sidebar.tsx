@@ -4,15 +4,15 @@ import { usePathname } from "next/navigation";
 import { pagesList } from "./pagesList";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
-import { useDynamicMdContext } from "./[docs_id]/dynamicMdContext";
+import { useSidebarMdContext } from "./[docs_id]/dynamicMdContext";
 
 export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
-  const { dynamicMdContent } = useDynamicMdContext();
+  const { sidebarMdContent } = useSidebarMdContext();
   
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
-  const currentSectionIndex = dynamicMdContent.findIndex(
+  const currentSectionIndex = sidebarMdContent.findIndex(
     (section) => section.inView
   );
   return (
@@ -62,9 +62,9 @@ export function Sidebar() {
                       <span className="mr-0">{page.id}.</span>
                       {page.title}
                     </Link>
-                    {`${group.id}-${page.id}` === docs_id && dynamicMdContent.length > 0 && (
+                    {`${group.id}-${page.id}` === docs_id && sidebarMdContent.length > 0 && (
                       <ul className="ml-4 text-sm">
-                        {dynamicMdContent.slice(1).map((section, idx) => {
+                        {sidebarMdContent.slice(1).map((section, idx) => {
                           // idx + 1 は実際のsectionIndexに対応（slice(1)で最初を除外しているため）
                           const isCurrentSection = idx + 1 === currentSectionIndex;
                           return (

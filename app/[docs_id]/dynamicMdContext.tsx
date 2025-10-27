@@ -3,38 +3,38 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { DynamicMarkdownSection } from "./pageContent";
 
-export interface IDynamicMdContext {
-  dynamicMdContent: DynamicMarkdownSection[];
-  setDynamicMdContent: React.Dispatch<React.SetStateAction<DynamicMarkdownSection[]>>;
+export interface ISidebarMdContext {
+  sidebarMdContent: DynamicMarkdownSection[];
+  setSidebarMdContent: React.Dispatch<React.SetStateAction<DynamicMarkdownSection[]>>;
 }
 
-const DynamicMdContext = createContext<IDynamicMdContext | null>(null);
+const SidebarMdContext = createContext<ISidebarMdContext | null>(null);
 
-export function useDynamicMdContext() {
-  const context = useContext(DynamicMdContext);
+export function useSidebarMdContext() {
+  const context = useContext(SidebarMdContext);
   if (!context) {
     throw new Error(
-      "useDynamicMdContext must be used within a DynamicMdProvider"
+      "useSidebarMdContext must be used within a SidebarMdProvider"
     );
   }
   return context;
 }
 
-export function useDynamicMdContextOptional() {
-  return useContext(DynamicMdContext);
+export function useSidebarMdContextOptional() {
+  return useContext(SidebarMdContext);
 }
 
-export function DynamicMdProvider({
+export function SidebarMdProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [dynamicMdContent, setDynamicMdContent] =
+  const [sidebarMdContent, setSidebarMdContent] =
     useState<DynamicMarkdownSection[]>([]);
 
   return (
-    <DynamicMdContext.Provider value={{ dynamicMdContent, setDynamicMdContent }}>
+    <SidebarMdContext.Provider value={{ sidebarMdContent, setSidebarMdContent }}>
       {children}
-    </DynamicMdContext.Provider>
+    </SidebarMdContext.Provider>
   );
 }

@@ -5,7 +5,7 @@ import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
 import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
-import { useDynamicMdContext } from "./dynamicMdContext";
+import { useSidebarMdContext } from "./dynamicMdContext";
 import clsx from "clsx";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
@@ -20,10 +20,10 @@ interface PageContentProps {
   docs_id: string;
 }
 export function PageContent(props: PageContentProps) {
-  const { setDynamicMdContent } = useDynamicMdContext();
+  const { setSidebarMdContent } = useSidebarMdContext();
   
   // SSR用のローカルstate
-  const [localDynamicMdContent, setLocalDynamicMdContent] = useState<
+  const [dynamicMdContent, setDynamicMdContent] = useState<
     DynamicMarkdownSection[]
   >(
     props.splitMdContent.map((section, i) => ({
@@ -40,14 +40,14 @@ export function PageContent(props: PageContentProps) {
       inView: false,
       sectionId: `${props.docs_id}-${i}`,
     }));
-    setLocalDynamicMdContent(newContent);
     setDynamicMdContent(newContent);
+    setSidebarMdContent(newContent);
     
     // クリーンアップ：コンポーネントがアンマウントされたらcontextをクリア
     return () => {
-      setDynamicMdContent([]);
+      setSidebarMdContent([]);
     };
-  }, [props.splitMdContent, props.docs_id, setDynamicMdContent]);
+  }, [props.splitMdContent, props.docs_id, setSidebarMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
@@ -70,15 +70,15 @@ export function PageContent(props: PageContentProps) {
       };
       
       // ローカルstateとcontextの両方を更新
-      setLocalDynamicMdContent(updateContent);
       setDynamicMdContent(updateContent);
+      setSidebarMdContent(updateContent);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [setDynamicMdContent]);
+  }, [setSidebarMdContent]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -91,7 +91,7 @@ export function PageContent(props: PageContentProps) {
         gridTemplateColumns: `1fr auto`,
       }}
     >
-      {localDynamicMdContent.map((section, index) => (
+      {dynamicMdContent.map((section, index) => (
         <>
           <div
             className="max-w-200"
@@ -147,7 +147,7 @@ export function PageContent(props: PageContentProps) {
         <div className="fixed bottom-4 right-4 left-4 lg:left-84 z-20">
           <ChatForm
             documentContent={props.documentContent}
-            sectionContent={localDynamicMdContent}
+            sectionContent={dynamicMdContent}
             docs_id={props.docs_id}
             close={() => setIsFormVisible(false)}
           />

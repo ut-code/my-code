@@ -9,7 +9,7 @@ import { PyodideProvider } from "./terminal/python/pyodide";
 import { WandboxProvider } from "./terminal/wandbox/wandbox";
 import { EmbedContextProvider } from "./terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
-import { DynamicMdProvider } from "./[docs_id]/dynamicMdContext";
+import { SidebarMdProvider } from "./[docs_id]/dynamicMdContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className="w-screen h-screen">
         <AutoAnonymousLogin />
-        <DynamicMdProvider>
+        <SidebarMdProvider>
           <div className="drawer lg:drawer-open">
             <input id="drawer-toggle" type="checkbox" className="drawer-toggle" />
             <div className="drawer-content flex flex-col">
@@ -43,7 +43,7 @@ export default function RootLayout({
               <Sidebar />
             </div>
           </div>
-        </DynamicMdProvider>
+        </SidebarMdProvider>
       </body>
     </html>
   );
