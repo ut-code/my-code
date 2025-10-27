@@ -75,6 +75,7 @@ interface ReplComponentProps {
   // 構文チェックのコールバック関数
   // incompleteの場合は次の行に続くことを示す
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
+  interrupt?: () => void;
 }
 export function ReplTerminal(props: ReplComponentProps) {
   const inputBuffer = useRef<string[]>([]);
@@ -95,6 +96,7 @@ export function ReplTerminal(props: ReplComponentProps) {
     sendCommand,
     checkSyntax,
     mutex,
+    interrupt,
   } = props;
 
   const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
@@ -234,7 +236,13 @@ export function ReplTerminal(props: ReplComponentProps) {
           const isLastChar = i === key.length - 1;
 
           // inputBufferは必ず1行以上ある状態にする
-          if (code === 13) {
+          if (code === 3) {
+            // Ctrl+C
+            if (interrupt) {
+              interrupt();
+              terminalInstanceRef.current.write("^C");
+            }
+          } else if (code === 13) {
             // Enter
             const hasContent =
               inputBuffer.current[inputBuffer.current.length - 1].trim()
@@ -304,6 +312,7 @@ export function ReplTerminal(props: ReplComponentProps) {
       mutex,
       terminalInstanceRef,
       addReplOutput,
+      interrupt,
     ]
   );
   useEffect(() => {
