@@ -42,6 +42,11 @@ export function PageContent(props: PageContentProps) {
     }));
     setLocalDynamicMdContent(newContent);
     setDynamicMdContent(newContent);
+    
+    // クリーンアップ：コンポーネントがアンマウントされたらcontextをクリア
+    return () => {
+      setDynamicMdContent([]);
+    };
   }, [props.splitMdContent, props.docs_id, setDynamicMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);

@@ -1,31 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import useSWR, { Fetcher } from "swr";
-import { splitMarkdown } from "./[docs_id]/splitMarkdown";
 import { pagesList } from "./pagesList";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
 import { useDynamicMdContext } from "./[docs_id]/dynamicMdContext";
 
-const fetcher: Fetcher<string, string> = (url) =>
-  fetch(url).then((r) => r.text());
-
 export function Sidebar() {
   const pathname = usePathname();
   const docs_id = pathname.replace(/^\//, "");
   const { dynamicMdContent } = useDynamicMdContext();
-  
-  // コンテキストが空の場合（まだページがロードされていない場合）はフェッチする
-  const { data, error, isLoading } = useSWR(
-    dynamicMdContent.length === 0 ? `/docs/${docs_id}.md` : null,
-    fetcher
-  );
-
-  if (error) console.error("Sidebar fetch error:", error);
-
-  // コンテキストがある場合はそれを使用、ない場合はフェッチしたデータを使用
-  const splitmdcontent = dynamicMdContent.length > 0 ? dynamicMdContent : splitMarkdown(data ?? "");
   
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
   const currentSectionIndex = dynamicMdContent.findIndex(
@@ -78,9 +62,9 @@ export function Sidebar() {
                       <span className="mr-0">{page.id}.</span>
                       {page.title}
                     </Link>
-                    {`${group.id}-${page.id}` === docs_id && !isLoading && (
+                    {`${group.id}-${page.id}` === docs_id && dynamicMdContent.length > 0 && (
                       <ul className="ml-4 text-sm">
-                        {splitmdcontent.slice(1).map((section, idx) => {
+                        {dynamicMdContent.slice(1).map((section, idx) => {
                           // idx + 1 は実際のsectionIndexに対応（slice(1)で最初を除外しているため）
                           const isCurrentSection = idx + 1 === currentSectionIndex;
                           return (
