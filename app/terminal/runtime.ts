@@ -12,9 +12,11 @@ export interface RuntimeContext {
   ready: boolean;
   mutex: MutexInterface;
   runFiles: (filenames: string[]) => Promise<ReplOutput[]>;
+  runCommand?: (command: string) => Promise<ReplOutput[]>; // For REPL command execution
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   interrupt?: () => void;
   splitContents?: (content: string) => ReplCommand[];
+  getCommandlineStr?: (filenames: string[]) => string; // For displaying command line
   // Language-specific properties
   prompt?: string;
   promptMore?: string;

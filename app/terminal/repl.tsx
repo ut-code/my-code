@@ -94,11 +94,11 @@ export function ReplTerminal(props: ReplComponentProps) {
 
   const sendCommand = useCallback(
     async (command: string) => {
-      // Python の場合は runPython があればそれを使用、なければ runFiles
-      if ("runPython" in runtime && typeof runtime.runPython === "function") {
-        return runtime.runPython(command);
+      // Use runCommand if available (for REPL), otherwise use runFiles
+      if (runtime.runCommand) {
+        return runtime.runCommand(command);
       }
-      // それ以外の言語では runFiles を使用（ただし REPL として使用しないので通常呼ばれない）
+      // Fallback for languages without REPL support
       return runtime.runFiles([command]);
     },
     [runtime]

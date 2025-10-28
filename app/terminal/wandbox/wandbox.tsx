@@ -11,8 +11,8 @@ import { MutexInterface } from "async-mutex";
 type WandboxLang = "C++";
 
 interface IWandboxContext extends RuntimeContext {
-  // 表示用のコマンドライン文字列を取得
-  getCommandlineStr: (lang: WandboxLang, filenames: string[]) => string;
+  // 表示用のコマンドライン文字列を取得 (language-specific version)
+  getCommandlineStrWithLang: (lang: WandboxLang, filenames: string[]) => string;
 }
 
 const WandboxContext = createContext<IWandboxContext>(null!);
@@ -50,6 +50,12 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     [compilerList]
   );
 
+  // Wrapper for RuntimeContext compatibility
+  const getCommandlineStrSimple = useCallback(
+    (filenames: string[]) => getCommandlineStr("C++", filenames),
+    [getCommandlineStr]
+  );
+
   const runFilesWithLang = useCallback(
     async (lang: WandboxLang, filenames: string[]) => {
       if (!compilerList) {
@@ -85,11 +91,18 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     // Wandbox doesn't need initialization
   }, []);
 
-  // Create a simple mutex that just executes the function
+  // Create a simple mutex that just executes the function immediately
+  // Wandbox doesn't need mutex locking as it makes synchronous API calls
   const mutex: MutexInterface = {
-    runExclusive: async <T,>(fn: () => Promise<T>) => fn(),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+    runExclusive: async <T,>(fn: () => Promise<T> | T) => fn(),
+    acquire: async () => {
+      return () => {}; // Release function (no-op)
+    },
+    waitForUnlock: async () => {},
+    isLocked: () => false,
+    cancel: () => {},
+    release: () => {},
+  };
 
   return (
     <WandboxContext.Provider
@@ -99,7 +112,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         ready,
         mutex,
         runFiles,
-        getCommandlineStr,
+        getCommandlineStr: getCommandlineStrSimple, // RuntimeContext compatible version
+        getCommandlineStrWithLang: getCommandlineStr, // Language-specific version
       }}
     >
       {children}

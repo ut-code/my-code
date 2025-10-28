@@ -16,6 +16,7 @@ import { RuntimeContext } from "../runtime";
 
 interface IPyodideContext extends RuntimeContext {
   runPython: (code: string) => Promise<ReplOutput[]>;
+  runCommand: (command: string) => Promise<ReplOutput[]>; // Alias for runPython for consistency
   runFile: (name: string) => Promise<ReplOutput[]>;
 }
 
@@ -231,6 +232,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         initializing,
         ready,
         runPython,
+        runCommand: runPython, // Alias for consistency with RuntimeContext
         checkSyntax,
         mutex: mutex.current,
         runFile,

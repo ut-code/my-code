@@ -11,7 +11,6 @@ import { writeOutput } from "./repl";
 import { useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import { useRuntime } from "./runtime";
-import { useWandbox } from "./wandbox/wandbox";
 
 export type ExecLang = "python" | "cpp";
 
@@ -37,7 +36,6 @@ export function ExecFile(props: ExecProps) {
   const sectionContext = useEmbedContext();
 
   const runtime = useRuntime(props.language);
-  const wandbox = useWandbox();
 
   // 表示するコマンドライン文字列
   let commandline: string;
@@ -50,7 +48,9 @@ export function ExecFile(props: ExecProps) {
     if (!props.filenames || props.filenames.length === 0) {
       throw new Error("C++の実行には filenames プロパティが必要です");
     }
-    commandline = wandbox.getCommandlineStr("C++", props.filenames);
+    commandline = runtime.getCommandlineStr
+      ? runtime.getCommandlineStr(props.filenames)
+      : `g++ ${props.filenames.join(" ")}`;
   } else {
     props.language satisfies never;
     commandline = `エラー: 非対応の言語 ${props.language}`;
