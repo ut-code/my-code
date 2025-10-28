@@ -2,6 +2,22 @@
 let pyodide;
 let pyodideOutput = [];
 
+// Helper function to read all files from the Pyodide file system
+function readAllFiles() {
+  const dirFiles = pyodide.FS.readdir(HOME);
+  const updatedFiles = [];
+  for (const filename of dirFiles) {
+    if (filename === "." || filename === "..") continue;
+    const filepath = HOME + filename;
+    const stat = pyodide.FS.stat(filepath);
+    if (pyodide.FS.isFile(stat.mode)) {
+      const content = pyodide.FS.readFile(filepath, { encoding: "utf8" });
+      updatedFiles.push([filename, content]);
+    }
+  }
+  return updatedFiles;
+}
+
 async function init(id, payload) {
   const { PYODIDE_CDN, interruptBuffer } = payload;
   if (!pyodide) {
@@ -73,18 +89,7 @@ async function runPython(id, payload) {
     }
   }
 
-  // Use Pyodide FS API to read all files
-  const dirFiles = pyodide.FS.readdir(HOME);
-  const updatedFiles = [];
-  for (const filename of dirFiles) {
-    if (filename === "." || filename === "..") continue;
-    const filepath = HOME + filename;
-    const stat = pyodide.FS.stat(filepath);
-    if (pyodide.FS.isFile(stat.mode)) {
-      const content = pyodide.FS.readFile(filepath, { encoding: "utf8" });
-      updatedFiles.push([filename, content]);
-    }
-  }
+  const updatedFiles = readAllFiles();
 
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
@@ -145,18 +150,7 @@ async function runFile(id, payload) {
     }
   }
 
-  // Use Pyodide FS API to read all files
-  const dirFiles = pyodide.FS.readdir(HOME);
-  const updatedFiles = [];
-  for (const filename of dirFiles) {
-    if (filename === "." || filename === "..") continue;
-    const filepath = HOME + filename;
-    const stat = pyodide.FS.stat(filepath);
-    if (pyodide.FS.isFile(stat.mode)) {
-      const content = pyodide.FS.readFile(filepath, { encoding: "utf8" });
-      updatedFiles.push([filename, content]);
-    }
-  }
+  const updatedFiles = readAllFiles();
 
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
