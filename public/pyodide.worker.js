@@ -2,6 +2,22 @@
 let pyodide;
 let pyodideOutput = [];
 
+// Helper function to read all files from the Pyodide file system
+function readAllFiles() {
+  const dirFiles = pyodide.FS.readdir(HOME);
+  const updatedFiles = [];
+  for (const filename of dirFiles) {
+    if (filename === "." || filename === "..") continue;
+    const filepath = HOME + filename;
+    const stat = pyodide.FS.stat(filepath);
+    if (pyodide.FS.isFile(stat.mode)) {
+      const content = pyodide.FS.readFile(filepath, { encoding: "utf8" });
+      updatedFiles.push([filename, content]);
+    }
+  }
+  return updatedFiles;
+}
+
 async function init(id, payload) {
   const { PYODIDE_CDN, interruptBuffer } = payload;
   if (!pyodide) {
@@ -73,8 +89,7 @@ async function runPython(id, payload) {
     }
   }
 
-  const pyReadFile = pyodide.runPython(READALLFILE_CODE); /* as PyCallable*/
-  const updatedFiles = pyReadFile().toJs(); /* as [string, string][]*/
+  const updatedFiles = readAllFiles();
 
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
@@ -92,17 +107,16 @@ async function runFile(id, payload) {
     return;
   }
   try {
-    // TODO: 手動でファイルの内容を書き込む代わりにファイルシステムのマウントができるらしい
-    // https://pyodide.org/en/stable/usage/file-system.html
-
-    const pyWriteFile = pyodide.runPython(WRITEFILE_CODE); /* as PyCallable*/
-    const pyExecFile = pyodide.runPython(EXECFILE_CODE); /* as PyCallable*/
-
+    // Use Pyodide FS API to write files to the file system
     for (const filename of Object.keys(files)) {
       if (files[filename]) {
-        pyWriteFile(HOME + filename, files[filename]);
+        pyodide.FS.writeFile(HOME + filename, files[filename], {
+          encoding: "utf8",
+        });
       }
     }
+
+    const pyExecFile = pyodide.runPython(EXECFILE_CODE); /* as PyCallable*/
     pyExecFile(HOME + name);
   } catch (e) {
     console.log(e);
@@ -136,8 +150,7 @@ async function runFile(id, payload) {
     }
   }
 
-  const pyReadFile = pyodide.runPython(READALLFILE_CODE); /* as PyCallable*/
-  const updatedFiles = pyReadFile().toJs(); /* as [string, string][]*/
+  const updatedFiles = readAllFiles();
 
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
@@ -225,23 +238,4 @@ def __execfile(filepath):
       exec(compile(file.read(), filepath, 'exec'), exec_globals)
 
 __execfile
-`;
-const WRITEFILE_CODE = `
-def __writefile(filepath, content):
-    with open(filepath, 'w') as f:
-        f.write(content)
-
-__writefile
-`;
-const READALLFILE_CODE = `
-def __readallfile():
-    import os
-    files = []
-    for file in os.listdir():
-        if os.path.isfile(file):
-          with open(file, 'r') as f:
-              files.append((file, f.read()))
-    return files
-
-__readallfile
 `;
