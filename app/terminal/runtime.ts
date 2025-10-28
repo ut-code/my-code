@@ -12,7 +12,7 @@ export interface RuntimeContext {
   ready: boolean;
   mutex: MutexInterface;
   runFiles: (filenames: string[]) => Promise<ReplOutput[]>;
-  runCommand?: (command: string) => Promise<ReplOutput[]>; // For REPL command execution
+  runCommand: (command: string) => Promise<ReplOutput[]>; // For REPL command execution
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   interrupt?: () => void;
   splitContents?: (content: string) => ReplCommand[];
@@ -28,7 +28,7 @@ export interface RuntimeContext {
  */
 export function useRuntime(language: string): RuntimeContext {
   const pyodide = usePyodide();
-  const wandbox = useWandbox();
+  const wandbox = useWandbox("C++");
 
   switch (language) {
     case "python":

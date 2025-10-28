@@ -10,18 +10,35 @@ import { MutexInterface } from "async-mutex";
 
 type WandboxLang = "C++";
 
-interface IWandboxContext extends RuntimeContext {
-  // 表示用のコマンドライン文字列を取得 (language-specific version)
-  getCommandlineStrWithLang: (lang: WandboxLang, filenames: string[]) => string;
+interface IWandboxContext {
+  init: () => Promise<void>;
+  initializing: boolean;
+  ready: boolean;
+  mutex: MutexInterface;
+  runFilesWithLang: (lang: WandboxLang) => (filenames: string[]) => Promise<ReturnType<typeof cppRunFiles>>;
+  getCommandlineStrWithLang: (lang: WandboxLang) => (filenames: string[]) => string;
 }
 
 const WandboxContext = createContext<IWandboxContext>(null!);
-export function useWandbox() {
+
+export function useWandbox(lang: WandboxLang = "C++"): RuntimeContext {
   const context = useContext(WandboxContext);
   if (!context) {
     throw new Error("useWandbox must be used within a WandboxProvider");
   }
-  return context;
+  
+  return {
+    init: context.init,
+    initializing: context.initializing,
+    ready: context.ready,
+    mutex: context.mutex,
+    runFiles: context.runFilesWithLang(lang),
+    runCommand: async () => {
+      // Wandbox doesn't support REPL, so return error
+      return [{ type: "error" as const, message: "REPL not supported for this language" }];
+    },
+    getCommandlineStr: context.getCommandlineStrWithLang(lang),
+  };
 }
 
 export function WandboxProvider({ children }: { children: ReactNode }) {
@@ -33,8 +50,9 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
 
   const ready = !!compilerList;
 
-  const getCommandlineStr = useCallback(
-    (lang: WandboxLang, filenames: string[]) => {
+  // Curried function for language-specific commandline string generation
+  const getCommandlineStrWithLang = useCallback(
+    (lang: WandboxLang) => (filenames: string[]) => {
       if (compilerList) {
         switch (lang) {
           case "C++":
@@ -50,14 +68,9 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     [compilerList]
   );
 
-  // Wrapper for RuntimeContext compatibility
-  const getCommandlineStrSimple = useCallback(
-    (filenames: string[]) => getCommandlineStr("C++", filenames),
-    [getCommandlineStr]
-  );
-
+  // Curried function for language-specific file execution
   const runFilesWithLang = useCallback(
-    async (lang: WandboxLang, filenames: string[]) => {
+    (lang: WandboxLang) => async (filenames: string[]) => {
       if (!compilerList) {
         return [
           { type: "error" as const, message: "Wandbox is not ready yet." },
@@ -78,13 +91,6 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
       }
     },
     [compilerList, files]
-  );
-
-  const runFiles = useCallback(
-    async (filenames: string[]) => {
-      return runFilesWithLang("C++", filenames);
-    },
-    [runFilesWithLang]
   );
 
   const init = useCallback(async () => {
@@ -114,9 +120,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         initializing: false,
         ready,
         mutex,
-        runFiles,
-        getCommandlineStr: getCommandlineStrSimple, // RuntimeContext compatible version
-        getCommandlineStrWithLang: getCommandlineStr, // Language-specific version
+        runFilesWithLang,
+        getCommandlineStrWithLang,
       }}
     >
       {children}

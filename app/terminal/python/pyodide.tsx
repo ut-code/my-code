@@ -14,15 +14,9 @@ import { Mutex, MutexInterface } from "async-mutex";
 import { useEmbedContext } from "../embedContext";
 import { RuntimeContext } from "../runtime";
 
-interface IPyodideContext extends RuntimeContext {
-  runPython: (code: string) => Promise<ReplOutput[]>;
-  runCommand: (command: string) => Promise<ReplOutput[]>; // Alias for runPython for consistency
-  runFile: (name: string) => Promise<ReplOutput[]>;
-}
+const PyodideContext = createContext<RuntimeContext>(null!);
 
-const PyodideContext = createContext<IPyodideContext>(null!);
-
-export function usePyodide() {
+export function usePyodide(): RuntimeContext {
   const context = useContext(PyodideContext);
   if (!context) {
     throw new Error("usePyodide must be used within a PyodideProvider");
@@ -125,10 +119,10 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const runPython = useCallback(
+  const runCommand = useCallback(
     async (code: string): Promise<ReplOutput[]> => {
       if (!mutex.current.isLocked()) {
-        throw new Error("mutex of PyodideContext must be locked for runPython");
+        throw new Error("mutex of PyodideContext must be locked for runCommand");
       }
       if (!workerRef.current || !ready) {
         return [{ type: "error", message: "Pyodide is not ready yet." }];
@@ -148,29 +142,6 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
       return output;
     },
     [ready, writeFile]
-  );
-
-  const runFile = useCallback(
-    async (name: string): Promise<ReplOutput[]> => {
-      if (!workerRef.current || !ready) {
-        return [{ type: "error", message: "Pyodide is not ready yet." }];
-      }
-      if (interruptBuffer.current) {
-        interruptBuffer.current[0] = 0;
-      }
-      return mutex.current.runExclusive(async () => {
-        const { output, updatedFiles } =
-          await postMessage<RunPayloadFromWorker>({
-            type: "runFile",
-            payload: { name, files },
-          });
-        for (const [newName, content] of updatedFiles) {
-          writeFile(newName, content);
-        }
-        return output;
-      });
-    },
-    [files, ready, writeFile]
   );
 
   const checkSyntax = useCallback(
@@ -197,9 +168,26 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
           },
         ];
       }
-      return runFile(filenames[0]);
+      // Incorporate runFile logic directly
+      if (!workerRef.current || !ready) {
+        return [{ type: "error", message: "Pyodide is not ready yet." }];
+      }
+      if (interruptBuffer.current) {
+        interruptBuffer.current[0] = 0;
+      }
+      return mutex.current.runExclusive(async () => {
+        const { output, updatedFiles } =
+          await postMessage<RunPayloadFromWorker>({
+            type: "runFile",
+            payload: { name: filenames[0], files },
+          });
+        for (const [newName, content] of updatedFiles) {
+          writeFile(newName, content);
+        }
+        return output;
+      });
     },
-    [runFile]
+    [files, ready, writeFile]
   );
 
   const splitContents = useCallback((content: string): ReplCommand[] => {
@@ -231,11 +219,9 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         init,
         initializing,
         ready,
-        runPython,
-        runCommand: runPython, // Alias for consistency with RuntimeContext
+        runCommand,
         checkSyntax,
         mutex: mutex.current,
-        runFile,
         runFiles,
         interrupt,
         splitContents,
