@@ -1,18 +1,16 @@
 "use client";
 
 import { createContext, ReactNode, useCallback, useContext } from "react";
-import { ReplOutput } from "../repl";
 import useSWR from "swr";
 import { compilerInfoFetcher } from "./api";
 import { cppRunFiles, getCppCommandlineStr } from "./cpp";
 import { useEmbedContext } from "../embedContext";
+import { RuntimeContext } from "../runtime";
+import { MutexInterface } from "async-mutex";
 
 type WandboxLang = "C++";
 
-interface IWandboxContext {
-  // filesの中から、filenamesで指定されたものをコードとして渡して実行する
-  // ヘッダーとソースはまとめて渡す
-  runFiles: (lang: WandboxLang, filenames: string[]) => Promise<ReplOutput[]>;
+interface IWandboxContext extends RuntimeContext {
   // 表示用のコマンドライン文字列を取得
   getCommandlineStr: (lang: WandboxLang, filenames: string[]) => string;
 }
@@ -33,6 +31,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     console.error("Failed to fetch compiler list from Wandbox:", error);
   }
 
+  const ready = !!compilerList;
+
   const getCommandlineStr = useCallback(
     (lang: WandboxLang, filenames: string[]) => {
       if (compilerList) {
@@ -49,7 +49,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     },
     [compilerList]
   );
-  const runFiles = useCallback(
+
+  const runFilesWithLang = useCallback(
     async (lang: WandboxLang, filenames: string[]) => {
       if (!compilerList) {
         return [
@@ -73,8 +74,34 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     [compilerList, files]
   );
 
+  const runFiles = useCallback(
+    async (filenames: string[]) => {
+      return runFilesWithLang("C++", filenames);
+    },
+    [runFilesWithLang]
+  );
+
+  const init = useCallback(async () => {
+    // Wandbox doesn't need initialization
+  }, []);
+
+  // Create a simple mutex that just executes the function
+  const mutex: MutexInterface = {
+    runExclusive: async <T,>(fn: () => Promise<T>) => fn(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
+
   return (
-    <WandboxContext.Provider value={{ runFiles, getCommandlineStr }}>
+    <WandboxContext.Provider
+      value={{
+        init,
+        initializing: false,
+        ready,
+        mutex,
+        runFiles,
+        getCommandlineStr,
+      }}
+    >
       {children}
     </WandboxContext.Provider>
   );

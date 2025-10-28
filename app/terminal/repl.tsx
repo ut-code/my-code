@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useMemo } from "react";
 import { highlightCodeToAnsi } from "./highlight";
 import chalk from "chalk";
-import { MutexInterface } from "async-mutex";
 import {
   clearTerminal,
   getRows,
@@ -14,6 +13,7 @@ import {
 } from "./terminal";
 import { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
+import { useRuntime } from "./runtime";
 
 export interface ReplOutput {
   type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
@@ -59,23 +59,10 @@ export function writeOutput(
 
 interface ReplComponentProps {
   terminalId: string;
-  initRuntime: () => void;
-  runtimeInitializing: boolean;
-  runtimeReady: boolean;
+  language: string;
   initMessage?: string; // ターミナル初期化時のメッセージ
+  content?: string; // 初期化時に実行するコマンドを含むコンテンツ (embedded.tsxの代替)
   initCommand?: ReplCommand[]; // 初期化時に実行するコマンドとその出力
-  prompt: string; // プロンプト文字列
-  promptMore?: string;
-  language?: string;
-  tabSize: number;
-  // コードブロックの実行全体を mutex.runExclusive() で囲うことで同時実行を防ぐ
-  mutex: MutexInterface;
-  // コマンド実行時のコールバック関数
-  sendCommand: (command: string) => Promise<ReplOutput[]>;
-  // 構文チェックのコールバック関数
-  // incompleteの場合は次の行に続くことを示す
-  checkSyntax?: (code: string) => Promise<SyntaxStatus>;
-  interrupt?: () => void;
 }
 export function ReplTerminal(props: ReplComponentProps) {
   const inputBuffer = useRef<string[]>([]);
@@ -84,25 +71,45 @@ export function ReplTerminal(props: ReplComponentProps) {
   const sectionContext = useEmbedContext();
   const addReplOutput = sectionContext?.addReplOutput;
 
+  const runtime = useRuntime(props.language);
   const {
-    terminalId,
-    initRuntime,
-    runtimeInitializing,
-    runtimeReady,
-    prompt,
-    promptMore,
-    language,
-    tabSize,
-    sendCommand,
+    init: initRuntime,
+    initializing: runtimeInitializing,
+    ready: runtimeReady,
     checkSyntax,
-    mutex,
     interrupt,
-  } = props;
+    splitContents,
+    prompt = ">>> ",
+    promptMore,
+    tabSize = 4,
+  } = runtime;
+
+  // content が指定されている場合は splitContents を使用
+  const initCommand = useMemo(() => {
+    if (props.content && splitContents) {
+      return splitContents(props.content);
+    }
+    return props.initCommand;
+  }, [props.content, props.initCommand, splitContents]);
+
+  const sendCommand = useCallback(
+    async (command: string) => {
+      // Python の場合は runPython があればそれを使用、なければ runFiles
+      if ("runPython" in runtime && typeof runtime.runPython === "function") {
+        return runtime.runPython(command);
+      }
+      // それ以外の言語では runFiles を使用（ただし REPL として使用しないので通常呼ばれない）
+      return runtime.runFiles([command]);
+    },
+    [runtime]
+  );
+
+  const { terminalId, language } = props;
 
   const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
     getRows: (cols: number) => {
       let rows = 0;
-      for (const cmd of props.initCommand || []) {
+      for (const cmd of initCommand || []) {
         // コマンドの行数をカウント
         for (const line of cmd.command.split("\n")) {
           rows += getRows(prompt + line, cols);
@@ -116,8 +123,8 @@ export function ReplTerminal(props: ReplComponentProps) {
     },
     onReady: () => {
       initDone.current = false;
-      if (props.initCommand) {
-        for (const cmd of props.initCommand) {
+      if (initCommand) {
+        for (const cmd of initCommand) {
           updateBuffer(() => cmd.command.split("\n"));
           terminalInstanceRef.current!.writeln("");
           inputBuffer.current = [];
@@ -190,11 +197,11 @@ export function ReplTerminal(props: ReplComponentProps) {
         terminalInstanceRef.current.writeln(props.initMessage);
       }
       (async () => {
-        if (props.initCommand) {
+        if (initCommand) {
           // 初期化時に実行するコマンドがある場合はそれを実行
           const initCommandResult: ReplCommand[] = [];
-          await mutex.runExclusive(async () => {
-            for (const cmd of props.initCommand!) {
+          await runtime.mutex.runExclusive(async () => {
+            for (const cmd of initCommand!) {
               const outputs = await sendCommand(cmd.command);
               initCommandResult.push({
                 command: cmd.command,
@@ -222,9 +229,9 @@ export function ReplTerminal(props: ReplComponentProps) {
     props.initMessage,
     updateBuffer,
     onOutput,
-    props.initCommand,
+    initCommand,
     sendCommand,
-    mutex,
+    runtime.mutex,
     terminalInstanceRef,
   ]);
 
@@ -262,7 +269,7 @@ export function ReplTerminal(props: ReplComponentProps) {
               terminalInstanceRef.current.writeln("");
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
-              const outputs = await mutex.runExclusive(() =>
+              const outputs = await runtime.mutex.runExclusive(() =>
                 sendCommand(command)
               );
               onOutput(outputs);
@@ -309,7 +316,7 @@ export function ReplTerminal(props: ReplComponentProps) {
       onOutput,
       checkSyntax,
       tabSize,
-      mutex,
+      runtime.mutex,
       terminalInstanceRef,
       addReplOutput,
       interrupt,

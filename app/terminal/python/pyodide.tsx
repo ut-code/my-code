@@ -9,19 +9,14 @@ import {
   useContext,
   useEffect,
 } from "react";
-import { SyntaxStatus, ReplOutput } from "../repl";
+import { SyntaxStatus, ReplOutput, ReplCommand } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
 import { useEmbedContext } from "../embedContext";
+import { RuntimeContext } from "../runtime";
 
-interface IPyodideContext {
-  init: () => Promise<void>;
-  initializing: boolean;
-  ready: boolean;
-  mutex: MutexInterface;
+interface IPyodideContext extends RuntimeContext {
   runPython: (code: string) => Promise<ReplOutput[]>;
   runFile: (name: string) => Promise<ReplOutput[]>;
-  checkSyntax: (code: string) => Promise<SyntaxStatus>;
-  interrupt: () => void;
 }
 
 const PyodideContext = createContext<IPyodideContext>(null!);
@@ -191,6 +186,44 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     [ready]
   );
 
+  const runFiles = useCallback(
+    async (filenames: string[]): Promise<ReplOutput[]> => {
+      if (filenames.length !== 1) {
+        return [
+          {
+            type: "error",
+            message: "Python execution requires exactly one filename",
+          },
+        ];
+      }
+      return runFile(filenames[0]);
+    },
+    [runFile]
+  );
+
+  const splitContents = useCallback((content: string): ReplCommand[] => {
+    const initCommands: { command: string; output: ReplOutput[] }[] = [];
+    for (const line of content.split("\n")) {
+      if (line.startsWith(">>> ")) {
+        // Remove the prompt from the command
+        initCommands.push({ command: line.slice(4), output: [] });
+      } else if (line.startsWith("... ")) {
+        if (initCommands.length > 0) {
+          initCommands[initCommands.length - 1].command += "\n" + line.slice(4);
+        }
+      } else {
+        // Lines without prompt are output from the previous command
+        if (initCommands.length > 0) {
+          initCommands[initCommands.length - 1].output.push({
+            type: "stdout",
+            message: line,
+          });
+        }
+      }
+    }
+    return initCommands;
+  }, []);
+
   return (
     <PyodideContext.Provider
       value={{
@@ -201,7 +234,12 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         checkSyntax,
         mutex: mutex.current,
         runFile,
+        runFiles,
         interrupt,
+        splitContents,
+        prompt: ">>> ",
+        promptMore: "... ",
+        tabSize: 4,
       }}
     >
       {children}
