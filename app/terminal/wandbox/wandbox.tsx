@@ -94,7 +94,10 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
   // Create a simple mutex that just executes the function immediately
   // Wandbox doesn't need mutex locking as it makes synchronous API calls
   const mutex: MutexInterface = {
-    runExclusive: async <T,>(fn: () => Promise<T> | T) => fn(),
+    runExclusive: async <T,>(fn: () => Promise<T> | T) => {
+      const result = fn();
+      return result instanceof Promise ? result : Promise.resolve(result);
+    },
     acquire: async () => {
       return () => {}; // Release function (no-op)
     },
