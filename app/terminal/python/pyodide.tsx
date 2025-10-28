@@ -54,7 +54,6 @@ type StatusPayloadFromWorker = { status: SyntaxStatus };
 export function PyodideProvider({ children }: { children: ReactNode }) {
   const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState<boolean>(false);
-  const [initializing, setInitializing] = useState<boolean>(false);
   const mutex = useRef<MutexInterface>(new Mutex());
   const { files, writeFile } = useEmbedContext();
   const messageCallbacks = useRef<
@@ -72,10 +71,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  const init = useCallback(async () => {
-    if (workerRef.current || initializing) return;
-
-    setInitializing(true);
+  useEffect(() => {
     const worker = new Worker("/pyodide.worker.js");
     workerRef.current = worker;
 
@@ -103,11 +99,8 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
       if (success) {
         setReady(true);
       }
-      setInitializing(false);
     });
-  }, [initializing]);
 
-  useEffect(() => {
     return () => {
       workerRef.current?.terminate();
     };
@@ -122,7 +115,9 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
   const runCommand = useCallback(
     async (code: string): Promise<ReplOutput[]> => {
       if (!mutex.current.isLocked()) {
-        throw new Error("mutex of PyodideContext must be locked for runCommand");
+        throw new Error(
+          "mutex of PyodideContext must be locked for runCommand"
+        );
       }
       if (!workerRef.current || !ready) {
         return [{ type: "error", message: "Pyodide is not ready yet." }];
@@ -190,7 +185,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     [files, ready, writeFile]
   );
 
-  const splitContents = useCallback((content: string): ReplCommand[] => {
+  const splitReplExamples = useCallback((content: string): ReplCommand[] => {
     const initCommands: { command: string; output: ReplOutput[] }[] = [];
     for (const line of content.split("\n")) {
       if (line.startsWith(">>> ")) {
@@ -216,18 +211,17 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
   return (
     <PyodideContext.Provider
       value={{
-        init,
-        initializing,
         ready,
         runCommand,
         checkSyntax,
         mutex: mutex.current,
         runFiles,
         interrupt,
-        splitContents,
+        splitReplExamples,
         prompt: ">>> ",
         promptMore: "... ",
         tabSize: 4,
+        getCommandlineStr: (filenames: string[]) => `python ${filenames[0]}`,
       }}
     >
       {children}

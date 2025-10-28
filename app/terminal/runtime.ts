@@ -5,28 +5,29 @@ import { useWandbox } from "./wandbox/wandbox";
 
 /**
  * Common runtime context interface for different languages
+ *
+ * see README.md for details
+ *
  */
 export interface RuntimeContext {
-  init: () => Promise<void>;
-  initializing: boolean;
   ready: boolean;
-  mutex: MutexInterface;
-  runFiles: (filenames: string[]) => Promise<ReplOutput[]>;
-  runCommand: (command: string) => Promise<ReplOutput[]>; // For REPL command execution
-  checkSyntax?: (code: string) => Promise<SyntaxStatus>;
+  tabSize: number;
+  mutex?: MutexInterface;
   interrupt?: () => void;
-  splitContents?: (content: string) => ReplCommand[];
-  getCommandlineStr?: (filenames: string[]) => string; // For displaying command line
-  // Language-specific properties
+  // repl
+  runCommand?: (command: string) => Promise<ReplOutput[]>;
+  checkSyntax?: (code: string) => Promise<SyntaxStatus>;
+  splitReplExamples?: (content: string) => ReplCommand[];
   prompt?: string;
   promptMore?: string;
-  tabSize?: number;
+  // file
+  runFiles: (filenames: string[]) => Promise<ReplOutput[]>;
+  getCommandlineStr: (filenames: string[]) => string;
 }
 
-/**
- * Hook to get runtime context for a specific language
- */
-export function useRuntime(language: string): RuntimeContext {
+export type RuntimeLang = "python" | "cpp";
+
+export function useRuntime(language: RuntimeLang): RuntimeContext {
   const pyodide = usePyodide();
   const wandbox = useWandbox("C++");
 
@@ -36,6 +37,21 @@ export function useRuntime(language: string): RuntimeContext {
     case "cpp":
       return wandbox;
     default:
+      language satisfies never;
       throw new Error(`Runtime not implemented for language: ${language}`);
   }
 }
+
+export const emptyMutex: MutexInterface = {
+  runExclusive: async <T>(fn: () => Promise<T> | T) => {
+    const result = fn();
+    return result instanceof Promise ? result : Promise.resolve(result);
+  },
+  acquire: async () => {
+    return () => {}; // Release function (no-op)
+  },
+  waitForUnlock: async () => {},
+  isLocked: () => false,
+  cancel: () => {},
+  release: () => {},
+};

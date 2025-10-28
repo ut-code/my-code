@@ -10,7 +10,7 @@ export default function PythonPage() {
       <ReplTerminal
         terminalId=""
         language="python"
-        initMessage="Welcome to Pyodide Terminal!"
+        initContent={">>> print('hello, world!')\nhello, world!"}
       />
       <EditorComponent
         language="python"
