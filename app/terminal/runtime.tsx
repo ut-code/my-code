@@ -30,7 +30,24 @@ export interface LangConstants {
 }
 export type RuntimeLang = "python" | "cpp";
 
+export function getRuntimeLang(
+  lang: string | undefined
+): RuntimeLang | undefined {
+  // markdownで指定される可能性のある言語名からRuntimeLangを取得
+  switch (lang) {
+    case "python":
+    case "py":
+      return "python";
+    case "cpp":
+    case "c++":
+      return "cpp";
+    default:
+      console.warn(`Unsupported language for runtime: ${lang}`);
+      return undefined;
+  }
+}
 export function useRuntime(language: RuntimeLang): RuntimeContext {
+  // すべての言語のcontextをインスタンス化
   const pyodide = usePyodide();
   const wandboxCpp = useWandbox("cpp");
 

@@ -29,6 +29,29 @@ import { langConstants } from "./runtime";
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
 export type AceLang = "python" | "c_cpp" | "json" | "csv" | "text";
+export function getAceLang(lang: string | undefined): AceLang {
+  // Markdownで指定される可能性のある言語名からAceLangを取得
+  switch (lang) {
+    case "python":
+    case "py":
+      return "python";
+    case "cpp":
+    case "c++":
+      return "c_cpp";
+    case "json":
+      return "json";
+    case "csv":
+      return "csv";
+    case "text":
+    case "txt":
+      return "text";
+    default:
+      console.warn(
+        `Unsupported language for ace editor: ${lang}, fallback to text mode.`
+      );
+      return "text";
+  }
+}
 
 interface EditorProps {
   language?: AceLang;
