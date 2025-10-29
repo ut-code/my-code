@@ -57,6 +57,7 @@ export function AccountMenu() {
                 `https://avatar.vercel.sh/${session.user?.name}`
               }
               alt="user avatar"
+              crossOrigin="anonymous"
             />
           </div>
         </label>
