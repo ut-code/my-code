@@ -1,15 +1,16 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { PythonEmbeddedTerminal } from "../terminal/python/embedded";
 import { type AceLang, EditorComponent } from "../terminal/editor";
-import { ExecFile, ExecLang } from "../terminal/exec";
+import { ExecFile } from "../terminal/exec";
 import { useChangeTheme } from "./themeToggle";
 import {
   tomorrow,
   atomOneDark,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { ReactNode } from "react";
+import { RuntimeLang } from "@/terminal/runtime";
+import { ReplTerminal } from "@/terminal/repl";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -94,6 +95,19 @@ function CodeComponent({
     className || ""
   );
   if (match) {
+    let runtimeLang: RuntimeLang | undefined = undefined;
+    switch (match[1]) {
+      case "python":
+        runtimeLang = "python";
+        break;
+      case "cpp":
+      case "c++":
+        runtimeLang = "cpp";
+        break;
+      default:
+        console.warn(`Unsupported language for runtime: ${match[1]}`);
+        break;
+    }
     if (match[2] === "-exec" && match[3]) {
       /*
       ```python-exec:main.py
@@ -105,24 +119,11 @@ function CodeComponent({
         hello, world!
       ---------------------------
       */
-      let execLang: ExecLang | undefined = undefined;
-      switch (match[1]) {
-        case "python":
-          execLang = "python";
-          break;
-        case "cpp":
-        case "c++":
-          execLang = "cpp";
-          break;
-        default:
-          console.warn(`Unsupported language for exec: ${match[1]}`);
-          break;
-      }
-      if (execLang) {
+      if (runtimeLang) {
         return (
           <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
             <ExecFile
-              language={execLang}
+              language={runtimeLang}
               filenames={match[3].split(",")}
               content={String(props.children || "").replace(/\n$/, "")}
             />
@@ -131,25 +132,21 @@ function CodeComponent({
       }
     } else if (match[2] === "-repl") {
       // repl付きの言語指定
-      // 現状はPythonのみ対応
       if (!match[3]) {
         console.warn(
           `${match[1]}-repl without terminal id! content: ${String(props.children).slice(0, 20)}...`
         );
       }
-      switch (match[1]) {
-        case "python":
-          return (
-            <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
-              <PythonEmbeddedTerminal
-                terminalId={match[3]}
-                content={String(props.children || "").replace(/\n$/, "")}
-              />
-            </div>
-          );
-        default:
-          console.warn(`Unsupported language for repl: ${match[1]}`);
-          break;
+      if (runtimeLang) {
+        return (
+          <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
+            <ReplTerminal
+              terminalId={match[3]}
+              language={runtimeLang}
+              initContent={String(props.children || "").replace(/\n$/, "")}
+            />
+          </div>
+        );
       }
     } else if (match[3]) {
       // ファイル名指定がある場合、ファイルエディター
@@ -180,7 +177,6 @@ function CodeComponent({
         <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
           <EditorComponent
             language={aceLang}
-            tabSize={4}
             filename={match[3]}
             readonly={match[2] === "-readonly"}
             initContent={String(props.children || "").replace(/\n$/, "")}

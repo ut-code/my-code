@@ -1,10 +1,10 @@
 # my.code(); Runtime API
 
-## runtime.ts
+## runtime.tsx
 
 各言語のランタイムはRuntimeContextインターフェースの実装を返すフックを実装する必要があります。
 
-runtime.ts の `useRuntime(lang)` は各言語のフックを呼び出し、その中で指定された言語のランタイムを返します。
+runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、その中で指定された言語のランタイムを返します。
 
 関数はすべてuseCallbackやuseMemoなどを用いレンダリングごとに同じインスタンスを返すように実装してください。
 
@@ -12,8 +12,6 @@ runtime.ts の `useRuntime(lang)` は各言語のフックを呼び出し、そ�
 
 * ready: `boolean`
     * ランタイムの初期化が完了したか、不要である場合true
-* tabSize: `number`
-    * REPLおよびコードエディターののタブ幅を指定します。
 * mutex?: `MutexInterface`
     * ランタイムに排他制御が必要な場合、MutexInterfaceのインスタンスを返してください。
 * interrupt?: `() => Promise<void>`
@@ -48,10 +46,6 @@ runtime.ts の `useRuntime(lang)` は各言語のフックを呼び出し、そ�
     ]
     ```
     が返されるようにします。
-* prompt?: `string`
-    * REPLの1行目のプロンプト文字列を指定します。
-* promptMore?: `string`
-    * REPLの2行目以降のプロンプト文字列を指定します。
 
 ### ファイル実行用
 
@@ -60,6 +54,17 @@ runtime.ts の `useRuntime(lang)` は各言語のフックを呼び出し、そ�
     * 呼び出し側でmutexのロックはされません
 * getCommandlineStr: `(filenames: string[]) => string`
     * 指定されたファイルを実行するためのコマンドライン引数文字列を返します。表示用です。
+
+### LangConstant
+
+言語ごとに固定の定数です。
+
+* tabSize: `number`
+    * REPLおよびコードエディターののタブ幅を指定します。1以上
+* prompt?: `string`
+    * REPLの1行目のプロンプト文字列を指定します。
+* promptMore?: `string`
+    * REPLの2行目以降のプロンプト文字列を指定します。省略時はpromptが使われます
 
 ## embedContext.tsx
 
@@ -113,6 +118,14 @@ EditorComponent コンポーネントを提供します。
 
 ### Pyodide (Python)
 
-Pyodide を web worker で動かしています。
-ランタイムの初期化に時間がかかるため、バックグラウンドで初期化を行います。
+Pyodide を web worker で動かしています。worker側のスクリプトは /public/python.worker.js にあります。
+
+### Wandbox (C++)
+
+wandbox.org のAPIを利用してC++コードを実行しています。C++以外にもいろいろな言語に対応しています。
+
+APIから利用可能なコンパイラとオプションのリストが得られるので、言語ごとにそこからオプションを選択するロジックを実装しています。
+
+C++ではg++の中でheadでない最新のものを選択し、warningスイッチオン、boost有効、std=最新を指定しています。
+また、コード実行時にシグナルハンドラーをユーザーのコードに挿入し、エラー時にスタックトレースを表示する処理とそれをjs側でパースする処理を実装しています。
 

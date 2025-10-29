@@ -14,7 +14,6 @@ export default function PythonPage() {
       />
       <EditorComponent
         language="python"
-        tabSize={4}
         filename="main.py"
         initContent="print('hello, world!')"
       />

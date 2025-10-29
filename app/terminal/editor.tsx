@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
 import { useEmbedContext } from "./embedContext";
+import { langConstants } from "./runtime";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
@@ -31,7 +32,6 @@ export type AceLang = "python" | "c_cpp" | "json" | "csv" | "text";
 
 interface EditorProps {
   language?: AceLang;
-  tabSize: number;
   filename: string;
   initContent: string;
   readonly?: boolean;
@@ -88,7 +88,7 @@ export function EditorComponent(props: EditorProps) {
         name={`ace-editor-${props.filename}`}
         mode={props.language}
         theme={theme}
-        tabSize={props.tabSize}
+        tabSize={langConstants(props.language || "text").tabSize}
         width="100%"
         height={
           Math.max((props.initContent.split("\n").length + 2) * 14, 128) + "px"

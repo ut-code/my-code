@@ -208,6 +208,11 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     return initCommands;
   }, []);
 
+  const getCommandlineStr = useCallback(
+    (filenames: string[]) => `python ${filenames[0]}`,
+    []
+  );
+
   return (
     <PyodideContext.Provider
       value={{
@@ -218,10 +223,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         runFiles,
         interrupt,
         splitReplExamples,
-        prompt: ">>> ",
-        promptMore: "... ",
-        tabSize: 4,
-        getCommandlineStr: (filenames: string[]) => `python ${filenames[0]}`,
+        getCommandlineStr,
       }}
     >
       {children}

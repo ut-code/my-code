@@ -13,7 +13,7 @@ import {
 } from "./terminal";
 import { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
-import { emptyMutex, RuntimeLang, useRuntime } from "./runtime";
+import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 
 export interface ReplOutput {
   type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
@@ -71,15 +71,16 @@ export function ReplTerminal({
 
   const {
     ready: runtimeReady,
-    tabSize,
     mutex: runtimeMutex = emptyMutex,
     interrupt: runtimeInterrupt,
     runCommand,
     checkSyntax,
     splitReplExamples,
-    prompt = "> ",
-    promptMore = prompt,
   } = useRuntime(language);
+  const { tabSize, prompt, promptMore } = langConstants(language);
+  if (!prompt) {
+    console.warn(`prompt not defined for language: ${language}`);
+  }
 
   if (!runCommand) {
     throw new Error(`runCommand not available for language: ${language}`);
@@ -136,7 +137,7 @@ export function ReplTerminal({
         inputBuffer.current = newBuffer();
         for (let i = 0; i < inputBuffer.current.length; i++) {
           terminalInstanceRef.current.write(
-            i === 0 ? prompt : promptMore || prompt
+            (i === 0 ? prompt : (promptMore ?? prompt)) ?? "> "
           );
           if (language) {
             terminalInstanceRef.current.write(
