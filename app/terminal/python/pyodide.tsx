@@ -1,7 +1,5 @@
 "use client";
 
-// Nextjsではドキュメント通りにpyodideをimportすると動かない? typeのインポートだけはできる
-import { type PyodideAPI } from "pyodide";
 import {
   useState,
   useRef,
@@ -9,29 +7,23 @@ import {
   ReactNode,
   createContext,
   useContext,
+  useEffect,
 } from "react";
 import { SyntaxStatus, ReplOutput } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
-import { PyCallable } from "pyodide/ffi";
 import { useEmbedContext } from "../embedContext";
 
-declare global {
-  interface Window {
-    loadPyodide: (options: { indexURL: string }) => Promise<PyodideAPI>;
-  }
-}
-
 interface IPyodideContext {
-  init: () => Promise<void>; // Pyodideを初期化する
-  initializing: boolean; // Pyodideの初期化が実行中
-  ready: boolean; // Pyodideの初期化が完了した
-  // runPython() などを複数の場所から同時実行すると結果が混ざる。
-  // コードブロックの実行全体を mutex.runExclusive() で囲うことで同時実行を防ぐ必要がある
+  init: () => Promise<void>;
+  initializing: boolean;
+  ready: boolean;
   mutex: MutexInterface;
   runPython: (code: string) => Promise<ReplOutput[]>;
   runFile: (name: string) => Promise<ReplOutput[]>;
   checkSyntax: (code: string) => Promise<SyntaxStatus>;
+  interrupt: () => void;
 }
+
 const PyodideContext = createContext<IPyodideContext>(null!);
 
 export function usePyodide() {
@@ -42,280 +34,159 @@ export function usePyodide() {
   return context;
 }
 
-// Python側で実行する構文チェックのコード
-// codeop.compile_commandは、コードが不完全な場合はNoneを返します。
-const CHECK_SYNTAX_CODE = `
-def __check_syntax(code):
-    import codeop
-
-    compiler = codeop.compile_command
-    try:
-        # compile_commandは、コードが完結していればコンパイルオブジェクトを、
-        # 不完全(まだ続きがある)であればNoneを返す
-        if compiler(code) is not None:
-            return "complete"
-        else:
-            return "incomplete"
-    except (SyntaxError, ValueError, OverflowError):
-        # 明らかな構文エラーの場合
-        return "invalid"
-
-__check_syntax
-`;
-
-const HOME = `/home/pyodide/`;
-
-// https://stackoverflow.com/questions/436198/what-alternative-is-there-to-execfile-in-python-3-how-to-include-a-python-fil
-const EXECFILE_CODE = `
-def __execfile(filepath):
-  with open(filepath, 'rb') as file:
-      exec_globals = {
-          "__file__": filepath,
-          "__name__": "__main__",
-      }
-      exec(compile(file.read(), filepath, 'exec'), exec_globals)
-
-__execfile
-`;
-const WRITEFILE_CODE = `
-def __writefile(filepath, content):
-    with open(filepath, 'w') as f:
-        f.write(content)
-
-__writefile
-`;
-const READALLFILE_CODE = `
-def __readallfile():
-    import os
-    files = []
-    for file in os.listdir():
-        if os.path.isfile(file):
-          with open(file, 'r') as f:
-              files.append((file, f.read()))
-    return files
-
-__readallfile
-`;
+type MessageToWorker =
+  | {
+      type: "init";
+      payload: { PYODIDE_CDN: string; interruptBuffer: Uint8Array };
+    }
+  | {
+      type: "runPython";
+      payload: { code: string };
+    }
+  | {
+      type: "checkSyntax";
+      payload: { code: string };
+    }
+  | {
+      type: "runFile";
+      payload: { name: string; files: Record<string, string> };
+    };
+type MessageFromWorker =
+  | { id: number; payload: unknown }
+  | { id: number; error: string };
+type InitPayloadFromWorker = { success: boolean };
+type RunPayloadFromWorker = {
+  output: ReplOutput[];
+  updatedFiles: [string, string][]; // Recordではない
+};
+type StatusPayloadFromWorker = { status: SyntaxStatus };
 
 export function PyodideProvider({ children }: { children: ReactNode }) {
-  const pyodideRef = useRef<PyodideAPI>(null);
+  const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState<boolean>(false);
   const [initializing, setInitializing] = useState<boolean>(false);
-  const pyodideOutput = useRef<ReplOutput[]>([]);
   const mutex = useRef<MutexInterface>(new Mutex());
   const { files, writeFile } = useEmbedContext();
+  const messageCallbacks = useRef<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Map<number, [(payload: any) => void, (error: string) => void]>
+  >(new Map());
+  const nextMessageId = useRef<number>(0);
+  const interruptBuffer = useRef<Uint8Array | null>(null);
+
+  function postMessage<T>({ type, payload }: MessageToWorker) {
+    const id = nextMessageId.current++;
+    return new Promise<T>((resolve, reject) => {
+      messageCallbacks.current.set(id, [resolve, reject]);
+      workerRef.current?.postMessage({ id, type, payload });
+    });
+  }
 
   const init = useCallback(async () => {
-    // next.config.ts 内でpyodideをimportし、バージョンを取得している
-    const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${process.env.PYODIDE_VERSION}/full/`;
+    if (workerRef.current || initializing) return;
 
-    const { promise, resolve } = Promise.withResolvers<void>();
-    const initPyodide = () => {
-      if (initializing) return;
-      setInitializing(true);
-      window
-        .loadPyodide({
-          indexURL: PYODIDE_CDN,
-        })
-        .then((pyodide) => {
-          pyodideRef.current = pyodide;
+    setInitializing(true);
+    const worker = new Worker("/pyodide.worker.js");
+    workerRef.current = worker;
 
-          // 標準出力とエラーをハンドリングする設定
-          pyodide.setStdout({
-            batched: (str) => {
-              pyodideOutput.current.push({ type: "stdout", message: str });
-            },
-          });
-          pyodide.setStderr({
-            batched: (str) => {
-              pyodideOutput.current.push({ type: "stderr", message: str });
-            },
-          });
+    interruptBuffer.current = new Uint8Array(new SharedArrayBuffer(1));
 
-          setReady(true);
-          setInitializing(false);
-          resolve();
-        });
+    worker.onmessage = (event) => {
+      const data = event.data as MessageFromWorker;
+      if (messageCallbacks.current.has(data.id)) {
+        const [resolve, reject] = messageCallbacks.current.get(data.id)!;
+        if ("error" in data) {
+          reject(data.error);
+        } else {
+          resolve(data.payload);
+        }
+        messageCallbacks.current.delete(data.id);
+      }
     };
 
-    // スクリプトタグを動的に追加
-    if ("loadPyodide" in window) {
-      initPyodide();
-    } else {
-      const script = document.createElement("script");
-      script.src = `${PYODIDE_CDN}pyodide.js`;
-      script.async = true;
-      script.onload = initPyodide;
-      script.onerror = () => {
-        // TODO
-      };
-      document.body.appendChild(script);
-
-      // コンポーネントのクリーンアップ時にスクリプトタグを削除
-      // return () => {
-      //   document.body.removeChild(script);
-      // };
-    }
-    return promise;
+    // next.config.ts 内でpyodideをimportし、バージョンを取得している
+    const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${process.env.PYODIDE_VERSION}/full/`;
+    postMessage<InitPayloadFromWorker>({
+      type: "init",
+      payload: { PYODIDE_CDN, interruptBuffer: interruptBuffer.current },
+    }).then(({ success }) => {
+      if (success) {
+        setReady(true);
+      }
+      setInitializing(false);
+    });
   }, [initializing]);
 
-  const runPython = useCallback<(code: string) => Promise<ReplOutput[]>>(
-    async (code: string) => {
+  useEffect(() => {
+    return () => {
+      workerRef.current?.terminate();
+    };
+  }, []);
+
+  const interrupt = useCallback(() => {
+    if (interruptBuffer.current) {
+      interruptBuffer.current[0] = 2;
+    }
+  }, []);
+
+  const runPython = useCallback(
+    async (code: string): Promise<ReplOutput[]> => {
       if (!mutex.current.isLocked()) {
         throw new Error("mutex of PyodideContext must be locked for runPython");
       }
-
-      const pyodide = pyodideRef.current;
-      if (!pyodide || !ready) {
+      if (!workerRef.current || !ready) {
         return [{ type: "error", message: "Pyodide is not ready yet." }];
       }
-      try {
-        const result = await pyodide.runPythonAsync(code);
-        if (result !== undefined) {
-          pyodideOutput.current.push({
-            type: "return",
-            message: String(result),
-          });
-        } else {
-          // 標準出力/エラーがない場合
-        }
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
-          if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
-            const lines = e.message.split("\n");
-            const execLineIndex = lines.findIndex((line) =>
-              line.includes("<exec>")
-            );
-            pyodideOutput.current.push({
-              type: "error",
-              message: lines
-                .slice(0, 1)
-                .concat(lines.slice(execLineIndex))
-                .join("\n")
-                .trim(),
-            });
-          } else {
-            pyodideOutput.current.push({
-              type: "error",
-              message: `予期せぬエラー: ${e.message.trim()}`,
-            });
-          }
-        } else {
-          pyodideOutput.current.push({
-            type: "error",
-            message: `予期せぬエラー: ${String(e).trim()}`,
-          });
-        }
+
+      if (interruptBuffer.current) {
+        interruptBuffer.current[0] = 0;
       }
 
-      const pyReadFile = pyodide.runPython(READALLFILE_CODE) as PyCallable;
-      for (const [file, content] of pyReadFile() as [string, string][]) {
-        writeFile(file, content);
+      const { output, updatedFiles } = await postMessage<RunPayloadFromWorker>({
+        type: "runPython",
+        payload: { code },
+      });
+      for (const [name, content] of updatedFiles) {
+        writeFile(name, content);
       }
-
-      const output = [...pyodideOutput.current];
-      pyodideOutput.current = []; // 出力をクリア
       return output;
     },
     [ready, writeFile]
   );
 
-  /**
-   * ファイルを実行する
-   */
-  const runFile = useCallback<(name: string) => Promise<ReplOutput[]>>(
-    async (name: string) => {
-      if (mutex.current.isLocked()) {
-        throw new Error(
-          "mutex of PyodideContext must not be locked for runFile"
-        );
-      }
-      const pyodide = pyodideRef.current;
-      if (!pyodide /*|| !ready*/) {
+  const runFile = useCallback(
+    async (name: string): Promise<ReplOutput[]> => {
+      if (!workerRef.current || !ready) {
         return [{ type: "error", message: "Pyodide is not ready yet." }];
       }
+      if (interruptBuffer.current) {
+        interruptBuffer.current[0] = 0;
+      }
       return mutex.current.runExclusive(async () => {
-        try {
-          const pyWriteFile = pyodide.runPython(WRITEFILE_CODE) as PyCallable;
-          const pyExecFile = pyodide.runPython(EXECFILE_CODE) as PyCallable;
-
-          for (const filename of Object.keys(files)) {
-            if (files[filename]) {
-              pyWriteFile(HOME + filename, files[filename]);
-            }
-          }
-          pyExecFile(HOME + name);
-        } catch (e) {
-          console.log(e);
-          if (e instanceof Error) {
-            // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
-            // <exec> 自身も隠す
-            if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
-              const lines = e.message.split("\n");
-              const execLineIndex = lines.findLastIndex((line) =>
-                line.includes("<exec>")
-              );
-              pyodideOutput.current.push({
-                type: "error",
-                message: lines
-                  .slice(0, 1)
-                  .concat(lines.slice(execLineIndex + 1))
-                  .join("\n")
-                  .trim(),
-              });
-            } else {
-              pyodideOutput.current.push({
-                type: "error",
-                message: `予期せぬエラー: ${e.message.trim()}`,
-              });
-            }
-          } else {
-            pyodideOutput.current.push({
-              type: "error",
-              message: `予期せぬエラー: ${String(e).trim()}`,
-            });
-          }
+        const { output, updatedFiles } =
+          await postMessage<RunPayloadFromWorker>({
+            type: "runFile",
+            payload: { name, files },
+          });
+        for (const [newName, content] of updatedFiles) {
+          writeFile(newName, content);
         }
-
-        const pyReadFile = pyodide.runPython(READALLFILE_CODE) as PyCallable;
-        for (const [file, content] of pyReadFile() as [string, string][]) {
-          writeFile(file, content);
-        }
-
-        const output = [...pyodideOutput.current];
-        pyodideOutput.current = []; // 出力をクリア
         return output;
       });
     },
-    [files, writeFile]
+    [files, ready, writeFile]
   );
 
-  /**
-   * Pythonコードの構文が完結しているかチェックする
-   */
-  const checkSyntax = useCallback<(code: string) => Promise<SyntaxStatus>>(
-    async (code) => {
-      if (mutex.current.isLocked()) {
-        throw new Error(
-          "mutex of PyodideContext must not be locked for checkSyntax"
-        );
-      }
-
-      const pyodide = pyodideRef.current;
-      if (!pyodide || !ready) return "invalid";
-
-      try {
-        // Pythonのコードを実行して結果を受け取る
-        const status = await mutex.current.runExclusive(() =>
-          (pyodide.runPython(CHECK_SYNTAX_CODE) as PyCallable)(code)
-        );
-        return status;
-      } catch (e) {
-        console.error("Syntax check error:", e);
-        return "invalid";
-      }
+  const checkSyntax = useCallback(
+    async (code: string): Promise<SyntaxStatus> => {
+      if (!workerRef.current || !ready) return "invalid";
+      const { status } = await mutex.current.runExclusive(() =>
+        postMessage<StatusPayloadFromWorker>({
+          type: "checkSyntax",
+          payload: { code },
+        })
+      );
+      return status;
     },
     [ready]
   );
@@ -330,6 +201,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
         checkSyntax,
         mutex: mutex.current,
         runFile,
+        interrupt,
       }}
     >
       {children}

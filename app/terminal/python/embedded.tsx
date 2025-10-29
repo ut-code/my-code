@@ -12,8 +12,15 @@ export function PythonEmbeddedTerminal({
   content: string;
 }) {
   const initCommands = useMemo(() => splitContents(content), [content]);
-  const { init, initializing, ready, runPython, checkSyntax, mutex } =
-    usePyodide();
+  const {
+    init,
+    initializing,
+    ready,
+    runPython,
+    checkSyntax,
+    mutex,
+    interrupt,
+  } = usePyodide();
 
   return (
     <ReplTerminal
@@ -29,6 +36,7 @@ export function PythonEmbeddedTerminal({
       tabSize={4}
       sendCommand={runPython}
       checkSyntax={checkSyntax}
+      interrupt={interrupt}
     />
   );
 }

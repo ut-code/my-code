@@ -6,7 +6,7 @@ import { ReplTerminal } from "../repl";
 import { usePyodide } from "./pyodide";
 
 export default function PythonPage() {
-  const { init, ready, initializing, runPython, checkSyntax, mutex } =
+  const { init, ready, initializing, runPython, checkSyntax, mutex, interrupt } =
     usePyodide();
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -23,6 +23,7 @@ export default function PythonPage() {
         mutex={mutex}
         sendCommand={runPython}
         checkSyntax={checkSyntax}
+        interrupt={interrupt}
       />
       <EditorComponent
         language="python"
