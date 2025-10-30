@@ -1,7 +1,8 @@
 // Ruby.wasm web worker
 let rubyVM = null;
 let rubyOutput = [];
-let rubyModule = null;
+let stdoutBuffer = "";
+let stderrBuffer = "";
 
 // Helper function to read all files from the virtual file system
 function readAllFiles() {
@@ -32,68 +33,56 @@ function readAllFiles() {
 }
 
 async function init(id, payload) {
-  const { RUBY_WASM_URL, interruptBuffer } = payload;
+  const { RUBY_WASM_URL } = payload;
   
   if (!rubyVM) {
     try {
-      // Import the browser WASI shim
+      // Import the browser WASI shim and Ruby runtime
       importScripts('https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.3.0/dist/index.js');
+      importScripts('https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@2.7.2/dist/browser.umd.js');
       
       // Fetch and compile the Ruby WASM module
       const response = await fetch(RUBY_WASM_URL);
       const buffer = await response.arrayBuffer();
-      rubyModule = await WebAssembly.compile(buffer);
+      const rubyModule = await WebAssembly.compile(buffer);
       
-      // Import the Ruby WASM runtime
-      // We need to use the browser WASI shim
-      const { WASI } = self.WASI || globalThis.WASI;
+      const { DefaultRubyVM } = rubyWasmWasi;
       
-      // Create WASI instance
-      const wasi = new WASI([], [], [
+      // Create custom WASI to capture stdout/stderr
+      const { WASI } = globalThis.WASI;
+      const fds = [
         {
-          path: 'stdout',
-          write: (buf) => {
-            const text = new TextDecoder().decode(buf);
-            rubyOutput.push({ type: 'stdout', message: text });
-            return buf.byteLength;
-          }
+          // stdin
+          path: "stdin",
+          read: () => new Uint8Array([]),
         },
         {
-          path: 'stderr',
-          write: (buf) => {
-            const text = new TextDecoder().decode(buf);
-            rubyOutput.push({ type: 'stderr', message: text });
-            return buf.byteLength;
-          }
-        }
-      ]);
+          // stdout
+          path: "stdout",
+          write: (buffer) => {
+            const text = new TextDecoder().decode(buffer);
+            stdoutBuffer += text;
+            return buffer.byteLength;
+          },
+        },
+        {
+          // stderr
+          path: "stderr",
+          write: (buffer) => {
+            const text = new TextDecoder().decode(buffer);
+            stderrBuffer += text;
+            return buffer.byteLength;
+          },
+        },
+      ];
       
-      // Import the RubyVM from @ruby/wasm-wasi
-      importScripts('https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@2.7.2/dist/browser.umd.js');
-      const { DefaultRubyVM } = self.ruby;
-      
-      const { vm } = await DefaultRubyVM(rubyModule, {
-        consolePrint: false
+      const wasi = new WASI([], [], fds);
+      const { vm } = await rubyWasmWasi.RubyVM.instantiateModule({
+        module: rubyModule,
+        wasip1: wasi,
       });
       
       rubyVM = vm;
-      
-      // Set up stdout/stderr capture
-      rubyVM.eval(`
-        class << $stdout
-          alias_method :original_write, :write
-          def write(str)
-            str
-          end
-        end
-        
-        class << $stderr
-          alias_method :original_write, :write
-          def write(str)
-            str
-          end
-        end
-      `);
       
     } catch (e) {
       console.error("Failed to initialize Ruby VM:", e);
@@ -105,6 +94,32 @@ async function init(id, payload) {
   self.postMessage({ id, payload: { success: true } });
 }
 
+function flushOutput() {
+  if (stdoutBuffer) {
+    const lines = stdoutBuffer.split('\n');
+    for (let i = 0; i < lines.length - 1; i++) {
+      rubyOutput.push({ type: 'stdout', message: lines[i] });
+    }
+    stdoutBuffer = lines[lines.length - 1];
+  }
+  if (stderrBuffer) {
+    const lines = stderrBuffer.split('\n');
+    for (let i = 0; i < lines.length - 1; i++) {
+      rubyOutput.push({ type: 'stderr', message: lines[i] });
+    }
+    stderrBuffer = lines[lines.length - 1];
+  }
+  // Final flush if there's remaining text
+  if (stdoutBuffer) {
+    rubyOutput.push({ type: 'stdout', message: stdoutBuffer });
+    stdoutBuffer = "";
+  }
+  if (stderrBuffer) {
+    rubyOutput.push({ type: 'stderr', message: stderrBuffer });
+    stderrBuffer = "";
+  }
+}
+
 async function runRuby(id, payload) {
   const { code } = payload;
   
@@ -114,13 +129,18 @@ async function runRuby(id, payload) {
   }
   
   try {
-    // Capture output
     rubyOutput = [];
+    stdoutBuffer = "";
+    stderrBuffer = "";
     
     const result = rubyVM.eval(code);
+    
+    // Flush any buffered output
+    flushOutput();
+    
     const resultStr = result.toString();
     
-    // Add result to output if it's not nil
+    // Add result to output if it's not nil and not empty
     if (resultStr !== '' && resultStr !== 'nil') {
       rubyOutput.push({
         type: 'return',
@@ -129,17 +149,19 @@ async function runRuby(id, payload) {
     }
   } catch (e) {
     console.log(e);
+    flushOutput();
+    
     if (e instanceof Error) {
-      // Clean up Ruby error messages
       let errorMessage = e.message;
       
-      // Remove internal Ruby traceback lines for cleaner output
-      if (errorMessage.includes('Traceback')) {
+      // Clean up Ruby error messages
+      if (errorMessage.includes('Traceback') || errorMessage.includes('Error')) {
         const lines = errorMessage.split('\n');
+        // Filter out internal lines
         errorMessage = lines.filter(line => 
           !line.includes('(eval)') || 
           line.includes('Error') || 
-          line.includes(':')
+          line.match(/:\d+:/)
         ).join('\n').trim();
       }
       
@@ -175,6 +197,8 @@ async function runFile(id, payload) {
   
   try {
     rubyOutput = [];
+    stdoutBuffer = "";
+    stderrBuffer = "";
     
     // Write files to the virtual file system
     for (const [filename, content] of Object.entries(files)) {
@@ -191,17 +215,22 @@ async function runFile(id, payload) {
     
     rubyVM.eval(fileContent);
     
+    // Flush any buffered output
+    flushOutput();
+    
   } catch (e) {
     console.log(e);
+    flushOutput();
+    
     if (e instanceof Error) {
       let errorMessage = e.message;
       
-      if (errorMessage.includes('Traceback')) {
+      if (errorMessage.includes('Traceback') || errorMessage.includes('Error')) {
         const lines = errorMessage.split('\n');
         errorMessage = lines.filter(line => 
           !line.includes('(eval)') || 
           line.includes('Error') || 
-          line.includes(':')
+          line.match(/:\d+:/)
         ).join('\n').trim();
       }
       

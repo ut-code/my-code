@@ -27,7 +27,7 @@ export function useRuby(): RuntimeContext {
 type MessageToWorker =
   | {
       type: "init";
-      payload: { RUBY_WASM_URL: string; interruptBuffer: Uint8Array };
+      payload: { RUBY_WASM_URL: string };
     }
   | {
       type: "runRuby";
@@ -77,8 +77,6 @@ export function RubyProvider({ children }: { children: ReactNode }) {
     const worker = new Worker("/ruby.worker.js");
     workerRef.current = worker;
 
-    interruptBuffer.current = new Uint8Array(new SharedArrayBuffer(1));
-
     worker.onmessage = (event) => {
       const data = event.data as MessageFromWorker;
       if (messageCallbacks.current.has(data.id)) {
@@ -98,7 +96,7 @@ export function RubyProvider({ children }: { children: ReactNode }) {
 
     postMessage<InitPayloadFromWorker>({
       type: "init",
-      payload: { RUBY_WASM_URL, interruptBuffer: interruptBuffer.current },
+      payload: { RUBY_WASM_URL },
     }).then(({ success }) => {
       if (success) {
         setReady(true);
