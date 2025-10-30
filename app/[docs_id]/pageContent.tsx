@@ -5,7 +5,7 @@ import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
 import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
-import { useSidebarMdContext } from "./dynamicMdContext";
+import { useSidebarMdContext } from "../sidebar";
 import clsx from "clsx";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
@@ -41,12 +41,7 @@ export function PageContent(props: PageContentProps) {
       sectionId: `${props.docs_id}-${i}`,
     }));
     setDynamicMdContent(newContent);
-    setSidebarMdContent(newContent);
-    
-    // クリーンアップ：コンポーネントがアンマウントされたらcontextをクリア
-    return () => {
-      setSidebarMdContent([]);
-    };
+    setSidebarMdContent(props.docs_id, newContent);
   }, [props.splitMdContent, props.docs_id, setSidebarMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -71,14 +66,14 @@ export function PageContent(props: PageContentProps) {
       
       // ローカルstateとcontextの両方を更新
       setDynamicMdContent(updateContent);
-      setSidebarMdContent(updateContent);
+      setSidebarMdContent(props.docs_id, updateContent);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [setSidebarMdContent]);
+  }, [setSidebarMdContent, props.docs_id]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
