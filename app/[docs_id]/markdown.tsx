@@ -1,7 +1,7 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { type AceLang, EditorComponent, getAceLang } from "../terminal/editor";
+import { EditorComponent, getAceLang } from "../terminal/editor";
 import { ExecFile } from "../terminal/exec";
 import { useChangeTheme } from "./themeToggle";
 import {
@@ -9,7 +9,7 @@ import {
   atomOneDark,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { ReactNode } from "react";
-import { getRuntimeLang, RuntimeLang } from "@/terminal/runtime";
+import { getRuntimeLang } from "@/terminal/runtime";
 import { ReplTerminal } from "@/terminal/repl";
 
 export function StyledMarkdown({ content }: { content: string }) {

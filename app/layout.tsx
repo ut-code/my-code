@@ -7,7 +7,7 @@ import { Sidebar } from "./sidebar";
 import { ReactNode } from "react";
 import { EmbedContextProvider } from "./terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
-import { SidebarMdProvider } from "./[docs_id]/dynamicMdContext";
+import { SidebarMdProvider } from "./sidebar";
 import { RuntimeProvider } from "./terminal/runtime";
 
 export const metadata: Metadata = {

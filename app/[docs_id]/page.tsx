@@ -6,7 +6,7 @@ import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
 import pyodideLock from "pyodide/pyodide-lock.json";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
-import { getChat } from "@/lib/chatHistory";
+import { getChatFromCache } from "@/lib/chatHistory";
 
 export default async function Page({
   params,
@@ -50,10 +50,10 @@ export default async function Page({
     splitMarkdown(text)
   );
 
-  const initialChatHistories = getChat(docs_id);
+  const initialChatHistories = getChatFromCache(docs_id);
 
   return (
-    <ChatHistoryProvider initialChatHistories={await initialChatHistories}>
+    <ChatHistoryProvider initialChatHistories={await initialChatHistories} docs_id={docs_id}>
       <PageContent
         documentContent={await mdContent}
         splitMdContent={await splitMdContent}

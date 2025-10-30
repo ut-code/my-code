@@ -4,17 +4,107 @@ import { usePathname } from "next/navigation";
 import { pagesList } from "./pagesList";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
-import { useSidebarMdContext } from "./[docs_id]/dynamicMdContext";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { DynamicMarkdownSection } from "./[docs_id]/pageContent";
+
+export interface ISidebarMdContext {
+  loadedDocsId: string;
+  sidebarMdContent: DynamicMarkdownSection[];
+  setSidebarMdContent: (
+    docsId: string,
+    content:
+      | DynamicMarkdownSection[]
+      | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
+  ) => void;
+}
+
+const SidebarMdContext = createContext<ISidebarMdContext | null>(null);
+
+export function useSidebarMdContext() {
+  const context = useContext(SidebarMdContext);
+  if (!context) {
+    throw new Error(
+      "useSidebarMdContext must be used within a SidebarMdProvider"
+    );
+  }
+  return context;
+}
+
+export function useSidebarMdContextOptional() {
+  return useContext(SidebarMdContext);
+}
+
+export function SidebarMdProvider({ children }: { children: ReactNode }) {
+  const [sidebarMdContent, setSidebarMdContent_] = useState<
+    DynamicMarkdownSection[]
+  >([]);
+  const [loadedDocsId, setLoadedDocsId] = useState<string>("");
+  const setSidebarMdContent = useCallback(
+    (
+      docsId: string,
+      content:
+        | DynamicMarkdownSection[]
+        | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
+    ) => {
+      setLoadedDocsId(docsId);
+      setSidebarMdContent_(content);
+    },
+    []
+  );
+  return (
+    <SidebarMdContext.Provider
+      value={{
+        loadedDocsId,
+        sidebarMdContent,
+        setSidebarMdContent,
+      }}
+    >
+      {children}
+    </SidebarMdContext.Provider>
+  );
+}
 
 export function Sidebar() {
   const pathname = usePathname();
-  const docs_id = pathname.replace(/^\//, "");
-  const { sidebarMdContent } = useSidebarMdContext();
-  
+  const currentDocsId = pathname.replace(/^\//, ""); // ちょっと遅延がある
+  const sidebarContext = useSidebarMdContext();
+  // sidebarMdContextの情報が古かったら使わない
+  const sidebarMdContent =
+    sidebarContext.loadedDocsId === currentDocsId
+      ? sidebarContext.sidebarMdContent
+      : [];
+
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
   const currentSectionIndex = sidebarMdContent.findIndex(
-    (section) => section.inView
+    (section, i) => i >= 1 && section.inView
   );
+
+  // 目次の開閉状態
+  const [detailsOpen, setDetailsOpen] = useState<boolean[]>([]);
+  const currentGroupIndex = pagesList.findIndex((group) =>
+    currentDocsId.startsWith(`${group.id}-`)
+  );
+  useEffect(() => {
+    // 表示しているグループが変わったときに現在のグループのdetailsを開く
+    if (currentGroupIndex !== -1) {
+      setDetailsOpen((detailsOpen) => {
+        const newDetailsOpen = [...detailsOpen];
+        while (newDetailsOpen.length <= currentGroupIndex) {
+          newDetailsOpen.push(false);
+        }
+        newDetailsOpen[currentGroupIndex] = true;
+        return newDetailsOpen;
+      });
+    }
+  }, [currentGroupIndex]);
+
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
       {/* todo: 背景色ほんとにこれでいい？ */}
@@ -51,9 +141,19 @@ export function Sidebar() {
       </span>
 
       <ul className="menu w-full">
-        {pagesList.map((group) => (
+        {pagesList.map((group, i) => (
           <li key={group.id}>
-            <details open={docs_id.startsWith(`${group.id}-`)}>
+            <details
+              open={!!detailsOpen.at(i)}
+              onToggle={(e) => {
+                const newDetailsOpen = [...detailsOpen];
+                while (newDetailsOpen.length <= i) {
+                  newDetailsOpen.push(false);
+                }
+                newDetailsOpen[i] = e.currentTarget.open;
+                setDetailsOpen(newDetailsOpen);
+              }}
+            >
               <summary>{group.lang}</summary>
               <ul>
                 {group.pages.map((page) => (
@@ -62,27 +162,31 @@ export function Sidebar() {
                       <span className="mr-0">{page.id}.</span>
                       {page.title}
                     </Link>
-                    {`${group.id}-${page.id}` === docs_id && sidebarMdContent.length > 0 && (
-                      <ul className="ml-4 text-sm">
-                        {sidebarMdContent.slice(1).map((section, idx) => {
-                          // idx + 1 は実際のsectionIndexに対応（slice(1)で最初を除外しているため）
-                          const isCurrentSection = idx + 1 === currentSectionIndex;
-                          return (
-                            <li
-                              key={idx}
-                              style={{ marginLeft: section.level - 2 + "em" }}
-                            >
-                              <Link
-                                href={`#${idx + 1}`}
-                                className={isCurrentSection ? "font-bold" : ""}
+                    {`${group.id}-${page.id}` === currentDocsId &&
+                      sidebarMdContent.length > 0 && (
+                        <ul className="ml-4 text-sm">
+                          {sidebarMdContent.slice(1).map((section, idx) => {
+                            // idx + 1 は実際のsectionIndexに対応（slice(1)で最初を除外しているため）
+                            const isCurrentSection =
+                              idx + 1 === currentSectionIndex;
+                            return (
+                              <li
+                                key={idx}
+                                style={{ marginLeft: section.level - 2 + "em" }}
                               >
-                                {section.title}
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
+                                <Link
+                                  href={`#${idx + 1}`}
+                                  className={
+                                    isCurrentSection ? "font-bold" : ""
+                                  }
+                                >
+                                  {section.title}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
                   </li>
                 ))}
               </ul>
