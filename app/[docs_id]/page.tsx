@@ -6,7 +6,7 @@ import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
 import pyodideLock from "pyodide/pyodide-lock.json";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
-import { getChat, getChatFromCache } from "@/lib/chatHistory";
+import { getChatFromCache } from "@/lib/chatHistory";
 
 export default async function Page({
   params,
