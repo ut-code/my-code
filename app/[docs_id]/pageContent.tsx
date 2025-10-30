@@ -59,7 +59,6 @@ export function PageContent(props: PageContentProps) {
         for (let i = 0; i < sectionRefs.current.length; i++) {
           if (sectionRefs.current.at(i) && dynMdContent.at(i)) {
             const rect = sectionRefs.current.at(i)!.getBoundingClientRect();
-            console.log(i, rect);
             dynMdContent.at(i)!.inView =
               rect.top < window.innerHeight * 0.9 &&
               rect.bottom >= window.innerHeight * 0.1;
