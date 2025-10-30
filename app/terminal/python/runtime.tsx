@@ -9,24 +9,14 @@ import {
   useContext,
   useEffect,
 } from "react";
-import { SyntaxStatus, ReplOutput } from "../repl";
+import { SyntaxStatus, ReplOutput, ReplCommand } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
 import { useEmbedContext } from "../embedContext";
+import { RuntimeContext } from "../runtime";
 
-interface IPyodideContext {
-  init: () => Promise<void>;
-  initializing: boolean;
-  ready: boolean;
-  mutex: MutexInterface;
-  runPython: (code: string) => Promise<ReplOutput[]>;
-  runFile: (name: string) => Promise<ReplOutput[]>;
-  checkSyntax: (code: string) => Promise<SyntaxStatus>;
-  interrupt: () => void;
-}
+const PyodideContext = createContext<RuntimeContext>(null!);
 
-const PyodideContext = createContext<IPyodideContext>(null!);
-
-export function usePyodide() {
+export function usePyodide(): RuntimeContext {
   const context = useContext(PyodideContext);
   if (!context) {
     throw new Error("usePyodide must be used within a PyodideProvider");
@@ -64,7 +54,6 @@ type StatusPayloadFromWorker = { status: SyntaxStatus };
 export function PyodideProvider({ children }: { children: ReactNode }) {
   const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState<boolean>(false);
-  const [initializing, setInitializing] = useState<boolean>(false);
   const mutex = useRef<MutexInterface>(new Mutex());
   const { files, writeFile } = useEmbedContext();
   const messageCallbacks = useRef<
@@ -82,10 +71,7 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  const init = useCallback(async () => {
-    if (workerRef.current || initializing) return;
-
-    setInitializing(true);
+  useEffect(() => {
     const worker = new Worker("/pyodide.worker.js");
     workerRef.current = worker;
 
@@ -113,11 +99,8 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
       if (success) {
         setReady(true);
       }
-      setInitializing(false);
     });
-  }, [initializing]);
 
-  useEffect(() => {
     return () => {
       workerRef.current?.terminate();
     };
@@ -129,10 +112,12 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const runPython = useCallback(
+  const runCommand = useCallback(
     async (code: string): Promise<ReplOutput[]> => {
       if (!mutex.current.isLocked()) {
-        throw new Error("mutex of PyodideContext must be locked for runPython");
+        throw new Error(
+          "mutex of PyodideContext must be locked for runCommand"
+        );
       }
       if (!workerRef.current || !ready) {
         return [{ type: "error", message: "Pyodide is not ready yet." }];
@@ -154,29 +139,6 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     [ready, writeFile]
   );
 
-  const runFile = useCallback(
-    async (name: string): Promise<ReplOutput[]> => {
-      if (!workerRef.current || !ready) {
-        return [{ type: "error", message: "Pyodide is not ready yet." }];
-      }
-      if (interruptBuffer.current) {
-        interruptBuffer.current[0] = 0;
-      }
-      return mutex.current.runExclusive(async () => {
-        const { output, updatedFiles } =
-          await postMessage<RunPayloadFromWorker>({
-            type: "runFile",
-            payload: { name, files },
-          });
-        for (const [newName, content] of updatedFiles) {
-          writeFile(newName, content);
-        }
-        return output;
-      });
-    },
-    [files, ready, writeFile]
-  );
-
   const checkSyntax = useCallback(
     async (code: string): Promise<SyntaxStatus> => {
       if (!workerRef.current || !ready) return "invalid";
@@ -191,17 +153,77 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
     [ready]
   );
 
+  const runFiles = useCallback(
+    async (filenames: string[]): Promise<ReplOutput[]> => {
+      if (filenames.length !== 1) {
+        return [
+          {
+            type: "error",
+            message: "Python execution requires exactly one filename",
+          },
+        ];
+      }
+      // Incorporate runFile logic directly
+      if (!workerRef.current || !ready) {
+        return [{ type: "error", message: "Pyodide is not ready yet." }];
+      }
+      if (interruptBuffer.current) {
+        interruptBuffer.current[0] = 0;
+      }
+      return mutex.current.runExclusive(async () => {
+        const { output, updatedFiles } =
+          await postMessage<RunPayloadFromWorker>({
+            type: "runFile",
+            payload: { name: filenames[0], files },
+          });
+        for (const [newName, content] of updatedFiles) {
+          writeFile(newName, content);
+        }
+        return output;
+      });
+    },
+    [files, ready, writeFile]
+  );
+
+  const splitReplExamples = useCallback((content: string): ReplCommand[] => {
+    const initCommands: { command: string; output: ReplOutput[] }[] = [];
+    for (const line of content.split("\n")) {
+      if (line.startsWith(">>> ")) {
+        // Remove the prompt from the command
+        initCommands.push({ command: line.slice(4), output: [] });
+      } else if (line.startsWith("... ")) {
+        if (initCommands.length > 0) {
+          initCommands[initCommands.length - 1].command += "\n" + line.slice(4);
+        }
+      } else {
+        // Lines without prompt are output from the previous command
+        if (initCommands.length > 0) {
+          initCommands[initCommands.length - 1].output.push({
+            type: "stdout",
+            message: line,
+          });
+        }
+      }
+    }
+    return initCommands;
+  }, []);
+
+  const getCommandlineStr = useCallback(
+    (filenames: string[]) => `python ${filenames[0]}`,
+    []
+  );
+
   return (
     <PyodideContext.Provider
       value={{
-        init,
-        initializing,
         ready,
-        runPython,
+        runCommand,
         checkSyntax,
         mutex: mutex.current,
-        runFile,
+        runFiles,
         interrupt,
+        splitReplExamples,
+        getCommandlineStr,
       }}
     >
       {children}

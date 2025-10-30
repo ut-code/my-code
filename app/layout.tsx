@@ -5,11 +5,10 @@ import "./globals.css";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
 import { ReactNode } from "react";
-import { PyodideProvider } from "./terminal/python/pyodide";
-import { WandboxProvider } from "./terminal/wandbox/wandbox";
 import { EmbedContextProvider } from "./terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./[docs_id]/dynamicMdContext";
+import { RuntimeProvider } from "./terminal/runtime";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,13 +24,15 @@ export default function RootLayout({
         <AutoAnonymousLogin />
         <SidebarMdProvider>
           <div className="drawer lg:drawer-open">
-            <input id="drawer-toggle" type="checkbox" className="drawer-toggle" />
+            <input
+              id="drawer-toggle"
+              type="checkbox"
+              className="drawer-toggle"
+            />
             <div className="drawer-content flex flex-col">
               <Navbar />
               <EmbedContextProvider>
-                <PyodideProvider>
-                  <WandboxProvider>{children}</WandboxProvider>
-                </PyodideProvider>
+                <RuntimeProvider>{children}</RuntimeProvider>
               </EmbedContextProvider>
             </div>
             <div className="drawer-side shadow-md z-50">

@@ -1,7 +1,24 @@
 import Prism from "prismjs";
 import chalk from "chalk";
+import { RuntimeLang } from "./runtime";
 // Python言語定義をインポート
 import "prismjs/components/prism-python";
+
+type PrismLang = "python";
+
+function getPrismLanguage(language: RuntimeLang): PrismLang {
+  switch (language) {
+    case "python":
+      return "python";
+    case "cpp":
+      throw new Error(
+        `highlight for ${language} is disabled because it should not support REPL`
+      );
+    default:
+      language satisfies never;
+      throw new Error(`Prism language not implemented for: ${language}`);
+  }
+}
 
 const nothing = (text: string): string => text;
 
@@ -50,12 +67,15 @@ const prismToAnsi: Record<string, (text: string) => string> = {
  * @param {string} code ハイライト対象のPythonコード
  * @returns {string} ANSIで色付けされた文字列
  */
-export function highlightCodeToAnsi(code: string, language: string): string {
+export function highlightCodeToAnsi(
+  code: string,
+  language: RuntimeLang
+): string {
   // Prismでハイライト処理を行い、HTML文字列を取得
   const highlightedHtml = Prism.highlight(
     code,
-    Prism.languages[language],
-    language
+    Prism.languages[getPrismLanguage(language)],
+    getPrismLanguage(language)
   );
 
   // 一時的なDOM要素を作成してパース

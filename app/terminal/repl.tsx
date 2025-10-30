@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { highlightCodeToAnsi } from "./highlight";
 import chalk from "chalk";
-import { MutexInterface } from "async-mutex";
 import {
   clearTerminal,
   getRows,
@@ -14,6 +13,7 @@ import {
 } from "./terminal";
 import { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
+import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 
 export interface ReplOutput {
   type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
@@ -59,50 +59,39 @@ export function writeOutput(
 
 interface ReplComponentProps {
   terminalId: string;
-  initRuntime: () => void;
-  runtimeInitializing: boolean;
-  runtimeReady: boolean;
-  initMessage?: string; // ターミナル初期化時のメッセージ
-  initCommand?: ReplCommand[]; // 初期化時に実行するコマンドとその出力
-  prompt: string; // プロンプト文字列
-  promptMore?: string;
-  language?: string;
-  tabSize: number;
-  // コードブロックの実行全体を mutex.runExclusive() で囲うことで同時実行を防ぐ
-  mutex: MutexInterface;
-  // コマンド実行時のコールバック関数
-  sendCommand: (command: string) => Promise<ReplOutput[]>;
-  // 構文チェックのコールバック関数
-  // incompleteの場合は次の行に続くことを示す
-  checkSyntax?: (code: string) => Promise<SyntaxStatus>;
-  interrupt?: () => void;
+  language: RuntimeLang;
+  initContent?: string; // markdownで書かれている内容 (初期化時に実行するコマンドを含む文字列)
 }
-export function ReplTerminal(props: ReplComponentProps) {
-  const inputBuffer = useRef<string[]>([]);
-  const initDone = useRef<boolean>(false);
-
-  const sectionContext = useEmbedContext();
-  const addReplOutput = sectionContext?.addReplOutput;
+export function ReplTerminal({
+  terminalId,
+  language,
+  initContent,
+}: ReplComponentProps) {
+  const { addReplOutput } = useEmbedContext();
 
   const {
-    terminalId,
-    initRuntime,
-    runtimeInitializing,
-    runtimeReady,
-    prompt,
-    promptMore,
-    language,
-    tabSize,
-    sendCommand,
+    ready: runtimeReady,
+    mutex: runtimeMutex = emptyMutex,
+    interrupt: runtimeInterrupt,
+    runCommand,
     checkSyntax,
-    mutex,
-    interrupt,
-  } = props;
+    splitReplExamples,
+  } = useRuntime(language);
+  const { tabSize, prompt, promptMore } = langConstants(language);
+  if (!prompt) {
+    console.warn(`prompt not defined for language: ${language}`);
+  }
+
+  if (!runCommand) {
+    throw new Error(`runCommand not available for language: ${language}`);
+  }
+
+  const initCommand = splitReplExamples?.(initContent || "");
 
   const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
     getRows: (cols: number) => {
       let rows = 0;
-      for (const cmd of props.initCommand || []) {
+      for (const cmd of initCommand || []) {
         // コマンドの行数をカウント
         for (const line of cmd.command.split("\n")) {
           rows += getRows(prompt + line, cols);
@@ -115,20 +104,22 @@ export function ReplTerminal(props: ReplComponentProps) {
       return rows + 2; // 最後のプロンプト行を含める
     },
     onReady: () => {
-      initDone.current = false;
-      if (props.initCommand) {
-        for (const cmd of props.initCommand) {
+      if (initCommand) {
+        for (const cmd of initCommand) {
           updateBuffer(() => cmd.command.split("\n"));
           terminalInstanceRef.current!.writeln("");
           inputBuffer.current = [];
-          onOutput(cmd.output);
+          handleOutput(cmd.output);
         }
       }
       terminalInstanceRef.current!.scrollToTop();
     },
   });
 
-  // bufferを更新し、画面に描画する
+  // REPLのユーザー入力
+  const inputBuffer = useRef<string[]>([]);
+
+  // inputBufferを更新し、画面に描画する
   const updateBuffer = useCallback(
     (newBuffer: () => string[]) => {
       if (terminalInstanceRef.current) {
@@ -146,7 +137,7 @@ export function ReplTerminal(props: ReplComponentProps) {
         inputBuffer.current = newBuffer();
         for (let i = 0; i < inputBuffer.current.length; i++) {
           terminalInstanceRef.current.write(
-            i === 0 ? prompt : promptMore || prompt
+            (i === 0 ? prompt : (promptMore ?? prompt)) ?? "> "
           );
           if (language) {
             terminalInstanceRef.current.write(
@@ -165,8 +156,8 @@ export function ReplTerminal(props: ReplComponentProps) {
     [prompt, promptMore, language, terminalInstanceRef]
   );
 
-  // ランタイムからの出力を処理し、bufferをリセット
-  const onOutput = useCallback(
+  // ランタイムからのoutputを描画し、inputBufferをリセット
+  const handleOutput = useCallback(
     (outputs: ReplOutput[]) => {
       if (terminalInstanceRef.current) {
         writeOutput(terminalInstanceRef.current, outputs, true);
@@ -176,57 +167,6 @@ export function ReplTerminal(props: ReplComponentProps) {
     },
     [updateBuffer, terminalInstanceRef]
   );
-
-  useEffect(() => {
-    if (
-      terminalInstanceRef.current &&
-      termReady &&
-      runtimeReady &&
-      !initDone.current
-    ) {
-      initDone.current = true;
-      if (props.initMessage) {
-        clearTerminal(terminalInstanceRef.current);
-        terminalInstanceRef.current.writeln(props.initMessage);
-      }
-      (async () => {
-        if (props.initCommand) {
-          // 初期化時に実行するコマンドがある場合はそれを実行
-          const initCommandResult: ReplCommand[] = [];
-          await mutex.runExclusive(async () => {
-            for (const cmd of props.initCommand!) {
-              const outputs = await sendCommand(cmd.command);
-              initCommandResult.push({
-                command: cmd.command,
-                output: outputs,
-              });
-            }
-          });
-          // 実際の実行結果でターミナルを再描画
-          clearTerminal(terminalInstanceRef.current!);
-          for (const cmd of initCommandResult) {
-            updateBuffer(() => cmd.command.split("\n"));
-            terminalInstanceRef.current!.writeln("");
-            inputBuffer.current = [];
-            onOutput(cmd.output);
-          }
-        }
-        updateBuffer(() => [""]);
-        // なぜかそのままscrollToTop()を呼ぶとスクロールせず、setTimeoutを入れるとscrollする(治安bad)
-        setTimeout(() => terminalInstanceRef.current!.scrollToTop());
-      })();
-    }
-  }, [
-    runtimeReady,
-    termReady,
-    props.initMessage,
-    updateBuffer,
-    onOutput,
-    props.initCommand,
-    sendCommand,
-    mutex,
-    terminalInstanceRef,
-  ]);
 
   const keyHandler = useCallback(
     async (key: string) => {
@@ -238,8 +178,8 @@ export function ReplTerminal(props: ReplComponentProps) {
           // inputBufferは必ず1行以上ある状態にする
           if (code === 3) {
             // Ctrl+C
-            if (interrupt) {
-              interrupt();
+            if (runtimeInterrupt) {
+              runtimeInterrupt();
               terminalInstanceRef.current.write("^C");
             }
           } else if (code === 13) {
@@ -262,10 +202,10 @@ export function ReplTerminal(props: ReplComponentProps) {
               terminalInstanceRef.current.writeln("");
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
-              const outputs = await mutex.runExclusive(() =>
-                sendCommand(command)
+              const outputs = await runtimeMutex.runExclusive(() =>
+                runCommand(command)
               );
-              onOutput(outputs);
+              handleOutput(outputs);
               addReplOutput?.(terminalId, command, outputs);
             }
           } else if (code === 127) {
@@ -303,16 +243,16 @@ export function ReplTerminal(props: ReplComponentProps) {
       }
     },
     [
-      terminalId,
-      updateBuffer,
-      sendCommand,
-      onOutput,
+      runtimeInterrupt,
       checkSyntax,
+      updateBuffer,
+      runtimeMutex,
+      runCommand,
+      handleOutput,
       tabSize,
-      mutex,
-      terminalInstanceRef,
       addReplOutput,
-      interrupt,
+      terminalId,
+      terminalInstanceRef,
     ]
   );
   useEffect(() => {
@@ -327,26 +267,81 @@ export function ReplTerminal(props: ReplComponentProps) {
     }
   }, [keyHandler, termReady, runtimeReady, terminalInstanceRef]);
 
+  // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)
+  const [initCommandState, setInitCommandState] = useState<
+    "idle" | "triggered" | "executing" | "done"
+  >("idle");
+  useEffect(() => {
+    if (
+      terminalInstanceRef.current &&
+      termReady &&
+      runtimeReady &&
+      initCommandState === "triggered"
+    ) {
+      setInitCommandState("executing");
+      (async () => {
+        if (initCommand) {
+          // 初期化時に実行するコマンドがある場合はそれを実行
+          const initCommandResult: ReplCommand[] = [];
+          await runtimeMutex.runExclusive(async () => {
+            for (const cmd of initCommand!) {
+              const outputs = await runCommand(cmd.command);
+              initCommandResult.push({
+                command: cmd.command,
+                output: outputs,
+              });
+            }
+          });
+          // 実際の実行結果でターミナルを再描画
+          clearTerminal(terminalInstanceRef.current!);
+          for (const cmd of initCommandResult) {
+            updateBuffer(() => cmd.command.split("\n"));
+            terminalInstanceRef.current!.writeln("");
+            inputBuffer.current = [];
+            handleOutput(cmd.output);
+          }
+        }
+        updateBuffer(() => [""]);
+        // なぜかそのままscrollToTop()を呼ぶとスクロールせず、setTimeoutを入れるとscrollする(治安bad)
+        setTimeout(() => terminalInstanceRef.current!.scrollToTop());
+        setInitCommandState("done");
+      })();
+    }
+  }, [
+    initCommandState,
+    runtimeReady,
+    initCommand,
+    runCommand,
+    runtimeMutex,
+    updateBuffer,
+    handleOutput,
+    termReady,
+    terminalInstanceRef,
+  ]);
+
   return (
     <div className={"relative h-max"}>
-      {!runtimeInitializing && !runtimeReady && (
-        <div
-          className="absolute z-10 inset-0 cursor-pointer"
-          onClick={() => {
-            if (terminalInstanceRef.current && termReady) {
-              initRuntime();
-              hideCursor(terminalInstanceRef.current);
-              terminalInstanceRef.current.write(
-                systemMessageColor(
-                  "(初期化しています...しばらくお待ちください)"
-                )
-              );
-              terminalInstanceRef.current.focus();
-            }
-          }}
-        />
-      )}
-      {runtimeInitializing && (
+      {terminalInstanceRef.current &&
+        termReady &&
+        initCommandState === "idle" && (
+          <div
+            className="absolute z-10 inset-0 cursor-pointer"
+            onClick={() => {
+              if (!runtimeReady) {
+                hideCursor(terminalInstanceRef.current!);
+                terminalInstanceRef.current!.write(
+                  systemMessageColor(
+                    "(初期化しています...しばらくお待ちください)"
+                  )
+                );
+                terminalInstanceRef.current!.focus();
+              }
+              setInitCommandState("triggered");
+            }}
+          />
+        )}
+      {(initCommandState === "triggered" ||
+        initCommandState === "executing") && (
         <div className="absolute z-10 inset-0 cursor-wait" />
       )}
       <div ref={terminalRef} />

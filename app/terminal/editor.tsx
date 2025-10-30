@@ -24,14 +24,37 @@ import { useEffect } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
 import { useEmbedContext } from "./embedContext";
+import { langConstants } from "./runtime";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
 export type AceLang = "python" | "c_cpp" | "json" | "csv" | "text";
+export function getAceLang(lang: string | undefined): AceLang {
+  // Markdownで指定される可能性のある言語名からAceLangを取得
+  switch (lang) {
+    case "python":
+    case "py":
+      return "python";
+    case "cpp":
+    case "c++":
+      return "c_cpp";
+    case "json":
+      return "json";
+    case "csv":
+      return "csv";
+    case "text":
+    case "txt":
+      return "text";
+    default:
+      console.warn(
+        `Unsupported language for ace editor: ${lang}, fallback to text mode.`
+      );
+      return "text";
+  }
+}
 
 interface EditorProps {
   language?: AceLang;
-  tabSize: number;
   filename: string;
   initContent: string;
   readonly?: boolean;
@@ -88,7 +111,7 @@ export function EditorComponent(props: EditorProps) {
         name={`ace-editor-${props.filename}`}
         mode={props.language}
         theme={theme}
-        tabSize={props.tabSize}
+        tabSize={langConstants(props.language || "text").tabSize}
         width="100%"
         height={
           Math.max((props.initContent.split("\n").length + 2) * 14, 128) + "px"

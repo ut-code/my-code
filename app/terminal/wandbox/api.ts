@@ -80,6 +80,12 @@ export const compilerInfoFetcher: Fetcher<CompilerInfo[]> = () =>
     (res) => res.json() as Promise<CompilerInfo[]>
   );
 
+export interface SelectedCompiler {
+  compilerName: string;
+  compilerOptions: string[];
+  compilerOptionsRaw: string[];
+  getCommandlineStr: (filenames: string[]) => string; // 表示用
+};
 interface CompileProps {
   compilerName: string;
   compilerOptions: string[];

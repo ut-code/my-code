@@ -1,58 +1,9 @@
 import { ReplOutput } from "../repl";
-import { compileAndRun, CompilerInfo } from "./api";
+import { compileAndRun, CompilerInfo, SelectedCompiler } from "./api";
 
-const CPP_STACKTRACE_HANDLER = `
-#define BOOST_STACKTRACE_USE_ADDR2LINE
-#include <boost/stacktrace.hpp>
-#include <iostream>
-#include <signal.h>
-void signal_handler(int signum) {
-    signal(signum, SIG_DFL);
-    switch(signum) {
-    case SIGILL:
-        std::cerr << "Illegal instruction" << std::endl;
-        break;
-    case SIGABRT:
-        std::cerr << "Aborted" << std::endl;
-        break;
-    case SIGBUS:
-        std::cerr << "Bus error" << std::endl;
-        break;
-    case SIGFPE:
-        std::cerr << "Floating point exception" << std::endl;
-        break;
-    case SIGSEGV:
-        std::cerr << "Segmentation fault" << std::endl;
-        break;
-    default:
-        std::cerr << "Signal " << signum << " received" << std::endl;
-        break;
-    }
-    std::cerr << "Stack trace:" << std::endl;
-    std::cerr << boost::stacktrace::stacktrace();
-    raise(signum);
-}
-struct _init_signal_handler {
-    _init_signal_handler() {
-        signal(SIGILL, signal_handler);
-        signal(SIGABRT, signal_handler);
-        signal(SIGBUS, signal_handler);
-        signal(SIGFPE, signal_handler);
-        signal(SIGSEGV, signal_handler);
-    }
-} _init_signal_handler_instance;
-`;
-
-interface CppOptions {
-  compilerName: string;
-  compilerOptions: string[];
-  compilerOptionsRaw: string[];
-  commandline: string[]; // 表示用
-}
-
-// 使用可能なコンパイラーの情報からコンパイルオプションを決定する
-// コマンドライン文字列表示用と実行時用で処理を共通化するため
-function cppOptions(compilerList: CompilerInfo[]): CppOptions {
+export function selectCppCompiler(
+  compilerList: CompilerInfo[]
+): SelectedCompiler {
   const compilerListForLang = compilerList.filter((c) => c.language === "C++");
   // headでない最初のgccを使う
   const selectedCompiler = compilerListForLang.find(
@@ -62,12 +13,13 @@ function cppOptions(compilerList: CompilerInfo[]): CppOptions {
     throw new Error("compiler not found");
   }
 
-  const options: CppOptions = {
+  const options: SelectedCompiler = {
     compilerName: selectedCompiler.name,
     compilerOptions: [],
-    commandline: ["g++"], // selectedCompiler["display-compile-command"]
     compilerOptionsRaw: [],
+    getCommandlineStr: () => "",
   };
+  const commandline: string[] = ["g++"]; // selectedCompiler["display-compile-command"]
 
   // singleオプション:
   const warningSwitch = selectedCompiler.switches.find(
@@ -75,7 +27,7 @@ function cppOptions(compilerList: CompilerInfo[]): CppOptions {
   );
   if (warningSwitch && warningSwitch.type === "single") {
     options.compilerOptions.push("warning");
-    options.commandline.push(warningSwitch["display-flags"]);
+    commandline.push(warningSwitch["display-flags"]);
   } else {
     console.warn("warning switch not found");
   }
@@ -103,7 +55,7 @@ function cppOptions(compilerList: CompilerInfo[]): CppOptions {
         .reverse()[0];
       if (stdLatestOption) {
         options.compilerOptions.push(stdLatestOption.name);
-        options.commandline.push(stdLatestOption["display-flags"]);
+        commandline.push(stdLatestOption["display-flags"]);
       } else {
         console.warn("std option not found");
       }
@@ -112,35 +64,26 @@ function cppOptions(compilerList: CompilerInfo[]): CppOptions {
         (o) => o.name === switchSelect.default
       );
       options.compilerOptions.push(switchSelect.default);
-      options.commandline.push(defaultOption!["display-flags"]);
+      commandline.push(defaultOption!["display-flags"]);
     }
   }
 
   // その他オプション
   options.compilerOptionsRaw.push("-g");
-  // options.commandline.push("-g");
+  // commandline.push("-g");
+
+  options.getCommandlineStr = (filenames: string[]) => {
+    return [...commandline, ...filenames, "&&", "./a.out"].join(" ");
+  };
 
   return options;
 }
 
-export function getCppCommandlineStr(
-  compilerList: CompilerInfo[],
-  filenames: string[]
-) {
-  return [
-    ...cppOptions(compilerList).commandline,
-    ...filenames,
-    "&&",
-    "./a.out",
-  ].join(" ");
-}
-
 export async function cppRunFiles(
-  compilerList: CompilerInfo[],
+  options: SelectedCompiler,
   files: Record<string, string | undefined>,
   filenames: string[]
-) {
-  const options = cppOptions(compilerList);
+): Promise<ReplOutput[]> {
   const result = await compileAndRun({
     compilerName: options.compilerName,
     compilerOptions: options.compilerOptions,
@@ -195,3 +138,45 @@ export async function cppRunFiles(
 
   return outputs;
 }
+
+const CPP_STACKTRACE_HANDLER = `
+#define BOOST_STACKTRACE_USE_ADDR2LINE
+#include <boost/stacktrace.hpp>
+#include <iostream>
+#include <signal.h>
+void signal_handler(int signum) {
+    signal(signum, SIG_DFL);
+    switch(signum) {
+    case SIGILL:
+        std::cerr << "Illegal instruction" << std::endl;
+        break;
+    case SIGABRT:
+        std::cerr << "Aborted" << std::endl;
+        break;
+    case SIGBUS:
+        std::cerr << "Bus error" << std::endl;
+        break;
+    case SIGFPE:
+        std::cerr << "Floating point exception" << std::endl;
+        break;
+    case SIGSEGV:
+        std::cerr << "Segmentation fault" << std::endl;
+        break;
+    default:
+        std::cerr << "Signal " << signum << " received" << std::endl;
+        break;
+    }
+    std::cerr << "Stack trace:" << std::endl;
+    std::cerr << boost::stacktrace::stacktrace();
+    raise(signum);
+}
+struct _init_signal_handler {
+    _init_signal_handler() {
+        signal(SIGILL, signal_handler);
+        signal(SIGABRT, signal_handler);
+        signal(SIGBUS, signal_handler);
+        signal(SIGFPE, signal_handler);
+        signal(SIGSEGV, signal_handler);
+    }
+} _init_signal_handler_instance;
+`;

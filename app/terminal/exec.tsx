@@ -1,6 +1,5 @@
 "use client";
 
-import { usePyodide } from "./python/pyodide";
 import {
   clearTerminal,
   getRows,
@@ -8,12 +7,10 @@ import {
   systemMessageColor,
   useTerminal,
 } from "./terminal";
-import { useWandbox } from "./wandbox/wandbox";
-import { ReplOutput, writeOutput } from "./repl";
-import { useState } from "react";
+import { writeOutput } from "./repl";
+import { useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
-
-export type ExecLang = "python" | "cpp";
+import { RuntimeLang, useRuntime } from "./runtime";
 
 interface ExecProps {
   /*
@@ -21,7 +18,7 @@ interface ExecProps {
    * C++の場合はソースコード(.cpp)を全部指定する。
    */
   filenames: string[];
-  language: ExecLang;
+  language: RuntimeLang;
   content: string;
 }
 export function ExecFile(props: ExecProps) {
@@ -34,82 +31,65 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const sectionContext = useEmbedContext();
+  const { setExecResult } = useEmbedContext();
 
-  const pyodide = usePyodide();
-  const wandbox = useWandbox();
+  const { ready, runFiles, getCommandlineStr } = useRuntime(props.language);
 
-  // 表示するコマンドライン文字列
-  let commandline: string;
-  // trueの間 (初期化しています...) と表示される
-  let runtimeInitializing: boolean;
-  // 初期化処理が必要な場合の関数
-  let beforeExec: (() => Promise<void>) | null = null;
-  // 実行中です... と表示される
-  const [isExecuting, setIsExecuting] = useState<boolean>(false);
-  // 実際に実行する関数
-  let exec: (() => Promise<ReplOutput[]>) | null = null;
-  switch (props.language) {
-    case "python":
-      if (props.filenames.length !== 1) {
-        throw new Error("Pythonの実行にはファイル名が1つ必要です");
-      }
-      commandline = `python ${props.filenames[0]}`;
-      runtimeInitializing = pyodide.initializing;
-      beforeExec = pyodide.ready ? null : pyodide.init;
-      exec = () => pyodide.runFile(props.filenames[0]);
-      break;
-    case "cpp":
-      if (!props.filenames || props.filenames.length === 0) {
-        throw new Error("C++の実行には filenames プロパティが必要です");
-      }
-      commandline = wandbox.getCommandlineStr("C++", props.filenames);
-      runtimeInitializing = false;
-      exec = () => wandbox.runFiles("C++", props.filenames);
-      break;
-    default:
-      props.language satisfies never;
-      commandline = `エラー: 非対応の言語 ${props.language}`;
-      runtimeInitializing = false;
-      break;
-  }
-
-  const onClick = async () => {
-    if (exec) {
-      if (beforeExec) {
+  // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)
+  const [executionState, setExecutionState] = useState<
+    "idle" | "triggered" | "executing"
+  >("idle");
+  useEffect(() => {
+    if (executionState === "triggered" && ready) {
+      setExecutionState("executing");
+      (async () => {
         clearTerminal(terminalInstanceRef.current!);
-        terminalInstanceRef.current!.write(
-          systemMessageColor("(初期化しています...しばらくお待ちください)")
-        );
-        await beforeExec();
-      }
-      clearTerminal(terminalInstanceRef.current!);
-      terminalInstanceRef.current!.write(systemMessageColor("実行中です..."));
-      setIsExecuting(true);
-      const outputs = await exec();
-      setIsExecuting(false);
-      clearTerminal(terminalInstanceRef.current!);
-      writeOutput(terminalInstanceRef.current!, outputs, false);
-      // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
-      sectionContext?.setExecResult(props.filenames.join(","), outputs);
+        terminalInstanceRef.current!.write(systemMessageColor("実行中です..."));
+        const outputs = await runFiles(props.filenames);
+        clearTerminal(terminalInstanceRef.current!);
+        writeOutput(terminalInstanceRef.current!, outputs, false);
+        // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
+        setExecResult(props.filenames.join(","), outputs);
+        setExecutionState("idle");
+      })();
     }
-  };
+  }, [
+    executionState,
+    ready,
+    props.filenames,
+    runFiles,
+    setExecResult,
+    terminalInstanceRef,
+  ]);
+
   return (
     <div className="relative">
       <div>
         <button
           className="btn btn-soft btn-primary rounded-tl-lg rounded-none"
-          onClick={onClick}
-          disabled={!termReady || runtimeInitializing}
+          onClick={() => {
+            if (!ready) {
+              clearTerminal(terminalInstanceRef.current!);
+              terminalInstanceRef.current!.write(
+                systemMessageColor(
+                  "(初期化しています...しばらくお待ちください)"
+                )
+              );
+            }
+            setExecutionState("triggered");
+          }}
+          disabled={!termReady || executionState !== "idle"}
         >
           ▶ 実行
         </button>
-        <code className="text-sm ml-4">{commandline}</code>
+        <code className="text-sm ml-4">
+          {getCommandlineStr(props.filenames)}
+        </code>
       </div>
       <div className="bg-base-300 p-4 pt-2 rounded-b-lg">
         <div ref={terminalRef} />
       </div>
-      {(runtimeInitializing || isExecuting) && (
+      {executionState !== "idle" && (
         <div className="absolute z-10 inset-0 cursor-wait" />
       )}
     </div>
