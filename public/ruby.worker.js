@@ -109,15 +109,37 @@ function flushOutput() {
     }
     stderrBuffer = lines[lines.length - 1];
   }
-  // Final flush if there's remaining text
-  if (stdoutBuffer) {
+  // Final flush if there's remaining non-empty text
+  if (stdoutBuffer && stdoutBuffer.trim()) {
     rubyOutput.push({ type: 'stdout', message: stdoutBuffer });
-    stdoutBuffer = "";
   }
-  if (stderrBuffer) {
+  stdoutBuffer = "";
+  
+  if (stderrBuffer && stderrBuffer.trim()) {
     rubyOutput.push({ type: 'stderr', message: stderrBuffer });
-    stderrBuffer = "";
   }
+  stderrBuffer = "";
+}
+
+function formatRubyError(error) {
+  if (!(error instanceof Error)) {
+    return `予期せぬエラー: ${String(error).trim()}`;
+  }
+  
+  let errorMessage = error.message;
+  
+  // Clean up Ruby error messages by filtering out internal eval lines
+  if (errorMessage.includes('Traceback') || errorMessage.includes('Error')) {
+    const lines = errorMessage.split('\n');
+    // Keep lines that either don't contain (eval), or contain Error, or have line numbers
+    errorMessage = lines.filter(line => 
+      !line.includes('(eval)') || 
+      line.includes('Error') || 
+      line.match(/:\d+:/)
+    ).join('\n').trim();
+  }
+  
+  return errorMessage;
 }
 
 async function runRuby(id, payload) {
@@ -151,30 +173,10 @@ async function runRuby(id, payload) {
     console.log(e);
     flushOutput();
     
-    if (e instanceof Error) {
-      let errorMessage = e.message;
-      
-      // Clean up Ruby error messages
-      if (errorMessage.includes('Traceback') || errorMessage.includes('Error')) {
-        const lines = errorMessage.split('\n');
-        // Filter out internal lines
-        errorMessage = lines.filter(line => 
-          !line.includes('(eval)') || 
-          line.includes('Error') || 
-          line.match(/:\d+:/)
-        ).join('\n').trim();
-      }
-      
-      rubyOutput.push({
-        type: 'error',
-        message: errorMessage
-      });
-    } else {
-      rubyOutput.push({
-        type: 'error',
-        message: `予期せぬエラー: ${String(e).trim()}`
-      });
-    }
+    rubyOutput.push({
+      type: 'error',
+      message: formatRubyError(e)
+    });
   }
   
   const updatedFiles = readAllFiles();
@@ -222,28 +224,10 @@ async function runFile(id, payload) {
     console.log(e);
     flushOutput();
     
-    if (e instanceof Error) {
-      let errorMessage = e.message;
-      
-      if (errorMessage.includes('Traceback') || errorMessage.includes('Error')) {
-        const lines = errorMessage.split('\n');
-        errorMessage = lines.filter(line => 
-          !line.includes('(eval)') || 
-          line.includes('Error') || 
-          line.match(/:\d+:/)
-        ).join('\n').trim();
-      }
-      
-      rubyOutput.push({
-        type: 'error',
-        message: errorMessage
-      });
-    } else {
-      rubyOutput.push({
-        type: 'error',
-        message: `予期せぬエラー: ${String(e).trim()}`
-      });
-    }
+    rubyOutput.push({
+      type: 'error',
+      message: formatRubyError(e)
+    });
   }
   
   const updatedFiles = readAllFiles();

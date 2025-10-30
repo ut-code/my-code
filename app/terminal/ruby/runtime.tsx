@@ -63,7 +63,6 @@ export function RubyProvider({ children }: { children: ReactNode }) {
     Map<number, [(payload: any) => void, (error: string) => void]>
   >(new Map());
   const nextMessageId = useRef<number>(0);
-  const interruptBuffer = useRef<Uint8Array | null>(null);
 
   function postMessage<T>({ type, payload }: MessageToWorker) {
     const id = nextMessageId.current++;
@@ -109,9 +108,9 @@ export function RubyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const interrupt = useCallback(() => {
-    if (interruptBuffer.current) {
-      interruptBuffer.current[0] = 2;
-    }
+    // TODO: Implement interrupt functionality for Ruby
+    // Ruby WASM doesn't currently support interrupts like Pyodide does
+    console.warn("Ruby interrupt is not yet implemented");
   }, []);
 
   const runCommand = useCallback(
@@ -121,10 +120,6 @@ export function RubyProvider({ children }: { children: ReactNode }) {
       }
       if (!workerRef.current || !ready) {
         return [{ type: "error", message: "Ruby VM is not ready yet." }];
-      }
-
-      if (interruptBuffer.current) {
-        interruptBuffer.current[0] = 0;
       }
 
       const { output, updatedFiles } = await postMessage<RunPayloadFromWorker>({
@@ -165,9 +160,6 @@ export function RubyProvider({ children }: { children: ReactNode }) {
       }
       if (!workerRef.current || !ready) {
         return [{ type: "error", message: "Ruby VM is not ready yet." }];
-      }
-      if (interruptBuffer.current) {
-        interruptBuffer.current[0] = 0;
       }
       return mutex.current.runExclusive(async () => {
         const { output, updatedFiles } =
