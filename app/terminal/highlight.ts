@@ -3,13 +3,17 @@ import chalk from "chalk";
 import { RuntimeLang } from "./runtime";
 // Python言語定義をインポート
 import "prismjs/components/prism-python";
+// Ruby言語定義をインポート
+import "prismjs/components/prism-ruby";
 
-type PrismLang = "python";
+type PrismLang = "python" | "ruby";
 
 function getPrismLanguage(language: RuntimeLang): PrismLang {
   switch (language) {
     case "python":
       return "python";
+    case "ruby":
+      return "ruby";
     case "cpp":
       throw new Error(
         `highlight for ${language} is disabled because it should not support REPL`

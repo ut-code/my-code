@@ -1,6 +1,7 @@
 import { MutexInterface } from "async-mutex";
 import { ReplOutput, SyntaxStatus, ReplCommand } from "./repl";
 import { PyodideProvider, usePyodide } from "./python/runtime";
+import { RubyProvider, useRuby } from "./ruby/runtime";
 import { useWandbox, WandboxProvider } from "./wandbox/runtime";
 import { AceLang } from "./editor";
 import { ReactNode } from "react";
@@ -28,7 +29,7 @@ export interface LangConstants {
   prompt?: string;
   promptMore?: string;
 }
-export type RuntimeLang = "python" | "cpp";
+export type RuntimeLang = "python" | "ruby" | "cpp";
 
 export function getRuntimeLang(
   lang: string | undefined
@@ -38,6 +39,9 @@ export function getRuntimeLang(
     case "python":
     case "py":
       return "python";
+    case "ruby":
+    case "rb":
+      return "ruby";
     case "cpp":
     case "c++":
       return "cpp";
@@ -49,11 +53,14 @@ export function getRuntimeLang(
 export function useRuntime(language: RuntimeLang): RuntimeContext {
   // すべての言語のcontextをインスタンス化
   const pyodide = usePyodide();
+  const ruby = useRuby();
   const wandboxCpp = useWandbox("cpp");
 
   switch (language) {
     case "python":
       return pyodide;
+    case "ruby":
+      return ruby;
     case "cpp":
       return wandboxCpp;
     default:
@@ -64,7 +71,9 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
 export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (
     <PyodideProvider>
-      <WandboxProvider>{children}</WandboxProvider>
+      <RubyProvider>
+        <WandboxProvider>{children}</WandboxProvider>
+      </RubyProvider>
     </PyodideProvider>
   );
 }
@@ -76,6 +85,12 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
         tabSize: 4,
         prompt: ">>> ",
         promptMore: "... ",
+      };
+    case "ruby":
+      return {
+        tabSize: 2,
+        prompt: ">> ",
+        promptMore: "?> ",
       };
     case "c_cpp":
     case "cpp":
