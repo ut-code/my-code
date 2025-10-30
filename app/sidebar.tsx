@@ -83,7 +83,7 @@ export function Sidebar() {
 
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
   const currentSectionIndex = sidebarMdContent.findIndex(
-    (section) => section.inView
+    (section, i) => i >= 1 && section.inView
   );
 
   // 目次の開閉状態

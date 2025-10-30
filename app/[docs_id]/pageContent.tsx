@@ -21,7 +21,7 @@ interface PageContentProps {
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
-  
+
   // SSR用のローカルstate
   const [dynamicMdContent, setDynamicMdContent] = useState<
     DynamicMarkdownSection[]
@@ -52,18 +52,22 @@ export function PageContent(props: PageContentProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      const updateContent = (prevDynamicMdContent: DynamicMarkdownSection[]) => {
+      const updateContent = (
+        prevDynamicMdContent: DynamicMarkdownSection[]
+      ) => {
         const dynMdContent = prevDynamicMdContent.slice(); // Reactの変更検知のために新しい配列を作成
         for (let i = 0; i < sectionRefs.current.length; i++) {
           if (sectionRefs.current.at(i) && dynMdContent.at(i)) {
             const rect = sectionRefs.current.at(i)!.getBoundingClientRect();
+            console.log(i, rect);
             dynMdContent.at(i)!.inView =
-              rect.top < window.innerHeight && rect.bottom >= 0;
+              rect.top < window.innerHeight * 0.9 &&
+              rect.bottom >= window.innerHeight * 0.1;
           }
         }
         return dynMdContent;
       };
-      
+
       // ローカルstateとcontextの両方を更新
       setDynamicMdContent(updateContent);
       setSidebarMdContent(props.docs_id, updateContent);
@@ -102,8 +106,9 @@ export function PageContent(props: PageContentProps) {
           </div>
           <div key={`${index}-chat`}>
             {/* 右側に表示するチャット履歴欄 */}
-            {chatHistories.filter((c) => c.sectionId === section.sectionId).map(
-              ({chatId, messages}) => (
+            {chatHistories
+              .filter((c) => c.sectionId === section.sectionId)
+              .map(({ chatId, messages }) => (
                 <div
                   key={chatId}
                   className="max-w-xs mb-2 p-2 text-sm border border-base-content/10 rounded-sm shadow-sm bg-base-100"
@@ -131,8 +136,7 @@ export function PageContent(props: PageContentProps) {
                     ))}
                   </div>
                 </div>
-              )
-            )}
+              ))}
           </div>
         </>
       ))}
