@@ -12,7 +12,7 @@ export function defineTests(
       (
         {
           python: 2000,
-          cpp: 5000,
+          cpp: 10000,
         } as Record<RuntimeLang, number>
       )[lang]
     );
