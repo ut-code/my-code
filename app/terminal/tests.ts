@@ -13,6 +13,7 @@ export function defineTests(
         {
           python: 2000,
           cpp: 10000,
+          javascript: 2000,
         } as Record<RuntimeLang, number>
       )[lang]
     );
@@ -31,6 +32,7 @@ export function defineTests(
           {
             python: `print("${msg}")`,
             cpp: null,
+            javascript: `console.log("${msg}")`,
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
         if (!printCode) {
@@ -55,6 +57,7 @@ export function defineTests(
           {
             python: [`${varName} = ${value}`, `print(${varName})`],
             cpp: [null, null],
+            javascript: [`var ${varName} = ${value}`, `console.log(${varName})`],
           } satisfies Record<RuntimeLang, string[] | null[]>
         )[lang];
         if (!setIntVarCode || !printIntVarCode) {
@@ -81,6 +84,7 @@ export function defineTests(
           {
             python: `raise Exception("${errorMsg}")`,
             cpp: null,
+            javascript: `throw new Error("${errorMsg}")`,
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
         if (!errorCode) {
@@ -100,6 +104,7 @@ export function defineTests(
           {
             python: [`testVar = 42`, `while True:\n    pass`, `print(testVar)`],
             cpp: [null, null, null],
+            javascript: [`var testVar = 42`, `while(true) {}`, `console.log(testVar)`],
           } satisfies Record<RuntimeLang, (string | null)[]>
         )[lang];
         if (!setIntVarCode || !infLoopCode || !printIntVarCode) {
@@ -136,8 +141,12 @@ export function defineTests(
               "test.cpp",
               `#include <iostream>\nint main() {\n  std::cout << "${msg}" << std::endl;\n  return 0;\n}\n`,
             ],
-          } satisfies Record<RuntimeLang, [string, string]>
+            javascript: [null, null],
+          } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
+        if (!filename || !code) {
+          this.skip();
+        }
         writeFile(filename, code);
         // use setTimeout to wait for writeFile to propagate.
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -160,8 +169,12 @@ export function defineTests(
               "test_error.cpp",
               `#include <stdexcept>\nint main() {\n  throw std::runtime_error("${errorMsg}");\n  return 0;\n}\n`,
             ],
-          } satisfies Record<RuntimeLang, [string, string]>
+            javascript: [null, null],
+          } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
+        if (!filename || !code) {
+          this.skip();
+        }
         writeFile(filename, code);
         await new Promise((resolve) => setTimeout(resolve, 100));
         const result = await runtimeRef.current[lang].runFiles([filename]);
@@ -192,8 +205,12 @@ export function defineTests(
               },
               ["test_multi_main.cpp", "test_multi_sub.cpp"],
             ],
-          } satisfies Record<RuntimeLang, [Record<string, string>, string[]]>
+            javascript: [null, null],
+          } satisfies Record<RuntimeLang, [Record<string, string>, string[]] | [null, null]>
         )[lang];
+        if (!codes || !execFiles) {
+          this.skip();
+        }
         for (const [filename, code] of Object.entries(codes)) {
           writeFile(filename, code);
         }

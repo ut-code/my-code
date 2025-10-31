@@ -12,6 +12,7 @@ const AceEditor = dynamic(
     await import("ace-builds/src-min-noconflict/ext-searchbox");
     await import("ace-builds/src-min-noconflict/mode-python");
     await import("ace-builds/src-min-noconflict/mode-c_cpp");
+    await import("ace-builds/src-min-noconflict/mode-javascript");
     await import("ace-builds/src-min-noconflict/mode-json");
     await import("ace-builds/src-min-noconflict/mode-csv");
     await import("ace-builds/src-min-noconflict/mode-text");
@@ -28,7 +29,7 @@ import { langConstants } from "./runtime";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
-export type AceLang = "python" | "c_cpp" | "json" | "csv" | "text";
+export type AceLang = "python" | "c_cpp" | "javascript" | "json" | "csv" | "text";
 export function getAceLang(lang: string | undefined): AceLang {
   // Markdownで指定される可能性のある言語名からAceLangを取得
   switch (lang) {
@@ -38,6 +39,9 @@ export function getAceLang(lang: string | undefined): AceLang {
     case "cpp":
     case "c++":
       return "c_cpp";
+    case "javascript":
+    case "js":
+      return "javascript";
     case "json":
       return "json";
     case "csv":
