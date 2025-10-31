@@ -12,6 +12,7 @@ export function defineTests(
       (
         {
           python: 2000,
+          ruby: 2000,
           cpp: 10000,
         } as Record<RuntimeLang, number>
       )[lang]
@@ -30,6 +31,7 @@ export function defineTests(
         const printCode = (
           {
             python: `print("${msg}")`,
+            ruby: `puts "${msg}"`,
             cpp: null,
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
@@ -54,6 +56,7 @@ export function defineTests(
         const [setIntVarCode, printIntVarCode] = (
           {
             python: [`${varName} = ${value}`, `print(${varName})`],
+            ruby: [`${varName} = ${value}`, `puts ${varName}`],
             cpp: [null, null],
           } satisfies Record<RuntimeLang, string[] | null[]>
         )[lang];
@@ -80,6 +83,7 @@ export function defineTests(
         const errorCode = (
           {
             python: `raise Exception("${errorMsg}")`,
+            ruby: `raise "${errorMsg}"`,
             cpp: null,
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
@@ -99,6 +103,7 @@ export function defineTests(
         const [setIntVarCode, infLoopCode, printIntVarCode] = (
           {
             python: [`testVar = 42`, `while True:\n    pass`, `print(testVar)`],
+            ruby: [`testVar = 42`, `loop do\nend`, `puts testVar`],
             cpp: [null, null, null],
           } satisfies Record<RuntimeLang, (string | null)[]>
         )[lang];
@@ -132,6 +137,7 @@ export function defineTests(
         const [filename, code] = (
           {
             python: ["test.py", `print("${msg}")`],
+            ruby: ["test.rb", `puts "${msg}"`],
             cpp: [
               "test.cpp",
               `#include <iostream>\nint main() {\n  std::cout << "${msg}" << std::endl;\n  return 0;\n}\n`,
@@ -156,6 +162,7 @@ export function defineTests(
         const [filename, code] = (
           {
             python: ["test_error.py", `raise Exception("${errorMsg}")\n`],
+            ruby: ["test_error.rb", `raise "${errorMsg}"\n`],
             cpp: [
               "test_error.cpp",
               `#include <stdexcept>\nint main() {\n  throw std::runtime_error("${errorMsg}");\n  return 0;\n}\n`,
@@ -182,6 +189,14 @@ export function defineTests(
                 "test_multi_sub.py": `def print_message():\n    print("${msg}")\n`,
               },
               ["test_multi_main.py"],
+            ],
+            ruby: [
+              {
+                "test_multi_main.rb":
+                  "require_relative 'test_multi_sub'\nprint_message\n",
+                "test_multi_sub.rb": `def print_message\n  puts "${msg}"\nend\n`,
+              },
+              ["test_multi_main.rb"],
             ],
             cpp: [
               {
