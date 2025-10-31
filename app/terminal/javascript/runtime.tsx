@@ -122,25 +122,24 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
     // Create a new worker
     initializeWorker();
     
-    // Wait for initialization
+    // Wait for initialization - use a different approach
     await new Promise<void>((resolve) => {
-      const checkReady = () => {
-        if (ready) {
-          resolve();
-        } else {
-          setTimeout(checkReady, 50);
+      const checkInterval = setInterval(() => {
+        if (workerRef.current) {
+          // Try to initialize and restore
+          postMessage<InitPayloadFromWorker>({
+            type: "restoreState",
+          }).then(() => {
+            clearInterval(checkInterval);
+            isInterrupted.current = false;
+            resolve();
+          }).catch(() => {
+            // Keep trying
+          });
         }
-      };
-      checkReady();
+      }, 100);
     });
-    
-    // Restore state by re-executing previous commands
-    await postMessage<InitPayloadFromWorker>({
-      type: "restoreState",
-    });
-    
-    isInterrupted.current = false;
-  }, [initializeWorker, ready]);
+  }, [initializeWorker]);
 
   const runCommand = useCallback(
     async (code: string): Promise<ReplOutput[]> => {
