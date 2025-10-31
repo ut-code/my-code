@@ -3,7 +3,6 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { MarkdownSection, splitMarkdown } from "./splitMarkdown";
-import pyodideLock from "pyodide/pyodide-lock.json";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
 import { getChatFromCache } from "@/lib/chatHistory";
@@ -39,12 +38,6 @@ export default async function Page({
         notFound();
       });
   }
-  mdContent = mdContent.then((text) =>
-    text.replaceAll(
-      "{process.env.PYODIDE_PYTHON_VERSION}",
-      String(pyodideLock.info.python)
-    )
-  );
 
   const splitMdContent: Promise<MarkdownSection[]> = mdContent.then((text) =>
     splitMarkdown(text)

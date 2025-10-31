@@ -1,6 +1,7 @@
 // Pyodide web worker
 let pyodide;
 let pyodideOutput = [];
+const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v0.28.1/full/`;
 
 // Helper function to read all files from the Pyodide file system
 function readAllFiles() {
@@ -19,7 +20,7 @@ function readAllFiles() {
 }
 
 async function init(id, payload) {
-  const { PYODIDE_CDN, interruptBuffer } = payload;
+  const { interruptBuffer } = payload;
   if (!pyodide) {
     importScripts(`${PYODIDE_CDN}pyodide.js`);
     pyodide = await loadPyodide({

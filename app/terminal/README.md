@@ -114,6 +114,12 @@ EditorComponent コンポーネントを提供します。
 
 実行結果はEmbedContextに送信されます。
 
+## page.tsx, tests.ts
+
+ブラウザーで localhost:3000/terminal を開くと、各実行環境のテストを行います。
+
+ランタイムを追加した場合、ここにテストケースを追加してください。
+
 ## 各言語の実装
 
 ### Pyodide (Python)
