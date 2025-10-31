@@ -83,14 +83,14 @@ export default function RuntimeTestPage() {
         <p className="mt-8">
           {new URLSearchParams(searchParams).has("grep") && (
             <>
-              一部のテスト結果のみ表示しています:
+              一部のテストだけを実行します:
               <code className="ml-2 font-mono">
                 {new URLSearchParams(searchParams).get("grep")}
               </code>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-              <a className="ml-4 btn btn-primary" href="/terminal">
+              <a className="ml-4 link link-info" href="/terminal">
                 {/* aタグでページをリロードしないと動作しない。 */}
-                全体を再実行
+                フィルタを解除
               </a>
             </>
           )}
