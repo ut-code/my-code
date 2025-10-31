@@ -94,19 +94,7 @@ function formatRubyError(error) {
     return `予期せぬエラー: ${String(error).trim()}`;
   }
 
-  let errorMessage = error.message;
-
-  // Clean up Ruby error messages by filtering out internal eval lines
-  if (errorMessage.includes("Traceback") || errorMessage.includes("Error")) {
-    const lines = errorMessage.split("\n");
-    // Keep lines that either don't contain eval, or contain Error, or have line numbers
-    errorMessage = lines
-      .filter((line) => !line.includes("in 'Kernel.eval'"))
-      .join("\n")
-      .trim();
-  }
-
-  return errorMessage;
+  return error.message;
 }
 
 async function runRuby(id, payload) {
