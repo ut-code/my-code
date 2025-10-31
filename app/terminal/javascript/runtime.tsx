@@ -110,11 +110,13 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
     // we terminate the worker and restart it, then restore state
     isInterrupted.current = true;
     
+    // Reject all pending callbacks before terminating
+    const error = "Worker interrupted";
+    messageCallbacks.current.forEach(([, reject]) => reject(error));
+    messageCallbacks.current.clear();
+    
     // Terminate the current worker
     workerRef.current?.terminate();
-    
-    // Clear pending callbacks
-    messageCallbacks.current.clear();
     
     // Reset ready state
     setReady(false);
@@ -159,11 +161,15 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
         });
         return output;
       } catch (error) {
-        // If interrupted, return a message indicating interruption
+        // If interrupted or worker was terminated, return appropriate message
         if (isInterrupted.current) {
           return [{ type: "error", message: "実行が中断されました" }];
         }
-        throw error;
+        // Handle other errors
+        if (error instanceof Error) {
+          return [{ type: "error", message: error.message }];
+        }
+        return [{ type: "error", message: String(error) }];
       }
     },
     [ready]
