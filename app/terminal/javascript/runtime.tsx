@@ -26,6 +26,7 @@ export function useJavaScript(): RuntimeContext {
 type MessageToWorker =
   | {
       type: "init";
+      payload?: undefined;
     }
   | {
       type: "runJavaScript";
@@ -37,6 +38,7 @@ type MessageToWorker =
     }
   | {
       type: "restoreState";
+      payload: { commands: string[] };
     };
 
 type MessageFromWorker =
@@ -59,7 +61,7 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
     Map<number, [(payload: any) => void, (error: string) => void]>
   >(new Map());
   const nextMessageId = useRef<number>(0);
-  const isInterrupted = useRef<boolean>(false);
+  const executedCommands = useRef<string[]>([]);
 
   function postMessage<T>({ type, payload }: MessageToWorker) {
     const id = nextMessageId.current++;
@@ -86,70 +88,52 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    postMessage<InitPayloadFromWorker>({
+    return postMessage<InitPayloadFromWorker>({
       type: "init",
     }).then(({ success }) => {
       if (success) {
         setReady(true);
       }
+      return worker;
     });
-
-    return worker;
   }, []);
 
   useEffect(() => {
-    const worker = initializeWorker();
+    let worker: Worker | null = null;
+    initializeWorker().then((w) => {
+      worker = w;
+    });
 
     return () => {
-      worker.terminate();
+      worker?.terminate();
     };
   }, [initializeWorker]);
 
   const interrupt = useCallback(async () => {
     // Since we can't interrupt JavaScript execution directly,
     // we terminate the worker and restart it, then restore state
-    isInterrupted.current = true;
-    
-    // Reject all pending callbacks before terminating
-    const error = "Worker interrupted";
-    messageCallbacks.current.forEach(([, reject]) => reject(error));
-    messageCallbacks.current.clear();
-    
-    // Terminate the current worker
-    workerRef.current?.terminate();
-    
-    // Reset ready state
-    setReady(false);
-    
-    // Create a new worker
-    initializeWorker();
-    
-    // Wait for initialization with timeout
-    const maxRetries = 50; // 5 seconds total
-    let retries = 0;
-    
-    await new Promise<void>((resolve, reject) => {
-      const checkInterval = setInterval(() => {
-        retries++;
-        if (retries > maxRetries) {
-          clearInterval(checkInterval);
-          reject(new Error("Worker initialization timeout"));
-          return;
-        }
-        
-        if (workerRef.current) {
-          // Try to restore state
-          postMessage<{ success: boolean }>({
-            type: "restoreState",
-          }).then(() => {
-            clearInterval(checkInterval);
-            isInterrupted.current = false;
-            resolve();
-          }).catch(() => {
-            // Keep trying
-          });
-        }
-      }, 100);
+    await mutex.current.runExclusive(async () => {
+      // Reject all pending callbacks before terminating
+      const error = "Worker interrupted";
+      messageCallbacks.current.forEach(([, reject]) => reject(error));
+      messageCallbacks.current.clear();
+      
+      // Terminate the current worker
+      workerRef.current?.terminate();
+      
+      // Reset ready state
+      setReady(false);
+      
+      // Create a new worker and wait for it to be ready
+      await initializeWorker();
+      
+      // Restore state by re-executing previous commands
+      if (executedCommands.current.length > 0) {
+        await postMessage<{ success: boolean }>({
+          type: "restoreState",
+          payload: { commands: executedCommands.current },
+        });
+      }
     });
   }, [initializeWorker]);
 
@@ -169,13 +153,11 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
           type: "runJavaScript",
           payload: { code },
         });
+        // Save successfully executed command
+        executedCommands.current.push(code);
         return output;
       } catch (error) {
-        // If interrupted or worker was terminated, return appropriate message
-        if (isInterrupted.current) {
-          return [{ type: "error", message: "実行が中断されました" }];
-        }
-        // Handle other errors
+        // Handle errors (including "Worker interrupted")
         if (error instanceof Error) {
           return [{ type: "error", message: error.message }];
         }

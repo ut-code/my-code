@@ -1,6 +1,5 @@
 // JavaScript web worker
 let jsOutput = [];
-let executedCommands = []; // Store successfully executed commands for state recovery
 
 // Helper function to capture console output
 function createConsoleProxy() {
@@ -22,7 +21,6 @@ function createConsoleProxy() {
 
 async function init(id) {
   // Initialize the worker
-  executedCommands = [];
   self.postMessage({ id, payload: { success: true } });
 }
 
@@ -42,9 +40,6 @@ async function runJavaScript(id, payload) {
         message: String(result),
       });
     }
-    
-    // Save the successfully executed command for state recovery
-    executedCommands.push(code);
   } catch (e) {
     // Use self.console to avoid recursion with our console proxy
     self.console.log(e);
@@ -93,17 +88,15 @@ async function checkSyntax(id, payload) {
   }
 }
 
-async function restoreState(id) {
+async function restoreState(id, payload) {
   // Re-execute all previously successful commands to restore state
-  const commandsToRestore = [...executedCommands];
-  executedCommands = []; // Clear before re-executing
+  const { commands } = payload;
   jsOutput = []; // Clear output for restoration
   
-  for (const command of commandsToRestore) {
+  for (const command of commands) {
     try {
       const console = createConsoleProxy();
       eval(command);
-      executedCommands.push(command);
     } catch (e) {
       // If restoration fails, we still continue with other commands
       // Use self.console to avoid recursion with our console proxy
@@ -128,7 +121,7 @@ self.onmessage = async (event) => {
       await checkSyntax(id, payload);
       return;
     case "restoreState":
-      await restoreState(id);
+      await restoreState(id, payload);
       return;
     default:
       console.error(`Unknown message type: ${type}`);
