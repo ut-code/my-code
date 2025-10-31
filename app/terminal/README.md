@@ -14,8 +14,10 @@ runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、そ
     * ランタイムの初期化が完了したか、不要である場合true
 * mutex?: `MutexInterface`
     * ランタイムに排他制御が必要な場合、MutexInterfaceのインスタンスを返してください。
-* interrupt?: `() => Promise<void>`
-    * 実行中のコマンドを中断します。呼び出し側でmutexのロックはされません
+* interrupt?: `() => void`
+    * 実行中のコマンドを中断します。
+    * 呼び出し側でmutexのロックはしません。interrupt()を呼ぶ際にはrunCommand()やrunFiles()が実行中であるためmutexはすでにロックされているはずです。
+    * interrupt()内で実行中の処理のPromiseをrejectしたあと、runtimeを再開する際の処理に必要であればmutexをロックすることも可能です。
 
 ### REPL用
 
@@ -25,7 +27,7 @@ runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、そ
 * checkSyntax?: `(code: string) => Promise<SyntaxStatus>`
     * コードの構文チェックを行います。行がコマンドとして完結していれば`complete`、次の行に続く場合(if文の条件式の途中など)は`incomplete`を返してください。
     * REPLでEnterを押した際の動作に影響します。
-    * 呼び出し側でmutexのロックはされません
+    * 呼び出し側でmutexのロックはせず、必要であればcheckSyntax()内でロックします。
 * splitReplExamples?: `(code: string) => ReplCommands[]`
     * markdown内に記述されているREPLのサンプルコードをパースします。例えば
     ```
@@ -51,7 +53,7 @@ runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、そ
 
 * runFiles: `(filenames: string[]) => Promise<ReplOutput[]>`
     * 指定されたファイルを実行します。ファイルの中身はEmbedContextから取得されます。
-    * 呼び出し側でmutexのロックはされません
+    * 呼び出し側でmutexのロックはせず、必要であればrunFiles()内でロックします。
 * getCommandlineStr: `(filenames: string[]) => string`
     * 指定されたファイルを実行するためのコマンドライン引数文字列を返します。表示用です。
 
