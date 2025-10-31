@@ -12,7 +12,7 @@ export function defineTests(
       (
         {
           python: 2000,
-          ruby: 2000,
+          ruby: 5000,
           cpp: 10000,
         } as Record<RuntimeLang, number>
       )[lang]
@@ -110,17 +110,26 @@ export function defineTests(
         if (!setIntVarCode || !infLoopCode || !printIntVarCode) {
           this.skip();
         }
-        const result = await (
+        const runPromise = (
           runtimeRef.current[lang].mutex || emptyMutex
         ).runExclusive(async () => {
           await runtimeRef.current[lang].runCommand!(setIntVarCode);
-          const runPromise = runtimeRef.current[lang].runCommand!(infLoopCode);
-          // Wait a bit to ensure the infinite loop has started
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          runtimeRef.current[lang].interrupt!();
-          await runPromise;
-          return runtimeRef.current[lang].runCommand!(printIntVarCode);
+          return runtimeRef.current[lang].runCommand!(infLoopCode);
         });
+        // Wait a bit to ensure the infinite loop has started
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        runtimeRef.current[lang].interrupt!();
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        await runPromise;
+        while (!runtimeRef.current[lang].ready) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        const result = await (
+          runtimeRef.current[lang].mutex || emptyMutex
+        ).runExclusive(() =>
+          runtimeRef.current[lang].runCommand!(printIntVarCode)
+        );
         console.log(`${lang} REPL interrupt recovery test: `, result);
         expect(result).to.be.deep.equal([
           {

@@ -27,7 +27,7 @@ export function useRuby(): RuntimeContext {
 type MessageToWorker =
   | {
       type: "init";
-      payload: { RUBY_WASM_URL: string };
+      payload: {};
     }
   | {
       type: "runRuby";
@@ -90,13 +90,9 @@ export function RubyProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Use CDN URL for Ruby WASM with stdlib
-    const RUBY_WASM_URL =
-      "https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.2/dist/ruby+stdlib.wasm";
-
     return postMessage<InitPayloadFromWorker>({
       type: "init",
-      payload: { RUBY_WASM_URL },
+      payload: {},
     });
   }, []);
 
@@ -112,32 +108,39 @@ export function RubyProvider({ children }: { children: ReactNode }) {
     };
   }, [initializeWorker]);
 
-  const interrupt = useCallback(async () => {
+  const interrupt = useCallback(() => {
     // Terminate the current worker
     if (workerRef.current) {
       workerRef.current.terminate();
     }
 
+    // reject all pending messages
+    for (const [, [, reject]] of messageCallbacks.current) {
+      reject("Execution interrupted");
+    }
+
     // Mark as not ready during reinitialization
     setReady(false);
 
-    // Reinitialize the worker
-    const { success } = await initializeWorker();
-    
-    if (success) {
-      // Re-execute all saved commands to restore state
-      for (const cmd of commandHistory.current) {
-        try {
-          await postMessage<RunPayloadFromWorker>({
-            type: "runRuby",
-            payload: { code: cmd },
-          });
-        } catch (e) {
-          console.error("Error restoring command:", cmd, e);
+    void mutex.current.runExclusive(async () => {
+      // Reinitialize the worker
+      const { success } = await initializeWorker();
+
+      if (success) {
+        // Re-execute all saved commands to restore state
+        for (const cmd of commandHistory.current) {
+          try {
+            await postMessage<RunPayloadFromWorker>({
+              type: "runRuby",
+              payload: { code: cmd },
+            });
+          } catch (e) {
+            console.error("Error restoring command:", cmd, e);
+          }
         }
+        setReady(true);
       }
-      setReady(true);
-    }
+    });
   }, [initializeWorker]);
 
   const runCommand = useCallback(
@@ -152,15 +155,22 @@ export function RubyProvider({ children }: { children: ReactNode }) {
       const { output, updatedFiles } = await postMessage<RunPayloadFromWorker>({
         type: "runRuby",
         payload: { code },
+      }).catch((error) => {
+        return {
+          output: [
+            { type: "error", message: `Execution error: ${error}` },
+          ] as ReplOutput[],
+          updatedFiles: [] as [string, string][],
+        };
       });
-      
+
       // Check if the command succeeded (no errors)
       const hasError = output.some((o) => o.type === "error");
       if (!hasError) {
         // Save successful command to history
         commandHistory.current.push(code);
       }
-      
+
       for (const [name, content] of updatedFiles) {
         writeFile(name, content);
       }
@@ -201,6 +211,13 @@ export function RubyProvider({ children }: { children: ReactNode }) {
           await postMessage<RunPayloadFromWorker>({
             type: "runFile",
             payload: { name: filenames[0], files },
+          }).catch((error) => {
+            return {
+              output: [
+                { type: "error", message: `Execution error: ${error}` },
+              ] as ReplOutput[],
+              updatedFiles: [] as [string, string][],
+            };
           });
         for (const [newName, content] of updatedFiles) {
           writeFile(newName, content);
