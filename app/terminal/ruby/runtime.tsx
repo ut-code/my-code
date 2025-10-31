@@ -63,6 +63,7 @@ export function RubyProvider({ children }: { children: ReactNode }) {
     Map<number, [(payload: any) => void, (error: string) => void]>
   >(new Map());
   const nextMessageId = useRef<number>(0);
+  const commandHistory = useRef<string[]>([]);
 
   function postMessage<T>({ type, payload }: MessageToWorker) {
     const id = nextMessageId.current++;
@@ -72,7 +73,7 @@ export function RubyProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  useEffect(() => {
+  const initializeWorker = useCallback(() => {
     const worker = new Worker("/ruby.worker.js");
     workerRef.current = worker;
 
@@ -93,10 +94,14 @@ export function RubyProvider({ children }: { children: ReactNode }) {
     const RUBY_WASM_URL =
       "https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.2/dist/ruby+stdlib.wasm";
 
-    postMessage<InitPayloadFromWorker>({
+    return postMessage<InitPayloadFromWorker>({
       type: "init",
       payload: { RUBY_WASM_URL },
-    }).then(({ success }) => {
+    });
+  }, []);
+
+  useEffect(() => {
+    initializeWorker().then(({ success }) => {
       if (success) {
         setReady(true);
       }
@@ -105,13 +110,35 @@ export function RubyProvider({ children }: { children: ReactNode }) {
     return () => {
       workerRef.current?.terminate();
     };
-  }, []);
+  }, [initializeWorker]);
 
-  const interrupt = useCallback(() => {
-    // TODO: Implement interrupt functionality for Ruby
-    // Ruby WASM doesn't currently support interrupts like Pyodide does
-    console.warn("Ruby interrupt is not yet implemented");
-  }, []);
+  const interrupt = useCallback(async () => {
+    // Terminate the current worker
+    if (workerRef.current) {
+      workerRef.current.terminate();
+    }
+
+    // Mark as not ready during reinitialization
+    setReady(false);
+
+    // Reinitialize the worker
+    const { success } = await initializeWorker();
+    
+    if (success) {
+      // Re-execute all saved commands to restore state
+      for (const cmd of commandHistory.current) {
+        try {
+          await postMessage<RunPayloadFromWorker>({
+            type: "runRuby",
+            payload: { code: cmd },
+          });
+        } catch (e) {
+          console.error("Error restoring command:", cmd, e);
+        }
+      }
+      setReady(true);
+    }
+  }, [initializeWorker]);
 
   const runCommand = useCallback(
     async (code: string): Promise<ReplOutput[]> => {
@@ -126,6 +153,14 @@ export function RubyProvider({ children }: { children: ReactNode }) {
         type: "runRuby",
         payload: { code },
       });
+      
+      // Check if the command succeeded (no errors)
+      const hasError = output.some((o) => o.type === "error");
+      if (!hasError) {
+        // Save successful command to history
+        commandHistory.current.push(code);
+      }
+      
       for (const [name, content] of updatedFiles) {
         writeFile(name, content);
       }
