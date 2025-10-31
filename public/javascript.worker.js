@@ -46,7 +46,8 @@ async function runJavaScript(id, payload) {
     // Save the successfully executed command for state recovery
     executedCommands.push(code);
   } catch (e) {
-    console.log(e);
+    // Use self.console to avoid recursion with our console proxy
+    self.console.log(e);
     if (e instanceof Error) {
       jsOutput.push({
         type: "error",
@@ -105,7 +106,8 @@ async function restoreState(id) {
       executedCommands.push(command);
     } catch (e) {
       // If restoration fails, we still continue with other commands
-      console.error("Failed to restore command:", command, e);
+      // Use self.console to avoid recursion with our console proxy
+      self.console.error("Failed to restore command:", command, e);
     }
   }
   

@@ -124,12 +124,22 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
     // Create a new worker
     initializeWorker();
     
-    // Wait for initialization - use a different approach
-    await new Promise<void>((resolve) => {
+    // Wait for initialization with timeout
+    const maxRetries = 50; // 5 seconds total
+    let retries = 0;
+    
+    await new Promise<void>((resolve, reject) => {
       const checkInterval = setInterval(() => {
+        retries++;
+        if (retries > maxRetries) {
+          clearInterval(checkInterval);
+          reject(new Error("Worker initialization timeout"));
+          return;
+        }
+        
         if (workerRef.current) {
-          // Try to initialize and restore
-          postMessage<InitPayloadFromWorker>({
+          // Try to restore state
+          postMessage<{ success: boolean }>({
             type: "restoreState",
           }).then(() => {
             clearInterval(checkInterval);
