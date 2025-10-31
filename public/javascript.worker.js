@@ -2,22 +2,21 @@
 let jsOutput = [];
 
 // Helper function to capture console output
-function createConsoleProxy() {
-  return {
-    log: (...args) => {
-      jsOutput.push({ type: "stdout", message: args.join(" ") });
-    },
-    error: (...args) => {
-      jsOutput.push({ type: "stderr", message: args.join(" ") });
-    },
-    warn: (...args) => {
-      jsOutput.push({ type: "stderr", message: args.join(" ") });
-    },
-    info: (...args) => {
-      jsOutput.push({ type: "stdout", message: args.join(" ") });
-    },
-  };
-}
+const originalConsole = globalThis.console;
+globalThis.console = {
+  log: (...args) => {
+    jsOutput.push({ type: "stdout", message: args.join(" ") });
+  },
+  error: (...args) => {
+    jsOutput.push({ type: "stderr", message: args.join(" ") });
+  },
+  warn: (...args) => {
+    jsOutput.push({ type: "stderr", message: args.join(" ") });
+  },
+  info: (...args) => {
+    jsOutput.push({ type: "stdout", message: args.join(" ") });
+  },
+};
 
 async function init(id) {
   // Initialize the worker
@@ -27,12 +26,9 @@ async function init(id) {
 async function runJavaScript(id, payload) {
   const { code } = payload;
   try {
-    // Create a console proxy to capture output
-    const console = createConsoleProxy();
-    
     // Execute code directly with eval in the worker global scope
     // This will preserve variables across calls
-    const result = eval(code);
+    const result = globalThis.eval(code);
     
     if (result !== undefined) {
       jsOutput.push({
@@ -41,8 +37,7 @@ async function runJavaScript(id, payload) {
       });
     }
   } catch (e) {
-    // Use self.console to avoid recursion with our console proxy
-    self.console.log(e);
+    originalConsole.log(e);
     if (e instanceof Error) {
       jsOutput.push({
         type: "error",
@@ -95,12 +90,10 @@ async function restoreState(id, payload) {
   
   for (const command of commands) {
     try {
-      const console = createConsoleProxy();
-      eval(command);
+      globalThis.eval(command);
     } catch (e) {
       // If restoration fails, we still continue with other commands
-      // Use self.console to avoid recursion with our console proxy
-      self.console.error("Failed to restore command:", command, e);
+      originalConsole.error("Failed to restore command:", command, e);
     }
   }
   
@@ -124,7 +117,7 @@ self.onmessage = async (event) => {
       await restoreState(id, payload);
       return;
     default:
-      console.error(`Unknown message type: ${type}`);
+      originalConsole.error(`Unknown message type: ${type}`);
       return;
   }
 };

@@ -109,21 +109,22 @@ export function JavaScriptProvider({ children }: { children: ReactNode }) {
     };
   }, [initializeWorker]);
 
-  const interrupt = useCallback(async () => {
+  const interrupt = useCallback(() => {
     // Since we can't interrupt JavaScript execution directly,
     // we terminate the worker and restart it, then restore state
-    await mutex.current.runExclusive(async () => {
-      // Reject all pending callbacks before terminating
-      const error = "Worker interrupted";
-      messageCallbacks.current.forEach(([, reject]) => reject(error));
-      messageCallbacks.current.clear();
-      
-      // Terminate the current worker
-      workerRef.current?.terminate();
-      
-      // Reset ready state
-      setReady(false);
-      
+
+    // Reject all pending callbacks before terminating
+    const error = "Worker interrupted";
+    messageCallbacks.current.forEach(([, reject]) => reject(error));
+    messageCallbacks.current.clear();
+    
+    // Terminate the current worker
+    workerRef.current?.terminate();
+    
+    // Reset ready state
+    setReady(false);
+    
+    mutex.current.runExclusive(async () => {
       // Create a new worker and wait for it to be ready
       await initializeWorker();
       
