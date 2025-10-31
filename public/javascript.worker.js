@@ -1,7 +1,6 @@
 // JavaScript web worker
 let jsOutput = [];
 let executedCommands = []; // Store successfully executed commands for state recovery
-let globalScope = {}; // Store global variables and functions
 
 // Helper function to capture console output
 function createConsoleProxy() {
@@ -24,7 +23,6 @@ function createConsoleProxy() {
 async function init(id) {
   // Initialize the worker
   executedCommands = [];
-  globalScope = {};
   self.postMessage({ id, payload: { success: true } });
 }
 
@@ -34,14 +32,9 @@ async function runJavaScript(id, payload) {
     // Create a console proxy to capture output
     const console = createConsoleProxy();
     
-    // Execute the code with eval in the global scope
-    // Use Function constructor with global scope to maintain state across calls
-    const func = new Function('console', 'globalScope', `
-      with (globalScope) {
-        return eval(${JSON.stringify(code)});
-      }
-    `);
-    const result = func(console, globalScope);
+    // Execute code directly with eval in the worker global scope
+    // This will preserve variables across calls
+    const result = eval(code);
     
     if (result !== undefined) {
       jsOutput.push({
@@ -104,17 +97,11 @@ async function restoreState(id) {
   const commandsToRestore = [...executedCommands];
   executedCommands = []; // Clear before re-executing
   jsOutput = []; // Clear output for restoration
-  const newGlobalScope = {}; // Create a fresh global scope
   
   for (const command of commandsToRestore) {
     try {
       const console = createConsoleProxy();
-      const func = new Function('console', 'globalScope', `
-        with (globalScope) {
-          return eval(${JSON.stringify(command)});
-        }
-      `);
-      func(console, newGlobalScope);
+      eval(command);
       executedCommands.push(command);
     } catch (e) {
       // If restoration fails, we still continue with other commands
@@ -122,7 +109,6 @@ async function restoreState(id) {
     }
   }
   
-  globalScope = newGlobalScope; // Update the global scope
   jsOutput = []; // Clear any output from restoration
   self.postMessage({ id, payload: { success: true } });
 }
