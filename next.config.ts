@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-import { version as pyodideVersion } from "pyodide";
 
 initOpenNextCloudflareForDev();
 
@@ -11,9 +10,6 @@ const nextConfig: NextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
-  },
-  env: {
-    PYODIDE_VERSION: pyodideVersion,
   },
   serverExternalPackages: ["@prisma/client", ".prisma/client"],
   async headers() {

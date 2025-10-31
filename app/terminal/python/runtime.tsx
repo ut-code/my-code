@@ -27,7 +27,7 @@ export function usePyodide(): RuntimeContext {
 type MessageToWorker =
   | {
       type: "init";
-      payload: { PYODIDE_CDN: string; interruptBuffer: Uint8Array };
+      payload: { interruptBuffer: Uint8Array };
     }
   | {
       type: "runPython";
@@ -90,11 +90,9 @@ export function PyodideProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // next.config.ts 内でpyodideをimportし、バージョンを取得している
-    const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${process.env.PYODIDE_VERSION}/full/`;
     postMessage<InitPayloadFromWorker>({
       type: "init",
-      payload: { PYODIDE_CDN, interruptBuffer: interruptBuffer.current },
+      payload: { interruptBuffer: interruptBuffer.current },
     }).then(({ success }) => {
       if (success) {
         setReady(true);
