@@ -2,12 +2,11 @@
 import { Heading } from "@/[docs_id]/markdown";
 import "mocha/mocha.js";
 import "mocha/mocha.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePyodide } from "./python/runtime";
 import { useWandbox } from "./wandbox/runtime";
 import { RuntimeContext, RuntimeLang } from "./runtime";
 import { useEmbedContext } from "./embedContext";
-import { useSearchParams } from "next/navigation";
 import { defineTests } from "./tests";
 
 export default function RuntimeTestPage() {
@@ -24,7 +23,10 @@ export default function RuntimeTestPage() {
   const [mochaState, setMochaState] = useState<"idle" | "running" | "finished">(
     "idle"
   );
-  const searchParams = useSearchParams();
+  const [searchParams, setSearchParams] = useState<string>("");
+  useEffect(() => {
+    setSearchParams(window.location.search);
+  }, []);
 
   const runTest = () => {
     setMochaState("running");
@@ -79,10 +81,12 @@ export default function RuntimeTestPage() {
           </div>
         )}
         <p className="mt-8">
-          {searchParams.has("grep") && (
+          {new URLSearchParams(searchParams).has("grep") && (
             <>
               一部のテスト結果のみ表示しています:
-              <code className="ml-2 font-mono">{searchParams.get("grep")}</code>
+              <code className="ml-2 font-mono">
+                {new URLSearchParams(searchParams).get("grep")}
+              </code>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a className="ml-4 btn btn-primary" href="/terminal">
                 {/* aタグでページをリロードしないと動作しない。 */}
