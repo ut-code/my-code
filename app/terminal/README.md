@@ -124,11 +124,20 @@ EditorComponent コンポーネントを提供します。
 
 ## 各言語の実装
 
-### Pyodide (Python)
+### Worker
 
-Pyodide を web worker で動かしています。worker側のスクリプトは /public/python.worker.js にあります。
+web worker でコードを実行する実装です。worker側のスクリプトは /public にあります。
+workerとの通信部分は言語によらず共通なので、それをworker/runtime.tsxで定義しています。
+Contextは言語ごとに分けて(worker/pyodide.ts などで)定義しています。
 
-### Wandbox (C++)
+Pythonの実行環境にはPyodideを使用しています。
+PyodideにはKeyboardInterruptを送信する機能があるのでinterrupt()でそれを利用しています。
+
+Rubyの実行環境にはruby.wasmを使用しています。
+
+JavaScriptはeval()を使用しています。runFiles()のAPIだけ実装していません。
+
+### Wandbox
 
 wandbox.org のAPIを利用してC++コードを実行しています。C++以外にもいろいろな言語に対応しています。
 
