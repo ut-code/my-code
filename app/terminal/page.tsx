@@ -9,15 +9,18 @@ import { useWandbox } from "./wandbox/runtime";
 import { RuntimeContext, RuntimeLang } from "./runtime";
 import { useEmbedContext } from "./embedContext";
 import { defineTests } from "./tests";
+import { useJavaScript } from "./javascript/runtime";
 
 export default function RuntimeTestPage() {
   const pyodide = usePyodide();
   const ruby = useRuby();
+  const javascript = useJavaScript();
   const wandboxCpp = useWandbox("cpp");
   const runtimeRef = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
   runtimeRef.current = {
     python: pyodide,
     ruby: ruby,
+    javascript: javascript,
     cpp: wandboxCpp,
   };
   const { files, writeFile } = useEmbedContext();

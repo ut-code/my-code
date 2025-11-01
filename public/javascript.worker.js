@@ -18,18 +18,21 @@ globalThis.console = {
   },
 };
 
-async function init(id) {
-  // Initialize the worker
-  self.postMessage({ id, payload: { success: true } });
+async function init(id, payload) {
+  // Initialize the worker and report capabilities
+  self.postMessage({
+    id,
+    payload: { success: true, capabilities: { interrupt: "restart" } },
+  });
 }
 
-async function runJavaScript(id, payload) {
+async function runCode(id, payload) {
   const { code } = payload;
   try {
     // Execute code directly with eval in the worker global scope
     // This will preserve variables across calls
     const result = globalThis.eval(code);
-    
+
     if (result !== undefined) {
       jsOutput.push({
         type: "return",
@@ -60,9 +63,22 @@ async function runJavaScript(id, payload) {
   });
 }
 
+function runFile(id, payload) {
+  const output = [
+    {
+      type: "error",
+      message: "File execution is not supported in this runtime",
+    },
+  ];
+  self.postMessage({
+    id,
+    payload: { output, updatedFiles: [] },
+  });
+}
+
 async function checkSyntax(id, payload) {
   const { code } = payload;
-  
+
   try {
     // Try to create a Function to check syntax
     new Function(code);
@@ -71,8 +87,10 @@ async function checkSyntax(id, payload) {
     // Check if it's a syntax error or if more input is expected
     if (e instanceof SyntaxError) {
       // Simple heuristic: check for "Unexpected end of input"
-      if (e.message.includes("Unexpected end of input") || 
-          e.message.includes("expected expression")) {
+      if (
+        e.message.includes("Unexpected end of input") ||
+        e.message.includes("expected expression")
+      ) {
         self.postMessage({ id, payload: { status: "incomplete" } });
       } else {
         self.postMessage({ id, payload: { status: "invalid" } });
@@ -87,7 +105,7 @@ async function restoreState(id, payload) {
   // Re-execute all previously successful commands to restore state
   const { commands } = payload;
   jsOutput = []; // Clear output for restoration
-  
+
   for (const command of commands) {
     try {
       globalThis.eval(command);
@@ -96,7 +114,7 @@ async function restoreState(id, payload) {
       originalConsole.error("Failed to restore command:", command, e);
     }
   }
-  
+
   jsOutput = []; // Clear any output from restoration
   self.postMessage({ id, payload: { success: true } });
 }
@@ -105,10 +123,13 @@ self.onmessage = async (event) => {
   const { id, type, payload } = event.data;
   switch (type) {
     case "init":
-      await init(id);
+      await init(id, payload);
       return;
-    case "runJavaScript":
-      await runJavaScript(id, payload);
+    case "runCode":
+      await runCode(id, payload);
+      return;
+    case "runFile":
+      runFile(id, payload);
       return;
     case "checkSyntax":
       await checkSyntax(id, payload);

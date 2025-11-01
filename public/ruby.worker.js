@@ -59,7 +59,10 @@ end
     }
   }
 
-  self.postMessage({ id, payload: { success: true } });
+  self.postMessage({
+    id,
+    payload: { success: true, capabilities: { interrupt: "restart" } },
+  });
 }
 
 function flushOutput() {
@@ -97,7 +100,7 @@ function formatRubyError(error) {
   return error.message;
 }
 
-async function runRuby(id, payload) {
+async function runCode(id, payload) {
   const { code } = payload;
 
   if (!rubyVM) {
@@ -284,6 +287,34 @@ function readAllFiles() {
   return updatedFiles;
 }
 
+async function restoreState(id, payload) {
+  // Re-execute all previously successful commands to restore state
+  const { commands } = payload;
+  if (!rubyVM) {
+    self.postMessage({ id, error: "Ruby VM not initialized" });
+    return;
+  }
+
+  rubyOutput = []; // Clear output for restoration
+  stdoutBuffer = "";
+  stderrBuffer = "";
+
+  for (const command of commands) {
+    try {
+      rubyVM.eval(command);
+    } catch (e) {
+      // If restoration fails, we still continue with other commands
+      console.error("Failed to restore command:", command, e);
+    }
+  }
+
+  // Clear any output from restoration
+  flushOutput();
+  rubyOutput = [];
+
+  self.postMessage({ id, payload: { success: true } });
+}
+
 self.onmessage = async (event) => {
   const { id, type, payload } = event.data;
 
@@ -291,14 +322,17 @@ self.onmessage = async (event) => {
     case "init":
       await init(id, payload);
       return;
-    case "runRuby":
-      await runRuby(id, payload);
+    case "runCode":
+      await runCode(id, payload);
       return;
     case "runFile":
       await runFile(id, payload);
       return;
     case "checkSyntax":
       await checkSyntax(id, payload);
+      return;
+    case "restoreState":
+      await restoreState(id, payload);
       return;
     default:
       console.error(`Unknown message type: ${type}`);
