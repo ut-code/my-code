@@ -1,9 +1,12 @@
 import { MutexInterface } from "async-mutex";
 import { ReplOutput, SyntaxStatus, ReplCommand } from "./repl";
-import { PyodideProvider, usePyodide } from "./python/runtime";
 import { useWandbox, WandboxProvider } from "./wandbox/runtime";
 import { AceLang } from "./editor";
 import { ReactNode } from "react";
+import { PyodideContext, usePyodide } from "./worker/pyodide";
+import { RubyContext, useRuby } from "./worker/ruby";
+import { JSEvalContext, useJSEval } from "./worker/jsEval";
+import { WorkerProvider } from "./worker/runtime";
 
 /**
  * Common runtime context interface for different languages
@@ -21,14 +24,14 @@ export interface RuntimeContext {
   splitReplExamples?: (content: string) => ReplCommand[];
   // file
   runFiles: (filenames: string[]) => Promise<ReplOutput[]>;
-  getCommandlineStr: (filenames: string[]) => string;
+  getCommandlineStr?: (filenames: string[]) => string;
 }
 export interface LangConstants {
   tabSize: number;
   prompt?: string;
   promptMore?: string;
 }
-export type RuntimeLang = "python" | "cpp";
+export type RuntimeLang = "python" | "ruby" | "cpp" | "javascript";
 
 export function getRuntimeLang(
   lang: string | undefined
@@ -38,9 +41,15 @@ export function getRuntimeLang(
     case "python":
     case "py":
       return "python";
+    case "ruby":
+    case "rb":
+      return "ruby";
     case "cpp":
     case "c++":
       return "cpp";
+    case "javascript":
+    case "js":
+      return "javascript";
     default:
       console.warn(`Unsupported language for runtime: ${lang}`);
       return undefined;
@@ -49,11 +58,17 @@ export function getRuntimeLang(
 export function useRuntime(language: RuntimeLang): RuntimeContext {
   // すべての言語のcontextをインスタンス化
   const pyodide = usePyodide();
+  const ruby = useRuby();
+  const jsEval = useJSEval();
   const wandboxCpp = useWandbox("cpp");
 
   switch (language) {
     case "python":
       return pyodide;
+    case "ruby":
+      return ruby;
+    case "javascript":
+      return jsEval;
     case "cpp":
       return wandboxCpp;
     default:
@@ -63,9 +78,13 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
 }
 export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (
-    <PyodideProvider>
-      <WandboxProvider>{children}</WandboxProvider>
-    </PyodideProvider>
+    <WorkerProvider context={PyodideContext} script="/pyodide.worker.js">
+      <WorkerProvider context={RubyContext} script="/ruby.worker.js">
+        <WorkerProvider context={JSEvalContext} script="/javascript.worker.js">
+          <WandboxProvider>{children}</WandboxProvider>
+        </WorkerProvider>
+      </WorkerProvider>
+    </WorkerProvider>
   );
 }
 
@@ -76,6 +95,17 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
         tabSize: 4,
         prompt: ">>> ",
         promptMore: "... ",
+      };
+    case "ruby":
+      return {
+        tabSize: 2,
+        prompt: ">> ",
+        promptMore: "?> ",
+      };
+    case "javascript":
+      return {
+        tabSize: 2,
+        prompt: "> ",
       };
     case "c_cpp":
     case "cpp":

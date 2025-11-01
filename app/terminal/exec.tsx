@@ -83,7 +83,7 @@ export function ExecFile(props: ExecProps) {
           ▶ 実行
         </button>
         <code className="text-sm ml-4">
-          {getCommandlineStr(props.filenames)}
+          {getCommandlineStr?.(props.filenames)}
         </code>
       </div>
       <div className="bg-base-300 p-4 pt-2 rounded-b-lg">

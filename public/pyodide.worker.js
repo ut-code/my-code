@@ -37,13 +37,16 @@ async function init(id, payload) {
         pyodideOutput.push({ type: "stderr", message: str });
       },
     });
-    
+
     pyodide.setInterruptBuffer(interruptBuffer);
   }
-  self.postMessage({ id, payload: { success: true } });
+  self.postMessage({
+    id,
+    payload: { capabilities: { interrupt: "buffer" } },
+  });
 }
 
-async function runPython(id, payload) {
+async function runCode(id, payload) {
   const { code } = payload;
   if (!pyodide) {
     self.postMessage({ id, error: "Pyodide not initialized" });
@@ -190,8 +193,8 @@ self.onmessage = async (event) => {
     case "init":
       await init(id, payload);
       return;
-    case "runPython":
-      await runPython(id, payload);
+    case "runCode":
+      await runCode(id, payload);
       return;
     case "runFile":
       await runFile(id, payload);
