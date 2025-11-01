@@ -3,6 +3,7 @@ import { ReplOutput, SyntaxStatus, ReplCommand } from "./repl";
 import { PyodideProvider, usePyodide } from "./python/runtime";
 import { RubyProvider, useRuby } from "./ruby/runtime";
 import { useWandbox, WandboxProvider } from "./wandbox/runtime";
+import { JavaScriptProvider, useJavaScript } from "./javascript/runtime";
 import { AceLang } from "./editor";
 import { ReactNode } from "react";
 
@@ -29,7 +30,7 @@ export interface LangConstants {
   prompt?: string;
   promptMore?: string;
 }
-export type RuntimeLang = "python" | "ruby" | "cpp";
+export type RuntimeLang = "python" | "ruby" | "cpp" | "javascript";
 
 export function getRuntimeLang(
   lang: string | undefined
@@ -45,6 +46,9 @@ export function getRuntimeLang(
     case "cpp":
     case "c++":
       return "cpp";
+    case "javascript":
+    case "js":
+      return "javascript";
     default:
       console.warn(`Unsupported language for runtime: ${lang}`);
       return undefined;
@@ -55,6 +59,7 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
   const pyodide = usePyodide();
   const ruby = useRuby();
   const wandboxCpp = useWandbox("cpp");
+  const javascript = useJavaScript();
 
   switch (language) {
     case "python":
@@ -63,6 +68,8 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
       return ruby;
     case "cpp":
       return wandboxCpp;
+    case "javascript":
+      return javascript;
     default:
       language satisfies never;
       throw new Error(`Runtime not implemented for language: ${language}`);
@@ -72,7 +79,9 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (
     <PyodideProvider>
       <RubyProvider>
-        <WandboxProvider>{children}</WandboxProvider>
+        <WandboxProvider>
+          <JavaScriptProvider>{children}</JavaScriptProvider>
+        </WandboxProvider>
       </RubyProvider>
     </PyodideProvider>
   );
@@ -91,6 +100,11 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
         tabSize: 2,
         prompt: ">> ",
         promptMore: "?> ",
+      };
+    case "javascript":
+      return {
+        tabSize: 2,
+        prompt: "> ",
       };
     case "c_cpp":
     case "cpp":

@@ -1,8 +1,5 @@
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
-/pyodide.worker.js
-  Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Embedder-Policy: require-corp
-/ruby.worker.js
+/*.worker.js
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: require-corp
