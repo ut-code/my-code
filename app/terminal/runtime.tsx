@@ -1,11 +1,12 @@
 import { MutexInterface } from "async-mutex";
 import { ReplOutput, SyntaxStatus, ReplCommand } from "./repl";
-import { PyodideProvider, usePyodide } from "./python/runtime";
-import { RubyProvider, useRuby } from "./ruby/runtime";
 import { useWandbox, WandboxProvider } from "./wandbox/runtime";
-import { JavaScriptProvider, useJavaScript } from "./javascript/runtime";
 import { AceLang } from "./editor";
 import { ReactNode } from "react";
+import { PyodideContext, usePyodide } from "./worker/pyodide";
+import { RubyContext, useRuby } from "./worker/ruby";
+import { JSEvalContext, useJSEval } from "./worker/jsEval";
+import { WorkerProvider } from "./worker/runtime";
 
 /**
  * Common runtime context interface for different languages
@@ -23,7 +24,7 @@ export interface RuntimeContext {
   splitReplExamples?: (content: string) => ReplCommand[];
   // file
   runFiles: (filenames: string[]) => Promise<ReplOutput[]>;
-  getCommandlineStr: (filenames: string[]) => string;
+  getCommandlineStr?: (filenames: string[]) => string;
 }
 export interface LangConstants {
   tabSize: number;
@@ -58,18 +59,18 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
   // すべての言語のcontextをインスタンス化
   const pyodide = usePyodide();
   const ruby = useRuby();
+  const jsEval = useJSEval();
   const wandboxCpp = useWandbox("cpp");
-  const javascript = useJavaScript();
 
   switch (language) {
     case "python":
       return pyodide;
     case "ruby":
       return ruby;
+    case "javascript":
+      return jsEval;
     case "cpp":
       return wandboxCpp;
-    case "javascript":
-      return javascript;
     default:
       language satisfies never;
       throw new Error(`Runtime not implemented for language: ${language}`);
@@ -77,13 +78,13 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
 }
 export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (
-    <PyodideProvider>
-      <RubyProvider>
-        <WandboxProvider>
-          <JavaScriptProvider>{children}</JavaScriptProvider>
-        </WandboxProvider>
-      </RubyProvider>
-    </PyodideProvider>
+    <WorkerProvider context={PyodideContext} script="/pyodide.worker.js">
+      <WorkerProvider context={RubyContext} script="/ruby.worker.js">
+        <WorkerProvider context={JSEvalContext} script="/javascript.worker.js">
+          <WandboxProvider>{children}</WandboxProvider>
+        </WorkerProvider>
+      </WorkerProvider>
+    </WorkerProvider>
   );
 }
 

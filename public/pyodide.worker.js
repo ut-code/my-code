@@ -42,7 +42,7 @@ async function init(id, payload) {
   }
   self.postMessage({
     id,
-    payload: { success: true, capabilities: { interrupt: "buffer" } },
+    payload: { capabilities: { interrupt: "buffer" } },
   });
 }
 

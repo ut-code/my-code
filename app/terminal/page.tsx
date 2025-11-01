@@ -3,18 +3,18 @@ import { Heading } from "@/[docs_id]/markdown";
 import "mocha/mocha.js";
 import "mocha/mocha.css";
 import { useEffect, useRef, useState } from "react";
-import { usePyodide } from "./python/runtime";
-import { useRuby } from "./ruby/runtime";
 import { useWandbox } from "./wandbox/runtime";
 import { RuntimeContext, RuntimeLang } from "./runtime";
 import { useEmbedContext } from "./embedContext";
 import { defineTests } from "./tests";
-import { useJavaScript } from "./javascript/runtime";
+import { usePyodide } from "./worker/pyodide";
+import { useRuby } from "./worker/ruby";
+import { useJSEval } from "./worker/jsEval";
 
 export default function RuntimeTestPage() {
   const pyodide = usePyodide();
   const ruby = useRuby();
-  const javascript = useJavaScript();
+  const javascript = useJSEval();
   const wandboxCpp = useWandbox("cpp");
   const runtimeRef = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
   runtimeRef.current = {

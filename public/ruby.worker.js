@@ -61,7 +61,7 @@ end
 
   self.postMessage({
     id,
-    payload: { success: true, capabilities: { interrupt: "restart" } },
+    payload: { capabilities: { interrupt: "restart" } },
   });
 }
 
@@ -312,7 +312,7 @@ async function restoreState(id, payload) {
   flushOutput();
   rubyOutput = [];
 
-  self.postMessage({ id, payload: { success: true } });
+  self.postMessage({ id, payload: {} });
 }
 
 self.onmessage = async (event) => {
