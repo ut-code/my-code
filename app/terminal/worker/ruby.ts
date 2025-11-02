@@ -22,10 +22,19 @@ function splitReplExamples(content: string): ReplCommand[] {
   const initCommands: { command: string; output: ReplOutput[] }[] = [];
   for (const line of content.split("\n")) {
     if (line.startsWith("irb")) {
-      initCommands.push({
-        command: line.slice(line.indexOf(" ") + 1),
-        output: [],
-      });
+      if (
+        initCommands.length > 0 &&
+        initCommands[initCommands.length - 1].output.length === 0
+      ) {
+        // 前のコマンド行と連続している場合つなげる
+        initCommands[initCommands.length - 1].command +=
+          "\n" + line.slice(line.indexOf(" ") + 1);
+      } else {
+        initCommands.push({
+          command: line.slice(line.indexOf(" ") + 1),
+          output: [],
+        });
+      }
     } else if (line.startsWith("=> ")) {
       if (initCommands.length > 0) {
         initCommands[initCommands.length - 1].output.push({

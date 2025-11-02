@@ -21,6 +21,23 @@ export const pagesList = [
     ],
   },
   {
+    id: "ruby",
+    lang: "Ruby",
+    description: "hoge",
+    pages: [
+      { id: 1, title: "rubyの世界へようこそ" },
+      { id: 2, title: "基本構文とデータ型" },
+      { id: 3, title: "制御構造とメソッド定義" },
+      { id: 4, title: "ブロックとイテレータ" },
+      { id: 5, title: "すべてがオブジェクト" },
+      { id: 6, title: "コレクション (Array, Hash, Range)" },
+      { id: 7, title: "クラスとオブジェクト" },
+      { id: 8, title: "モジュールとMix-in" },
+      { id: 9, title: "Proc, Lambda, クロージャ" },
+      { id: 10, title: "標準ライブラリの活用" },
+    ],
+  },
+  {
     id: "cpp",
     lang: "C++",
     description: "C++の基本から高度な機能までを学べるチュートリアル",

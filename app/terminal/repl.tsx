@@ -198,17 +198,10 @@ export function ReplTerminal({
             }
           } else if (code === 13) {
             // Enter
-            const hasContent =
-              inputBuffer.current[inputBuffer.current.length - 1].trim()
-                .length > 0;
             const status = checkSyntax
               ? await checkSyntax(inputBuffer.current.join("\n"))
               : "complete";
-            if (
-              (inputBuffer.current.length === 1 && status === "incomplete") ||
-              (inputBuffer.current.length >= 2 && hasContent) ||
-              !isLastChar
-            ) {
+            if (status === "incomplete" || !isLastChar) {
               // 次の行に続く
               updateBuffer(() => [...inputBuffer.current, ""]);
             } else {
