@@ -102,6 +102,7 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
         tabSize: 2,
         // TODO: 実際のirbのプロンプトは静的でなく、(main)や番号などの動的な表示がある
         prompt: "irb> ",
+        promptMore: "irb* ",
         returnPrefix: "=> ",
       };
     case "javascript":
