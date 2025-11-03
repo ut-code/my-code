@@ -92,12 +92,24 @@ function flushOutput() {
   stderrBuffer = "";
 }
 
-function formatRubyError(error) {
+function formatRubyError(error, isFile) {
   if (!(error instanceof Error)) {
     return `予期せぬエラー: ${String(error).trim()}`;
   }
 
-  return error.message;
+  let errorMessage = error.message;
+
+  // Clean up Ruby error messages by filtering out internal eval lines
+  if (errorMessage.includes("Traceback") || errorMessage.includes("Error")) {
+    let lines = errorMessage.split("\n");
+    lines = lines.filter((line) => line !== "-e:in 'Kernel.eval'");
+    if (isFile) {
+      lines = lines.filter((line) => !line.startsWith("eval:1:in"));
+    }
+    errorMessage = lines.join("\n");
+  }
+
+  return errorMessage;
 }
 
 async function runCode(id, payload) {
@@ -131,7 +143,7 @@ async function runCode(id, payload) {
 
     rubyOutput.push({
       type: "error",
-      message: formatRubyError(e),
+      message: formatRubyError(e, false),
     });
   }
 
@@ -168,12 +180,7 @@ async function runFile(id, payload) {
     }
 
     // Run the specified file
-    const fileContent = files[name];
-    if (!fileContent) {
-      throw new Error(`File not found: ${name}`);
-    }
-
-    rubyVM.eval(fileContent);
+    rubyVM.eval(`load ${JSON.stringify(name)}`);
 
     // Flush any buffered output
     flushOutput();
@@ -183,7 +190,7 @@ async function runFile(id, payload) {
 
     rubyOutput.push({
       type: "error",
-      message: formatRubyError(e),
+      message: formatRubyError(e, true),
     });
   }
 

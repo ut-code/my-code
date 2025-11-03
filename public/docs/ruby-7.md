@@ -366,7 +366,7 @@ Ruby入門
       * ヒント: 親クラスの `info` メソッドの結果を `super` で利用すると効率的です。
 
 ```ruby:practice7_2.rb
-require './practice7_1.rb'  # 7_1のコードを実行してBookの定義を読み込みます
+load './practice7_1.rb'  # 7_1のコードを実行してBookの定義を読み込みます
 
 # ここにEBookクラスの定義を書いてください
 
