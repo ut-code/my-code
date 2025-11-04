@@ -4,7 +4,7 @@ Rubyの制御構造は、他の多くの言語と似ていますが、Rubyの「
 
 ## 条件分岐
 
-Rubyの条件分岐は、`if`、`unless`、`case`が基本です。`if`や`case`は文（Statement）ではなく\*\*式（Expression）\*\*であるため、それ自体が値を返します。
+Rubyの条件分岐は、`if`、`unless`、`case`が基本です。`if`や`case`は文（Statement）ではなく**式（Expression）**であるため、それ自体が値を返します。
 
 ### if, else, elsif
 
