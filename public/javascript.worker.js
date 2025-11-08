@@ -41,6 +41,7 @@ async function runCode(id, payload) {
     }
   } catch (e) {
     originalConsole.log(e);
+    // TODO: stack trace?
     if (e instanceof Error) {
       jsOutput.push({
         type: "error",
@@ -49,7 +50,7 @@ async function runCode(id, payload) {
     } else {
       jsOutput.push({
         type: "error",
-        message: `予期せぬエラー: ${String(e)}`,
+        message: `${String(e)}`,
       });
     }
   }
@@ -64,12 +65,31 @@ async function runCode(id, payload) {
 }
 
 function runFile(id, payload) {
-  const output = [
-    {
-      type: "error",
-      message: "File execution is not supported in this runtime",
-    },
-  ];
+  const { name, files } = payload;
+  // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
+  try {
+    // Execute code directly with eval in the worker global scope
+    // This will preserve variables across calls
+    globalThis.eval(files[name]);
+  } catch (e) {
+    originalConsole.log(e);
+    // TODO: stack trace?
+    if (e instanceof Error) {
+      jsOutput.push({
+        type: "error",
+        message: `${e.name}: ${e.message}`,
+      });
+    } else {
+      jsOutput.push({
+        type: "error",
+        message: `${String(e)}`,
+      });
+    }
+  }
+
+  const output = [...jsOutput];
+  jsOutput = []; // Clear output
+
   self.postMessage({
     id,
     payload: { output, updatedFiles: [] },

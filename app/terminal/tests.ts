@@ -60,7 +60,10 @@ export function defineTests(
             python: [`${varName} = ${value}`, `print(${varName})`],
             ruby: [`${varName} = ${value}`, `puts ${varName}`],
             cpp: [null, null],
-            javascript: [`var ${varName} = ${value}`, `console.log(${varName})`],
+            javascript: [
+              `var ${varName} = ${value}`,
+              `console.log(${varName})`,
+            ],
           } satisfies Record<RuntimeLang, string[] | null[]>
         )[lang];
         if (!setIntVarCode || !printIntVarCode) {
@@ -109,7 +112,11 @@ export function defineTests(
             python: [`testVar = 42`, `while True:\n    pass`, `print(testVar)`],
             ruby: [`testVar = 42`, `loop do\nend`, `puts testVar`],
             cpp: [null, null, null],
-            javascript: [`var testVar = 42`, `while(true) {}`, `console.log(testVar)`],
+            javascript: [
+              `var testVar = 42`,
+              `while(true) {}`,
+              `console.log(testVar)`,
+            ],
           } satisfies Record<RuntimeLang, (string | null)[]>
         )[lang];
         if (!setIntVarCode || !infLoopCode || !printIntVarCode) {
@@ -156,7 +163,7 @@ export function defineTests(
               "test.cpp",
               `#include <iostream>\nint main() {\n  std::cout << "${msg}" << std::endl;\n  return 0;\n}\n`,
             ],
-            javascript: [null, null],
+            javascript: ["test.js", `console.log("${msg}")`],
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
         if (!filename || !code) {
@@ -185,7 +192,7 @@ export function defineTests(
               "test_error.cpp",
               `#include <stdexcept>\nint main() {\n  throw std::runtime_error("${errorMsg}");\n  return 0;\n}\n`,
             ],
-            javascript: [null, null],
+            javascript: ["test_error.js", `throw new Error("${errorMsg}");\n`],
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
         if (!filename || !code) {
@@ -230,7 +237,10 @@ export function defineTests(
               ["test_multi_main.cpp", "test_multi_sub.cpp"],
             ],
             javascript: [null, null],
-          } satisfies Record<RuntimeLang, [Record<string, string>, string[]] | [null, null]>
+          } satisfies Record<
+            RuntimeLang,
+            [Record<string, string>, string[]] | [null, null]
+          >
         )[lang];
         if (!codes || !execFiles) {
           this.skip();

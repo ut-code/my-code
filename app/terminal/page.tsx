@@ -69,8 +69,10 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   javascript: {
     repl: true,
     replInitContent: '> console.log("Hello, World!");\nHello, World!',
-    editor: false,
-    exec: false,
+    editor: {
+      "main.js": 'console.log("Hello, World!");',
+    },
+    exec: ["main.js"],
   },
   cpp: {
     repl: false,
