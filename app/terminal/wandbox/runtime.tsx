@@ -10,7 +10,6 @@ import {
 import useSWR from "swr";
 import { compilerInfoFetcher, SelectedCompiler } from "./api";
 import { cppRunFiles, selectCppCompiler } from "./cpp";
-import { useEmbedContext } from "../embedContext";
 import { RuntimeContext, RuntimeLang } from "../runtime";
 import { ReplOutput } from "../repl";
 
@@ -23,13 +22,15 @@ interface IWandboxContext {
   ) => (filenames: string[]) => string;
   runFilesWithLang: (
     lang: WandboxLang
-  ) => (filenames: string[]) => Promise<ReplOutput[]>;
+  ) => (
+    filenames: string[],
+    files: Record<string, string>
+  ) => Promise<ReplOutput[]>;
 }
 
 const WandboxContext = createContext<IWandboxContext>(null!);
 
 export function WandboxProvider({ children }: { children: ReactNode }) {
-  const { files } = useEmbedContext();
   const { data: compilerList, error } = useSWR("list", compilerInfoFetcher);
   if (error) {
     console.error("Failed to fetch compiler list from Wandbox:", error);
@@ -68,21 +69,22 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
 
   // Curried function for language-specific file execution
   const runFilesWithLang = useCallback(
-    (lang: WandboxLang) => async (filenames: string[]) => {
-      if (!selectedCompiler) {
-        return [
-          { type: "error" as const, message: "Wandbox is not ready yet." },
-        ];
-      }
-      switch (lang) {
-        case "cpp":
-          return cppRunFiles(selectedCompiler.cpp, files, filenames);
-        default:
-          lang satisfies never;
-          throw new Error(`unsupported language: ${lang}`);
-      }
-    },
-    [selectedCompiler, files]
+    (lang: WandboxLang) =>
+      async (filenames: string[], files: Record<string, string>) => {
+        if (!selectedCompiler) {
+          return [
+            { type: "error" as const, message: "Wandbox is not ready yet." },
+          ];
+        }
+        switch (lang) {
+          case "cpp":
+            return cppRunFiles(selectedCompiler.cpp, files, filenames);
+          default:
+            lang satisfies never;
+            throw new Error(`unsupported language: ${lang}`);
+        }
+      },
+    [selectedCompiler]
   );
 
   return (

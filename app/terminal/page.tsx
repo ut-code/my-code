@@ -74,6 +74,13 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     },
     exec: ["main.js"],
   },
+  typescript: {
+    repl: false,
+    editor: {
+      "main.ts": 'function greet(name: string): void {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("World");',
+    },
+    exec: ["main.ts"],
+  },
   cpp: {
     repl: false,
     editor: {

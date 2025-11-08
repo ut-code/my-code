@@ -73,7 +73,7 @@ export function EditorComponent(props: EditorProps) {
   const code = files[props.filename] || props.initContent;
   useEffect(() => {
     if (!files[props.filename]) {
-      writeFile(props.filename, props.initContent);
+      writeFile({ [props.filename]: props.initContent });
     }
   }, [files, props.filename, props.initContent, writeFile]);
 
@@ -92,7 +92,7 @@ export function EditorComponent(props: EditorProps) {
             // codeの内容が変更された場合のみ表示する
             (props.readonly || code == props.initContent) && "invisible"
           )}
-          onClick={() => writeFile(props.filename, props.initContent)}
+          onClick={() => writeFile({ [props.filename]: props.initContent })}
         >
           {/*<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->*/}
           <svg
@@ -131,7 +131,7 @@ export function EditorComponent(props: EditorProps) {
         enableLiveAutocompletion={true}
         enableSnippets={false}
         value={code}
-        onChange={(code: string) => writeFile(props.filename, code)}
+        onChange={(code: string) => writeFile({ [props.filename]: code })}
       />
     </div>
   );

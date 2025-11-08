@@ -31,7 +31,7 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const { setExecResult } = useEmbedContext();
+  const { files, setExecResult } = useEmbedContext();
 
   const { ready, runFiles, getCommandlineStr } = useRuntime(props.language);
 
@@ -45,7 +45,7 @@ export function ExecFile(props: ExecProps) {
       (async () => {
         clearTerminal(terminalInstanceRef.current!);
         terminalInstanceRef.current!.write(systemMessageColor("実行中です..."));
-        const outputs = await runFiles(props.filenames);
+        const outputs = await runFiles(props.filenames, files);
         clearTerminal(terminalInstanceRef.current!);
         writeOutput(terminalInstanceRef.current!, outputs, false);
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
@@ -60,6 +60,7 @@ export function ExecFile(props: ExecProps) {
     runFiles,
     setExecResult,
     terminalInstanceRef,
+    files,
   ]);
 
   return (

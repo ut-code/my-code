@@ -25,7 +25,11 @@ type TerminalId = string;
 
 interface IEmbedContext {
   files: Record<Filename, string>;
-  writeFile: (name: Filename, content: string) => void;
+  // ファイルを書き込む。更新後のページ内の全ファイル内容を返す
+  // 返り値を使うことで再レンダリングを待たずに最新の内容を取得できる
+  writeFile: (
+    updatedFiles: Record<Filename, string>
+  ) => Promise<Record<Filename, string>>;
 
   replOutputs: Record<TerminalId, ReplCommand[]>;
   addReplOutput: (
@@ -72,16 +76,26 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   }, [pathname, currentPathname]);
 
   const writeFile = useCallback(
-    (name: Filename, content: string) => {
-      setFiles((files) => {
-        if (files[pathname]?.[name] !== content) {
-          files = { ...files };
-          files[pathname] = { ...(files[pathname] ?? {}) };
-          files[pathname][name] = content;
-          return files;
-        } else {
-          return files;
-        }
+    (updatedFiles: Record<Filename, string>) => {
+      return new Promise<Record<Filename, string>>((resolve) => {
+        setFiles((files) => {
+          let changed = false;
+          const newFiles = { ...files };
+          newFiles[pathname] = { ...(newFiles[pathname] ?? {}) };
+          for (const [name, content] of Object.entries(updatedFiles)) {
+            if (newFiles[pathname][name] !== content) {
+              changed = true;
+              newFiles[pathname][name] = content;
+            }
+          }
+          if (changed) {
+            resolve(newFiles[pathname]);
+            return newFiles;
+          } else {
+            resolve(files[pathname] || {});
+            return files;
+          }
+        });
       });
     },
     [pathname]
