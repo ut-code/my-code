@@ -1,10 +1,18 @@
-import Prism from "prismjs";
 import chalk from "chalk";
 import { RuntimeLang } from "./runtime";
-// 言語定義をインポート
-import "prismjs/components/prism-python";
-import "prismjs/components/prism-ruby";
-import "prismjs/components/prism-javascript";
+
+export async function importPrism() {
+  if (typeof window !== "undefined") {
+    const Prism = await import("prismjs");
+    // 言語定義をインポート
+    await import("prismjs/components/prism-python");
+    await import("prismjs/components/prism-ruby");
+    await import("prismjs/components/prism-javascript");
+    return Prism;
+  } else {
+    return null!;
+  }
+}
 
 type PrismLang = "python" | "ruby" | "javascript";
 
@@ -74,6 +82,7 @@ const prismToAnsi: Record<string, (text: string) => string> = {
  * @returns {string} ANSIで色付けされた文字列
  */
 export function highlightCodeToAnsi(
+  Prism: typeof import("prismjs"),
   code: string,
   language: RuntimeLang
 ): string {
@@ -129,3 +138,4 @@ export function highlightCodeToAnsi(
     ""
   );
 }
+

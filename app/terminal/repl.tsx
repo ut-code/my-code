@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { highlightCodeToAnsi } from "./highlight";
+import { highlightCodeToAnsi, importPrism } from "./highlight";
 import chalk from "chalk";
 import {
   clearTerminal,
@@ -11,7 +11,7 @@ import {
   systemMessageColor,
   useTerminal,
 } from "./terminal";
-import { Terminal } from "@xterm/xterm";
+import type { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
 import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 
@@ -69,6 +69,13 @@ export function ReplTerminal({
 }: ReplComponentProps) {
   const { addReplOutput } = useEmbedContext();
 
+  const [Prism, setPrism] = useState<typeof import("prismjs") | null>(null);
+  useEffect(() => {
+    if(Prism === null){
+      importPrism().then((prism) => setPrism(prism));
+    }
+  }, [Prism]);
+
   const {
     ready: runtimeReady,
     mutex: runtimeMutex = emptyMutex,
@@ -122,7 +129,7 @@ export function ReplTerminal({
   // inputBufferを更新し、画面に描画する
   const updateBuffer = useCallback(
     (newBuffer: () => string[]) => {
-      if (terminalInstanceRef.current) {
+      if (terminalInstanceRef.current && Prism) {
         hideCursor(terminalInstanceRef.current);
         // バッファの行数分カーソルを戻す
         if (inputBuffer.current.length >= 2) {
@@ -141,7 +148,7 @@ export function ReplTerminal({
           );
           if (language) {
             terminalInstanceRef.current.write(
-              highlightCodeToAnsi(inputBuffer.current[i], language)
+              highlightCodeToAnsi(Prism, inputBuffer.current[i], language)
             );
           } else {
             terminalInstanceRef.current.write(inputBuffer.current[i]);
@@ -153,7 +160,7 @@ export function ReplTerminal({
         showCursor(terminalInstanceRef.current);
       }
     },
-    [prompt, promptMore, language, terminalInstanceRef]
+    [Prism, prompt, promptMore, language, terminalInstanceRef]
   );
 
   // ランタイムからのoutputを描画し、inputBufferをリセット

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Terminal } from "@xterm/xterm";
-import { FitAddon } from "@xterm/addon-fit";
+import type { Terminal } from "@xterm/xterm";
+import type { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import chalk from "chalk";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
@@ -70,104 +70,110 @@ export function useTerminal(props: TerminalProps) {
 
   // ターミナルの初期化処理
   useEffect(() => {
-    const abortController = new AbortController();
-    // globals.cssでフォントを指定し読み込んでいるが、
-    // それが読み込まれる前にterminalを初期化してしまうとバグる。
-    document.fonts.load("0.875rem Inconsolata Variable").then(() => {
-      if (!abortController.signal.aborted) {
-        const fromCSS = (varName: string) =>
-          window.getComputedStyle(document.body).getPropertyValue(varName);
-        // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
-        const term = new Terminal({
-          cursorBlink: true,
-          convertEol: true,
-          cursorStyle: "bar",
-          cursorInactiveStyle: "none",
-          fontSize: 14,
-          lineHeight: 1.4,
-          letterSpacing: 0,
-          fontFamily: "'Inconsolata Variable','Noto Sans JP Variable'",
-          theme: {
-            // DaisyUIの変数を使用してテーマを設定している
-            // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
-            background: fromCSS("--color-base-300"),
-            foreground: fromCSS("--color-base-content"),
-            cursor: fromCSS("--color-base-content"),
-            selectionBackground: fromCSS("--color-primary"),
-            selectionForeground: fromCSS("--color-primary-content"),
-            black: fromCSS("--color-black"),
-            brightBlack: fromCSS("--color-neutral-500"),
-            red: fromCSS("--color-red-600"),
-            brightRed: fromCSS("--color-red-400"),
-            green: fromCSS("--color-green-600"),
-            brightGreen: fromCSS("--color-green-400"),
-            yellow: fromCSS("--color-yellow-700"),
-            brightYellow: fromCSS("--color-yellow-400"),
-            blue: fromCSS("--color-indigo-600"),
-            brightBlue: fromCSS("--color-indigo-400"),
-            magenta: fromCSS("--color-fuchsia-600"),
-            brightMagenta: fromCSS("--color-fuchsia-400"),
-            cyan: fromCSS("--color-cyan-600"),
-            brightCyan: fromCSS("--color-cyan-400"),
-            white: fromCSS("--color-base-100"),
-            brightWhite: fromCSS("--color-white"),
-          },
-        });
-        terminalInstanceRef.current = term;
+    if (typeof window !== "undefined") {
+      const abortController = new AbortController();
+      // globals.cssでフォントを指定し読み込んでいるが、
+      // それが読み込まれる前にterminalを初期化してしまうとバグる。
+      Promise.all([
+        import("@xterm/xterm"),
+        import("@xterm/addon-fit"),
+        document.fonts.load("0.875rem Inconsolata Variable"),
+      ]).then(([{ Terminal }, { FitAddon }]) => {
+        if (!abortController.signal.aborted) {
+          const fromCSS = (varName: string) =>
+            window.getComputedStyle(document.body).getPropertyValue(varName);
+          // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
+          const term = new Terminal({
+            cursorBlink: true,
+            convertEol: true,
+            cursorStyle: "bar",
+            cursorInactiveStyle: "none",
+            fontSize: 14,
+            lineHeight: 1.4,
+            letterSpacing: 0,
+            fontFamily: "'Inconsolata Variable','Noto Sans JP Variable'",
+            theme: {
+              // DaisyUIの変数を使用してテーマを設定している
+              // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
+              background: fromCSS("--color-base-300"),
+              foreground: fromCSS("--color-base-content"),
+              cursor: fromCSS("--color-base-content"),
+              selectionBackground: fromCSS("--color-primary"),
+              selectionForeground: fromCSS("--color-primary-content"),
+              black: fromCSS("--color-black"),
+              brightBlack: fromCSS("--color-neutral-500"),
+              red: fromCSS("--color-red-600"),
+              brightRed: fromCSS("--color-red-400"),
+              green: fromCSS("--color-green-600"),
+              brightGreen: fromCSS("--color-green-400"),
+              yellow: fromCSS("--color-yellow-700"),
+              brightYellow: fromCSS("--color-yellow-400"),
+              blue: fromCSS("--color-indigo-600"),
+              brightBlue: fromCSS("--color-indigo-400"),
+              magenta: fromCSS("--color-fuchsia-600"),
+              brightMagenta: fromCSS("--color-fuchsia-400"),
+              cyan: fromCSS("--color-cyan-600"),
+              brightCyan: fromCSS("--color-cyan-400"),
+              white: fromCSS("--color-base-100"),
+              brightWhite: fromCSS("--color-white"),
+            },
+          });
+          terminalInstanceRef.current = term;
 
-        fitAddonRef.current = new FitAddon();
-        term.loadAddon(fitAddonRef.current);
-        // fitAddon.fit();
+          fitAddonRef.current = new FitAddon();
+          term.loadAddon(fitAddonRef.current);
+          // fitAddon.fit();
 
-        term.open(terminalRef.current);
+          term.open(terminalRef.current);
 
-        // https://github.com/xtermjs/xterm.js/issues/2478
-        // my.code();ではCtrl+Cでのkeyboardinterruptは要らないので、コピーペーストに置き換えてしまう
-        term.attachCustomKeyEventHandler((arg) => {
-          if (
-            arg.ctrlKey &&
-            (arg.key === "c" || arg.key === "x") &&
-            arg.type === "keydown"
-          ) {
-            const selection = term.getSelection();
-            if (selection) {
-              navigator.clipboard.writeText(selection);
+          // https://github.com/xtermjs/xterm.js/issues/2478
+          // my.code();ではCtrl+Cでのkeyboardinterruptは要らないので、コピーペーストに置き換えてしまう
+          term.attachCustomKeyEventHandler((arg) => {
+            if (
+              arg.ctrlKey &&
+              (arg.key === "c" || arg.key === "x") &&
+              arg.type === "keydown"
+            ) {
+              const selection = term.getSelection();
+              if (selection) {
+                navigator.clipboard.writeText(selection);
+                return false;
+              }
+            }
+            if (arg.ctrlKey && arg.key === "v" && arg.type === "keydown") {
               return false;
             }
-          }
-          if (arg.ctrlKey && arg.key === "v" && arg.type === "keydown") {
-            return false;
-          }
-          return true;
-        });
+            return true;
+          });
 
-        setTermReady(true);
-        onReadyRef.current?.();
-      }
-    });
+          setTermReady(true);
+          onReadyRef.current?.();
+        }
+      });
 
-    const observer = new ResizeObserver(() => {
-      // fitAddon.fit();
-      const dims = fitAddonRef.current?.proposeDimensions();
-      if (dims && !isNaN(dims.cols)) {
-        const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
-        terminalInstanceRef.current?.resize(dims.cols, rows);
-      }
-    });
-    observer.observe(terminalRef.current);
+      const observer = new ResizeObserver(() => {
+        // fitAddon.fit();
+        const dims = fitAddonRef.current?.proposeDimensions();
+        if (dims && !isNaN(dims.cols)) {
+          const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
+          terminalInstanceRef.current?.resize(dims.cols, rows);
+        }
+      });
+      observer.observe(terminalRef.current);
 
-    return () => {
-      abortController.abort("terminal component dismount");
-      observer.disconnect();
-      if (fitAddonRef.current) {
-        fitAddonRef.current.dispose();
-        fitAddonRef.current = null;
-      }
-      if (terminalInstanceRef.current) {
-        terminalInstanceRef.current.dispose();
-        terminalInstanceRef.current = null;
-      }
-    };
+      return () => {
+        abortController.abort("terminal component dismount");
+        observer.disconnect();
+        if (fitAddonRef.current) {
+          fitAddonRef.current.dispose();
+          fitAddonRef.current = null;
+        }
+        if (terminalInstanceRef.current) {
+          terminalInstanceRef.current.dispose();
+          terminalInstanceRef.current = null;
+        }
+      };
+    }
   }, []);
 
   // テーマが変わったときにterminalのテーマを更新する
