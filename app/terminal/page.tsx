@@ -1,6 +1,5 @@
 "use client";
 import { Heading } from "@/[docs_id]/markdown";
-import "mocha/mocha.js";
 import "mocha/mocha.css";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useWandbox } from "./wandbox/runtime";
@@ -150,19 +149,23 @@ function MochaTest() {
   );
   const { writeFile } = useEmbedContext();
 
-  const runTest = () => {
-    setMochaState("running");
+  const runTest = async () => {
+    if(typeof window !== "undefined") {
+      setMochaState("running");
+      
+      await import("mocha/mocha.js");
 
-    mocha.setup("bdd");
+      mocha.setup("bdd");
 
-    for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
-      defineTests(lang, runtimeRef, writeFile);
+      for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
+        defineTests(lang, runtimeRef, writeFile);
+      }
+
+      const runner = mocha.run();
+      runner.on("end", () => {
+        setMochaState("finished");
+      });
     }
-
-    const runner = mocha.run();
-    runner.on("end", () => {
-      setMochaState("finished");
-    });
   };
 
   return (
