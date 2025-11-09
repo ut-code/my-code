@@ -30,6 +30,7 @@ export interface LangConstants {
   tabSize: number;
   prompt?: string;
   promptMore?: string;
+  returnPrefix?: string;
 }
 export type RuntimeLang = "python" | "ruby" | "cpp" | "javascript";
 
@@ -99,8 +100,10 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
     case "ruby":
       return {
         tabSize: 2,
-        prompt: ">> ",
-        promptMore: "?> ",
+        // TODO: 実際のirbのプロンプトは静的でなく、(main)や番号などの動的な表示がある
+        prompt: "irb> ",
+        promptMore: "irb* ",
+        returnPrefix: "=> ",
       };
     case "javascript":
       return {

@@ -47,7 +47,13 @@ export function ExecFile(props: ExecProps) {
         terminalInstanceRef.current!.write(systemMessageColor("実行中です..."));
         const outputs = await runFiles(props.filenames);
         clearTerminal(terminalInstanceRef.current!);
-        writeOutput(terminalInstanceRef.current!, outputs, false);
+        writeOutput(
+          terminalInstanceRef.current!,
+          outputs,
+          false,
+          undefined,
+          props.language
+        );
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
         setExecResult(props.filenames.join(","), outputs);
         setExecutionState("idle");
@@ -60,6 +66,7 @@ export function ExecFile(props: ExecProps) {
     runFiles,
     setExecResult,
     terminalInstanceRef,
+    props.language,
   ]);
 
   return (

@@ -28,7 +28,9 @@ export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チ�
 export function writeOutput(
   term: Terminal,
   outputs: ReplOutput[],
-  endNewLine: boolean
+  endNewLine: boolean,
+  returnPrefix: string | undefined,
+  language: RuntimeLang
 ) {
   for (let i = 0; i < outputs.length; i++) {
     const output = outputs[i];
@@ -46,6 +48,12 @@ export function writeOutput(
         break;
       case "system":
         term.write(systemMessageColor(message));
+        break;
+      case "return":
+        if (returnPrefix) {
+          term.write(returnPrefix);
+        }
+        term.write(highlightCodeToAnsi(message, language));
         break;
       default:
         term.write(message);
@@ -77,7 +85,7 @@ export function ReplTerminal({
     checkSyntax,
     splitReplExamples,
   } = useRuntime(language);
-  const { tabSize, prompt, promptMore } = langConstants(language);
+  const { tabSize, prompt, promptMore, returnPrefix } = langConstants(language);
   if (!prompt) {
     console.warn(`prompt not defined for language: ${language}`);
   }
@@ -160,12 +168,18 @@ export function ReplTerminal({
   const handleOutput = useCallback(
     (outputs: ReplOutput[]) => {
       if (terminalInstanceRef.current) {
-        writeOutput(terminalInstanceRef.current, outputs, true);
+        writeOutput(
+          terminalInstanceRef.current,
+          outputs,
+          true,
+          returnPrefix,
+          language
+        );
         // 出力が終わったらプロンプトを表示
         updateBuffer(() => [""]);
       }
     },
-    [updateBuffer, terminalInstanceRef]
+    [updateBuffer, terminalInstanceRef, returnPrefix, language]
   );
 
   const keyHandler = useCallback(
@@ -184,17 +198,10 @@ export function ReplTerminal({
             }
           } else if (code === 13) {
             // Enter
-            const hasContent =
-              inputBuffer.current[inputBuffer.current.length - 1].trim()
-                .length > 0;
             const status = checkSyntax
               ? await checkSyntax(inputBuffer.current.join("\n"))
               : "complete";
-            if (
-              (inputBuffer.current.length === 1 && status === "incomplete") ||
-              (inputBuffer.current.length >= 2 && hasContent) ||
-              !isLastChar
-            ) {
+            if (status === "incomplete" || !isLastChar) {
               // 次の行に続く
               updateBuffer(() => [...inputBuffer.current, ""]);
             } else {
