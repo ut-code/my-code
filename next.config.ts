@@ -30,6 +30,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        "child_process": false,
+        "node:child_process": false,
+        ...config.resolve.fallback,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

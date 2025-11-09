@@ -1,39 +1,49 @@
-// Pyodide web worker
-let pyodide;
-let pyodideOutput = [];
-const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v0.28.1/full/`;
+import type { PyodideInterface } from "pyodide";
+// import { loadPyodide } from "pyodide"; -> Reading from "node:child_process" is not handled by plugins
+import { version as pyodideVersion } from "pyodide/package.json";
+import type { PyCallable } from "pyodide/ffi";
+import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
+import type { ReplOutput } from "../repl";
+
+const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`;
+
+let pyodide: PyodideInterface;
+let pyodideOutput: ReplOutput[] = [];
 
 // Helper function to read all files from the Pyodide file system
-function readAllFiles() {
+function readAllFiles(): Record<string, string> {
+  if (!pyodide) {
+    return {};
+  }
+  const updatedFiles: Record<string, string> = {};
   const dirFiles = pyodide.FS.readdir(HOME);
-  const updatedFiles = [];
   for (const filename of dirFiles) {
     if (filename === "." || filename === "..") continue;
-    const filepath = HOME + filename;
+    const filepath = `${HOME}/${filename}`;
     const stat = pyodide.FS.stat(filepath);
     if (pyodide.FS.isFile(stat.mode)) {
       const content = pyodide.FS.readFile(filepath, { encoding: "utf8" });
-      updatedFiles.push([filename, content]);
+      updatedFiles[filename] = content;
     }
   }
   return updatedFiles;
 }
 
-async function init(id, payload) {
+async function init({ id, payload }: WorkerRequest["init"]) {
   const { interruptBuffer } = payload;
   if (!pyodide) {
-    importScripts(`${PYODIDE_CDN}pyodide.js`);
-    pyodide = await loadPyodide({
-      indexURL: PYODIDE_CDN,
-    });
+    (globalThis as WorkerGlobalScope).importScripts(`${PYODIDE_CDN}pyodide.js`);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    pyodide = await (globalThis as any).loadPyodide({ indexURL: PYODIDE_CDN });
 
     pyodide.setStdout({
-      batched: (str) => {
+      batched: (str: string) => {
         pyodideOutput.push({ type: "stdout", message: str });
       },
     });
     pyodide.setStderr({
-      batched: (str) => {
+      batched: (str: string) => {
         pyodideOutput.push({ type: "stderr", message: str });
       },
     });
@@ -43,13 +53,16 @@ async function init(id, payload) {
   self.postMessage({
     id,
     payload: { capabilities: { interrupt: "buffer" } },
-  });
+  } satisfies WorkerResponse["init"]);
 }
 
-async function runCode(id, payload) {
+async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   const { code } = payload;
   if (!pyodide) {
-    self.postMessage({ id, error: "Pyodide not initialized" });
+    self.postMessage({
+      id,
+      error: "Pyodide not initialized",
+    } satisfies WorkerResponse["runCode"]);
     return;
   }
   try {
@@ -59,10 +72,8 @@ async function runCode(id, payload) {
         type: "return",
         message: String(result),
       });
-    } else {
-      // 標準出力/エラーがない場合
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.log(e);
     if (e instanceof Error) {
       // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
@@ -94,35 +105,35 @@ async function runCode(id, payload) {
   }
 
   const updatedFiles = readAllFiles();
-
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
 
   self.postMessage({
     id,
     payload: { output, updatedFiles },
-  });
+  } satisfies WorkerResponse["runCode"]);
 }
 
-async function runFile(id, payload) {
+async function runFile({ id, payload }: WorkerRequest["runFile"]) {
   const { name, files } = payload;
   if (!pyodide) {
-    self.postMessage({ id, error: "Pyodide not initialized" });
+    self.postMessage({
+      id,
+      error: "Pyodide not initialized",
+    } satisfies WorkerResponse["runFile"]);
     return;
   }
   try {
     // Use Pyodide FS API to write files to the file system
     for (const filename of Object.keys(files)) {
       if (files[filename]) {
-        pyodide.FS.writeFile(HOME + filename, files[filename], {
-          encoding: "utf8",
-        });
+        pyodide.FS.writeFile(`${HOME}/${filename}`, files[filename]);
       }
     }
 
-    const pyExecFile = pyodide.runPython(EXECFILE_CODE); /* as PyCallable*/
-    pyExecFile(HOME + name);
-  } catch (e) {
+    const pyExecFile = pyodide.runPython(EXECFILE_CODE) as PyCallable;
+    pyExecFile(`${HOME}/${name}`);
+  } catch (e: unknown) {
     console.log(e);
     if (e instanceof Error) {
       // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
@@ -155,22 +166,21 @@ async function runFile(id, payload) {
   }
 
   const updatedFiles = readAllFiles();
-
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
   self.postMessage({
     id,
     payload: { output, updatedFiles },
-  });
+  } satisfies WorkerResponse["runFile"]);
 }
 
-async function checkSyntax(id, payload) {
+async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
   const { code } = payload;
   if (!pyodide) {
     self.postMessage({
       id,
       payload: { status: "invalid" },
-    });
+    } satisfies WorkerResponse["checkSyntax"]);
     return;
   }
 
@@ -179,40 +189,49 @@ async function checkSyntax(id, payload) {
     self.postMessage({
       id,
       payload: { status: "incomplete" },
-    });
+    } satisfies WorkerResponse["checkSyntax"]);
     return;
   }
 
   try {
     // Pythonのコードを実行して結果を受け取る
-    const status = pyodide.runPython(CHECK_SYNTAX_CODE)(code);
-    self.postMessage({ id, payload: { status } });
+    const status = (pyodide.runPython(CHECK_SYNTAX_CODE) as PyCallable)(code);
+    self.postMessage({
+      id,
+      payload: { status },
+    } satisfies WorkerResponse["checkSyntax"]);
   } catch (e) {
     console.error("Syntax check error:", e);
     self.postMessage({
       id,
       payload: { status: "invalid" },
-    });
+    } satisfies WorkerResponse["checkSyntax"]);
   }
 }
 
-self.onmessage = async (event) => {
-  const { id, type, payload } = event.data;
-  switch (type) {
+self.onmessage = async (event: MessageEvent<WorkerRequest[MessageType]>) => {
+  switch (event.data.type) {
     case "init":
-      await init(id, payload);
+      await init(event.data);
       return;
     case "runCode":
-      await runCode(id, payload);
+      await runCode(event.data);
       return;
     case "runFile":
-      await runFile(id, payload);
+      await runFile(event.data);
       return;
     case "checkSyntax":
-      await checkSyntax(id, payload);
+      await checkSyntax(event.data);
+      return;
+    case "restoreState":
+      self.postMessage({
+        id: event.data.id,
+        error: "not implemented",
+      } satisfies WorkerResponse["restoreState"]);
       return;
     default:
-      console.error(`Unknown message type: ${type}`);
+      event.data satisfies never;
+      console.error(`Unknown message: ${event.data}`);
       return;
   }
 };

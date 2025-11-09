@@ -91,9 +91,9 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
 }
 export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (
-    <WorkerProvider context={PyodideContext} script="/pyodide.worker.js">
-      <WorkerProvider context={RubyContext} script="/ruby.worker.js">
-        <WorkerProvider context={JSEvalContext} script="/javascript.worker.js">
+    <WorkerProvider context={PyodideContext} lang="python">
+      <WorkerProvider context={RubyContext} lang="ruby">
+        <WorkerProvider context={JSEvalContext} lang="javascript">
           <WandboxProvider>
             <TypeScriptProvider>{children}</TypeScriptProvider>
           </WandboxProvider>
