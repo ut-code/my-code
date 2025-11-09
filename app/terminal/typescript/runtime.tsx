@@ -1,38 +1,64 @@
 "use client";
 
-import ts, { CompilerOptions } from "typescript";
-import {
-  createSystem,
-  createVirtualTypeScriptEnvironment,
-  knownLibFilesForCompilerOptions,
-  VirtualTypeScriptEnvironment,
-} from "@typescript/vfs";
+import type { CompilerOptions } from "typescript";
+import type { VirtualTypeScriptEnvironment } from "@typescript/vfs";
 import {
   createContext,
   ReactNode,
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { useEmbedContext } from "../embedContext";
 import { ReplOutput } from "../repl";
 import { RuntimeContext } from "../runtime";
+import dynamic from "next/dynamic";
 
 export const compilerOptions: CompilerOptions = {};
 
-const TypeScriptContext = createContext<VirtualTypeScriptEnvironment | null>(
-  null
+type TSModules = {
+  ts: typeof import("typescript");
+  vfs: typeof import("@typescript/vfs");
+};
+interface ITypeScriptContext {
+  modules: TSModules | null;
+  setModules: (modules: TSModules) => void;
+  tsEnv: VirtualTypeScriptEnvironment | null;
+}
+const TypeScriptContext = createContext<ITypeScriptContext>({
+  modules: null,
+  setModules: () => {},
+  tsEnv: null,
+});
+const LazyInitTypeScript = dynamic(
+  async () => {
+    const ts = await import("typescript");
+    const vfs = await import("@typescript/vfs");
+    return function LazyInitTypeScript() {
+      const { setModules } = useContext(TypeScriptContext);
+      useEffect(() => {
+        setModules({ ts, vfs });
+      }, [setModules]);
+      return null;
+    };
+  },
+  { ssr: false }
 );
 export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
+  const [modules, setModules] = useState<TSModules | null>(null);
+
   useEffect(() => {
-    if (tsEnv === null) {
+    if (modules !== null && tsEnv === null) {
+      const { ts, vfs } = modules;
       const abortController = new AbortController();
       (async () => {
-        const system = createSystem(new Map());
-        const libFiles = knownLibFilesForCompilerOptions(compilerOptions, ts);
+        const system = vfs.createSystem(new Map());
+        const libFiles = vfs.knownLibFilesForCompilerOptions(
+          compilerOptions,
+          ts
+        );
         const libFileContents = await Promise.all(
           libFiles.map(async (libFile) => {
             const response = await fetch(
@@ -52,7 +78,7 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
             system.writeFile(`/${libFile}`, content);
           }
         });
-        const env = createVirtualTypeScriptEnvironment(
+        const env = vfs.createVirtualTypeScriptEnvironment(
           system,
           [],
           ts,
@@ -64,21 +90,22 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
         abortController.abort();
       };
     }
-  }, [tsEnv]);
+  }, [tsEnv, setTSEnv, modules]);
   return (
-    <TypeScriptContext.Provider value={tsEnv}>
+    <TypeScriptContext.Provider value={{ tsEnv, modules, setModules }}>
+      <LazyInitTypeScript />
       {children}
     </TypeScriptContext.Provider>
   );
 }
 
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
-  const tsEnv = useContext(TypeScriptContext);
+  const { modules, tsEnv } = useContext(TypeScriptContext);
 
   const { writeFile } = useEmbedContext();
   const runFiles = useCallback(
     async (filenames: string[], files: Record<string, string>) => {
-      if (tsEnv === null) {
+      if (tsEnv === null || modules === null) {
         return [
           { type: "error" as const, message: "TypeScript is not ready yet." },
         ];
@@ -95,11 +122,14 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
       )) {
         outputs.push({
           type: "error",
-          message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
-            getCurrentDirectory: () => "",
-            getCanonicalFileName: (f) => f,
-            getNewLine: () => "\n",
-          }),
+          message: modules.ts.formatDiagnosticsWithColorAndContext(
+            [diagnostic],
+            {
+              getCurrentDirectory: () => "",
+              getCanonicalFileName: (f) => f,
+              getNewLine: () => "\n",
+            }
+          ),
         });
       }
 
@@ -108,23 +138,33 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
       )) {
         outputs.push({
           type: "error",
-          message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
-            getCurrentDirectory: () => "",
-            getCanonicalFileName: (f) => f,
-            getNewLine: () => "\n",
-          }),
+          message: modules.ts.formatDiagnosticsWithColorAndContext(
+            [diagnostic],
+            {
+              getCurrentDirectory: () => "",
+              getCanonicalFileName: (f) => f,
+              getNewLine: () => "\n",
+            }
+          ),
         });
       }
 
       const emitOutput = tsEnv.languageService.getEmitOutput(filenames[0]);
-      files = await writeFile(Object.fromEntries(emitOutput.outputFiles.map((of) => [of.name, of.text])));
+      files = await writeFile(
+        Object.fromEntries(
+          emitOutput.outputFiles.map((of) => [of.name, of.text])
+        )
+      );
 
-      console.log(emitOutput)
-      const jsOutputs = jsEval.runFiles([emitOutput.outputFiles[0].name], files);
+      console.log(emitOutput);
+      const jsOutputs = jsEval.runFiles(
+        [emitOutput.outputFiles[0].name],
+        files
+      );
 
       return outputs.concat(await jsOutputs);
     },
-    [tsEnv, writeFile, jsEval]
+    [modules, tsEnv, writeFile, jsEval]
   );
   return {
     ready: tsEnv !== null,
