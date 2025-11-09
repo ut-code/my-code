@@ -35,6 +35,8 @@ export const pagesList = [
       { id: 8, title: "モジュールとMix-in" },
       { id: 9, title: "Proc, Lambda, クロージャ" },
       { id: 10, title: "標準ライブラリの活用" },
+      { id: 11, title: "テスト文化入門" },
+      { id: 12, title: "メタプログラミング入門" },
     ],
   },
   {

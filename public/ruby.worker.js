@@ -179,6 +179,9 @@ async function runFile(id, payload) {
       }
     }
 
+    // clear LOADED_FEATURES so that `require` can reload files
+    rubyVM.eval(`$LOADED_FEATURES.reject! { |f| f =~ /^\\/[^\\/]*\\.rb$/ }`);
+
     // Run the specified file
     rubyVM.eval(`load ${JSON.stringify(name)}`);
 
