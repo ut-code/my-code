@@ -8,45 +8,64 @@ import {
   useRef,
   useState,
 } from "react";
-import { RuntimeContext } from "../runtime";
+import { RuntimeContext, RuntimeLang } from "../runtime";
 import { ReplOutput, SyntaxStatus } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
 import { useEmbedContext } from "../embedContext";
 
-type MessageToWorker =
-  | { type: "init"; payload: { interruptBuffer: Uint8Array } }
-  | { type: "runCode"; payload: { code: string } }
-  | { type: "checkSyntax"; payload: { code: string } }
-  | {
-      type: "runFile";
-      payload: { name: string; files: Record<string, string> };
-    }
-  | { type: "restoreState"; payload: { commands: string[] } };
-
-type MessageFromWorker =
-  | { id: number; payload: unknown }
-  | { id: number; error: string };
-
+type WorkerLang = "python" | "ruby" | "javascript";
 type WorkerCapabilities = {
   interrupt: "buffer" | "restart";
 };
-type InitPayloadFromWorker = {
-  capabilities: WorkerCapabilities;
+
+export type MessageType = keyof MessagePayload;
+export type MessagePayload = {
+  init: {
+    req: { interruptBuffer: Uint8Array };
+    res: { capabilities: WorkerCapabilities };
+  };
+  runCode: {
+    req: { code: string };
+    res: { output: ReplOutput[]; updatedFiles: Record<string, string> };
+  };
+  runFile: {
+    req: { name: string; files: Record<string, string> };
+    res: { output: ReplOutput[]; updatedFiles: Record<string, string> };
+  };
+  checkSyntax: {
+    req: { code: string };
+    res: { status: SyntaxStatus };
+  };
+  restoreState: {
+    req: { commands: string[] };
+    res: object;
+  };
 };
-type RunPayloadFromWorker = {
-  output: ReplOutput[];
-  updatedFiles: [string, string][];
+// export type WorkerRequest = { id: number; type: "init"; payload: MessagePayload["init"]["req"]; } | ... と同じ
+export type WorkerRequest = {
+  [K in MessageType]: {
+    id: number;
+    type: K;
+    payload: MessagePayload[K]["req"];
+  };
 };
-type StatusPayloadFromWorker = { status: SyntaxStatus };
+export type WorkerResponse = {
+  [K in MessageType]:
+    | {
+        id: number;
+        payload: MessagePayload[MessageType]["res"];
+      }
+    | { id: number; error: string };
+};
 
 export function WorkerProvider({
   children,
   context,
-  script,
+  lang,
 }: {
   children: ReactNode;
   context: Context<RuntimeContext>;
-  script: string;
+  lang: WorkerLang;
 }) {
   const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState<boolean>(false);
@@ -65,23 +84,41 @@ export function WorkerProvider({
   const commandHistory = useRef<string[]>([]);
 
   // Generic postMessage
-  function postMessage<T>(message: MessageToWorker) {
+  function postMessage<K extends MessageType>(
+    type: K,
+    payload: MessagePayload[K]["req"]
+  ) {
     const id = nextMessageId.current++;
-    return new Promise<T>((resolve, reject) => {
+    return new Promise<MessagePayload[K]["res"]>((resolve, reject) => {
       messageCallbacks.current.set(id, [resolve, reject]);
-      workerRef.current?.postMessage({ id, ...message });
+      workerRef.current?.postMessage({ id, type, payload } as WorkerRequest[K]);
     });
   }
 
   const initializeWorker = useCallback(async () => {
-    const worker = new Worker(script);
+    let worker: Worker;
+    lang satisfies RuntimeLang;
+    switch (lang) {
+      case "python":
+        worker = new Worker(new URL("./pyodide.worker.ts", import.meta.url));
+        break;
+      case "ruby":
+        worker = new Worker(new URL("./ruby.worker.ts", import.meta.url));
+        break;
+      case "javascript":
+        worker = new Worker(new URL("./jsEval.worker.ts", import.meta.url));
+        break;
+      default:
+        lang satisfies never;
+        throw new Error(`Unknown worker language: ${lang}`);
+    }
     workerRef.current = worker;
 
     // Always create and provide the buffer
     interruptBuffer.current = new Uint8Array(new SharedArrayBuffer(1));
 
     worker.onmessage = (event) => {
-      const data = event.data as MessageFromWorker;
+      const data = event.data as WorkerResponse[MessageType];
       if (messageCallbacks.current.has(data.id)) {
         const [resolve, reject] = messageCallbacks.current.get(data.id)!;
         if ("error" in data) {
@@ -93,13 +130,12 @@ export function WorkerProvider({
       }
     };
 
-    return postMessage<InitPayloadFromWorker>({
-      type: "init",
-      payload: { interruptBuffer: interruptBuffer.current },
+    return postMessage("init", {
+      interruptBuffer: interruptBuffer.current,
     }).then((payload) => {
       capabilities.current = payload.capabilities;
     });
-  }, [script]);
+  }, [lang]);
 
   // Initialization effect
   useEffect(() => {
@@ -130,9 +166,8 @@ export function WorkerProvider({
         void mutex.current.runExclusive(async () => {
           await initializeWorker();
           if (commandHistory.current.length > 0) {
-            await postMessage<object>({
-              type: "restoreState",
-              payload: { commands: commandHistory.current },
+            await postMessage("restoreState", {
+              commands: commandHistory.current,
             });
           }
           setReady(true);
@@ -167,13 +202,9 @@ export function WorkerProvider({
       }
 
       try {
-        const { output, updatedFiles } =
-          await postMessage<RunPayloadFromWorker>({
-            type: "runCode",
-            payload: { code },
-          });
+        const { output, updatedFiles } = await postMessage("runCode", { code });
 
-        for (const [name, content] of updatedFiles) {
+        for (const [name, content] of Object.entries(updatedFiles)) {
           writeFile(name, content);
         }
 
@@ -200,10 +231,7 @@ export function WorkerProvider({
     async (code: string): Promise<SyntaxStatus> => {
       if (!workerRef.current || !ready) return "invalid";
       const { status } = await mutex.current.runExclusive(() =>
-        postMessage<StatusPayloadFromWorker>({
-          type: "checkSyntax",
-          payload: { code },
-        })
+        postMessage("checkSyntax", { code })
       );
       return status;
     },
@@ -235,12 +263,11 @@ export function WorkerProvider({
         interruptBuffer.current[0] = 0;
       }
       return mutex.current.runExclusive(async () => {
-        const { output, updatedFiles } =
-          await postMessage<RunPayloadFromWorker>({
-            type: "runFile",
-            payload: { name: filenames[0], files },
-          });
-        for (const [newName, content] of updatedFiles) {
+        const { output, updatedFiles } = await postMessage("runFile", {
+          name: filenames[0],
+          files,
+        });
+        for (const [newName, content] of Object.entries(updatedFiles)) {
           writeFile(newName, content);
         }
         return output;

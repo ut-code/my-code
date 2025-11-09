@@ -1,37 +1,36 @@
-// Ruby.wasm web worker
-let rubyVM = null;
-let rubyOutput = [];
+import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
+import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
+import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
+import type { ReplOutput } from "../repl";
+
+let rubyVM: RubyVM | null = null;
+let rubyOutput: ReplOutput[] = [];
 let stdoutBuffer = "";
 let stderrBuffer = "";
 
-const RUBY_JS_URL =
-  "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@2.7.2/dist/browser.umd.js";
-const RUBY_WASM_URL =
-  "https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@2.7.2/dist/ruby+stdlib.wasm";
-
+declare global {
+  var stdout: { write: (str: string) => void };
+  var stderr: { write: (str: string) => void };
+}
 globalThis.stdout = {
-  write(str) {
+  write(str: string) {
     stdoutBuffer += str;
   },
 };
 globalThis.stderr = {
-  write(str) {
+  write(str: string) {
     stderrBuffer += str;
   },
 };
 
-async function init(id, payload) {
-  // const { } = payload;
-
+async function init({ id }: WorkerRequest["init"]) {
   if (!rubyVM) {
     try {
-      importScripts(RUBY_JS_URL);
-
       // Fetch and compile the Ruby WASM module
-      const rubyModule = await WebAssembly.compileStreaming(
-        await fetch(RUBY_WASM_URL)
+      const rubyWasmRes = await fetch(
+        "https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@latest/dist/ruby+stdlib.wasm"
       );
-      const { DefaultRubyVM } = globalThis["ruby-wasm-wasi"];
+      const rubyModule = await WebAssembly.compileStreaming(rubyWasmRes);
       const { vm } = await DefaultRubyVM(rubyModule);
       rubyVM = vm;
 
@@ -49,20 +48,18 @@ $stderr = Object.new.tap do |obj|
   end
 end
 `);
-    } catch (e) {
+      self.postMessage({
+        id,
+        payload: { capabilities: { interrupt: "restart" } },
+      } satisfies WorkerResponse["init"]);
+    } catch (e: unknown) {
       console.error("Failed to initialize Ruby VM:", e);
       self.postMessage({
         id,
-        error: `Failed to initialize Ruby: ${e.message}`,
-      });
-      return;
+        error: `Failed to initialize Ruby: ${e}`,
+      } satisfies WorkerResponse["init"]);
     }
   }
-
-  self.postMessage({
-    id,
-    payload: { capabilities: { interrupt: "restart" } },
-  });
 }
 
 function flushOutput() {
@@ -92,7 +89,7 @@ function flushOutput() {
   stderrBuffer = "";
 }
 
-function formatRubyError(error, isFile) {
+function formatRubyError(error: unknown, isFile: boolean): string {
   if (!(error instanceof Error)) {
     return `予期せぬエラー: ${String(error).trim()}`;
   }
@@ -112,11 +109,14 @@ function formatRubyError(error, isFile) {
   return errorMessage;
 }
 
-async function runCode(id, payload) {
+async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   const { code } = payload;
 
   if (!rubyVM) {
-    self.postMessage({ id, error: "Ruby VM not initialized" });
+    self.postMessage({
+      id,
+      error: "Ruby VM not initialized",
+    } satisfies WorkerResponse["runCode"]);
     return;
   }
 
@@ -135,7 +135,7 @@ async function runCode(id, payload) {
     // Add result to output if it's not nil and not empty
     rubyOutput.push({
       type: "return",
-      message: resultStr,
+      message: resultStr.toString(),
     });
   } catch (e) {
     console.log(e);
@@ -154,14 +154,17 @@ async function runCode(id, payload) {
   self.postMessage({
     id,
     payload: { output, updatedFiles },
-  });
+  } satisfies WorkerResponse["runCode"]);
 }
 
-async function runFile(id, payload) {
+async function runFile({ id, payload }: WorkerRequest["runFile"]) {
   const { name, files } = payload;
 
   if (!rubyVM) {
-    self.postMessage({ id, error: "Ruby VM not initialized" });
+    self.postMessage({
+      id,
+      error: "Ruby VM not initialized",
+    } satisfies WorkerResponse["runFile"]);
     return;
   }
 
@@ -174,7 +177,9 @@ async function runFile(id, payload) {
     for (const [filename, content] of Object.entries(files)) {
       if (content) {
         rubyVM.eval(
-          `File.write(${JSON.stringify(filename)}, ${JSON.stringify(content).replaceAll("#", "\\#")})`
+          `File.write(${JSON.stringify(filename)}, ${JSON.stringify(
+            content
+          ).replaceAll("#", "\\#")})`
         );
       }
     }
@@ -204,17 +209,17 @@ async function runFile(id, payload) {
   self.postMessage({
     id,
     payload: { output, updatedFiles },
-  });
+  } satisfies WorkerResponse["runFile"]);
 }
 
-async function checkSyntax(id, payload) {
+async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
   const { code } = payload;
 
   if (!rubyVM) {
     self.postMessage({
       id,
       payload: { status: "invalid" },
-    });
+    } satisfies WorkerResponse["checkSyntax"]);
     return;
   }
 
@@ -222,68 +227,60 @@ async function checkSyntax(id, payload) {
     // Try to parse the code to check syntax
     // Ruby doesn't have a built-in compile_command like Python
     // We'll use a simple heuristic
-    const trimmed = code.trim();
-
-    // // Check for incomplete syntax patterns
-    // const incompletePatterns = [
-    //   /\bif\b.*(?<!then)$/,
-    //   /\bdef\b.*$/,
-    //   /\bclass\b.*$/,
-    //   /\bmodule\b.*$/,
-    //   /\bdo\b\s*$/,
-    //   /\bbegin\b\s*$/,
-    //   /\{[^}]*$/,
-    //   /\[[^\]]*$/,
-    //   /\([^)]*$/,
-    // ];
-
-    // // Check if code ends with a continuation pattern
-    // if (incompletePatterns.some((pattern) => pattern.test(trimmed))) {
-    //   self.postMessage({ id, payload: { status: "incomplete" } });
-    //   return;
-    // }
-
-    // Try to compile/evaluate in check mode
     try {
       rubyVM.eval(`BEGIN { raise "check" }; ${code}`);
-    } catch (e) {
+    } catch (e: unknown) {
       if (
+        e instanceof Error &&
         e.message &&
         (e.message.includes("unexpected end-of-input") || // for `if` etc.
           e.message.includes("expected a matching") || // for ( ), [ ]
           e.message.includes("expected a `}` to close the hash literal") ||
           e.message.includes("unterminated string meets end of file"))
       ) {
-        self.postMessage({ id, payload: { status: "incomplete" } });
+        self.postMessage({
+          id,
+          payload: { status: "incomplete" },
+        } satisfies WorkerResponse["checkSyntax"]);
         return;
       }
       // If it's our check exception, syntax is valid
-      if (e.message && e.message.includes("check")) {
-        self.postMessage({ id, payload: { status: "complete" } });
+      if (e instanceof Error && e.message && e.message.includes("check")) {
+        self.postMessage({
+          id,
+          payload: { status: "complete" },
+        } satisfies WorkerResponse["checkSyntax"]);
         return;
       }
       // Otherwise it's a syntax error
-      self.postMessage({ id, payload: { status: "invalid" } });
+      self.postMessage({
+        id,
+        payload: { status: "invalid" },
+      } satisfies WorkerResponse["checkSyntax"]);
       return;
     }
-    self.postMessage({ id, payload: { status: "complete" } });
+    self.postMessage({
+      id,
+      payload: { status: "complete" },
+    } satisfies WorkerResponse["checkSyntax"]);
   } catch (e) {
     console.error("Syntax check error:", e);
     self.postMessage({
       id,
       payload: { status: "invalid" },
-    });
+    } satisfies WorkerResponse["checkSyntax"]);
   }
 }
 
 // Helper function to read all files from the virtual file system
-function readAllFiles() {
-  if (!rubyVM) return [];
-  const updatedFiles = [];
+function readAllFiles(): Record<string, string> {
+  if (!rubyVM) return {};
+  const updatedFiles: Record<string, string> = {};
 
   try {
     // Get list of files in the home directory
-    const result = rubyVM.eval(`
+    const result = rubyVM.eval(
+      `
       require 'json'
       files = {}
       Dir.glob('*').each do |filename|
@@ -292,10 +289,11 @@ function readAllFiles() {
         end
       end
       JSON.generate(files)
-    `);
+    `
+    );
     const filesObj = JSON.parse(result.toString());
     for (const [filename, content] of Object.entries(filesObj)) {
-      updatedFiles.push([filename, content]);
+      updatedFiles[filename] = content as string;
     }
   } catch (e) {
     console.error("Error reading files:", e);
@@ -304,11 +302,14 @@ function readAllFiles() {
   return updatedFiles;
 }
 
-async function restoreState(id, payload) {
+async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
   // Re-execute all previously successful commands to restore state
   const { commands } = payload;
   if (!rubyVM) {
-    self.postMessage({ id, error: "Ruby VM not initialized" });
+    self.postMessage({
+      id,
+      error: "Ruby VM not initialized",
+    } satisfies WorkerResponse["restoreState"]);
     return;
   }
 
@@ -329,30 +330,32 @@ async function restoreState(id, payload) {
   flushOutput();
   rubyOutput = [];
 
-  self.postMessage({ id, payload: {} });
+  self.postMessage({
+    id,
+    payload: {},
+  } satisfies WorkerResponse["restoreState"]);
 }
 
-self.onmessage = async (event) => {
-  const { id, type, payload } = event.data;
-
-  switch (type) {
+self.onmessage = async (event: MessageEvent<WorkerRequest[MessageType]>) => {
+  switch (event.data.type) {
     case "init":
-      await init(id, payload);
+      await init(event.data);
       return;
     case "runCode":
-      await runCode(id, payload);
+      await runCode(event.data);
       return;
     case "runFile":
-      await runFile(id, payload);
+      await runFile(event.data);
       return;
     case "checkSyntax":
-      await checkSyntax(id, payload);
+      await checkSyntax(event.data);
       return;
     case "restoreState":
-      await restoreState(id, payload);
+      await restoreState(event.data);
       return;
     default:
-      console.error(`Unknown message type: ${type}`);
+      event.data satisfies never;
+      console.error(`Unknown message: ${event.data}`);
       return;
   }
 };
