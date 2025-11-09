@@ -1,32 +1,39 @@
-// JavaScript web worker
-let jsOutput = [];
+import type { ReplOutput } from "../repl";
+import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
+
+let jsOutput: ReplOutput[] = [];
 
 // Helper function to capture console output
 const originalConsole = globalThis.console;
 globalThis.console = {
-  log: (...args) => {
+  ...originalConsole,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  log: (...args: any[]) => {
     jsOutput.push({ type: "stdout", message: args.join(" ") });
   },
-  error: (...args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error: (...args: any[]) => {
     jsOutput.push({ type: "stderr", message: args.join(" ") });
   },
-  warn: (...args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  warn: (...args: any[]) => {
     jsOutput.push({ type: "stderr", message: args.join(" ") });
   },
-  info: (...args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  info: (...args: any[]) => {
     jsOutput.push({ type: "stdout", message: args.join(" ") });
   },
 };
 
-async function init(id, payload) {
+async function init({ id }: WorkerRequest["init"]) {
   // Initialize the worker and report capabilities
   self.postMessage({
     id,
     payload: { capabilities: { interrupt: "restart" } },
-  });
+  } satisfies WorkerResponse["init"]);
 }
 
-async function runCode(id, payload) {
+async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   const { code } = payload;
   try {
     // Execute code directly with eval in the worker global scope
@@ -60,11 +67,11 @@ async function runCode(id, payload) {
   self.postMessage({
     id,
     payload: { output, updatedFiles: [] },
-  });
+  } satisfies WorkerResponse["runCode"]);
 }
 
-function runFile(id, payload) {
-  const output = [
+function runFile({ id }: WorkerRequest["runFile"]) {
+  const output: ReplOutput[] = [
     {
       type: "error",
       message: "File execution is not supported in this runtime",
@@ -73,16 +80,19 @@ function runFile(id, payload) {
   self.postMessage({
     id,
     payload: { output, updatedFiles: [] },
-  });
+  } satisfies WorkerResponse["runFile"]);
 }
 
-async function checkSyntax(id, payload) {
+async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
   const { code } = payload;
 
   try {
     // Try to create a Function to check syntax
     new Function(code);
-    self.postMessage({ id, payload: { status: "complete" } });
+    self.postMessage({
+      id,
+      payload: { status: "complete" },
+    } satisfies WorkerResponse["checkSyntax"]);
   } catch (e) {
     // Check if it's a syntax error or if more input is expected
     if (e instanceof SyntaxError) {
@@ -91,17 +101,26 @@ async function checkSyntax(id, payload) {
         e.message.includes("Unexpected end of input") ||
         e.message.includes("expected expression")
       ) {
-        self.postMessage({ id, payload: { status: "incomplete" } });
+        self.postMessage({
+          id,
+          payload: { status: "incomplete" },
+        } satisfies WorkerResponse["checkSyntax"]);
       } else {
-        self.postMessage({ id, payload: { status: "invalid" } });
+        self.postMessage({
+          id,
+          payload: { status: "invalid" },
+        } satisfies WorkerResponse["checkSyntax"]);
       }
     } else {
-      self.postMessage({ id, payload: { status: "invalid" } });
+      self.postMessage({
+        id,
+        payload: { status: "invalid" },
+      } satisfies WorkerResponse["checkSyntax"]);
     }
   }
 }
 
-async function restoreState(id, payload) {
+async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
   // Re-execute all previously successful commands to restore state
   const { commands } = payload;
   jsOutput = []; // Clear output for restoration
@@ -116,29 +135,32 @@ async function restoreState(id, payload) {
   }
 
   jsOutput = []; // Clear any output from restoration
-  self.postMessage({ id, payload: {} });
+  self.postMessage({
+    id,
+    payload: {},
+  } satisfies WorkerResponse["restoreState"]);
 }
 
-self.onmessage = async (event) => {
-  const { id, type, payload } = event.data;
-  switch (type) {
+self.onmessage = async (event: MessageEvent<WorkerRequest[MessageType]>) => {
+  switch (event.data.type) {
     case "init":
-      await init(id, payload);
+      await init(event.data);
       return;
     case "runCode":
-      await runCode(id, payload);
+      await runCode(event.data);
       return;
     case "runFile":
-      runFile(id, payload);
+      runFile(event.data);
       return;
     case "checkSyntax":
-      await checkSyntax(id, payload);
+      await checkSyntax(event.data);
       return;
     case "restoreState":
-      await restoreState(id, payload);
+      await restoreState(event.data);
       return;
     default:
-      originalConsole.error(`Unknown message type: ${type}`);
+      event.data satisfies never;
+      originalConsole.error(`Unknown message: ${event.data}`);
       return;
   }
 };
