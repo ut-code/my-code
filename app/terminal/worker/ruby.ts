@@ -21,13 +21,26 @@ export function useRuby() {
 function splitReplExamples(content: string): ReplCommand[] {
   const initCommands: { command: string; output: ReplOutput[] }[] = [];
   for (const line of content.split("\n")) {
-    if (line.startsWith(">> ")) {
-      // Ruby IRB uses >> as the prompt
-      initCommands.push({ command: line.slice(3), output: [] });
-    } else if (line.startsWith("?> ")) {
-      // Ruby IRB uses ?> for continuation
+    if (line.startsWith("irb")) {
+      if (
+        initCommands.length > 0 &&
+        initCommands[initCommands.length - 1].output.length === 0
+      ) {
+        // 前のコマンド行と連続している場合つなげる
+        initCommands[initCommands.length - 1].command +=
+          "\n" + line.slice(line.indexOf(" ") + 1);
+      } else {
+        initCommands.push({
+          command: line.slice(line.indexOf(" ") + 1),
+          output: [],
+        });
+      }
+    } else if (line.startsWith("=> ")) {
       if (initCommands.length > 0) {
-        initCommands[initCommands.length - 1].command += "\n" + line.slice(3);
+        initCommands[initCommands.length - 1].output.push({
+          type: "return",
+          message: line.slice(3),
+        });
       }
     } else {
       // Lines without prompt are output from the previous command

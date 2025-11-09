@@ -59,7 +59,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   },
   ruby: {
     repl: true,
-    replInitContent: '>> puts "Hello, World!"\nHello, World!',
+    replInitContent: 'irb(main):001:0> puts "Hello, World!"\nHello, World!',
     editor: {
       "main.rb": 'puts "Hello, World!"',
     },

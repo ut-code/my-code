@@ -19,7 +19,7 @@ const CACHE_KEY_BASE = "https://my-code.utcode.net/chatHistory";
 interface Context {
   drizzle: Awaited<ReturnType<typeof getDrizzle>>;
   auth: Auth;
-  userId: string;
+  userId?: string;
 }
 /**
  * drizzleが初期化されてなければ初期化し、
@@ -40,10 +40,9 @@ async function initAll(ctx?: Partial<Context>): Promise<Context> {
     const session = await ctx.auth.api.getSession({
       headers: await headers(),
     });
-    if (!session) {
-      throw new Error("Not authenticated");
+    if (session) {
+      ctx.userId = session.user.id;
     }
-    ctx.userId = session.user.id;
   }
   return ctx as Context;
 }
@@ -64,7 +63,9 @@ export async function addChat(
   context?: Partial<Context>
 ) {
   const { drizzle, userId } = await initAll(context);
-
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
   const [newChat] = await drizzle
     .insert(chat)
     .values({
@@ -106,6 +107,9 @@ export async function getChat(
   context?: Partial<Context>
 ): Promise<ChatWithMessages[]> {
   const { drizzle, userId } = await initAll(context);
+  if (!userId) {
+    return [];
+  }
 
   const chats = await drizzle.query.chat.findMany({
     where: and(eq(chat.userId, userId), eq(chat.docsId, docsId)),
@@ -131,6 +135,9 @@ export async function getChatFromCache(
   context?: Partial<Context>
 ) {
   const { drizzle, auth, userId } = await initAll(context);
+  if (!userId) {
+    return [];
+  }
 
   const cache = await getCache();
   const cachedResponse = await cache.match(

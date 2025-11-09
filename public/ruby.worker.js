@@ -92,12 +92,24 @@ function flushOutput() {
   stderrBuffer = "";
 }
 
-function formatRubyError(error) {
+function formatRubyError(error, isFile) {
   if (!(error instanceof Error)) {
     return `予期せぬエラー: ${String(error).trim()}`;
   }
 
-  return error.message;
+  let errorMessage = error.message;
+
+  // Clean up Ruby error messages by filtering out internal eval lines
+  if (errorMessage.includes("Traceback") || errorMessage.includes("Error")) {
+    let lines = errorMessage.split("\n");
+    lines = lines.filter((line) => line !== "-e:in 'Kernel.eval'");
+    if (isFile) {
+      lines = lines.filter((line) => !line.startsWith("eval:1:in"));
+    }
+    errorMessage = lines.join("\n");
+  }
+
+  return errorMessage;
 }
 
 async function runCode(id, payload) {
@@ -118,22 +130,20 @@ async function runCode(id, payload) {
     // Flush any buffered output
     flushOutput();
 
-    const resultStr = result.toString();
+    const resultStr = await result.callAsync("inspect");
 
     // Add result to output if it's not nil and not empty
-    if (resultStr !== "" && resultStr !== "nil") {
-      rubyOutput.push({
-        type: "return",
-        message: resultStr,
-      });
-    }
+    rubyOutput.push({
+      type: "return",
+      message: resultStr,
+    });
   } catch (e) {
     console.log(e);
     flushOutput();
 
     rubyOutput.push({
       type: "error",
-      message: formatRubyError(e),
+      message: formatRubyError(e, false),
     });
   }
 
@@ -164,18 +174,16 @@ async function runFile(id, payload) {
     for (const [filename, content] of Object.entries(files)) {
       if (content) {
         rubyVM.eval(
-          `File.write(${JSON.stringify(filename)}, ${JSON.stringify(content)})`
+          `File.write(${JSON.stringify(filename)}, ${JSON.stringify(content).replaceAll("#", "\\#")})`
         );
       }
     }
 
-    // Run the specified file
-    const fileContent = files[name];
-    if (!fileContent) {
-      throw new Error(`File not found: ${name}`);
-    }
+    // clear LOADED_FEATURES so that `require` can reload files
+    rubyVM.eval(`$LOADED_FEATURES.reject! { |f| f =~ /^\\/[^\\/]*\\.rb$/ }`);
 
-    rubyVM.eval(fileContent);
+    // Run the specified file
+    rubyVM.eval(`load ${JSON.stringify(name)}`);
 
     // Flush any buffered output
     flushOutput();
@@ -185,7 +193,7 @@ async function runFile(id, payload) {
 
     rubyOutput.push({
       type: "error",
-      message: formatRubyError(e),
+      message: formatRubyError(e, true),
     });
   }
 
@@ -216,29 +224,39 @@ async function checkSyntax(id, payload) {
     // We'll use a simple heuristic
     const trimmed = code.trim();
 
-    // Check for incomplete syntax patterns
-    const incompletePatterns = [
-      /\bif\b.*(?<!then)$/,
-      /\bdef\b.*$/,
-      /\bclass\b.*$/,
-      /\bmodule\b.*$/,
-      /\bdo\b\s*$/,
-      /\bbegin\b\s*$/,
-      /\{[^}]*$/,
-      /\[[^\]]*$/,
-      /\([^)]*$/,
-    ];
+    // // Check for incomplete syntax patterns
+    // const incompletePatterns = [
+    //   /\bif\b.*(?<!then)$/,
+    //   /\bdef\b.*$/,
+    //   /\bclass\b.*$/,
+    //   /\bmodule\b.*$/,
+    //   /\bdo\b\s*$/,
+    //   /\bbegin\b\s*$/,
+    //   /\{[^}]*$/,
+    //   /\[[^\]]*$/,
+    //   /\([^)]*$/,
+    // ];
 
-    // Check if code ends with a continuation pattern
-    if (incompletePatterns.some((pattern) => pattern.test(trimmed))) {
-      self.postMessage({ id, payload: { status: "incomplete" } });
-      return;
-    }
+    // // Check if code ends with a continuation pattern
+    // if (incompletePatterns.some((pattern) => pattern.test(trimmed))) {
+    //   self.postMessage({ id, payload: { status: "incomplete" } });
+    //   return;
+    // }
 
     // Try to compile/evaluate in check mode
     try {
       rubyVM.eval(`BEGIN { raise "check" }; ${code}`);
     } catch (e) {
+      if (
+        e.message &&
+        (e.message.includes("unexpected end-of-input") || // for `if` etc.
+          e.message.includes("expected a matching") || // for ( ), [ ]
+          e.message.includes("expected a `}` to close the hash literal") ||
+          e.message.includes("unterminated string meets end of file"))
+      ) {
+        self.postMessage({ id, payload: { status: "incomplete" } });
+        return;
+      }
       // If it's our check exception, syntax is valid
       if (e.message && e.message.includes("check")) {
         self.postMessage({ id, payload: { status: "complete" } });
@@ -248,7 +266,6 @@ async function checkSyntax(id, payload) {
       self.postMessage({ id, payload: { status: "invalid" } });
       return;
     }
-
     self.postMessage({ id, payload: { status: "complete" } });
   } catch (e) {
     console.error("Syntax check error:", e);

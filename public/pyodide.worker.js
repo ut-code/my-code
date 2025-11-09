@@ -174,6 +174,15 @@ async function checkSyntax(id, payload) {
     return;
   }
 
+  // 複数行コマンドは最後に空行を入れないと完了しないものとする
+  if (code.includes("\n") && code.split("\n").at(-1) !== "") {
+    self.postMessage({
+      id,
+      payload: { status: "incomplete" },
+    });
+    return;
+  }
+
   try {
     // Pythonのコードを実行して結果を受け取る
     const status = pyodide.runPython(CHECK_SYNTAX_CODE)(code);
