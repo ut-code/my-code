@@ -124,17 +124,6 @@ export function ReplTerminal({
       }
       return rows + 2; // 最後のプロンプト行を含める
     },
-    onReady: () => {
-      if (initCommand) {
-        for (const cmd of initCommand) {
-          updateBuffer(() => cmd.command.split("\n"));
-          terminalInstanceRef.current!.writeln("");
-          inputBuffer.current = [];
-          handleOutput(cmd.output);
-        }
-      }
-      terminalInstanceRef.current!.scrollToTop();
-    },
   });
 
   // REPLのユーザー入力
@@ -143,7 +132,7 @@ export function ReplTerminal({
   // inputBufferを更新し、画面に描画する
   const updateBuffer = useCallback(
     (newBuffer: () => string[]) => {
-      if (terminalInstanceRef.current && Prism) {
+      if (terminalInstanceRef.current) {
         hideCursor(terminalInstanceRef.current);
         // バッファの行数分カーソルを戻す
         if (inputBuffer.current.length >= 2) {
@@ -161,9 +150,14 @@ export function ReplTerminal({
             (i === 0 ? prompt : (promptMore ?? prompt)) ?? "> "
           );
           if (language) {
-            terminalInstanceRef.current.write(
-              highlightCodeToAnsi(Prism, inputBuffer.current[i], language)
-            );
+            if (Prism) {
+              terminalInstanceRef.current.write(
+                highlightCodeToAnsi(Prism, inputBuffer.current[i], language)
+              );
+            } else {
+              console.warn("Prism is not loaded, cannot highlight input code");
+              terminalInstanceRef.current.write(inputBuffer.current[i]);
+            }
           } else {
             terminalInstanceRef.current.write(inputBuffer.current[i]);
           }
@@ -193,7 +187,7 @@ export function ReplTerminal({
         updateBuffer(() => [""]);
       }
     },
-    [updateBuffer, terminalInstanceRef, returnPrefix, language]
+    [Prism, updateBuffer, terminalInstanceRef, returnPrefix, language]
   );
 
   const keyHandler = useCallback(
@@ -288,18 +282,34 @@ export function ReplTerminal({
     }
   }, [keyHandler, termReady, runtimeReady, terminalInstanceRef]);
 
-  // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)
   const [initCommandState, setInitCommandState] = useState<
-    "idle" | "triggered" | "executing" | "done"
-  >("idle");
+    "initializing" | "idle" | "triggered" | "executing" | "done"
+  >("initializing");
   useEffect(() => {
     if (
+      terminalInstanceRef.current &&
+      termReady &&
+      Prism &&
+      initCommandState === "initializing"
+    ) {
+      // xtermの初期化とPrismの読み込みが完了したら、initCommandを実行せず描画する
+      if (initCommand) {
+        for (const cmd of initCommand) {
+          updateBuffer(() => cmd.command.split("\n"));
+          terminalInstanceRef.current!.writeln("");
+          inputBuffer.current = [];
+          handleOutput(cmd.output);
+        }
+      }
+      terminalInstanceRef.current!.scrollToTop();
+      setInitCommandState("idle");
+    } else if (
       terminalInstanceRef.current &&
       termReady &&
       runtimeReady &&
       initCommandState === "triggered"
     ) {
-      setInitCommandState("executing");
+      // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)      setInitCommandState("executing");
       (async () => {
         if (initCommand) {
           // 初期化時に実行するコマンドがある場合はそれを実行
@@ -338,6 +348,7 @@ export function ReplTerminal({
     handleOutput,
     termReady,
     terminalInstanceRef,
+    Prism,
   ]);
 
   return (
