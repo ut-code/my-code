@@ -4,16 +4,15 @@ import { pagesList } from "./pagesList";
 export default function Home() {
   return (
     <div className="p-4">
-      <div className="hero bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 rounded-lg my-6 py-12">
+      <div className="hero bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 rounded-lg my-6 py-8 sm:px-4">
         <div className="hero-content text-center">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold mb-6">my.code(); へようこそ</h1>
-            <p className="text-lg mb-4">
-              my.code();
-              はプログラミング言語のチュートリアルを提供するウェブサイトです。
+          <div className="">
+            <h1 className="text-5xl font-bold mb-8">my.code(); へようこそ</h1>
+            <p className="text-3xl font-bold mb-4">
+              環境構築不要、その場で実践。
             </p>
-            <p className="text-base opacity-80">
-              ブラウザ上で動かせる実行環境とAIアシスタントで、あなたの学習を強力にサポートします。
+            <p className="text-lg opacity-80">
+              AIアシスタントとの対話履歴があなただけの教材へと進化する、新しいプログラミング学習サイトです。
             </p>
           </div>
         </div>
@@ -57,8 +56,9 @@ export default function Home() {
             <h3 className="card-title text-primary">📚 豊富なチュートリアル</h3>
             <p>
               my.code();
-              ではさまざまなプログラミング言語やフレームワークのチュートリアルを提供しています。
+              では数多くのプログラミング言語のチュートリアルを提供しています。
               初心者向けの基礎から上級者向けの応用まで、幅広いレベルに対応したチュートリアルが揃っています。
+              あなたがまだ触ったことのない言語も、気軽に体験してみることができます。
             </p>
           </div>
         </div>
@@ -68,9 +68,9 @@ export default function Home() {
               ⚡ すぐに動かせる実行環境
             </h3>
             <p>
-              my.code();
-              ではブラウザ上でコードを実行できる環境を整備しており、環境構築の手間なくすぐにコードを実行することができます。
+              環境構築の手間なくブラウザ上ですぐにコードを実行することができます。
               チュートリアル内のサンプルコードはそのまま実行するだけでなく、自由に編集して試すことも可能です。
+              さらに、エラーメッセージの解説やエラー箇所のハイライト表示など、初心者に優しい機能も充実しています。
             </p>
           </div>
         </div>
@@ -80,9 +80,9 @@ export default function Home() {
               🤖 AIアシスタントによるサポート
             </h3>
             <p>
-              my.code(); ではAIアシスタントが学習をサポートします。
-              チュートリアルを読んでいてわからないことがあれば、AIアシスタントに質問してみてください。
-              さらに、実行したサンプルコードの解説やエラーの原因調査、改善提案まで、AIアシスタントがあなたの学習を強力に支援します。
+              わからないことがあれば、AIアシスタントに質問してみてください。
+              AIとの対話履歴により教材そのものがアップデートされ、あなた専用の学習コンテンツとして蓄積・進化します。
+              実行したコードの解説やエラーの原因調査、改善提案まで、AIアシスタントがあなたの学習を強力に支援します。
             </p>
           </div>
         </div>
