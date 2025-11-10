@@ -52,6 +52,7 @@ export function ExecFile(props: ExecProps) {
           outputs,
           false,
           undefined,
+          null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
           props.language
         );
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる

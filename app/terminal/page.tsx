@@ -147,7 +147,9 @@ function MochaTest() {
   const [mochaState, setMochaState] = useState<"idle" | "running" | "finished">(
     "idle"
   );
-  const { writeFile } = useEmbedContext();
+  const { files } = useEmbedContext();
+  const filesRef = useRef(files);
+  filesRef.current = files;
 
   const runTest = async () => {
     if(typeof window !== "undefined") {
@@ -158,7 +160,7 @@ function MochaTest() {
       mocha.setup("bdd");
 
       for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
-        defineTests(lang, runtimeRef, writeFile);
+        defineTests(lang, runtimeRef, filesRef);
       }
 
       const runner = mocha.run();

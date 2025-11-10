@@ -24,7 +24,7 @@ export interface RuntimeContext {
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   splitReplExamples?: (content: string) => ReplCommand[];
   // file
-  runFiles: (filenames: string[], files: Record<string, string>) => Promise<ReplOutput[]>;
+  runFiles: (filenames: string[], files: Readonly<Record<string, string>>) => Promise<ReplOutput[]>;
   getCommandlineStr?: (filenames: string[]) => string;
 }
 export interface LangConstants {

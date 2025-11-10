@@ -24,7 +24,7 @@ interface IWandboxContext {
     lang: WandboxLang
   ) => (
     filenames: string[],
-    files: Record<string, string>
+    files: Readonly<Record<string, string>>
   ) => Promise<ReplOutput[]>;
 }
 
@@ -70,7 +70,7 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
   // Curried function for language-specific file execution
   const runFilesWithLang = useCallback(
     (lang: WandboxLang) =>
-      async (filenames: string[], files: Record<string, string>) => {
+      async (filenames: string[], files: Readonly<Record<string, string>>) => {
         if (!selectedCompiler) {
           return [
             { type: "error" as const, message: "Wandbox is not ready yet." },

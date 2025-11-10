@@ -24,21 +24,21 @@ type Filename = string;
 type TerminalId = string;
 
 interface IEmbedContext {
-  files: Record<Filename, string>;
+  files: Readonly<Record<Filename, string>>;
   // ファイルを書き込む。更新後のページ内の全ファイル内容を返す
   // 返り値を使うことで再レンダリングを待たずに最新の内容を取得できる
   writeFile: (
-    updatedFiles: Record<Filename, string>
-  ) => Promise<Record<Filename, string>>;
+    updatedFiles: Readonly<Record<Filename, string>>
+  ) => Promise<Readonly<Record<Filename, string>>>;
 
-  replOutputs: Record<TerminalId, ReplCommand[]>;
+  replOutputs: Readonly<Record<TerminalId, ReplCommand[]>>;
   addReplOutput: (
     terminalId: TerminalId,
     command: string,
     output: ReplOutput[]
   ) => void;
 
-  execResults: Record<Filename, ReplOutput[]>;
+  execResults: Readonly<Record<Filename, ReplOutput[]>>;
   setExecResult: (filename: Filename, output: ReplOutput[]) => void;
 }
 const EmbedContext = createContext<IEmbedContext>(null!);

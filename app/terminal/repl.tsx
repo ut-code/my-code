@@ -30,6 +30,7 @@ export function writeOutput(
   outputs: ReplOutput[],
   endNewLine: boolean,
   returnPrefix: string | undefined,
+  Prism: typeof import("prismjs") | null,
   language: RuntimeLang
 ) {
   for (let i = 0; i < outputs.length; i++) {
@@ -53,7 +54,12 @@ export function writeOutput(
         if (returnPrefix) {
           term.write(returnPrefix);
         }
-        term.write(highlightCodeToAnsi(message, language));
+        if (Prism) {
+          term.write(highlightCodeToAnsi(Prism, message, language));
+        } else {
+          console.warn("Prism is not loaded, cannot highlight return value");
+          term.write(message);
+        }
         break;
       default:
         term.write(message);
@@ -79,7 +85,7 @@ export function ReplTerminal({
 
   const [Prism, setPrism] = useState<typeof import("prismjs") | null>(null);
   useEffect(() => {
-    if(Prism === null){
+    if (Prism === null) {
       importPrism().then((prism) => setPrism(prism));
     }
   }, [Prism]);
@@ -180,6 +186,7 @@ export function ReplTerminal({
           outputs,
           true,
           returnPrefix,
+          Prism,
           language
         );
         // 出力が終わったらプロンプトを表示

@@ -5,7 +5,7 @@ import { emptyMutex, RuntimeContext, RuntimeLang } from "./runtime";
 export function defineTests(
   lang: RuntimeLang,
   runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext>>,
-  writeFile: (name: string, content: string) => void
+  filesRef: RefObject<Readonly<Record<string, string>>>,
 ) {
   describe(`${lang} Runtime`, function () {
     this.timeout(
@@ -136,7 +136,6 @@ export function defineTests(
         while (!runtimeRef.current[lang].ready) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        await new Promise((resolve) => setTimeout(resolve, 100));
         const result = await (
           runtimeRef.current[lang].mutex || emptyMutex
         ).runExclusive(() =>
@@ -169,10 +168,7 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        writeFile(filename, code);
-        // use setTimeout to wait for writeFile to propagate.
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        const result = await runtimeRef.current[lang].runFiles([filename]);
+        const result = await runtimeRef.current[lang].runFiles([filename], {[filename]: code});
         console.log(`${lang} single file stdout test: `, result);
         expect(result).to.be.deep.equal([
           {
@@ -198,9 +194,7 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        writeFile(filename, code);
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        const result = await runtimeRef.current[lang].runFiles([filename]);
+        const result = await runtimeRef.current[lang].runFiles([filename], {[filename]: code});
         console.log(`${lang} single file error capture test: `, result);
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         expect(result.filter((r) => r.message.includes(errorMsg))).to.not.be
@@ -245,11 +239,7 @@ export function defineTests(
         if (!codes || !execFiles) {
           this.skip();
         }
-        for (const [filename, code] of Object.entries(codes)) {
-          writeFile(filename, code);
-        }
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        const result = await runtimeRef.current[lang].runFiles(execFiles);
+        const result = await runtimeRef.current[lang].runFiles(execFiles, codes);
         console.log(`${lang} multifile stdout test: `, result);
         expect(result).to.be.deep.equal([
           {

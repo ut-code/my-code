@@ -237,7 +237,10 @@ export function WorkerProvider({
   );
 
   const runFiles = useCallback(
-    async (filenames: string[], files: Record<string, string>): Promise<ReplOutput[]> => {
+    async (
+      filenames: string[],
+      files: Readonly<Record<string, string>>
+    ): Promise<ReplOutput[]> => {
       if (filenames.length !== 1) {
         return [
           {

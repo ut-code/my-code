@@ -80,7 +80,7 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
 
   const { writeFile } = useEmbedContext();
   const runFiles = useCallback(
-    async (filenames: string[], files: Record<string, string>) => {
+    async (filenames: string[], files: Readonly<Record<string, string>>) => {
       if (tsEnv === null || typeof window === "undefined") {
         return [
           { type: "error" as const, message: "TypeScript is not ready yet." },
