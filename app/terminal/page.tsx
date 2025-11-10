@@ -1,6 +1,5 @@
 "use client";
 import { Heading } from "@/[docs_id]/markdown";
-import "mocha/mocha.js";
 import "mocha/mocha.css";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useWandbox } from "./wandbox/runtime";
@@ -13,6 +12,7 @@ import { useJSEval } from "./worker/jsEval";
 import { ReplTerminal } from "./repl";
 import { EditorComponent, getAceLang } from "./editor";
 import { ExecFile } from "./exec";
+import { useTypeScript } from "./typescript/runtime";
 
 export default function RuntimeTestPage() {
   return (
@@ -69,8 +69,17 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   javascript: {
     repl: true,
     replInitContent: '> console.log("Hello, World!");\nHello, World!',
-    editor: false,
-    exec: false,
+    editor: {
+      "main.js": 'console.log("Hello, World!");',
+    },
+    exec: ["main.js"],
+  },
+  typescript: {
+    repl: false,
+    editor: {
+      "main.ts": 'function greet(name: string): void {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("World");',
+    },
+    exec: ["main.ts"],
   },
   cpp: {
     repl: false,
@@ -122,13 +131,15 @@ function RuntimeSample({
 function MochaTest() {
   const pyodide = usePyodide();
   const ruby = useRuby();
-  const javascript = useJSEval();
+  const jsEval = useJSEval();
+  const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
   const runtimeRef = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
   runtimeRef.current = {
     python: pyodide,
     ruby: ruby,
-    javascript: javascript,
+    javascript: jsEval,
+    typescript: typescript,
     cpp: wandboxCpp,
   };
 
@@ -139,21 +150,27 @@ function MochaTest() {
   const [mochaState, setMochaState] = useState<"idle" | "running" | "finished">(
     "idle"
   );
-  const { writeFile } = useEmbedContext();
+  const { files } = useEmbedContext();
+  const filesRef = useRef(files);
+  filesRef.current = files;
 
-  const runTest = () => {
-    setMochaState("running");
+  const runTest = async () => {
+    if(typeof window !== "undefined") {
+      setMochaState("running");
+      
+      await import("mocha/mocha.js");
 
-    mocha.setup("bdd");
+      mocha.setup("bdd");
 
-    for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
-      defineTests(lang, runtimeRef, writeFile);
+      for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
+        defineTests(lang, runtimeRef, filesRef);
+      }
+
+      const runner = mocha.run();
+      runner.on("end", () => {
+        setMochaState("finished");
+      });
     }
-
-    const runner = mocha.run();
-    runner.on("end", () => {
-      setMochaState("finished");
-    });
   };
 
   return (

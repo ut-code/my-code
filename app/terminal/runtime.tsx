@@ -7,6 +7,7 @@ import { PyodideContext, usePyodide } from "./worker/pyodide";
 import { RubyContext, useRuby } from "./worker/ruby";
 import { JSEvalContext, useJSEval } from "./worker/jsEval";
 import { WorkerProvider } from "./worker/runtime";
+import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
 
 /**
  * Common runtime context interface for different languages
@@ -23,7 +24,7 @@ export interface RuntimeContext {
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   splitReplExamples?: (content: string) => ReplCommand[];
   // file
-  runFiles: (filenames: string[]) => Promise<ReplOutput[]>;
+  runFiles: (filenames: string[], files: Readonly<Record<string, string>>) => Promise<ReplOutput[]>;
   getCommandlineStr?: (filenames: string[]) => string;
 }
 export interface LangConstants {
@@ -32,7 +33,12 @@ export interface LangConstants {
   promptMore?: string;
   returnPrefix?: string;
 }
-export type RuntimeLang = "python" | "ruby" | "cpp" | "javascript";
+export type RuntimeLang =
+  | "python"
+  | "ruby"
+  | "cpp"
+  | "javascript"
+  | "typescript";
 
 export function getRuntimeLang(
   lang: string | undefined
@@ -51,6 +57,9 @@ export function getRuntimeLang(
     case "javascript":
     case "js":
       return "javascript";
+    case "typescript":
+    case "ts":
+      return "typescript";
     default:
       console.warn(`Unsupported language for runtime: ${lang}`);
       return undefined;
@@ -61,6 +70,7 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
   const pyodide = usePyodide();
   const ruby = useRuby();
   const jsEval = useJSEval();
+  const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
 
   switch (language) {
@@ -70,6 +80,8 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
       return ruby;
     case "javascript":
       return jsEval;
+    case "typescript":
+      return typescript;
     case "cpp":
       return wandboxCpp;
     default:
@@ -82,7 +94,9 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
     <WorkerProvider context={PyodideContext} lang="python">
       <WorkerProvider context={RubyContext} lang="ruby">
         <WorkerProvider context={JSEvalContext} lang="javascript">
-          <WandboxProvider>{children}</WandboxProvider>
+          <WandboxProvider>
+            <TypeScriptProvider>{children}</TypeScriptProvider>
+          </WandboxProvider>
         </WorkerProvider>
       </WorkerProvider>
     </WorkerProvider>
@@ -106,6 +120,7 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
         returnPrefix: "=> ",
       };
     case "javascript":
+    case "typescript":
       return {
         tabSize: 2,
         prompt: "> ",

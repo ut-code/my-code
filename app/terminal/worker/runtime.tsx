@@ -70,7 +70,7 @@ export function WorkerProvider({
   const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState<boolean>(false);
   const mutex = useRef<MutexInterface>(new Mutex());
-  const { files, writeFile } = useEmbedContext();
+  const { writeFile } = useEmbedContext();
 
   const messageCallbacks = useRef<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -204,9 +204,7 @@ export function WorkerProvider({
       try {
         const { output, updatedFiles } = await postMessage("runCode", { code });
 
-        for (const [name, content] of Object.entries(updatedFiles)) {
-          writeFile(name, content);
-        }
+        writeFile(updatedFiles);
 
         // Save command to history if interrupt method is 'restart'
         if (capabilities.current?.interrupt === "restart") {
@@ -239,7 +237,10 @@ export function WorkerProvider({
   );
 
   const runFiles = useCallback(
-    async (filenames: string[]): Promise<ReplOutput[]> => {
+    async (
+      filenames: string[],
+      files: Readonly<Record<string, string>>
+    ): Promise<ReplOutput[]> => {
       if (filenames.length !== 1) {
         return [
           {
@@ -267,13 +268,11 @@ export function WorkerProvider({
           name: filenames[0],
           files,
         });
-        for (const [newName, content] of Object.entries(updatedFiles)) {
-          writeFile(newName, content);
-        }
+        writeFile(updatedFiles);
         return output;
       });
     },
-    [files, ready, writeFile]
+    [ready, writeFile]
   );
 
   return (

@@ -1,6 +1,5 @@
 import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import { EditorComponent, getAceLang } from "../terminal/editor";
 import { ExecFile } from "../terminal/exec";
 import { useChangeTheme } from "./themeToggle";
@@ -11,6 +10,9 @@ import {
 import { ReactNode } from "react";
 import { getRuntimeLang } from "@/terminal/runtime";
 import { ReplTerminal } from "@/terminal/repl";
+import dynamic from "next/dynamic";
+// SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
+const SyntaxHighlighter = dynamic(() => import("react-syntax-highlighter"), { ssr: false });
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (

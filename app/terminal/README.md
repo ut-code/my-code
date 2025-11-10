@@ -51,8 +51,9 @@ runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、そ
 
 ### ファイル実行用
 
-* runFiles: `(filenames: string[]) => Promise<ReplOutput[]>`
-    * 指定されたファイルを実行します。ファイルの中身はEmbedContextから取得されます。
+* runFiles: `(filenames: string[], files: Record<string, string>) => Promise<ReplOutput[]>`
+    * 指定されたファイルを実行します。
+    * EmbedContextから取得したfilesを呼び出し側で引数に渡します
     * 呼び出し側でmutexのロックはせず、必要であればrunFiles()内でロックします。
 * getCommandlineStr: `(filenames: string[]) => string`
     * 指定されたファイルを実行するためのコマンドライン引数文字列を返します。表示用です。

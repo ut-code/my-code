@@ -1,11 +1,13 @@
+/// <reference lib="webworker" />
+
 import type { ReplOutput } from "../repl";
 import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
 
 let jsOutput: ReplOutput[] = [];
 
 // Helper function to capture console output
-const originalConsole = globalThis.console;
-globalThis.console = {
+const originalConsole = self.console;
+self.console = {
   ...originalConsole,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   log: (...args: any[]) => {
@@ -38,7 +40,7 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   try {
     // Execute code directly with eval in the worker global scope
     // This will preserve variables across calls
-    const result = globalThis.eval(code);
+    const result = self.eval(code);
 
     if (result !== undefined) {
       jsOutput.push({
@@ -48,6 +50,7 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
     }
   } catch (e) {
     originalConsole.log(e);
+    // TODO: stack trace?
     if (e instanceof Error) {
       jsOutput.push({
         type: "error",
@@ -56,7 +59,7 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
     } else {
       jsOutput.push({
         type: "error",
-        message: `予期せぬエラー: ${String(e)}`,
+        message: `${String(e)}`,
       });
     }
   }
@@ -70,13 +73,32 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   } satisfies WorkerResponse["runCode"]);
 }
 
-function runFile({ id }: WorkerRequest["runFile"]) {
-  const output: ReplOutput[] = [
-    {
-      type: "error",
-      message: "File execution is not supported in this runtime",
-    },
-  ];
+function runFile({ id, payload }: WorkerRequest["runFile"]) {
+  const { name, files } = payload;
+  // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
+  try {
+    // Execute code directly with eval in the worker global scope
+    // This will preserve variables across calls
+    self.eval(files[name]);
+  } catch (e) {
+    originalConsole.log(e);
+    // TODO: stack trace?
+    if (e instanceof Error) {
+      jsOutput.push({
+        type: "error",
+        message: `${e.name}: ${e.message}`,
+      });
+    } else {
+      jsOutput.push({
+        type: "error",
+        message: `${String(e)}`,
+      });
+    }
+  }
+
+  const output = [...jsOutput];
+  jsOutput = []; // Clear output
+
   self.postMessage({
     id,
     payload: { output, updatedFiles: [] },
@@ -127,7 +149,7 @@ async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
 
   for (const command of commands) {
     try {
-      globalThis.eval(command);
+      self.eval(command);
     } catch (e) {
       // If restoration fails, we still continue with other commands
       originalConsole.error("Failed to restore command:", command, e);
