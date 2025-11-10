@@ -12,6 +12,7 @@ import { useJSEval } from "./worker/jsEval";
 import { ReplTerminal } from "./repl";
 import { EditorComponent, getAceLang } from "./editor";
 import { ExecFile } from "./exec";
+import { useTypeScript } from "./typescript/runtime";
 
 export default function RuntimeTestPage() {
   return (
@@ -130,13 +131,15 @@ function RuntimeSample({
 function MochaTest() {
   const pyodide = usePyodide();
   const ruby = useRuby();
-  const javascript = useJSEval();
+  const jsEval = useJSEval();
+  const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
   const runtimeRef = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
   runtimeRef.current = {
     python: pyodide,
     ruby: ruby,
-    javascript: javascript,
+    javascript: jsEval,
+    typescript: typescript,
     cpp: wandboxCpp,
   };
 

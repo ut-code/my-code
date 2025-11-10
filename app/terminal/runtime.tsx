@@ -120,6 +120,7 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
         returnPrefix: "=> ",
       };
     case "javascript":
+    case "typescript":
       return {
         tabSize: 2,
         prompt: "> ",

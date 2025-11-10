@@ -5,7 +5,7 @@ import { emptyMutex, RuntimeContext, RuntimeLang } from "./runtime";
 export function defineTests(
   lang: RuntimeLang,
   runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext>>,
-  filesRef: RefObject<Readonly<Record<string, string>>>,
+  filesRef: RefObject<Readonly<Record<string, string>>>
 ) {
   describe(`${lang} Runtime`, function () {
     this.timeout(
@@ -35,6 +35,7 @@ export function defineTests(
             ruby: `puts "${msg}"`,
             cpp: null,
             javascript: `console.log("${msg}")`,
+            typescript: null,
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
         if (!printCode) {
@@ -64,6 +65,7 @@ export function defineTests(
               `var ${varName} = ${value}`,
               `console.log(${varName})`,
             ],
+            typescript: [null, null],
           } satisfies Record<RuntimeLang, string[] | null[]>
         )[lang];
         if (!setIntVarCode || !printIntVarCode) {
@@ -92,6 +94,7 @@ export function defineTests(
             ruby: `raise "${errorMsg}"`,
             cpp: null,
             javascript: `throw new Error("${errorMsg}")`,
+            typescript: null,
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
         if (!errorCode) {
@@ -117,6 +120,7 @@ export function defineTests(
               `while(true) {}`,
               `console.log(testVar)`,
             ],
+            typescript: [null, null, null],
           } satisfies Record<RuntimeLang, (string | null)[]>
         )[lang];
         if (!setIntVarCode || !infLoopCode || !printIntVarCode) {
@@ -163,12 +167,15 @@ export function defineTests(
               `#include <iostream>\nint main() {\n  std::cout << "${msg}" << std::endl;\n  return 0;\n}\n`,
             ],
             javascript: ["test.js", `console.log("${msg}")`],
+            typescript: ["test.ts", `console.log("${msg}")`],
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
         if (!filename || !code) {
           this.skip();
         }
-        const result = await runtimeRef.current[lang].runFiles([filename], {[filename]: code});
+        const result = await runtimeRef.current[lang].runFiles([filename], {
+          [filename]: code,
+        });
         console.log(`${lang} single file stdout test: `, result);
         expect(result).to.be.deep.equal([
           {
@@ -189,12 +196,16 @@ export function defineTests(
               `#include <stdexcept>\nint main() {\n  throw std::runtime_error("${errorMsg}");\n  return 0;\n}\n`,
             ],
             javascript: ["test_error.js", `throw new Error("${errorMsg}");\n`],
+            // TODO: tscが出す型エラーのテストはできていない
+            typescript: ["test_error.ts", `throw new Error("${errorMsg}");\n`],
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
         if (!filename || !code) {
           this.skip();
         }
-        const result = await runtimeRef.current[lang].runFiles([filename], {[filename]: code});
+        const result = await runtimeRef.current[lang].runFiles([filename], {
+          [filename]: code,
+        });
         console.log(`${lang} single file error capture test: `, result);
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         expect(result.filter((r) => r.message.includes(errorMsg))).to.not.be
@@ -231,6 +242,7 @@ export function defineTests(
               ["test_multi_main.cpp", "test_multi_sub.cpp"],
             ],
             javascript: [null, null],
+            typescript: [null, null],
           } satisfies Record<
             RuntimeLang,
             [Record<string, string>, string[]] | [null, null]
@@ -239,7 +251,10 @@ export function defineTests(
         if (!codes || !execFiles) {
           this.skip();
         }
-        const result = await runtimeRef.current[lang].runFiles(execFiles, codes);
+        const result = await runtimeRef.current[lang].runFiles(
+          execFiles,
+          codes
+        );
         console.log(`${lang} multifile stdout test: `, result);
         expect(result).to.be.deep.equal([
           {

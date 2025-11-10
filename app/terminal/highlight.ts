@@ -25,6 +25,7 @@ function getPrismLanguage(language: RuntimeLang): PrismLang {
     case "javascript":
       return "javascript";
     case "cpp":
+    case "typescript":
       throw new Error(
         `highlight for ${language} is disabled because it should not support REPL`
       );
