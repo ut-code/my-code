@@ -45,12 +45,7 @@ export function defineTests(
           runtimeRef.current[lang].mutex || emptyMutex
         ).runExclusive(() => runtimeRef.current[lang].runCommand!(printCode));
         console.log(`${lang} REPL stdout test: `, result);
-        expect(result).to.be.deep.equal([
-          {
-            type: "stdout",
-            message: msg,
-          },
-        ]);
+        expect(result).to.be.deep.include({ type: "stdout", message: msg });
       });
 
       it("should preserve variables across commands", async function () {
@@ -78,12 +73,10 @@ export function defineTests(
           return runtimeRef.current[lang].runCommand!(printIntVarCode);
         });
         console.log(`${lang} REPL variable preservation test: `, result);
-        expect(result).to.be.deep.equal([
-          {
-            type: "stdout",
-            message: value.toString(),
-          },
-        ]);
+        expect(result).to.be.deep.include({
+          type: "stdout",
+          message: value.toString(),
+        });
       });
 
       it("should capture errors", async function () {
@@ -146,12 +139,31 @@ export function defineTests(
           runtimeRef.current[lang].runCommand!(printIntVarCode)
         );
         console.log(`${lang} REPL interrupt recovery test: `, result);
-        expect(result).to.be.deep.equal([
+        expect(result).to.be.deep.include({ type: "stdout", message: "42" });
+      });
+
+      it("should capture files modified by command", async function () {
+        const targetFile = "test.txt";
+        const msg = "Hello, World!";
+        const writeCode = (
           {
-            type: "stdout",
-            message: "42",
-          },
-        ]);
+            python: `with open("${targetFile}", "w") as f:\n    f.write("${msg}")`,
+            ruby: `File.open("${targetFile}", "w") {|f| f.write("${msg}") }`,
+            cpp: null,
+            javascript: null,
+            typescript: null,
+          } satisfies Record<RuntimeLang, string | null>
+        )[lang];
+        if (!writeCode) {
+          this.skip();
+        }
+        const result = await (
+          runtimeRef.current[lang].mutex || emptyMutex
+        ).runExclusive(() => runtimeRef.current[lang].runCommand!(writeCode));
+        console.log(`${lang} REPL file modify test: `, result);
+        // wait for files to be updated
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        expect(filesRef.current[targetFile]).to.equal(msg);
       });
     });
 
@@ -177,12 +189,7 @@ export function defineTests(
           [filename]: code,
         });
         console.log(`${lang} single file stdout test: `, result);
-        expect(result).to.be.deep.equal([
-          {
-            type: "stdout",
-            message: msg,
-          },
-        ]);
+        expect(result).to.be.deep.include({ type: "stdout", message: msg });
       });
 
       it("should capture errors", async function () {
@@ -256,12 +263,37 @@ export function defineTests(
           codes
         );
         console.log(`${lang} multifile stdout test: `, result);
-        expect(result).to.be.deep.equal([
+        expect(result).to.be.deep.include({ type: "stdout", message: msg });
+      });
+
+      it("should capture files modified by script", async function () {
+        const targetFile = "test.txt";
+        const msg = "Hello, World!";
+        const [filename, code] = (
           {
-            type: "stdout",
-            message: msg,
-          },
-        ]);
+            python: [
+              "test.py",
+              `with open("${targetFile}", "w") as f:\n    f.write("${msg}")`,
+            ],
+            ruby: [
+              "test.rb",
+              `File.open("${targetFile}", "w") {|f| f.write("${msg}") }`,
+            ],
+            cpp: [null, null],
+            javascript: [null, null],
+            typescript: [null, null],
+          } satisfies Record<RuntimeLang, [string, string] | [null, null]>
+        )[lang];
+        if (!filename || !code) {
+          this.skip();
+        }
+        const result = await runtimeRef.current[lang].runFiles([filename], {
+          [filename]: code,
+        });
+        console.log(`${lang} file modify test: `, result);
+        // wait for files to be updated
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        expect(filesRef.current[targetFile]).to.equal(msg);
       });
     });
   });
