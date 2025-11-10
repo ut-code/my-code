@@ -1,5 +1,12 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { pagesList } from "./pagesList";
+
+export const metadata: Metadata = {
+  title: "my.code(); へようこそ",
+  description:
+    "環境構築不要、その場で実践。AIアシスタントとの対話履歴があなただけの教材へと進化する、新しいプログラミング学習サイトです。",
+};
 
 export default function Home() {
   return (
