@@ -1,3 +1,6 @@
+/// <reference lib="webworker" />
+/// <reference lib="ES2023" />
+
 import type { PyodideInterface } from "pyodide";
 // import { loadPyodide } from "pyodide"; -> Reading from "node:child_process" is not handled by plugins
 import { version as pyodideVersion } from "pyodide/package.json";
@@ -32,10 +35,10 @@ function readAllFiles(): Record<string, string> {
 async function init({ id, payload }: WorkerRequest["init"]) {
   const { interruptBuffer } = payload;
   if (!pyodide) {
-    (globalThis as WorkerGlobalScope).importScripts(`${PYODIDE_CDN}pyodide.js`);
+    self.importScripts(`${PYODIDE_CDN}pyodide.js`);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pyodide = await (globalThis as any).loadPyodide({ indexURL: PYODIDE_CDN });
+    pyodide = await (self as any).loadPyodide({ indexURL: PYODIDE_CDN });
 
     pyodide.setStdout({
       batched: (str: string) => {

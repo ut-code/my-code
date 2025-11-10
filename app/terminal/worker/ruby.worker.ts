@@ -1,3 +1,6 @@
+/// <reference lib="webworker" />
+/// <reference lib="ES2023" />
+
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
@@ -12,12 +15,12 @@ declare global {
   var stdout: { write: (str: string) => void };
   var stderr: { write: (str: string) => void };
 }
-globalThis.stdout = {
+self.stdout = {
   write(str: string) {
     stdoutBuffer += str;
   },
 };
-globalThis.stderr = {
+self.stderr = {
   write(str: string) {
     stderrBuffer += str;
   },
