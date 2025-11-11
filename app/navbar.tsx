@@ -7,7 +7,7 @@ export function Navbar() {
       {/* fixedのヘッダーの分だけスクロールするコンテンツを下に移動するためのdiv */}
       <div className="h-16 lg:hidden" />
 
-      <div className="h-16 navbar bg-base-200 w-full fixed lg:hidden flex gap-4 z-40 shadow-md">
+      <div className="h-16 navbar bg-base-200 w-full fixed lg:hidden flex gap-2 z-40 shadow-md">
         <div className="flex-none">
           {/* サイドバーを開閉するボタン */}
           <label
@@ -30,15 +30,17 @@ export function Navbar() {
             </svg>
           </label>
         </div>
-        {/* サイドバーが常時表示されている場合のみ */}
-        <Link href="/" className="flex-1 font-bold text-xl">
-          <img
-            src="/icon.svg"
-            alt="icon"
-            className="inline-block w-8 h-8 mr-2"
-          />
-          my.code();
-        </Link>
+        {/* サイドバーが表示されていない場合のみ */}
+        <div className="flex-1">
+          <Link href="/" className="flex items-center">
+            <img
+              src="/icon.svg"
+              alt="icon"
+              className="inline-block w-8 h-8 mr-2"
+            />
+            <span className="font-bold text-xl">my.code();</span>
+          </Link>
+        </div>
         <ThemeToggle />
         <AccountMenu />
       </div>

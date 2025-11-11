@@ -110,14 +110,13 @@ export function Sidebar() {
       {/* todo: 背景色ほんとにこれでいい？ */}
       <h2 className="hidden lg:flex flex-row items-center p-4 gap-2">
         {/* サイドバーが常時表示されているlg以上の場合のみ */}
-        <Link href="/" className="flex-1 text-xl font-bold">
-          {/* TODO: サイドバーの幅が狭すぎてアイコンを小さくしないと入らない... */}
+        <Link href="/" className="flex-1 flex items-center">
           <img
             src="/icon.svg"
             alt="icon"
-            className="inline-block w-6 h-6 mr-1"
+            className="inline-block w-8 h-8 mr-2"
           />
-          my.code();
+          <span className="text-xl font-bold">my.code();</span>
         </Link>
         <ThemeToggle />
         <AccountMenu />
