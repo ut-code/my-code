@@ -3,9 +3,8 @@ import { metadata as pageMetadata } from "./page";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    // page.tsxからもってくる
-    name: pageMetadata.title as string,
-    short_name: pageMetadata.title as string,
+    name: "my.code();",
+    short_name: "my.code();",
     description: pageMetadata.description as string,
     start_url: "/",
     display: "standalone",
