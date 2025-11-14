@@ -7,7 +7,7 @@ export function Navbar() {
       {/* fixedのヘッダーの分だけスクロールするコンテンツを下に移動するためのdiv */}
       <div className="h-16 lg:hidden" />
 
-      <div className="h-16 navbar bg-base-200 w-full fixed lg:hidden flex gap-4 z-40 shadow-md">
+      <div className="h-16 navbar bg-base-300/60 w-full fixed lg:hidden flex gap-4 z-40 shadow-md backdrop-blur-xs">
         <div className="flex-none">
           {/* サイドバーを開閉するボタン */}
           <label
