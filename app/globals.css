@@ -99,14 +99,16 @@ mycdark:
   terminal.tsxで Inconsolata Variable をloadしているので意味ない...
 
   NotoSansJPの指定は正直なくても良い気はするが、
-  あまり変なフォントが選ばれるとターミナルやコードエディターの表示が崩れる可能性があるので適当に指定している
+  あまり変なフォントが選ばれるとxtermやaceエディターの表示が崩れる可能性があるので、
+  確実にフォントを統一するために適当に指定している
   */
   --font-mono:
     "Inconsolata Variable",
-    /* TailwindCSSデフォルトの欧文フォント */ "SFMono-Regular", "Menlo",
-    "Monaco", "Consolas", "Liberation Mono", "Courier New",
-    /* 日本語用にNotoSans */ "Noto Sans JP", "Noto Sans CJK JP",
-    "Source Han Sans JP", "源ノ角ゴシック", "Noto Sans JP Variable", monospace;
+    /* Inconsolataのfallbackとしての欧文フォント */ "Inconsolata",
+    "Noto Sans Mono", "Roboto Mono", "SFMono-Regular", "Menlo", "Monaco",
+    "Consolas", "Liberation Mono", "Courier New",
+    /* 日本語用にNotoSans */ "Noto Sans Mono CJK JP", "Noto Sans JP",
+    "Noto Sans CJK JP", "Source Han Sans JP", "Noto Sans JP Variable", monospace;
   /*
   本家のフォント名は Rounded M+ 1c 、または1pでもいいかも
   layout.tsxでインポートしているwebフォントが M PLUS Rounded 1c
