@@ -35,7 +35,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center">
             <img
               src="/icon.svg"
-              alt="icon"
+              alt="my.code(); Logo"
               className="inline-block w-8 h-8 mr-2"
             />
             <span className="font-bold text-xl font-mono">my.code();</span>

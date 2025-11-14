@@ -113,7 +113,7 @@ export function Sidebar() {
         <Link href="/" className="flex-1 flex items-center">
           <img
             src="/icon.svg"
-            alt="icon"
+            alt="my.code(); Logo"
             className="inline-block w-8 h-8 mr-1"
           />
           <span className="text-xl font-bold font-mono">my.code();</span>
