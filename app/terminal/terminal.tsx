@@ -88,8 +88,8 @@ export function useTerminal(props: TerminalProps) {
             convertEol: true,
             cursorStyle: "bar",
             cursorInactiveStyle: "none",
-            fontSize: 14,
-            lineHeight: 1.4,
+            fontSize: 16,
+            lineHeight: 1.2,
             letterSpacing: 0,
             fontFamily: "'Inconsolata Variable','Noto Sans JP Variable'",
             theme: {

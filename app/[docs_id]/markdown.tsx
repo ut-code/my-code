@@ -152,7 +152,7 @@ function CodeComponent({
       <SyntaxHighlighter
         language={match[1]}
         PreTag="div"
-        className="border border-base-300 mx-2 my-2 rounded-lg text-sm p-4!"
+        className="border border-base-300 mx-2 my-2 rounded-lg p-4!"
         style={codetheme}
         {...props}
       >
@@ -164,7 +164,7 @@ function CodeComponent({
     return (
       <SyntaxHighlighter
         PreTag="div"
-        className="border border-base-300 mx-2 my-2 rounded-lg text-sm p-4!"
+        className="border border-base-300 mx-2 my-2 rounded-lg p-4!"
         style={codetheme}
         {...props}
       >
@@ -175,7 +175,7 @@ function CodeComponent({
     // inline
     return (
       <code
-        className="bg-base-200/60 border border-base-300 px-1 py-0.5 rounded text-sm "
+        className="bg-base-content/10 border border-base-content/20 px-1 py-0.5 mx-0.5 rounded-md"
         {...props}
       />
     );

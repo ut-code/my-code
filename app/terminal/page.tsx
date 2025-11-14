@@ -178,7 +178,7 @@ function MochaTest() {
     <div className="border-1 border-transparent translate-x-0">
       {/* margin collapseさせない & fixedの対象をviewportではなくこのdivにする */}
       {mochaState === "idle" ? (
-        <button className="btn btn-primary mt-4" onClick={runTest}>
+        <button className="btn btn-accent mt-4" onClick={runTest}>
           テストを実行
         </button>
       ) : mochaState === "running" ? (

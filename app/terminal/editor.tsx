@@ -137,7 +137,7 @@ export function EditorComponent(props: EditorProps) {
         }
         className="font-mono!" // Aceのデフォルトフォントを上書き
         readOnly={props.readonly}
-        fontSize={14}
+        fontSize={16}
         enableBasicAutocompletion={true}
         enableLiveAutocompletion={true}
         enableSnippets={false}
