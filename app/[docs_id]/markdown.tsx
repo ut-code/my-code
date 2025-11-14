@@ -175,7 +175,7 @@ function CodeComponent({
     // inline
     return (
       <code
-        className="bg-base-content/10 border border-base-content/20 px-1 py-0.5 mx-0.5 rounded-md"
+        className="bg-current/10 border border-current/20 px-1 py-0.5 mx-0.5 rounded-md"
         {...props}
       />
     );
