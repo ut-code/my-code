@@ -22,7 +22,7 @@ const AceEditor = dynamic(
   },
   { ssr: false }
 );
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
 import { useEmbedContext } from "./embedContext";
@@ -88,6 +88,13 @@ export function EditorComponent(props: EditorProps) {
     }
   }, [files, props.filename, props.initContent, writeFile]);
 
+  const [fontSize, setFontSize] = useState(16);
+  useEffect(() => {
+    setFontSize(
+      parseFloat(getComputedStyle(document.documentElement).fontSize)
+    ); // 1rem
+  }, []);
+
   return (
     <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden">
       <div className="flex flex-row items-center">
@@ -133,11 +140,12 @@ export function EditorComponent(props: EditorProps) {
         tabSize={langConstants(props.language || "text").tabSize}
         width="100%"
         height={
-          Math.max((props.initContent.split("\n").length + 2) * 14, 128) + "px"
+          Math.max((props.initContent.split("\n").length + 2) * fontSize, 128) +
+          "px"
         }
         className="font-mono!" // Aceのデフォルトフォントを上書き
         readOnly={props.readonly}
-        fontSize={16}
+        fontSize={fontSize}
         enableBasicAutocompletion={true}
         enableLiveAutocompletion={true}
         enableSnippets={false}

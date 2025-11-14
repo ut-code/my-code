@@ -88,7 +88,9 @@ export function useTerminal(props: TerminalProps) {
             convertEol: true,
             cursorStyle: "bar",
             cursorInactiveStyle: "none",
-            fontSize: 16,
+            fontSize: parseFloat(
+              getComputedStyle(document.documentElement).fontSize
+            ), // 1rem
             lineHeight: 1.2,
             letterSpacing: 0,
             fontFamily: "'Inconsolata Variable','Noto Sans JP Variable'",
