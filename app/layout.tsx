@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "@fontsource-variable/noto-sans-jp";
 import "@fontsource-variable/inconsolata";
-import "@fontsource/m-plus-rounded-1c";
+import "@fontsource/m-plus-rounded-1c/400.css";
+import "@fontsource/m-plus-rounded-1c/700.css";
 import "./globals.css";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
