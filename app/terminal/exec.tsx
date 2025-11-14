@@ -72,10 +72,10 @@ export function ExecFile(props: ExecProps) {
   ]);
 
   return (
-    <div className="relative">
+    <div className="border border-accent border-2 shadow-md m-2 rounded-lg overflow-hidden relative">
       <div>
         <button
-          className="btn btn-soft btn-primary rounded-tl-lg rounded-none"
+          className="btn btn-soft btn-accent rounded-none"
           onClick={() => {
             if (!ready) {
               clearTerminal(terminalInstanceRef.current!);
@@ -95,7 +95,7 @@ export function ExecFile(props: ExecProps) {
           {getCommandlineStr?.(props.filenames)}
         </code>
       </div>
-      <div className="bg-base-300 p-4 pt-2 rounded-b-lg">
+      <div className="bg-base-300 p-4 pt-2">
         <div ref={terminalRef} />
       </div>
       {executionState !== "idle" && (

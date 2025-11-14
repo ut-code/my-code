@@ -6,7 +6,7 @@ export function useChangeTheme() {
   useEffect(() => {
     const updateTheme = () => {
       const theme = document.documentElement.getAttribute("data-theme");
-      setTheme(theme === "dark" ? "twilight" : "tomorrow");
+      setTheme(theme === "mycdark" ? "twilight" : "tomorrow");
     };
 
     const observer = new MutationObserver(updateTheme);
@@ -25,7 +25,7 @@ export function ThemeToggle() {
   useEffect(() => {
     const checkIsDarkSchemePreferred = () =>
       window?.matchMedia?.("(prefers-color-scheme:dark)")?.matches ?? false;
-    const initialTheme = checkIsDarkSchemePreferred() ? "dark" : "light";
+    const initialTheme = checkIsDarkSchemePreferred() ? "mycdark" : "myclight";
     document.documentElement.setAttribute("data-theme", initialTheme);
   }, []);
 
@@ -50,7 +50,7 @@ export function ThemeToggle() {
         className="toggle theme-controller"
         onChange={(e) => {
           const isdark = e.target.checked;
-          const theme = isdark ? "dark" : "light";
+          const theme = isdark ? "mycdark" : "myclight";
           document.documentElement.setAttribute("data-theme", theme);
         }}
       />

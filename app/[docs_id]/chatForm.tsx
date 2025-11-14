@@ -138,7 +138,7 @@ export function ChatForm({
         }}
       >
         <button
-          className="btn btn-soft btn-secondary rounded-full"
+          className="btn btn-soft btn-primary rounded-full"
           onClick={close}
           type="button"
         >
@@ -158,7 +158,7 @@ export function ChatForm({
         )}
         <button
           type="submit"
-          className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
+          className="btn btn-soft btn-circle btn-secondary"
           title="送信"
           disabled={isLoading}
         >

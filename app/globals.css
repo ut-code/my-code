@@ -1,11 +1,92 @@
 @import "tailwindcss";
 @plugin "daisyui" {
   themes:
-    light --default,
-    dark --prefersdark;
+    myclight --default,
+    mycdark --prefersdark;
 }
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/*
+myclight:
+- 適当に決めたアイコンの背景色が #ba6900 = oklch(0.5999 0.1391 61.15) だったので、それをprimaryとして使う
+- baseやneutralなどをhue=61.15で統一
+- info〜errorはcupcakeのコピペ
+
+mycdark:
+- primary, secondary, accentのchroma, hueをmyclightとあわせる
+- info〜errorはhalloweenのコピペ
+
+*/
+@plugin "daisyui/theme" {
+  name: "myclight";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0.01 61.15);
+  --color-base-200: oklch(95% 0.013 61.15);
+  --color-base-300: oklch(92% 0.016 61.15);
+  --color-base-content: oklch(21% 0.006 61.15);
+  --color-primary: oklch(60% 0.139 61.15);
+  --color-primary-content: oklch(98% 0.02 61.15);
+  --color-secondary: oklch(55% 0.262 315);
+  --color-secondary-content: oklch(98% 0.02 315);
+  --color-accent: oklch(51% 0.181 190);
+  --color-accent-content: oklch(98% 0.02 190);
+  --color-neutral: oklch(33% 0.07 61.15);
+  --color-neutral-content: oklch(98% 0.003 61.15);
+  --color-info: oklch(68% 0.169 237.323);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(69% 0.17 162.48);
+  --color-success-content: oklch(26% 0.051 172.552);
+  --color-warning: oklch(79% 0.184 86.047);
+  --color-warning-content: oklch(28% 0.066 53.813);
+  --color-error: oklch(64% 0.246 16.439);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "mycdark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: oklch(20% 0.016 61.15);
+  --color-base-200: oklch(16.5% 0.016 61.15);
+  --color-base-300: oklch(10% 0.016 61.15);
+  --color-base-content: oklch(85% 0.01 61.15);
+  --color-primary: oklch(70% 0.139 61.15);
+  --color-primary-content: oklch(26% 0.07 61.15);
+  --color-secondary: oklch(65% 0.262 315);
+  --color-secondary-content: oklch(18% 0.191 315);
+  --color-accent: oklch(61% 0.181 190);
+  --color-accent-content: oklch(18% 0.152 190);
+  --color-neutral: oklch(30% 0.07 61.15);
+  --color-neutral-content: oklch(85% 0.01 61.15);
+  --color-info: oklch(54.615% 0.215 262.88);
+  --color-info-content: oklch(90.923% 0.043 262.88);
+  --color-success: oklch(62.705% 0.169 149.213);
+  --color-success-content: oklch(12.541% 0.033 149.213);
+  --color-warning: oklch(66.584% 0.157 58.318);
+  --color-warning-content: oklch(13.316% 0.031 58.318);
+  --color-error: oklch(65.72% 0.199 27.33);
+  --color-error-content: oklch(13.144% 0.039 27.33);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@custom-variant dark (&:where([data-theme=mycdark], [data-theme=mycdark] *));
 
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {

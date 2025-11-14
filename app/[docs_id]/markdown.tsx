@@ -12,7 +12,9 @@ import { getRuntimeLang } from "@/terminal/runtime";
 import { ReplTerminal } from "@/terminal/repl";
 import dynamic from "next/dynamic";
 // SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
-const SyntaxHighlighter = dynamic(() => import("react-syntax-highlighter"), { ssr: false });
+const SyntaxHighlighter = dynamic(() => import("react-syntax-highlighter"), {
+  ssr: false,
+});
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -40,14 +42,14 @@ const components: Components = {
   li: ({ node, ...props }) => <li className="my-1" {...props} />,
   a: ({ node, ...props }) => <a className="link link-info" {...props} />,
   strong: ({ node, ...props }) => (
-    <strong className="text-primary dark:text-secondary" {...props} />
+    <strong className="text-primary" {...props} />
   ),
   table: ({ node, ...props }) => (
     <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-lg border border-base-content/5 shadow-sm">
       <table className="table w-max" {...props} />
     </div>
   ),
-  hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
+  hr: ({ node, ...props }) => <hr className="border-accent my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => (
     <CodeComponent {...{ node, className, ref, style, ...props }} />
@@ -111,13 +113,11 @@ function CodeComponent({
       */
       if (runtimeLang) {
         return (
-          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
-            <ExecFile
-              language={runtimeLang}
-              filenames={match[3].split(",")}
-              content={String(props.children || "").replace(/\n$/, "")}
-            />
-          </div>
+          <ExecFile
+            language={runtimeLang}
+            filenames={match[3].split(",")}
+            content={String(props.children || "").replace(/\n$/, "")}
+          />
         );
       }
     } else if (match[2] === "-repl") {
@@ -129,34 +129,30 @@ function CodeComponent({
       }
       if (runtimeLang) {
         return (
-          <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
-            <ReplTerminal
-              terminalId={match[3]}
-              language={runtimeLang}
-              initContent={String(props.children || "").replace(/\n$/, "")}
-            />
-          </div>
+          <ReplTerminal
+            terminalId={match[3]}
+            language={runtimeLang}
+            initContent={String(props.children || "").replace(/\n$/, "")}
+          />
         );
       }
     } else if (match[3]) {
       // ファイル名指定がある場合、ファイルエディター
       const aceLang = getAceLang(match[1]);
       return (
-        <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
-          <EditorComponent
-            language={aceLang}
-            filename={match[3]}
-            readonly={match[2] === "-readonly"}
-            initContent={String(props.children || "").replace(/\n$/, "")}
-          />
-        </div>
+        <EditorComponent
+          language={aceLang}
+          filename={match[3]}
+          readonly={match[2] === "-readonly"}
+          initContent={String(props.children || "").replace(/\n$/, "")}
+        />
       );
     }
     return (
       <SyntaxHighlighter
         language={match[1]}
         PreTag="div"
-        className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
+        className="border border-base-300 mx-2 my-2 rounded-lg text-sm p-4!"
         style={codetheme}
         {...props}
       >
@@ -168,7 +164,7 @@ function CodeComponent({
     return (
       <SyntaxHighlighter
         PreTag="div"
-        className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
+        className="border border-base-300 mx-2 my-2 rounded-lg text-sm p-4!"
         style={codetheme}
         {...props}
       >

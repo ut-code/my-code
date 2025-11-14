@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { pagesList } from "./pagesList";
+import clsx from "clsx";
 
 export const metadata: Metadata = {
   title: "my.code(); へようこそ",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="p-4">
-      <div className="hero bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 rounded-lg my-6 py-8 sm:px-4">
+      <div className="hero bg-gradient-to-br from-primary/30 via-secondary/15 to-accent/30 rounded-lg my-6 py-8 sm:px-4">
         <div className="hero-content text-center">
           <div className="">
             <h1 className="text-5xl font-bold mb-8">my.code(); へようこそ</h1>
@@ -38,7 +39,12 @@ export default function Home() {
             <Link
               key={group.id}
               href={`${group.id}-${group.pages[0].id}`}
-              className="card card-border bg-base-100 card-md shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+              className={clsx(
+                "card card-border card-md shadow-lg hover:shadow-xl transition-all hover:-translate-y-1",
+                // lightテーマではbase-100の背景にbase-100のカードでも違和感ないんだけど、
+                // darkテーマではそれだと見えないので、色を変えている
+                "dark:bg-neutral dark:text-neutral-content"
+              )}
             >
               <div className="card-body">
                 <h2 className="card-title">{group.lang}</h2>
@@ -58,7 +64,7 @@ export default function Home() {
           gridTemplateColumns: "repeat(auto-fit, minmax(16rem, 1fr))",
         }}
       >
-        <div className="card bg-gradient-to-br from-primary/10 to-primary/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-primary/30 to-primary/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-primary">📚 豊富なチュートリアル</h3>
             <p>
@@ -69,7 +75,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <div className="card bg-gradient-to-br from-secondary/10 to-secondary/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-secondary/30 to-secondary/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-secondary">
               ⚡ すぐに動かせる実行環境
@@ -81,7 +87,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <div className="card bg-gradient-to-br from-accent/10 to-accent/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-accent/30 to-accent/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-accent">
               🤖 AIアシスタントによるサポート
@@ -93,7 +99,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <div className="card bg-gradient-to-br from-info/10 to-info/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-info/30 to-info/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-info">✏️ 実践的な練習問題</h3>
             <p>

@@ -184,9 +184,7 @@ export function useTerminal(props: TerminalProps) {
 
       terminalInstanceRef.current.options = {
         theme: {
-          background: fromCSS(
-            theme === "tomorrow" ? "--color-base-300" : "--color-neutral-900"
-          ),
+          background: fromCSS("--color-base-300"),
           foreground: fromCSS("--color-base-content"),
         },
       };

@@ -13,6 +13,7 @@ import {
   useState,
 } from "react";
 import { DynamicMarkdownSection } from "./[docs_id]/pageContent";
+import clsx from "clsx";
 
 export interface ISidebarMdContext {
   loadedDocsId: string;
@@ -163,7 +164,13 @@ export function Sidebar() {
               <ul>
                 {group.pages.map((page) => (
                   <li key={page.id}>
-                    <Link href={`${group.id}-${page.id}`}>
+                    <Link
+                      href={`${group.id}-${page.id}`}
+                      className={clsx(
+                        `${group.id}-${page.id}` === currentDocsId &&
+                          "menu-active"
+                      )}
+                    >
                       <span className="mr-0">{page.id}.</span>
                       {page.title}
                     </Link>

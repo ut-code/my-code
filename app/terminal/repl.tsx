@@ -352,7 +352,7 @@ export function ReplTerminal({
   ]);
 
   return (
-    <div className={"relative h-max"}>
+    <div className="bg-base-300 border border-accent border-2 shadow-md m-2 p-4 pr-1 rounded-lg relative h-max">
       {terminalInstanceRef.current &&
         termReady &&
         initCommandState === "idle" && (
