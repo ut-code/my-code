@@ -114,9 +114,9 @@ export function Sidebar() {
           <img
             src="/icon.svg"
             alt="icon"
-            className="inline-block w-8 h-8 mr-2"
+            className="inline-block w-8 h-8 mr-1"
           />
-          <span className="text-xl font-bold">my.code();</span>
+          <span className="text-xl font-bold font-mono">my.code();</span>
         </Link>
         <ThemeToggle />
         <AccountMenu />
