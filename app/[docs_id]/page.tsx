@@ -35,9 +35,9 @@ async function getMarkdownContent(docs_id: string): Promise<string> {
 export async function generateMetadata({
   params,
 }: {
-  params: { docs_id: string };
+  params: Promise<{ docs_id: string }>;
 }): Promise<Metadata> {
-  const { docs_id } = params;
+  const { docs_id } = await params;
   const mdContent = await getMarkdownContent(docs_id);
   const splitMdContent = splitMarkdown(mdContent);
 
@@ -57,9 +57,9 @@ export async function generateMetadata({
 export default async function Page({
   params,
 }: {
-  params: { docs_id: string };
+  params: Promise<{ docs_id: string }>;
 }) {
-  const { docs_id } = params;
+  const { docs_id } = await params;
 
   const mdContent = getMarkdownContent(docs_id);
   const splitMdContent = mdContent.then((text) => splitMarkdown(text));
