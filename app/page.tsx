@@ -15,7 +15,10 @@ export default function Home() {
       <div className="hero bg-gradient-to-br from-primary/30 via-secondary/15 to-accent/30 rounded-lg my-6 py-8 sm:px-4">
         <div className="hero-content text-center">
           <div className="">
-            <h1 className="text-5xl font-bold mb-8">my.code(); へようこそ</h1>
+            <h1 className="text-5xl font-bold mb-8">
+              <span className="font-mono mr-4">my.code();</span>
+              へようこそ
+            </h1>
             <p className="text-3xl font-bold mb-4">
               環境構築不要、その場で実践。
             </p>
