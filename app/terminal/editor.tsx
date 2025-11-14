@@ -89,7 +89,7 @@ export function EditorComponent(props: EditorProps) {
   }, [files, props.filename, props.initContent, writeFile]);
 
   return (
-    <div className="border border-accent border-2 shadow-md m-2 rounded-lg overflow-hidden">
+    <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden">
       <div className="flex flex-row items-center">
         <div className="font-mono text-sm mt-2 mb-1 ml-4 mr-2">
           {props.filename}

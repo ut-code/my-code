@@ -104,7 +104,7 @@ export function ChatForm({
 
   return (
     <form
-      className="border border-2 border-secondary shadow-lg rounded-lg bg-base-100"
+      className="border border-2 border-secondary shadow-lg rounded-box bg-base-100"
       style={{
         width: "100%",
         textAlign: "center",
@@ -112,7 +112,7 @@ export function ChatForm({
       onSubmit={handleSubmit}
     >
       <textarea
-        className="textarea textarea-ghost textarea-md rounded-lg"
+        className="textarea textarea-ghost textarea-md rounded-box"
         placeholder={
           "質問を入力してください" +
           (exampleData
