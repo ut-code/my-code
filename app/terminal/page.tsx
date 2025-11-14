@@ -31,7 +31,7 @@ export default function RuntimeTestPage() {
               className="tab"
               aria-label={lang}
             />
-            <div className="tab-content border-base-300 bg-base-100 p-4">
+            <div className="tab-content border-base-300 bg-base-200 p-4">
               <RuntimeSample lang={lang as RuntimeLang} config={config} />
             </div>
           </Fragment>
@@ -105,7 +105,7 @@ function RuntimeSample({
   config: SampleConfig;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col">
       {config.repl && (
         <ReplTerminal
           terminalId="1"

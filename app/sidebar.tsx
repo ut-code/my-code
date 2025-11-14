@@ -108,7 +108,6 @@ export function Sidebar() {
 
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
-      {/* todo: 背景色ほんとにこれでいい？ */}
       <h2 className="hidden lg:flex flex-row items-center p-4 gap-2">
         {/* サイドバーが常時表示されているlg以上の場合のみ */}
         <Link href="/" className="flex-1 flex items-center">

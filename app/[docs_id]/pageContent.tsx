@@ -109,7 +109,7 @@ export function PageContent(props: PageContentProps) {
               .map(({ chatId, messages }) => (
                 <div
                   key={chatId}
-                  className="max-w-xs mb-2 p-2 text-sm border border-base-content/10 rounded-sm shadow-sm bg-base-100"
+                  className="max-w-xs mb-2 p-2 text-sm border border-base-content/10 rounded-sm shadow-sm bg-base-200"
                 >
                   <div className="max-h-60 overflow-y-auto">
                     {messages.map((msg, index) => (
