@@ -5,7 +5,7 @@ import { ExecFile } from "../terminal/exec";
 import { useChangeTheme } from "./themeToggle";
 import {
   tomorrow,
-  atomOneDark,
+  tomorrowNight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { ReactNode } from "react";
 import { getRuntimeLang } from "@/terminal/runtime";
@@ -45,7 +45,7 @@ const components: Components = {
     <strong className="text-primary" {...props} />
   ),
   table: ({ node, ...props }) => (
-    <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-box border border-base-content/5 shadow-sm">
+    <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-box border border-current/20 shadow-sm">
       <table className="table w-max" {...props} />
     </div>
   ),
@@ -94,7 +94,7 @@ function CodeComponent({
   [key: string]: unknown;
 }) {
   const theme = useChangeTheme();
-  const codetheme = theme === "tomorrow" ? tomorrow : atomOneDark;
+  const codetheme = theme === "tomorrow" ? tomorrow : tomorrowNight;
   const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
     className || ""
   );
@@ -152,7 +152,7 @@ function CodeComponent({
       <SyntaxHighlighter
         language={match[1]}
         PreTag="div"
-        className="border border-base-300 mx-2 my-2 rounded-box p-4!"
+        className="border border-current/20 mx-2 my-2 rounded-box p-4!"
         style={codetheme}
         {...props}
       >
@@ -164,7 +164,7 @@ function CodeComponent({
     return (
       <SyntaxHighlighter
         PreTag="div"
-        className="border border-base-300 mx-2 my-2 rounded-box p-4!"
+        className="border border-current/20 mx-2 my-2 rounded-box p-4!"
         style={codetheme}
         {...props}
       >

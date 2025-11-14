@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 
 export function useChangeTheme() {
-  const [theme, setTheme] = useState("tomorrow");
+  const [theme, setTheme] = useState<"tomorrow" | "tomorrow_night">("tomorrow");
   useEffect(() => {
     const updateTheme = () => {
       const theme = document.documentElement.getAttribute("data-theme");
-      setTheme(theme === "mycdark" ? "twilight" : "tomorrow");
+      setTheme(theme === "mycdark" ? "tomorrow_night" : "tomorrow");
     };
 
     const observer = new MutationObserver(updateTheme);
@@ -21,7 +21,7 @@ export function useChangeTheme() {
 }
 export function ThemeToggle() {
   const theme = useChangeTheme();
-  const isChecked = theme === "twilight";
+  const isChecked = theme === "tomorrow_night";
   useEffect(() => {
     const checkIsDarkSchemePreferred = () =>
       window?.matchMedia?.("(prefers-color-scheme:dark)")?.matches ?? false;

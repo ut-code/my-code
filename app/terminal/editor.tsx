@@ -7,7 +7,7 @@ const AceEditor = dynamic(
     const ace = await import("react-ace");
     // テーマは色分けが今のTerminal側のハイライト(highlight.js)の実装に近いものを適当に選んだ
     await import("ace-builds/src-min-noconflict/theme-tomorrow");
-    await import("ace-builds/src-min-noconflict/theme-twilight");
+    await import("ace-builds/src-min-noconflict/theme-tomorrow_night");
     await import("ace-builds/src-min-noconflict/ext-language_tools");
     await import("ace-builds/src-min-noconflict/ext-searchbox");
     await import("ace-builds/src-min-noconflict/mode-python");
