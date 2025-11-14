@@ -90,6 +90,19 @@ mycdark:
 
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {
-  --font-mono: "Inconsolata Variable", "Noto Sans JP Variable", monospace;
-  --font-sans: 'M PLUS Rounded 1c', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  /*
+  Variable がついているほうはlayout.tsxでインポートしているwebフォント、
+  それ以外はフォールバック (インストールされていればwebフォントをダウンロードする必要はないため)
+
+  NotoSansJPの指定は正直なくても良い気はするが、
+  あまり変なフォントが選ばれるとターミナルやコードエディターの表示が崩れる可能性があるので適当に指定している
+  */
+  --font-mono:
+    "Inconsolata", "Inconsolata Variable", "Noto Sans JP", "Noto Sans CJK JP",
+    "Source Han Sans JP", "源ノ角ゴシック", "Noto Sans JP Variable", monospace;
+  /*
+  */
+  --font-sans:
+    "M PLUS Rounded 1c", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
 }
