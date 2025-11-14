@@ -91,5 +91,5 @@ mycdark:
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {
   --font-mono: "Inconsolata Variable", "Noto Sans JP Variable", monospace;
-  --font-sans: 'M PLUS Rounded 1c', sans-serif;
+  --font-sans: 'M PLUS Rounded 1c', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
