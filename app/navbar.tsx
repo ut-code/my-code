@@ -1,7 +1,33 @@
+"use client";
+
 import Link from "next/link";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
+import { usePathname } from "next/navigation";
+import { pagesList } from "./pagesList";
+
+function PageTitle() {
+  const pathname = usePathname();
+
+  if(pathname === "/"){
+    return <>へようこそ</>;
+  }
+
+  const currentDocsId = pathname.replace(/^\//, "");
+  const currentGroup = pagesList.find((group) => currentDocsId.startsWith(group.id));
+  const currentPage = currentGroup?.pages.find((page) => `${currentGroup.id}-${page.id}` === currentDocsId);
+  if(currentPage){
+    return <>
+      <span className="text-base mr-2">{currentGroup?.lang}-{currentPage.id}.</span>
+      <span>{currentPage.title}</span>
+    </>
+  }
+
+  console.warn(`navbar page name is not defined for pathname ${pathname}`);
+  return null;
+}
 export function Navbar() {
+
   return (
     <>
       {/* fixedのヘッダーの分だけスクロールするコンテンツを下に移動するためのdiv */}
@@ -31,16 +57,18 @@ export function Navbar() {
           </label>
         </div>
         {/* サイドバーが表示されていない場合のみ */}
-        <div className="flex-1">
-          <Link href="/" className="flex items-center">
-            <img
-              src="/icon.svg"
-              alt="my.code(); Logo"
-              className="inline-block w-8 h-8 mr-2"
-            />
-            <span className="font-bold text-xl font-mono">my.code();</span>
-          </Link>
+        <Link href="/" className="flex items-center">
+          <img
+            src="/icon.svg"
+            alt="my.code(); Logo"
+            className="inline-block w-8 h-8 mr-2"
+          />
+          <span className="font-bold text-xl font-mono">my.code();</span>
+        </Link>
+        <div className="flex-1 hidden md:inline text-nowrap overflow-hidden text-ellipsis font-bold text-xl">
+          <PageTitle />
         </div>
+        <div className="flex-1 md:hidden" />
         <ThemeToggle />
         <AccountMenu />
       </div>
