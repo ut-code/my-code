@@ -7,7 +7,7 @@ const AceEditor = dynamic(
     const ace = await import("react-ace");
     // テーマは色分けが今のTerminal側のハイライト(highlight.js)の実装に近いものを適当に選んだ
     await import("ace-builds/src-min-noconflict/theme-tomorrow");
-    await import("ace-builds/src-min-noconflict/theme-twilight");
+    await import("ace-builds/src-min-noconflict/theme-tomorrow_night");
     await import("ace-builds/src-min-noconflict/ext-language_tools");
     await import("ace-builds/src-min-noconflict/ext-searchbox");
     await import("ace-builds/src-min-noconflict/mode-python");
@@ -22,8 +22,7 @@ const AceEditor = dynamic(
   },
   { ssr: false }
 );
-import "./editor.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
 import { useEmbedContext } from "./embedContext";
@@ -89,8 +88,15 @@ export function EditorComponent(props: EditorProps) {
     }
   }, [files, props.filename, props.initContent, writeFile]);
 
+  const [fontSize, setFontSize] = useState(16);
+  useEffect(() => {
+    setFontSize(
+      parseFloat(getComputedStyle(document.documentElement).fontSize)
+    ); // 1rem
+  }, []);
+
   return (
-    <div className="embedded-editor">
+    <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden">
       <div className="flex flex-row items-center">
         <div className="font-mono text-sm mt-2 mb-1 ml-4 mr-2">
           {props.filename}
@@ -134,11 +140,12 @@ export function EditorComponent(props: EditorProps) {
         tabSize={langConstants(props.language || "text").tabSize}
         width="100%"
         height={
-          Math.max((props.initContent.split("\n").length + 2) * 14, 128) + "px"
+          Math.max((props.initContent.split("\n").length + 2) * fontSize, 128) +
+          "px"
         }
         className="font-mono!" // Aceのデフォルトフォントを上書き
         readOnly={props.readonly}
-        fontSize={14}
+        fontSize={fontSize}
         enableBasicAutocompletion={true}
         enableLiveAutocompletion={true}
         enableSnippets={false}

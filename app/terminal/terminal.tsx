@@ -72,12 +72,15 @@ export function useTerminal(props: TerminalProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const abortController = new AbortController();
-      // globals.cssでフォントを指定し読み込んでいるが、
-      // それが読み込まれる前にterminalを初期化してしまうとバグる。
+      /*
+      globals.cssでフォントを指定し読み込んでいるが、
+      それが読み込まれる前にterminalを初期化してしまうとバグるので、
+      ここで fonts.load() をawaitしている。
+      */
       Promise.all([
         import("@xterm/xterm"),
         import("@xterm/addon-fit"),
-        document.fonts.load("0.875rem Inconsolata Variable"),
+        document.fonts.load("1rem Inconsolata Variable"),
       ]).then(([{ Terminal }, { FitAddon }]) => {
         if (!abortController.signal.aborted) {
           const fromCSS = (varName: string) =>
@@ -88,10 +91,13 @@ export function useTerminal(props: TerminalProps) {
             convertEol: true,
             cursorStyle: "bar",
             cursorInactiveStyle: "none",
-            fontSize: 14,
-            lineHeight: 1.4,
+            fontSize: parseFloat(
+              getComputedStyle(document.documentElement).fontSize
+            ), // 1rem
+            lineHeight: 1.2,
             letterSpacing: 0,
-            fontFamily: "'Inconsolata Variable','Noto Sans JP Variable'",
+            fontFamily:
+              "'Inconsolata Variable', 'Noto Sans JP', 'Noto Sans CJK JP', 'Source Han Sans JP', '源ノ角ゴシック', 'Noto Sans JP Variable', monospace",
             theme: {
               // DaisyUIの変数を使用してテーマを設定している
               // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
@@ -184,9 +190,7 @@ export function useTerminal(props: TerminalProps) {
 
       terminalInstanceRef.current.options = {
         theme: {
-          background: fromCSS(
-            theme === "tomorrow" ? "--color-base-300" : "--color-neutral-900"
-          ),
+          background: fromCSS("--color-base-300"),
           foreground: fromCSS("--color-base-content"),
         },
       };

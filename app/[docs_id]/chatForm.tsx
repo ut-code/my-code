@@ -104,7 +104,7 @@ export function ChatForm({
 
   return (
     <form
-      className="border border-2 border-secondary shadow-lg rounded-lg bg-base-100"
+      className="border border-2 border-secondary shadow-lg rounded-box bg-base-100"
       style={{
         width: "100%",
         textAlign: "center",
@@ -112,7 +112,7 @@ export function ChatForm({
       onSubmit={handleSubmit}
     >
       <textarea
-        className="textarea textarea-ghost textarea-md rounded-lg"
+        className="textarea textarea-ghost textarea-md rounded-box"
         placeholder={
           "質問を入力してください" +
           (exampleData
@@ -138,7 +138,7 @@ export function ChatForm({
         }}
       >
         <button
-          className="btn btn-soft btn-secondary rounded-full"
+          className="btn btn-soft btn-primary rounded-full"
           onClick={close}
           type="button"
         >
@@ -158,7 +158,7 @@ export function ChatForm({
         )}
         <button
           type="submit"
-          className="btn btn-soft btn-circle btn-accent border-2 border-accent rounded-full"
+          className="btn btn-soft btn-circle btn-secondary"
           title="送信"
           disabled={isLoading}
         >

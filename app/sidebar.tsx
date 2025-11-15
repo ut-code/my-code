@@ -13,6 +13,7 @@ import {
   useState,
 } from "react";
 import { DynamicMarkdownSection } from "./[docs_id]/pageContent";
+import clsx from "clsx";
 
 export interface ISidebarMdContext {
   loadedDocsId: string;
@@ -107,11 +108,15 @@ export function Sidebar() {
 
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
-      {/* todo: 背景色ほんとにこれでいい？ */}
       <h2 className="hidden lg:flex flex-row items-center p-4 gap-2">
-        {/* サイドバーが常時表示されている場合のみ */}
-        <Link href="/" className="flex-1 text-xl font-bold">
-          my.code();
+        {/* サイドバーが常時表示されているlg以上の場合のみ */}
+        <Link href="/" className="flex-1 flex items-center">
+          <img
+            src="/icon.svg"
+            alt="my.code(); Logo"
+            className="inline-block w-8 h-8 mr-1"
+          />
+          <span className="text-xl font-bold font-mono">my.code();</span>
         </Link>
         <ThemeToggle />
         <AccountMenu />
@@ -158,7 +163,13 @@ export function Sidebar() {
               <ul>
                 {group.pages.map((page) => (
                   <li key={page.id}>
-                    <Link href={`${group.id}-${page.id}`}>
+                    <Link
+                      href={`${group.id}-${page.id}`}
+                      className={clsx(
+                        `${group.id}-${page.id}` === currentDocsId &&
+                          "menu-active"
+                      )}
+                    >
                       <span className="mr-0">{page.id}.</span>
                       {page.title}
                     </Link>

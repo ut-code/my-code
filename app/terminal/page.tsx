@@ -1,4 +1,5 @@
 "use client";
+
 import { Heading } from "@/[docs_id]/markdown";
 import "mocha/mocha.css";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -30,7 +31,7 @@ export default function RuntimeTestPage() {
               className="tab"
               aria-label={lang}
             />
-            <div className="tab-content border-base-300 bg-base-100 p-4">
+            <div className="tab-content border-base-300 bg-base-200 p-4">
               <RuntimeSample lang={lang as RuntimeLang} config={config} />
             </div>
           </Fragment>
@@ -104,7 +105,7 @@ function RuntimeSample({
   config: SampleConfig;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col">
       {config.repl && (
         <ReplTerminal
           terminalId="1"
@@ -177,7 +178,7 @@ function MochaTest() {
     <div className="border-1 border-transparent translate-x-0">
       {/* margin collapseさせない & fixedの対象をviewportではなくこのdivにする */}
       {mochaState === "idle" ? (
-        <button className="btn btn-primary mt-4" onClick={runTest}>
+        <button className="btn btn-accent mt-4" onClick={runTest}>
           テストを実行
         </button>
       ) : mochaState === "running" ? (

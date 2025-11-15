@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
 import { Heading, StyledMarkdown } from "./markdown";
@@ -90,10 +90,9 @@ export function PageContent(props: PageContentProps) {
       }}
     >
       {dynamicMdContent.map((section, index) => (
-        <>
+        <Fragment key={index}>
           <div
             className="max-w-200"
-            key={`${index}-content`}
             id={`${index}`} // 目次からaタグで飛ぶために必要
             ref={(el) => {
               sectionRefs.current[index] = el;
@@ -103,14 +102,14 @@ export function PageContent(props: PageContentProps) {
             <Heading level={section.level}>{section.title}</Heading>
             <StyledMarkdown content={section.content} />
           </div>
-          <div key={`${index}-chat`}>
+          <div>
             {/* 右側に表示するチャット履歴欄 */}
             {chatHistories
               .filter((c) => c.sectionId === section.sectionId)
               .map(({ chatId, messages }) => (
                 <div
                   key={chatId}
-                  className="max-w-xs mb-2 p-2 text-sm border border-base-content/10 rounded-sm shadow-sm bg-base-100"
+                  className="max-w-xs mb-2 p-2 text-sm border border-base-content/10 rounded-sm shadow-sm bg-base-200"
                 >
                   <div className="max-h-60 overflow-y-auto">
                     {messages.map((msg, index) => (
@@ -120,12 +119,10 @@ export function PageContent(props: PageContentProps) {
                       >
                         <div
                           className={clsx(
-                            "chat-bubble p-1!",
                             msg.role === "user" &&
-                              "bg-primary text-primary-content",
-                            msg.role === "ai" &&
-                              "bg-secondary-content dark:bg-neutral text-black dark:text-white",
-                            msg.role === "error" && "chat-bubble-error"
+                              "chat-bubble p-0.5! bg-secondary/30",
+                            msg.role === "ai" && "chat-bubble p-0.5!",
+                            msg.role === "error" && "text-error"
                           )}
                           style={{ maxWidth: "100%", wordBreak: "break-word" }}
                         >
@@ -137,7 +134,7 @@ export function PageContent(props: PageContentProps) {
                 </div>
               ))}
           </div>
-        </>
+        </Fragment>
       ))}
       {isFormVisible ? (
         // sidebarの幅が80であることからleft-84 (sidebar.tsx参照)
