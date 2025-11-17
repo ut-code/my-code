@@ -146,8 +146,9 @@ export function EditorComponent(props: EditorProps) {
         className="font-mono!" // Aceのデフォルトフォントを上書き
         readOnly={props.readonly}
         fontSize={fontSize}
-        enableBasicAutocompletion={true}
-        enableLiveAutocompletion={true}
+        showPrintMargin={false}
+        enableBasicAutocompletion={false}
+        enableLiveAutocompletion={false}
         enableSnippets={false}
         value={code}
         onChange={(code: string) => writeFile({ [props.filename]: code })}
