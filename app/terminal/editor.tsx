@@ -27,6 +27,7 @@ import clsx from "clsx";
 import { useChangeTheme } from "../[docs_id]/themeToggle";
 import { useEmbedContext } from "./embedContext";
 import { langConstants } from "./runtime";
+import { MarkdownLang } from "@/[docs_id]/styledSyntaxHighlighter";
 // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
@@ -39,7 +40,7 @@ export type AceLang =
   | "json"
   | "csv"
   | "text";
-export function getAceLang(lang: string | undefined): AceLang {
+export function getAceLang(lang: MarkdownLang | undefined): AceLang {
   // Markdownで指定される可能性のある言語名からAceLangを取得
   switch (lang) {
     case "python":
@@ -61,13 +62,16 @@ export function getAceLang(lang: string | undefined): AceLang {
       return "json";
     case "csv":
       return "csv";
+    case "sh":
+    case "bash":
     case "text":
     case "txt":
+    case undefined:
+      console.warn(`Ace editor mode not implemented for language: ${lang}`);
       return "text";
     default:
-      console.warn(
-        `Unsupported language for ace editor: ${lang}, fallback to text mode.`
-      );
+      lang satisfies never;
+      console.warn(`Language not listed in MarkdownLang: ${lang}`);
       return "text";
   }
 }

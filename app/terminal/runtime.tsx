@@ -8,6 +8,7 @@ import { RubyContext, useRuby } from "./worker/ruby";
 import { JSEvalContext, useJSEval } from "./worker/jsEval";
 import { WorkerProvider } from "./worker/runtime";
 import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
+import { MarkdownLang } from "@/[docs_id]/styledSyntaxHighlighter";
 
 /**
  * Common runtime context interface for different languages
@@ -24,7 +25,10 @@ export interface RuntimeContext {
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   splitReplExamples?: (content: string) => ReplCommand[];
   // file
-  runFiles: (filenames: string[], files: Readonly<Record<string, string>>) => Promise<ReplOutput[]>;
+  runFiles: (
+    filenames: string[],
+    files: Readonly<Record<string, string>>
+  ) => Promise<ReplOutput[]>;
   getCommandlineStr?: (filenames: string[]) => string;
 }
 export interface LangConstants {
@@ -41,7 +45,7 @@ export type RuntimeLang =
   | "typescript";
 
 export function getRuntimeLang(
-  lang: string | undefined
+  lang: MarkdownLang | undefined
 ): RuntimeLang | undefined {
   // markdownで指定される可能性のある言語名からRuntimeLangを取得
   switch (lang) {
@@ -60,8 +64,18 @@ export function getRuntimeLang(
     case "typescript":
     case "ts":
       return "typescript";
+    case "bash":
+    case "sh":
+    case "json":
+    case "csv":
+    case "text":
+    case "txt":
+    case undefined:
+      // unsupported languages
+      return undefined;
     default:
-      console.warn(`Unsupported language for runtime: ${lang}`);
+      lang satisfies never;
+      console.warn(`Language not listed in MarkdownLang: ${lang}`);
       return undefined;
   }
 }

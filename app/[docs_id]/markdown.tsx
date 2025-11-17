@@ -1,20 +1,15 @@
-import Markdown, { Components } from "react-markdown";
+import Markdown, { Components, ExtraProps } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { EditorComponent, getAceLang } from "../terminal/editor";
 import { ExecFile } from "../terminal/exec";
-import { useChangeTheme } from "./themeToggle";
-import {
-  tomorrow,
-  tomorrowNight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { ReactNode } from "react";
+import { JSX, ReactNode } from "react";
 import { getRuntimeLang } from "@/terminal/runtime";
 import { ReplTerminal } from "@/terminal/repl";
-import dynamic from "next/dynamic";
-// SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
-const SyntaxHighlighter = dynamic(() => import("react-syntax-highlighter"), {
-  ssr: false,
-});
+import {
+  getSyntaxHighlighterLang,
+  MarkdownLang,
+  StyledSyntaxHighlighter,
+} from "./styledSyntaxHighlighter";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -86,20 +81,12 @@ function CodeComponent({
   ref,
   style,
   ...props
-}: {
-  node: unknown;
-  className?: string;
-  ref?: unknown;
-  style?: unknown;
-  [key: string]: unknown;
-}) {
-  const theme = useChangeTheme();
-  const codetheme = theme === "tomorrow" ? tomorrow : tomorrowNight;
+}: JSX.IntrinsicElements["code"] & ExtraProps) {
   const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
     className || ""
   );
   if (match) {
-    const runtimeLang = getRuntimeLang(match[1]);
+    const runtimeLang = getRuntimeLang(match[1] as MarkdownLang | undefined);
     if (match[2] === "-exec" && match[3]) {
       /*
       ```python-exec:main.py
@@ -138,7 +125,7 @@ function CodeComponent({
       }
     } else if (match[3]) {
       // ファイル名指定がある場合、ファイルエディター
-      const aceLang = getAceLang(match[1]);
+      const aceLang = getAceLang(match[1] as MarkdownLang | undefined);
       return (
         <EditorComponent
           language={aceLang}
@@ -148,28 +135,20 @@ function CodeComponent({
         />
       );
     }
+    const syntaxHighlighterLang = getSyntaxHighlighterLang(
+      match[1] as MarkdownLang | undefined
+    );
     return (
-      <SyntaxHighlighter
-        language={match[1]}
-        PreTag="div"
-        className="border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!"
-        style={codetheme}
-        {...props}
-      >
+      <StyledSyntaxHighlighter language={syntaxHighlighterLang}>
         {String(props.children || "").replace(/\n$/, "")}
-      </SyntaxHighlighter>
+      </StyledSyntaxHighlighter>
     );
   } else if (String(props.children).includes("\n")) {
     // 言語指定なしコードブロック
     return (
-      <SyntaxHighlighter
-        PreTag="div"
-        className="border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!"
-        style={codetheme}
-        {...props}
-      >
+      <StyledSyntaxHighlighter language={undefined}>
         {String(props.children || "").replace(/\n$/, "")}
-      </SyntaxHighlighter>
+      </StyledSyntaxHighlighter>
     );
   } else {
     // inline
