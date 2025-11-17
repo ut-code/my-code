@@ -43,10 +43,8 @@ export default function Home() {
               key={group.id}
               href={`${group.id}-${group.pages[0].id}`}
               className={clsx(
-                "card card-border card-md shadow-lg hover:shadow-xl transition-all hover:-translate-y-1",
-                // lightテーマではbase-100の背景にbase-100のカードでも違和感ないんだけど、
-                // darkテーマではそれだと見えないので、色を変えている
-                "dark:bg-neutral dark:text-neutral-content"
+                "card card-border card-md bg-base-200 shadow-lg",
+                "hover:shadow-xl transition-all hover:-translate-y-1",
               )}
             >
               <div className="card-body">
