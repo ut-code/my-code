@@ -163,6 +163,7 @@ function MochaTest() {
       mocha.setup("bdd");
 
       for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
+        runtimeRef.current[lang].init?.();
         defineTests(lang, runtimeRef, filesRef);
       }
 

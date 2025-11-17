@@ -1,8 +1,10 @@
+"use client";
+
 import { MutexInterface } from "async-mutex";
 import { ReplOutput, SyntaxStatus, ReplCommand } from "./repl";
 import { useWandbox, WandboxProvider } from "./wandbox/runtime";
 import { AceLang } from "./editor";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { PyodideContext, usePyodide } from "./worker/pyodide";
 import { RubyContext, useRuby } from "./worker/ruby";
 import { JSEvalContext, useJSEval } from "./worker/jsEval";
@@ -16,6 +18,7 @@ import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
  *
  */
 export interface RuntimeContext {
+  init?: () => void;
   ready: boolean;
   mutex?: MutexInterface;
   interrupt?: () => void;
@@ -24,7 +27,10 @@ export interface RuntimeContext {
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   splitReplExamples?: (content: string) => ReplCommand[];
   // file
-  runFiles: (filenames: string[], files: Readonly<Record<string, string>>) => Promise<ReplOutput[]>;
+  runFiles: (
+    filenames: string[],
+    files: Readonly<Record<string, string>>
+  ) => Promise<ReplOutput[]>;
   getCommandlineStr?: (filenames: string[]) => string;
 }
 export interface LangConstants {
@@ -73,21 +79,32 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
   const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
 
+  let runtime: RuntimeContext;
   switch (language) {
     case "python":
-      return pyodide;
+      runtime = pyodide;
+      break;
     case "ruby":
-      return ruby;
+      runtime = ruby;
+      break;
     case "javascript":
-      return jsEval;
+      runtime = jsEval;
+      break;
     case "typescript":
-      return typescript;
+      runtime = typescript;
+      break;
     case "cpp":
-      return wandboxCpp;
+      runtime = wandboxCpp;
+      break;
     default:
       language satisfies never;
       throw new Error(`Runtime not implemented for language: ${language}`);
   }
+  const { init } = runtime;
+  useEffect(() => {
+    init?.();
+  }, [init]);
+  return runtime;
 }
 export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (

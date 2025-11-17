@@ -8,6 +8,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { useEmbedContext } from "../embedContext";
@@ -16,18 +17,21 @@ import { RuntimeContext } from "../runtime";
 
 export const compilerOptions: CompilerOptions = {};
 
-const TypeScriptContext = createContext<VirtualTypeScriptEnvironment | null>(
-  null
-);
+const TypeScriptContext = createContext<{
+  init: () => void;
+  tsEnv: VirtualTypeScriptEnvironment | null;
+}>({ init: () => undefined, tsEnv: null });
 export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
-
-  useEffect(() => {
-    // useEffectはサーバーサイドでは実行されないが、
+  const initializing = useRef(false);
+  const init = useCallback(() => {
+    if (initializing.current) {
+      return;
+    }
+    initializing.current = true;
     // typeof window !== "undefined" でガードしないとなぜかesbuildが"typescript"を
     // サーバーサイドでのインポート対象とみなしてしまう。
     if (tsEnv === null && typeof window !== "undefined") {
-      const abortController = new AbortController();
       (async () => {
         const ts = await import("typescript");
         const vfs = await import("@typescript/vfs");
@@ -39,8 +43,7 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
         const libFileContents = await Promise.all(
           libFiles.map(async (libFile) => {
             const response = await fetch(
-              `/typescript/${ts.version}/${libFile}`,
-              { signal: abortController.signal }
+              `/typescript/${ts.version}/${libFile}`
             );
             if (response.ok) {
               return response.text();
@@ -63,20 +66,17 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
         );
         setTSEnv(env);
       })();
-      return () => {
-        abortController.abort();
-      };
     }
   }, [tsEnv, setTSEnv]);
   return (
-    <TypeScriptContext.Provider value={tsEnv}>
+    <TypeScriptContext.Provider value={{ init, tsEnv }}>
       {children}
     </TypeScriptContext.Provider>
   );
 }
 
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
-  const tsEnv = useContext(TypeScriptContext);
+  const { init, tsEnv } = useContext(TypeScriptContext);
 
   const { writeFile } = useEmbedContext();
   const runFiles = useCallback(
@@ -139,6 +139,7 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
     [tsEnv, writeFile, jsEval]
   );
   return {
+    init,
     ready: tsEnv !== null,
     runFiles,
     getCommandlineStr,

@@ -96,6 +96,13 @@ export function WorkerProvider({
   }
 
   const initializeWorker = useCallback(async () => {
+    if (!mutex.current.isLocked()) {
+      throw new Error(`mutex of context must be locked for initializeWorker`);
+    }
+    if (workerRef.current) {
+      return;
+    }
+
     let worker: Worker;
     lang satisfies RuntimeLang;
     switch (lang) {
@@ -137,12 +144,12 @@ export function WorkerProvider({
     });
   }, [lang]);
 
-  // Initialization effect
-  useEffect(() => {
-    initializeWorker().then(() => setReady(true));
-    return () => {
-      workerRef.current?.terminate();
-    };
+  // First initialization
+  const init = useCallback(() => {
+    // すでに初期化済みだった場合initializeWorker()がreturnしなにもしない
+    void mutex.current.runExclusive(() =>
+      initializeWorker().then(() => setReady(true))
+    );
   }, [initializeWorker]);
 
   const interrupt = useCallback(() => {
@@ -161,6 +168,7 @@ export function WorkerProvider({
         messageCallbacks.current.clear();
 
         workerRef.current?.terminate();
+        workerRef.current = null;
         setReady(false);
 
         void mutex.current.runExclusive(async () => {
@@ -278,6 +286,7 @@ export function WorkerProvider({
   return (
     <context.Provider
       value={{
+        init,
         ready,
         runCommand,
         checkSyntax,
