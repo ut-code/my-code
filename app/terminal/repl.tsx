@@ -14,6 +14,7 @@ import {
 import type { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
 import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
+import clsx from "clsx";
 
 export interface ReplOutput {
   type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
@@ -309,7 +310,8 @@ export function ReplTerminal({
       runtimeReady &&
       initCommandState === "triggered"
     ) {
-      // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)      setInitCommandState("executing");
+      // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)
+      setInitCommandState("executing");
       (async () => {
         if (initCommand) {
           // 初期化時に実行するコマンドがある場合はそれを実行
@@ -353,6 +355,19 @@ export function ReplTerminal({
 
   return (
     <div className="bg-base-300 border border-accent border-2 shadow-md m-2 p-4 pr-1 rounded-box relative h-max">
+      {/*
+      ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
+      可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
+      */}
+      <pre
+        className={clsx(
+          "font-mono overflow-auto cursor-wait",
+          "min-h-26", // xterm.jsで5行分の高さ
+          initCommandState !== "initializing" && "hidden"
+        )}
+      >
+        {initContent + "\n\n"}
+      </pre>
       {terminalInstanceRef.current &&
         termReady &&
         initCommandState === "idle" && (
@@ -376,7 +391,14 @@ export function ReplTerminal({
         initCommandState === "executing") && (
         <div className="absolute z-10 inset-0 cursor-wait" />
       )}
-      <div ref={terminalRef} />
+      <div
+        className={clsx(
+          initCommandState === "initializing" &&
+            /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
+            "absolute invisible"
+        )}
+        ref={terminalRef}
+      />
     </div>
   );
 }

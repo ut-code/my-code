@@ -1,13 +1,19 @@
+"use client";
+
 import { useChangeTheme } from "./themeToggle";
 import {
   tomorrow,
   tomorrowNight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import dynamic from "next/dynamic";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 // SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
-const SyntaxHighlighter = dynamic(() => import("react-syntax-highlighter"), {
-  ssr: false,
+const SyntaxHighlighter = lazy(() => {
+  if (typeof window !== "undefined") {
+    return import("react-syntax-highlighter");
+  } else {
+    throw new Error("should not try SSR");
+  }
 });
 
 // Markdownで指定される可能性のある言語名を列挙
@@ -81,14 +87,29 @@ export function StyledSyntaxHighlighter(props: {
 }) {
   const theme = useChangeTheme();
   const codetheme = theme === "tomorrow" ? tomorrow : tomorrowNight;
+  const [initHighlighter, setInitHighlighter] = useState(false);
+  useEffect(() => {
+    setInitHighlighter(true);
+  }, []);
+  return initHighlighter ? (
+    <Suspense fallback={<FallbackPre>{props.children}</FallbackPre>}>
+      <SyntaxHighlighter
+        language={props.language}
+        PreTag="div"
+        className="border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!"
+        style={codetheme}
+      >
+        {props.children}
+      </SyntaxHighlighter>
+    </Suspense>
+  ) : (
+    <FallbackPre>{props.children}</FallbackPre>
+  );
+}
+function FallbackPre({ children }: { children: string }) {
   return (
-    <SyntaxHighlighter
-      language={props.language}
-      PreTag="div"
-      className="border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!"
-      style={codetheme}
-    >
-      {props.children}
-    </SyntaxHighlighter>
+    <pre className="border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!">
+      {children}
+    </pre>
   );
 }

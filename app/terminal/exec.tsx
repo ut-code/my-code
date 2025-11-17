@@ -11,6 +11,7 @@ import { writeOutput } from "./repl";
 import { useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import { RuntimeLang, useRuntime } from "./runtime";
+import clsx from "clsx";
 
 interface ExecProps {
   /*
@@ -95,8 +96,28 @@ export function ExecFile(props: ExecProps) {
           {getCommandlineStr?.(props.filenames)}
         </code>
       </div>
-      <div className="bg-base-300 p-4 pt-2">
-        <div ref={terminalRef} />
+      <div className="bg-base-300 p-4 pt-2 relative">
+        {/*
+      ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
+      可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
+      */}
+        <pre
+          className={clsx(
+            "font-mono overflow-auto cursor-wait",
+            "min-h-26", // xterm.jsで5行分の高さ
+            termReady && "hidden"
+          )}
+        >
+          {props.content}
+        </pre>
+        <div
+          className={clsx(
+            !termReady &&
+              /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
+              "absolute invisible"
+          )}
+          ref={terminalRef}
+        />
       </div>
       {executionState !== "idle" && (
         <div className="absolute z-10 inset-0 cursor-wait" />

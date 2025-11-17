@@ -102,6 +102,14 @@ export function useTerminal(props: TerminalProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const abortController = new AbortController();
+      const resizeTerminal = () => {
+        // fitAddon.fit();
+        const dims = fitAddonRef.current?.proposeDimensions();
+        if (dims && !isNaN(dims.cols)) {
+          const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
+          terminalInstanceRef.current?.resize(dims.cols, rows);
+        }
+      }
       /*
       globals.cssでフォントを指定し読み込んでいるが、
       それが読み込まれる前にterminalを初期化してしまうとバグるので、
@@ -131,7 +139,8 @@ export function useTerminal(props: TerminalProps) {
 
           fitAddonRef.current = new FitAddon();
           term.loadAddon(fitAddonRef.current);
-          // fitAddon.fit();
+          // fitAddonRef.current.fit();
+          resizeTerminal();
 
           term.open(terminalRef.current);
 
@@ -160,14 +169,7 @@ export function useTerminal(props: TerminalProps) {
         }
       });
 
-      const observer = new ResizeObserver(() => {
-        // fitAddon.fit();
-        const dims = fitAddonRef.current?.proposeDimensions();
-        if (dims && !isNaN(dims.cols)) {
-          const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
-          terminalInstanceRef.current?.resize(dims.cols, rows);
-        }
-      });
+      const observer = new ResizeObserver(resizeTerminal);
       observer.observe(terminalRef.current);
 
       return () => {

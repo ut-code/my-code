@@ -1,10 +1,17 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { lazy, Suspense, useEffect, useState } from "react";
+import clsx from "clsx";
+import { useChangeTheme } from "../[docs_id]/themeToggle";
+import { useEmbedContext } from "./embedContext";
+import { langConstants } from "./runtime";
+import { MarkdownLang } from "@/[docs_id]/styledSyntaxHighlighter";
+
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
-const AceEditor = dynamic(
-  async () => {
+const AceEditor = lazy(async () => {
+  if (typeof window !== "undefined") {
     const ace = await import("react-ace");
+    // snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
     // テーマは色分けが今のTerminal側のハイライト(highlight.js)の実装に近いものを適当に選んだ
     await import("ace-builds/src-min-noconflict/theme-tomorrow");
     await import("ace-builds/src-min-noconflict/theme-tomorrow_night");
@@ -19,16 +26,10 @@ const AceEditor = dynamic(
     await import("ace-builds/src-min-noconflict/mode-csv");
     await import("ace-builds/src-min-noconflict/mode-text");
     return ace;
-  },
-  { ssr: false }
-);
-import { useEffect, useState } from "react";
-import clsx from "clsx";
-import { useChangeTheme } from "../[docs_id]/themeToggle";
-import { useEmbedContext } from "./embedContext";
-import { langConstants } from "./runtime";
-import { MarkdownLang } from "@/[docs_id]/styledSyntaxHighlighter";
-// snippetを有効化するにはsnippetもimportする必要がある: import "ace-builds/src-min-noconflict/snippets/python";
+  } else {
+    throw new Error("should not try SSR");
+  }
+});
 
 // mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
 export type AceLang =
@@ -92,12 +93,16 @@ export function EditorComponent(props: EditorProps) {
     }
   }, [files, props.filename, props.initContent, writeFile]);
 
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState<number>();
+  const [initAce, setInitAce] = useState(false);
   useEffect(() => {
     setFontSize(
       parseFloat(getComputedStyle(document.documentElement).fontSize)
     ); // 1rem
+    setInitAce(true);
   }, []);
+  // 最小8行 or 初期内容+1行
+  const editorHeight = Math.max(props.initContent.split("\n").length + 1, 8);
 
   return (
     <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden">
@@ -137,26 +142,55 @@ export function EditorComponent(props: EditorProps) {
           元の内容に戻す
         </button>
       </div>
-      <AceEditor
-        name={`ace-editor-${props.filename}`}
-        mode={props.language}
-        theme={theme}
-        tabSize={langConstants(props.language || "text").tabSize}
-        width="100%"
-        height={
-          Math.max((props.initContent.split("\n").length + 2) * fontSize, 128) +
-          "px"
-        }
-        className="font-mono!" // Aceのデフォルトフォントを上書き
-        readOnly={props.readonly}
-        fontSize={fontSize}
-        showPrintMargin={false}
-        enableBasicAutocompletion={false}
-        enableLiveAutocompletion={false}
-        enableSnippets={false}
-        value={code}
-        onChange={(code: string) => writeFile({ [props.filename]: code })}
-      />
+      {fontSize !== undefined && initAce ? (
+        <Suspense
+          fallback={
+            <FallbackPre editorHeight={editorHeight}>{code}</FallbackPre>
+          }
+        >
+          <AceEditor
+            name={`ace-editor-${props.filename}`}
+            mode={props.language}
+            theme={theme}
+            tabSize={langConstants(props.language || "text").tabSize}
+            width="100%"
+            height={editorHeight * (fontSize + 1) + "px"}
+            className="font-mono!" // Aceのデフォルトフォントを上書き
+            readOnly={props.readonly}
+            fontSize={fontSize}
+            showPrintMargin={false}
+            enableBasicAutocompletion={false}
+            enableLiveAutocompletion={false}
+            enableSnippets={false}
+            value={code}
+            onChange={(code: string) => writeFile({ [props.filename]: code })}
+          />
+        </Suspense>
+      ) : (
+        <FallbackPre editorHeight={editorHeight}>{code}</FallbackPre>
+      )}
     </div>
+  );
+}
+
+function FallbackPre({
+  children,
+  editorHeight,
+}: {
+  children: string;
+  editorHeight: number;
+}) {
+  // AceEditorはなぜかline-heightが小さい
+  // fontSize + 1px になるっぽい?
+  return (
+    <pre
+      className="font-mono overflow-auto bg-base-300 px-2 cursor-wait"
+      style={{
+        height: `calc((1em + 1px) * ${editorHeight})`,
+        lineHeight: "calc(1em + 1px)",
+      }}
+    >
+      {children}
+    </pre>
   );
 }
