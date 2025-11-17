@@ -88,6 +88,29 @@ mycdark:
 
 @custom-variant dark (&:where([data-theme=mycdark], [data-theme=mycdark] *));
 
+/* Aceの背景色と文字色を上書き */
+.ace_editor {
+  background-color: var(--color-base-300) !important;
+  color: var(--color-base-content) !important;
+}
+.ace_gutter {
+  /* editorと同じにする */
+  background: inherit !important;
+  color: inherit !important;
+}
+.ace_active-line {
+  /* bg-base-content/10 このdivにはテキストが入らないので、opacity:0.1で代用可能 */
+  background: var(--color-base-content) !important;
+  opacity: 0.1;
+}
+.ace_gutter-active-line {
+  /* bg-base-content/20 --color-base-contentにa=0.2を追加する方法がなさそうなのでcolor-mixで代用する */
+  background-color: color-mix(in oklch, var(--color-base-content) 20%, var(--color-base-300)) !important;
+}
+.ace_bracket {
+  border: 1px solid var(--color-primary) !important;
+}
+
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {
   /*

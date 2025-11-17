@@ -73,7 +73,7 @@ export function ExecFile(props: ExecProps) {
 
   return (
     <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden relative">
-      <div>
+      <div className="bg-base-200">
         <button
           className="btn btn-soft btn-accent rounded-none"
           onClick={() => {
