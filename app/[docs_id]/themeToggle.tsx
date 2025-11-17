@@ -9,6 +9,7 @@ export function useChangeTheme() {
       setTheme(theme === "mycdark" ? "tomorrow_night" : "tomorrow");
     };
 
+    updateTheme();
     const observer = new MutationObserver(updateTheme);
     observer.observe(document.documentElement, {
       attributes: true,
