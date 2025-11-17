@@ -110,6 +110,16 @@ mycdark:
 .ace_bracket {
   border: 1px solid var(--color-primary) !important;
 }
+.ace_cursor {
+  color: var(--color-primary) !important;
+}
+.ace_selection {
+  background: var(--color-primary) !important;
+  opacity: 0.4;
+}
+.ace_selected-word {
+  border: 1px solid var(--color-primary) !important;
+}
 
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {

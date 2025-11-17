@@ -61,7 +61,7 @@ function computeTerminalTheme() {
     // DaisyUIの変数を使用してテーマを設定している
     background: fromCSS("--color-base-300"),
     foreground: fromCSS("--color-base-content"),
-    cursor: fromCSS("--color-base-content"),
+    cursor: fromCSS("--color-primary"),
     selectionBackground: fromCSS("--color-primary"),
     selectionForeground: fromCSS("--color-primary-content"),
     black: fromCSS("--color-black"),
@@ -125,6 +125,7 @@ export function useTerminal(props: TerminalProps) {
             cursorBlink: true,
             convertEol: true,
             cursorStyle: "bar",
+            cursorWidth: 2,
             cursorInactiveStyle: "none",
             fontSize: parseFloat(
               getComputedStyle(document.documentElement).fontSize
