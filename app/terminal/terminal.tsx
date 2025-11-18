@@ -53,6 +53,36 @@ export function showCursor(term: Terminal) {
 
 export const systemMessageColor = chalk.blue.bold.italic;
 
+function computeTerminalTheme() {
+  const fromCSS = (varName: string) =>
+    window.getComputedStyle(document.body).getPropertyValue(varName);
+  // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
+  return {
+    // DaisyUIの変数を使用してテーマを設定している
+    background: fromCSS("--color-base-300"),
+    foreground: fromCSS("--color-base-content"),
+    cursor: fromCSS("--color-primary"),
+    selectionBackground: fromCSS("--color-primary"),
+    selectionForeground: fromCSS("--color-primary-content"),
+    black: fromCSS("--color-black"),
+    red: fromCSS("--color-red-600"),
+    green: fromCSS("--color-green-700"),
+    yellow: fromCSS("--color-yellow-700"),
+    blue: fromCSS("--color-indigo-600"),
+    magenta: fromCSS("--color-fuchsia-500"),
+    cyan: fromCSS("--color-cyan-600"),
+    white: fromCSS("--color-neutral-100"),
+    brightBlack: fromCSS("--color-neutral-500"),
+    brightRed: fromCSS("--color-red-400"),
+    brightGreen: fromCSS("--color-green-500"),
+    brightYellow: fromCSS("--color-yellow-500"),
+    brightBlue: fromCSS("--color-indigo-400"),
+    brightMagenta: fromCSS("--color-fuchsia-300"),
+    brightCyan: fromCSS("--color-cyan-400"),
+    brightWhite: fromCSS("--color-white"),
+  } as const;
+}
+
 interface TerminalProps {
   getRows?: (cols: number) => number;
   onReady?: () => void;
@@ -72,57 +102,46 @@ export function useTerminal(props: TerminalProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const abortController = new AbortController();
-      // globals.cssでフォントを指定し読み込んでいるが、
-      // それが読み込まれる前にterminalを初期化してしまうとバグる。
+      const resizeTerminal = () => {
+        // fitAddon.fit();
+        const dims = fitAddonRef.current?.proposeDimensions();
+        if (dims && !isNaN(dims.cols)) {
+          const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
+          terminalInstanceRef.current?.resize(dims.cols, rows);
+        }
+      }
+      /*
+      globals.cssでフォントを指定し読み込んでいるが、
+      それが読み込まれる前にterminalを初期化してしまうとバグるので、
+      ここで fonts.load() をawaitしている。
+      */
       Promise.all([
         import("@xterm/xterm"),
         import("@xterm/addon-fit"),
-        document.fonts.load("0.875rem Inconsolata Variable"),
+        document.fonts.load("1rem Inconsolata Variable"),
       ]).then(([{ Terminal }, { FitAddon }]) => {
         if (!abortController.signal.aborted) {
-          const fromCSS = (varName: string) =>
-            window.getComputedStyle(document.body).getPropertyValue(varName);
-          // "--color-" + color_name のように文字列を分割するとTailwindCSSが認識せずCSSの値として出力されない場合があるので注意
           const term = new Terminal({
             cursorBlink: true,
             convertEol: true,
             cursorStyle: "bar",
+            cursorWidth: 2,
             cursorInactiveStyle: "none",
-            fontSize: 14,
-            lineHeight: 1.4,
+            fontSize: parseFloat(
+              getComputedStyle(document.documentElement).fontSize
+            ), // 1rem
+            lineHeight: 1.2,
             letterSpacing: 0,
-            fontFamily: "'Inconsolata Variable','Noto Sans JP Variable'",
-            theme: {
-              // DaisyUIの変数を使用してテーマを設定している
-              // TODO: ダークテーマ/ライトテーマを切り替えたときに再設定する?
-              background: fromCSS("--color-base-300"),
-              foreground: fromCSS("--color-base-content"),
-              cursor: fromCSS("--color-base-content"),
-              selectionBackground: fromCSS("--color-primary"),
-              selectionForeground: fromCSS("--color-primary-content"),
-              black: fromCSS("--color-black"),
-              brightBlack: fromCSS("--color-neutral-500"),
-              red: fromCSS("--color-red-600"),
-              brightRed: fromCSS("--color-red-400"),
-              green: fromCSS("--color-green-600"),
-              brightGreen: fromCSS("--color-green-400"),
-              yellow: fromCSS("--color-yellow-700"),
-              brightYellow: fromCSS("--color-yellow-400"),
-              blue: fromCSS("--color-indigo-600"),
-              brightBlue: fromCSS("--color-indigo-400"),
-              magenta: fromCSS("--color-fuchsia-600"),
-              brightMagenta: fromCSS("--color-fuchsia-400"),
-              cyan: fromCSS("--color-cyan-600"),
-              brightCyan: fromCSS("--color-cyan-400"),
-              white: fromCSS("--color-base-100"),
-              brightWhite: fromCSS("--color-white"),
-            },
+            fontFamily:
+              "'Inconsolata Variable', 'Noto Sans JP', 'Noto Sans CJK JP', 'Source Han Sans JP', '源ノ角ゴシック', 'Noto Sans JP Variable', monospace",
+            theme: computeTerminalTheme(),
           });
           terminalInstanceRef.current = term;
 
           fitAddonRef.current = new FitAddon();
           term.loadAddon(fitAddonRef.current);
-          // fitAddon.fit();
+          // fitAddonRef.current.fit();
+          resizeTerminal();
 
           term.open(terminalRef.current);
 
@@ -151,14 +170,7 @@ export function useTerminal(props: TerminalProps) {
         }
       });
 
-      const observer = new ResizeObserver(() => {
-        // fitAddon.fit();
-        const dims = fitAddonRef.current?.proposeDimensions();
-        if (dims && !isNaN(dims.cols)) {
-          const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
-          terminalInstanceRef.current?.resize(dims.cols, rows);
-        }
-      });
+      const observer = new ResizeObserver(resizeTerminal);
       observer.observe(terminalRef.current);
 
       return () => {
@@ -179,16 +191,8 @@ export function useTerminal(props: TerminalProps) {
   // テーマが変わったときにterminalのテーマを更新する
   useEffect(() => {
     if (terminalInstanceRef.current) {
-      const fromCSS = (varName: string) =>
-        window.getComputedStyle(document.body).getPropertyValue(varName);
-
       terminalInstanceRef.current.options = {
-        theme: {
-          background: fromCSS(
-            theme === "tomorrow" ? "--color-base-300" : "--color-neutral-900"
-          ),
-          foreground: fromCSS("--color-base-content"),
-        },
+        theme: computeTerminalTheme(),
       };
     }
   }, [theme]);

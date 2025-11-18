@@ -11,6 +11,7 @@ import { writeOutput } from "./repl";
 import { useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import { RuntimeLang, useRuntime } from "./runtime";
+import clsx from "clsx";
 
 interface ExecProps {
   /*
@@ -72,10 +73,10 @@ export function ExecFile(props: ExecProps) {
   ]);
 
   return (
-    <div className="relative">
-      <div>
+    <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden relative">
+      <div className="bg-base-200">
         <button
-          className="btn btn-soft btn-primary rounded-tl-lg rounded-none"
+          className="btn btn-soft btn-accent rounded-none"
           onClick={() => {
             if (!ready) {
               clearTerminal(terminalInstanceRef.current!);
@@ -95,8 +96,28 @@ export function ExecFile(props: ExecProps) {
           {getCommandlineStr?.(props.filenames)}
         </code>
       </div>
-      <div className="bg-base-300 p-4 pt-2 rounded-b-lg">
-        <div ref={terminalRef} />
+      <div className="bg-base-300 p-4 pt-2 relative">
+        {/*
+      ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
+      可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
+      */}
+        <pre
+          className={clsx(
+            "font-mono overflow-auto cursor-wait",
+            "min-h-26", // xterm.jsで5行分の高さ
+            termReady && "hidden"
+          )}
+        >
+          {props.content}
+        </pre>
+        <div
+          className={clsx(
+            !termReady &&
+              /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
+              "absolute invisible"
+          )}
+          ref={terminalRef}
+        />
       </div>
       {executionState !== "idle" && (
         <div className="absolute z-10 inset-0 cursor-wait" />

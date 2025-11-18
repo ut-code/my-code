@@ -1,4 +1,5 @@
 "use client";
+
 import { Heading } from "@/[docs_id]/markdown";
 import "mocha/mocha.css";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -13,6 +14,7 @@ import { ReplTerminal } from "./repl";
 import { EditorComponent, getAceLang } from "./editor";
 import { ExecFile } from "./exec";
 import { useTypeScript } from "./typescript/runtime";
+import { useTerminal } from "./terminal";
 
 export default function RuntimeTestPage() {
   return (
@@ -30,12 +32,15 @@ export default function RuntimeTestPage() {
               className="tab"
               aria-label={lang}
             />
-            <div className="tab-content border-base-300 bg-base-100 p-4">
+            <div className="tab-content border-base-300 bg-base-200 p-4">
               <RuntimeSample lang={lang as RuntimeLang} config={config} />
             </div>
           </Fragment>
         ))}
       </div>
+
+      <Heading level={2}>Xterm.js Colors</Heading>
+      <AnsiColorSample />
 
       <Heading level={2}>自動テスト</Heading>
       <MochaTest />
@@ -52,7 +57,7 @@ interface SampleConfig {
 const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   python: {
     repl: true,
-    replInitContent: '>>> print("Hello, World!")\nHello, World!',
+    replInitContent: '>>> print("Hello, World!")\x1b[0m\nHello, World!',
     editor: {
       "main.py": 'print("Hello, World!")',
     },
@@ -60,7 +65,8 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   },
   ruby: {
     repl: true,
-    replInitContent: 'irb(main):001:0> puts "Hello, World!"\nHello, World!',
+    replInitContent:
+      'irb(main):001:0> puts "Hello, World!"\x1b[0m\nHello, World!',
     editor: {
       "main.rb": 'puts "Hello, World!"',
     },
@@ -68,7 +74,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   },
   javascript: {
     repl: true,
-    replInitContent: '> console.log("Hello, World!");\nHello, World!',
+    replInitContent: '> console.log("Hello, World!");\x1b[0m\nHello, World!',
     editor: {
       "main.js": 'console.log("Hello, World!");',
     },
@@ -77,7 +83,8 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   typescript: {
     repl: false,
     editor: {
-      "main.ts": 'function greet(name: string): void {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("World");',
+      "main.ts":
+        'function greet(name: string): void {\x1b[0m\n  console.log("Hello, " + name + "!");\x1b[0m\n}\x1b[0m\n\x1b[0m\ngreet("World");',
     },
     exec: ["main.ts"],
   },
@@ -104,7 +111,7 @@ function RuntimeSample({
   config: SampleConfig;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col">
       {config.repl && (
         <ReplTerminal
           terminalId="1"
@@ -124,6 +131,44 @@ function RuntimeSample({
       {config.exec && (
         <ExecFile filenames={config.exec} language={lang} content="" />
       )}
+    </div>
+  );
+}
+
+function AnsiColorSample() {
+  const { terminalRef, terminalInstanceRef } = useTerminal({
+    getRows: () => 6,
+    onReady: () => {
+      for (let i = 0; i <= 7; i++) {
+        terminalInstanceRef.current!.write(`\x1b[0;${30 + i}m${30 + i}`);
+      }
+      terminalInstanceRef.current!.write("\x1b[0m\n");
+      terminalInstanceRef.current!.write("\x1b[1m1;");
+      for (let i = 0; i <= 7; i++) {
+        terminalInstanceRef.current!.write(`\x1b[1;${30 + i}m${30 + i}`);
+      }
+      terminalInstanceRef.current!.write("\x1b[0m\n");
+      for (let i = 0; i <= 7; i++) {
+        terminalInstanceRef.current!.write(`\x1b[0;${90 + i}m${90 + i}`);
+      }
+      terminalInstanceRef.current!.write("\x1b[0m\n");
+      terminalInstanceRef.current!.write("\x1b[1m1;");
+      for (let i = 0; i <= 7; i++) {
+        terminalInstanceRef.current!.write(`\x1b[1;${90 + i}m${90 + i}`);
+      }
+      terminalInstanceRef.current!.write("\x1b[0m\n");
+      for (let i = 0; i <= 7; i++) {
+        terminalInstanceRef.current!.write(`\x1b[0;${40 + i}m${40 + i}`);
+      }
+      terminalInstanceRef.current!.write("\x1b[0m\n");
+      for (let i = 0; i <= 7; i++) {
+        terminalInstanceRef.current!.write(`\x1b[0;${100 + i}m${100 + i}`);
+      }
+    },
+  });
+  return (
+    <div className="bg-base-300 border border-accent border-2 shadow-md m-2 p-4 pr-1 rounded-box relative h-max">
+      <div ref={terminalRef} />
     </div>
   );
 }
@@ -155,9 +200,9 @@ function MochaTest() {
   filesRef.current = files;
 
   const runTest = async () => {
-    if(typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       setMochaState("running");
-      
+
       await import("mocha/mocha.js");
 
       mocha.setup("bdd");
@@ -177,7 +222,7 @@ function MochaTest() {
     <div className="border-1 border-transparent translate-x-0">
       {/* margin collapseさせない & fixedの対象をviewportではなくこのdivにする */}
       {mochaState === "idle" ? (
-        <button className="btn btn-primary mt-4" onClick={runTest}>
+        <button className="btn btn-accent mt-4" onClick={runTest}>
           テストを実行
         </button>
       ) : mochaState === "running" ? (
