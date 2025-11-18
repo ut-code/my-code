@@ -7,7 +7,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useRef,
+  useEffect,
   useState,
 } from "react";
 import { useEmbedContext } from "../embedContext";
@@ -22,15 +22,14 @@ const TypeScriptContext = createContext<{
 }>({ init: () => undefined, tsEnv: null });
 export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
-  const initializing = useRef(false);
-  const init = useCallback(() => {
-    if (initializing.current) {
-      return;
-    }
-    initializing.current = true;
+  const [doInit, setDoInit] = useState(false);
+  const init = useCallback(() => setDoInit(true), []);
+  useEffect(() => {
+    // useEffectはサーバーサイドでは実行されないが、
     // typeof window !== "undefined" でガードしないとなぜかesbuildが"typescript"を
     // サーバーサイドでのインポート対象とみなしてしまう。
-    if (tsEnv === null && typeof window !== "undefined") {
+    if (doInit && tsEnv === null && typeof window !== "undefined") {
+      const abortController = new AbortController();
       (async () => {
         const ts = await import("typescript");
         const vfs = await import("@typescript/vfs");
@@ -42,7 +41,8 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
         const libFileContents = await Promise.all(
           libFiles.map(async (libFile) => {
             const response = await fetch(
-              `/typescript/${ts.version}/${libFile}`
+              `/typescript/${ts.version}/${libFile}`,
+              { signal: abortController.signal }
             );
             if (response.ok) {
               return response.text();
@@ -65,8 +65,11 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
         );
         setTSEnv(env);
       })();
+      return () => {
+        abortController.abort();
+      };
     }
-  }, [tsEnv, setTSEnv]);
+  }, [tsEnv, setTSEnv, doInit]);
   return (
     <TypeScriptContext.Provider value={{ init, tsEnv }}>
       {children}

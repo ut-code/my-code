@@ -1,6 +1,14 @@
 "use client";
 
-import { Context, ReactNode, useCallback, useRef, useState } from "react";
+import {
+  Context,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { RuntimeContext, RuntimeLang } from "../runtime";
 import { ReplOutput, SyntaxStatus } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
@@ -62,7 +70,7 @@ export function WorkerProvider({
 }) {
   const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState<boolean>(false);
-  const mutex = useRef<MutexInterface>(new Mutex());
+  const mutex = useMemo<MutexInterface>(() => new Mutex(), []);
   const { writeFile } = useEmbedContext();
 
   const messageCallbacks = useRef<
@@ -89,7 +97,7 @@ export function WorkerProvider({
   }
 
   const initializeWorker = useCallback(async () => {
-    if (!mutex.current.isLocked()) {
+    if (!mutex.isLocked()) {
       throw new Error(`mutex of context must be locked for initializeWorker`);
     }
     if (workerRef.current) {
@@ -135,15 +143,26 @@ export function WorkerProvider({
     }).then((payload) => {
       capabilities.current = payload.capabilities;
     });
-  }, [lang]);
+  }, [lang, mutex]);
 
-  // First initialization
-  const init = useCallback(() => {
-    // すでに初期化済みだった場合initializeWorker()がreturnしなにもしない
-    void mutex.current.runExclusive(() =>
-      initializeWorker().then(() => setReady(true))
-    );
-  }, [initializeWorker]);
+  const [doInit, setDoInit] = useState(false);
+  const init = useCallback(() => setDoInit(true), []);
+
+  // Initialization effect
+  useEffect(() => {
+    if (doInit) {
+      void mutex.runExclusive(async () => {
+        await initializeWorker();
+        setReady(true);
+      });
+      return () => {
+        void mutex.runExclusive(async () => {
+          workerRef.current?.terminate();
+          workerRef.current = null;
+        });
+      };
+    }
+  }, [doInit, initializeWorker, mutex]);
 
   const interrupt = useCallback(() => {
     if (!capabilities.current) return;
@@ -164,7 +183,7 @@ export function WorkerProvider({
         workerRef.current = null;
         setReady(false);
 
-        void mutex.current.runExclusive(async () => {
+        void mutex.runExclusive(async () => {
           await initializeWorker();
           if (commandHistory.current.length > 0) {
             await postMessage("restoreState", {
@@ -179,11 +198,11 @@ export function WorkerProvider({
         capabilities.current?.interrupt satisfies never;
         break;
     }
-  }, [initializeWorker]);
+  }, [initializeWorker, mutex]);
 
   const runCommand = useCallback(
     async (code: string): Promise<ReplOutput[]> => {
-      if (!mutex.current.isLocked()) {
+      if (!mutex.isLocked()) {
         throw new Error(`mutex of context must be locked for runCommand`);
       }
       if (!workerRef.current || !ready) {
@@ -223,18 +242,18 @@ export function WorkerProvider({
         return [{ type: "error", message: String(error) }];
       }
     },
-    [ready, writeFile]
+    [ready, writeFile, mutex]
   );
 
   const checkSyntax = useCallback(
     async (code: string): Promise<SyntaxStatus> => {
       if (!workerRef.current || !ready) return "invalid";
-      const { status } = await mutex.current.runExclusive(() =>
+      const { status } = await mutex.runExclusive(() =>
         postMessage("checkSyntax", { code })
       );
       return status;
     },
-    [ready]
+    [ready, mutex]
   );
 
   const runFiles = useCallback(
@@ -264,7 +283,7 @@ export function WorkerProvider({
       ) {
         interruptBuffer.current[0] = 0;
       }
-      return mutex.current.runExclusive(async () => {
+      return mutex.runExclusive(async () => {
         const { output, updatedFiles } = await postMessage("runFile", {
           name: filenames[0],
           files,
@@ -273,7 +292,7 @@ export function WorkerProvider({
         return output;
       });
     },
-    [ready, writeFile]
+    [ready, writeFile, mutex]
   );
 
   return (
@@ -283,7 +302,7 @@ export function WorkerProvider({
         ready,
         runCommand,
         checkSyntax,
-        mutex: mutex.current,
+        mutex,
         runFiles,
         interrupt,
       }}
