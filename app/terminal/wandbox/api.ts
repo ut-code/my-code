@@ -132,6 +132,10 @@ export async function compileAndRun(
     }
   );
 
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
   // Read the ndjson response line by line
   const text = await response.text();
   const lines = text.trim().split("\n");
