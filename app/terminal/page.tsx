@@ -268,7 +268,7 @@ function MochaTest() {
           </>
         )}
       </p>
-      <div className="m-0!" id="mocha" />
+      <div className="m-0! font-sans!" id="mocha" />
     </div>
   );
 }
