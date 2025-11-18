@@ -1,19 +1,29 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { pagesList } from "./pagesList";
+import clsx from "clsx";
+
+export const metadata: Metadata = {
+  title: "my.code(); へようこそ",
+  description:
+    "環境構築不要、その場で実践。AIアシスタントとの対話履歴があなただけの教材へと進化する、新しいプログラミング学習サイトです。",
+};
 
 export default function Home() {
   return (
     <div className="p-4">
-      <div className="hero bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 rounded-lg my-6 py-12">
+      <div className="hero bg-gradient-to-br from-primary/30 via-secondary/15 to-accent/30 rounded-lg my-6 py-8 sm:px-4">
         <div className="hero-content text-center">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold mb-6">my.code(); へようこそ</h1>
-            <p className="text-lg mb-4">
-              my.code();
-              はプログラミング言語のチュートリアルを提供するウェブサイトです。
+          <div className="">
+            <h1 className="text-5xl font-bold mb-8">
+              <span className="font-mono mr-4">my.code();</span>
+              へようこそ
+            </h1>
+            <p className="text-3xl font-bold mb-4">
+              環境構築不要、その場で実践。
             </p>
-            <p className="text-base opacity-80">
-              ブラウザ上で動かせる実行環境とAIアシスタントで、あなたの学習を強力にサポートします。
+            <p className="text-lg opacity-80">
+              AIアシスタントとの対話履歴があなただけの教材へと進化する、新しいプログラミング学習サイトです。
             </p>
           </div>
         </div>
@@ -32,7 +42,10 @@ export default function Home() {
             <Link
               key={group.id}
               href={`${group.id}-${group.pages[0].id}`}
-              className="card card-border bg-base-100 card-md shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+              className={clsx(
+                "card card-border card-md bg-base-200 shadow-lg",
+                "hover:shadow-xl transition-all hover:-translate-y-1",
+              )}
             >
               <div className="card-body">
                 <h2 className="card-title">{group.lang}</h2>
@@ -52,41 +65,42 @@ export default function Home() {
           gridTemplateColumns: "repeat(auto-fit, minmax(16rem, 1fr))",
         }}
       >
-        <div className="card bg-gradient-to-br from-primary/10 to-primary/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-primary/30 to-primary/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-primary">📚 豊富なチュートリアル</h3>
             <p>
               my.code();
-              ではさまざまなプログラミング言語やフレームワークのチュートリアルを提供しています。
+              では数多くのプログラミング言語のチュートリアルを提供しています。
               初心者向けの基礎から上級者向けの応用まで、幅広いレベルに対応したチュートリアルが揃っています。
+              あなたがまだ触ったことのない言語も、気軽に体験してみることができます。
             </p>
           </div>
         </div>
-        <div className="card bg-gradient-to-br from-secondary/10 to-secondary/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-secondary/30 to-secondary/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-secondary">
               ⚡ すぐに動かせる実行環境
             </h3>
             <p>
-              my.code();
-              ではブラウザ上でコードを実行できる環境を整備しており、環境構築の手間なくすぐにコードを実行することができます。
+              環境構築の手間なくブラウザ上ですぐにコードを実行することができます。
               チュートリアル内のサンプルコードはそのまま実行するだけでなく、自由に編集して試すことも可能です。
+              さらに、エラーメッセージの解説やエラー箇所のハイライト表示など、初心者に優しい機能も充実しています。
             </p>
           </div>
         </div>
-        <div className="card bg-gradient-to-br from-accent/10 to-accent/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-accent/30 to-accent/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-accent">
               🤖 AIアシスタントによるサポート
             </h3>
             <p>
-              my.code(); ではAIアシスタントが学習をサポートします。
-              チュートリアルを読んでいてわからないことがあれば、AIアシスタントに質問してみてください。
-              さらに、実行したサンプルコードの解説やエラーの原因調査、改善提案まで、AIアシスタントがあなたの学習を強力に支援します。
+              わからないことがあれば、AIアシスタントに質問してみてください。
+              AIとの対話履歴により教材そのものがアップデートされ、あなた専用の学習コンテンツとして蓄積・進化します。
+              実行したコードの解説やエラーの原因調査、改善提案まで、AIアシスタントがあなたの学習を強力に支援します。
             </p>
           </div>
         </div>
-        <div className="card bg-gradient-to-br from-info/10 to-info/5 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="card bg-gradient-to-br from-info/30 to-info/15 shadow-lg hover:shadow-xl transition-shadow">
           <div className="card-body">
             <h3 className="card-title text-info">✏️ 実践的な練習問題</h3>
             <p>

@@ -2,13 +2,14 @@
 import { useState, useEffect } from "react";
 
 export function useChangeTheme() {
-  const [theme, setTheme] = useState("tomorrow");
+  const [theme, setTheme] = useState<"tomorrow" | "tomorrow_night">("tomorrow");
   useEffect(() => {
     const updateTheme = () => {
       const theme = document.documentElement.getAttribute("data-theme");
-      setTheme(theme === "dark" ? "twilight" : "tomorrow");
+      setTheme(theme === "mycdark" ? "tomorrow_night" : "tomorrow");
     };
 
+    updateTheme();
     const observer = new MutationObserver(updateTheme);
     observer.observe(document.documentElement, {
       attributes: true,
@@ -21,20 +22,19 @@ export function useChangeTheme() {
 }
 export function ThemeToggle() {
   const theme = useChangeTheme();
-  const isChecked = theme === "twilight";
+  const isChecked = theme === "tomorrow_night";
   useEffect(() => {
     const checkIsDarkSchemePreferred = () =>
       window?.matchMedia?.("(prefers-color-scheme:dark)")?.matches ?? false;
-    const initialTheme = checkIsDarkSchemePreferred() ? "dark" : "light";
+    const initialTheme = checkIsDarkSchemePreferred() ? "mycdark" : "myclight";
     document.documentElement.setAttribute("data-theme", initialTheme);
   }, []);
 
   return (
-    <label className="flex items-center cursor-pointer gap-2">
+    <label className="flex items-center cursor-pointer gap-1">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
+        className="w-5 h-5"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -51,14 +51,13 @@ export function ThemeToggle() {
         className="toggle theme-controller"
         onChange={(e) => {
           const isdark = e.target.checked;
-          const theme = isdark ? "dark" : "light";
+          const theme = isdark ? "mycdark" : "myclight";
           document.documentElement.setAttribute("data-theme", theme);
         }}
       />
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
+        className="w-5 h-5"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

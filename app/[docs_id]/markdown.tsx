@@ -1,18 +1,15 @@
-import Markdown, { Components } from "react-markdown";
+import Markdown, { Components, ExtraProps } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { EditorComponent, getAceLang } from "../terminal/editor";
 import { ExecFile } from "../terminal/exec";
-import { useChangeTheme } from "./themeToggle";
-import {
-  tomorrow,
-  atomOneDark,
-} from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { ReactNode } from "react";
+import { JSX, ReactNode } from "react";
 import { getRuntimeLang } from "@/terminal/runtime";
 import { ReplTerminal } from "@/terminal/repl";
-import dynamic from "next/dynamic";
-// SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
-const SyntaxHighlighter = dynamic(() => import("react-syntax-highlighter"), { ssr: false });
+import {
+  getSyntaxHighlighterLang,
+  MarkdownLang,
+  StyledSyntaxHighlighter,
+} from "./styledSyntaxHighlighter";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -40,14 +37,14 @@ const components: Components = {
   li: ({ node, ...props }) => <li className="my-1" {...props} />,
   a: ({ node, ...props }) => <a className="link link-info" {...props} />,
   strong: ({ node, ...props }) => (
-    <strong className="text-primary dark:text-secondary" {...props} />
+    <strong className="text-primary" {...props} />
   ),
   table: ({ node, ...props }) => (
-    <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-lg border border-base-content/5 shadow-sm">
+    <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-box border border-current/20 shadow-sm">
       <table className="table w-max" {...props} />
     </div>
   ),
-  hr: ({ node, ...props }) => <hr className="border-primary my-4" {...props} />,
+  hr: ({ node, ...props }) => <hr className="border-accent my-4" {...props} />,
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => (
     <CodeComponent {...{ node, className, ref, style, ...props }} />
@@ -84,20 +81,12 @@ function CodeComponent({
   ref,
   style,
   ...props
-}: {
-  node: unknown;
-  className?: string;
-  ref?: unknown;
-  style?: unknown;
-  [key: string]: unknown;
-}) {
-  const theme = useChangeTheme();
-  const codetheme = theme === "tomorrow" ? tomorrow : atomOneDark;
+}: JSX.IntrinsicElements["code"] & ExtraProps) {
   const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
     className || ""
   );
   if (match) {
-    const runtimeLang = getRuntimeLang(match[1]);
+    const runtimeLang = getRuntimeLang(match[1] as MarkdownLang | undefined);
     if (match[2] === "-exec" && match[3]) {
       /*
       ```python-exec:main.py
@@ -111,13 +100,11 @@ function CodeComponent({
       */
       if (runtimeLang) {
         return (
-          <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
-            <ExecFile
-              language={runtimeLang}
-              filenames={match[3].split(",")}
-              content={String(props.children || "").replace(/\n$/, "")}
-            />
-          </div>
+          <ExecFile
+            language={runtimeLang}
+            filenames={match[3].split(",")}
+            content={String(props.children || "").replace(/\n$/, "")}
+          />
         );
       }
     } else if (match[2] === "-repl") {
@@ -129,57 +116,45 @@ function CodeComponent({
       }
       if (runtimeLang) {
         return (
-          <div className="bg-base-300 border border-primary border-2 shadow-md m-2 p-4 pr-1 rounded-lg">
-            <ReplTerminal
-              terminalId={match[3]}
-              language={runtimeLang}
-              initContent={String(props.children || "").replace(/\n$/, "")}
-            />
-          </div>
+          <ReplTerminal
+            terminalId={match[3]}
+            language={runtimeLang}
+            initContent={String(props.children || "").replace(/\n$/, "")}
+          />
         );
       }
     } else if (match[3]) {
       // ファイル名指定がある場合、ファイルエディター
-      const aceLang = getAceLang(match[1]);
+      const aceLang = getAceLang(match[1] as MarkdownLang | undefined);
       return (
-        <div className="border border-primary border-2 shadow-md m-2 rounded-lg">
-          <EditorComponent
-            language={aceLang}
-            filename={match[3]}
-            readonly={match[2] === "-readonly"}
-            initContent={String(props.children || "").replace(/\n$/, "")}
-          />
-        </div>
+        <EditorComponent
+          language={aceLang}
+          filename={match[3]}
+          readonly={match[2] === "-readonly"}
+          initContent={String(props.children || "").replace(/\n$/, "")}
+        />
       );
     }
+    const syntaxHighlighterLang = getSyntaxHighlighterLang(
+      match[1] as MarkdownLang | undefined
+    );
     return (
-      <SyntaxHighlighter
-        language={match[1]}
-        PreTag="div"
-        className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
-        style={codetheme}
-        {...props}
-      >
+      <StyledSyntaxHighlighter language={syntaxHighlighterLang}>
         {String(props.children || "").replace(/\n$/, "")}
-      </SyntaxHighlighter>
+      </StyledSyntaxHighlighter>
     );
   } else if (String(props.children).includes("\n")) {
     // 言語指定なしコードブロック
     return (
-      <SyntaxHighlighter
-        PreTag="div"
-        className="border border-base-content/50 mx-2 my-2 rounded-lg text-sm p-4!"
-        style={codetheme}
-        {...props}
-      >
+      <StyledSyntaxHighlighter language={undefined}>
         {String(props.children || "").replace(/\n$/, "")}
-      </SyntaxHighlighter>
+      </StyledSyntaxHighlighter>
     );
   } else {
     // inline
     return (
       <code
-        className="bg-base-200/60 border border-base-300 px-1 py-0.5 rounded text-sm "
+        className="bg-current/10 border border-current/20 px-1 py-0.5 mx-0.5 rounded-md"
         {...props}
       />
     );
