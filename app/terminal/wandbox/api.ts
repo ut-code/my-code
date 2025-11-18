@@ -101,10 +101,7 @@ interface CompileProps {
   codes: Code[];
 }
 export interface CompileResultWithOutput extends CompileResult {
-  compilerOutput: ReplOutput[];
-  compilerError: ReplOutput[];
-  programOutput: ReplOutput[];
-  programError: ReplOutput[];
+  output: ReplOutput[];
 }
 
 export async function compileAndRun(
@@ -136,12 +133,41 @@ export async function compileAndRun(
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  // Read the ndjson response line by line
-  const text = await response.text();
-  const lines = text.trim().split("\n");
-  const ndjsonResults: CompileNdjsonResult[] = lines
-    .filter((line) => line.trim().length > 0)
-    .map((line) => JSON.parse(line) as CompileNdjsonResult);
+  // Read the ndjson response as a stream
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error("Response body is not readable");
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+  const ndjsonResults: CompileNdjsonResult[] = [];
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      
+      // Keep the last incomplete line in the buffer
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        if (line.trim().length > 0) {
+          ndjsonResults.push(JSON.parse(line) as CompileNdjsonResult);
+        }
+      }
+    }
+
+    // Process any remaining data in the buffer
+    if (buffer.trim().length > 0) {
+      ndjsonResults.push(JSON.parse(buffer) as CompileNdjsonResult);
+    }
+  } finally {
+    reader.releaseLock();
+  }
 
   // Merge ndjson results into a CompileResult (same logic as Rust merge_compile_result)
   const result: CompileResult = {
@@ -157,6 +183,9 @@ export async function compileAndRun(
     url: "",
   };
 
+  // Build output array in the order messages are received
+  const output: ReplOutput[] = [];
+
   for (const r of ndjsonResults) {
     switch (r.type) {
       case "Control":
@@ -165,18 +194,42 @@ export async function compileAndRun(
       case "CompilerMessageS":
         result.compiler_output += r.data;
         result.compiler_message += r.data;
+        // Add to output in order
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            output.push({ type: "stdout", message: line });
+          }
+        }
         break;
       case "CompilerMessageE":
         result.compiler_error += r.data;
         result.compiler_message += r.data;
+        // Add to output in order
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            output.push({ type: "error", message: line });
+          }
+        }
         break;
       case "StdOut":
         result.program_output += r.data;
         result.program_message += r.data;
+        // Add to output in order
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            output.push({ type: "stdout", message: line });
+          }
+        }
         break;
       case "StdErr":
         result.program_error += r.data;
         result.program_message += r.data;
+        // Add to output in order
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            output.push({ type: "stderr", message: line });
+          }
+        }
         break;
       case "ExitCode":
         result.status += r.data;
@@ -192,29 +245,6 @@ export async function compileAndRun(
 
   return {
     ...result,
-    compilerOutput: result.compiler_output.trim()
-      ? result.compiler_output
-          .trim()
-          .split("\n")
-          .map((line) => ({ type: "stdout" as const, message: line }))
-      : [],
-    compilerError: result.compiler_error.trim()
-      ? result.compiler_error
-          .trim()
-          .split("\n")
-          .map((line) => ({ type: "error" as const, message: line }))
-      : [],
-    programOutput: result.program_output.trim()
-      ? result.program_output
-          .trim()
-          .split("\n")
-          .map((line) => ({ type: "stdout" as const, message: line }))
-      : [],
-    programError: result.program_error.trim()
-      ? result.program_error
-          .trim()
-          .split("\n")
-          .map((line) => ({ type: "error" as const, message: line }))
-      : [],
+    output,
   };
 }

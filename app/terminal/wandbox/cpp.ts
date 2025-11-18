@@ -101,33 +101,34 @@ export async function cppRunFiles(
     ],
   });
 
-  const traceIndex = result.programError.findIndex(
-    (line) => line.message === "Stack trace:"
+  // Find stack trace in the output
+  const traceIndex = result.output.findIndex(
+    (line) => line.type === "stderr" && line.message === "Stack trace:"
   );
-  const outputs: ReplOutput[] = [
-    ...result.compilerOutput,
-    ...result.compilerError,
-    ...result.programOutput,
-    ...(traceIndex >= 0
-      ? result.programError.slice(0, traceIndex)
-      : result.programError),
-  ];
+  
+  let outputs: ReplOutput[];
+  
   if (traceIndex >= 0) {
     // CPP_STACKTRACE_HANDLER のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
+    outputs = result.output.slice(0, traceIndex);
     outputs.push({
       type: "trace" as const,
       message: "Stack trace (filtered):",
     });
-    for (const line of result.programError.slice(traceIndex + 1)) {
+    
+    for (const line of result.output.slice(traceIndex + 1)) {
       // ユーザーのソースコードだけを対象にする
-      if (line.message.includes("/home/wandbox")) {
+      if (line.type === "stderr" && line.message.includes("/home/wandbox")) {
         outputs.push({
           type: "trace" as const,
           message: line.message.replace("/home/wandbox/", ""),
         });
       }
     }
+  } else {
+    outputs = [...result.output];
   }
+  
   if (result.status !== "0") {
     outputs.push({
       type: "system" as const,
