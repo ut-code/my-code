@@ -23,7 +23,7 @@ export default function RuntimeTestPage() {
 
       <Heading level={2}>REPLとコード実行のサンプル</Heading>
       {/* name of each tab group should be unique */}
-      <div className="tabs tabs-border">
+      <div className="tabs tabs-box">
         {Object.entries(sampleConfig).map(([lang, config]) => (
           <Fragment key={lang}>
             <input
@@ -32,7 +32,7 @@ export default function RuntimeTestPage() {
               className="tab"
               aria-label={lang}
             />
-            <div className="tab-content border-base-300 bg-base-200 p-4">
+            <div className="tab-content border-base-300 bg-base-100">
               <RuntimeSample lang={lang as RuntimeLang} config={config} />
             </div>
           </Fragment>
@@ -57,7 +57,7 @@ interface SampleConfig {
 const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   python: {
     repl: true,
-    replInitContent: '>>> print("Hello, World!")\x1b[0m\nHello, World!',
+    replInitContent: '>>> print("Hello, World!")\nHello, World!',
     editor: {
       "main.py": 'print("Hello, World!")',
     },
@@ -66,7 +66,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   ruby: {
     repl: true,
     replInitContent:
-      'irb(main):001:0> puts "Hello, World!"\x1b[0m\nHello, World!',
+      'irb(main):001:0> puts "Hello, World!"\nHello, World!',
     editor: {
       "main.rb": 'puts "Hello, World!"',
     },
@@ -74,7 +74,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   },
   javascript: {
     repl: true,
-    replInitContent: '> console.log("Hello, World!");\x1b[0m\nHello, World!',
+    replInitContent: '> console.log("Hello, World!");\nHello, World!',
     editor: {
       "main.js": 'console.log("Hello, World!");',
     },
@@ -84,7 +84,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     repl: false,
     editor: {
       "main.ts":
-        'function greet(name: string): void {\x1b[0m\n  console.log("Hello, " + name + "!");\x1b[0m\n}\x1b[0m\n\x1b[0m\ngreet("World");',
+        'function greet(name: string): void {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("World");',
     },
     exec: ["main.ts"],
   },
@@ -269,7 +269,7 @@ function MochaTest() {
           </>
         )}
       </p>
-      <div className="m-0!" id="mocha" />
+      <div className="m-0! font-sans!" id="mocha" />
     </div>
   );
 }
