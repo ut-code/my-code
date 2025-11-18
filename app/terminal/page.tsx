@@ -23,7 +23,7 @@ export default function RuntimeTestPage() {
 
       <Heading level={2}>REPLとコード実行のサンプル</Heading>
       {/* name of each tab group should be unique */}
-      <div className="tabs tabs-border">
+      <div className="tabs tabs-box">
         {Object.entries(sampleConfig).map(([lang, config]) => (
           <Fragment key={lang}>
             <input
@@ -32,7 +32,7 @@ export default function RuntimeTestPage() {
               className="tab"
               aria-label={lang}
             />
-            <div className="tab-content border-base-300 bg-base-200 p-4">
+            <div className="tab-content border-base-300 bg-base-100">
               <RuntimeSample lang={lang as RuntimeLang} config={config} />
             </div>
           </Fragment>
