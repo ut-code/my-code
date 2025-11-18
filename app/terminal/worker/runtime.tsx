@@ -5,6 +5,7 @@ import {
   ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -69,7 +70,7 @@ export function WorkerProvider({
 }) {
   const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState<boolean>(false);
-  const mutex = useRef<MutexInterface>(new Mutex());
+  const mutex = useMemo<MutexInterface>(() => new Mutex(), []);
   const { writeFile } = useEmbedContext();
 
   const messageCallbacks = useRef<
@@ -96,6 +97,13 @@ export function WorkerProvider({
   }
 
   const initializeWorker = useCallback(async () => {
+    if (!mutex.isLocked()) {
+      throw new Error(`mutex of context must be locked for initializeWorker`);
+    }
+    if (workerRef.current) {
+      return;
+    }
+
     let worker: Worker;
     lang satisfies RuntimeLang;
     switch (lang) {
@@ -135,15 +143,27 @@ export function WorkerProvider({
     }).then((payload) => {
       capabilities.current = payload.capabilities;
     });
-  }, [lang]);
+  }, [lang, mutex]);
+
+  const [doInit, setDoInit] = useState(false);
+  const init = useCallback(() => setDoInit(true), []);
 
   // Initialization effect
   useEffect(() => {
-    initializeWorker().then(() => setReady(true));
-    return () => {
-      workerRef.current?.terminate();
-    };
-  }, [initializeWorker]);
+    if (doInit) {
+      void mutex.runExclusive(async () => {
+        await initializeWorker();
+        setReady(true);
+      });
+      return () => {
+        void mutex.runExclusive(async () => {
+          workerRef.current?.terminate();
+          workerRef.current = null;
+          setReady(false);
+        });
+      };
+    }
+  }, [doInit, initializeWorker, mutex]);
 
   const interrupt = useCallback(() => {
     if (!capabilities.current) return;
@@ -161,9 +181,10 @@ export function WorkerProvider({
         messageCallbacks.current.clear();
 
         workerRef.current?.terminate();
+        workerRef.current = null;
         setReady(false);
 
-        void mutex.current.runExclusive(async () => {
+        void mutex.runExclusive(async () => {
           await initializeWorker();
           if (commandHistory.current.length > 0) {
             await postMessage("restoreState", {
@@ -178,11 +199,11 @@ export function WorkerProvider({
         capabilities.current?.interrupt satisfies never;
         break;
     }
-  }, [initializeWorker]);
+  }, [initializeWorker, mutex]);
 
   const runCommand = useCallback(
     async (code: string): Promise<ReplOutput[]> => {
-      if (!mutex.current.isLocked()) {
+      if (!mutex.isLocked()) {
         throw new Error(`mutex of context must be locked for runCommand`);
       }
       if (!workerRef.current || !ready) {
@@ -222,18 +243,18 @@ export function WorkerProvider({
         return [{ type: "error", message: String(error) }];
       }
     },
-    [ready, writeFile]
+    [ready, writeFile, mutex]
   );
 
   const checkSyntax = useCallback(
     async (code: string): Promise<SyntaxStatus> => {
       if (!workerRef.current || !ready) return "invalid";
-      const { status } = await mutex.current.runExclusive(() =>
+      const { status } = await mutex.runExclusive(() =>
         postMessage("checkSyntax", { code })
       );
       return status;
     },
-    [ready]
+    [ready, mutex]
   );
 
   const runFiles = useCallback(
@@ -263,7 +284,7 @@ export function WorkerProvider({
       ) {
         interruptBuffer.current[0] = 0;
       }
-      return mutex.current.runExclusive(async () => {
+      return mutex.runExclusive(async () => {
         const { output, updatedFiles } = await postMessage("runFile", {
           name: filenames[0],
           files,
@@ -272,16 +293,17 @@ export function WorkerProvider({
         return output;
       });
     },
-    [ready, writeFile]
+    [ready, writeFile, mutex]
   );
 
   return (
     <context.Provider
       value={{
+        init,
         ready,
         runCommand,
         checkSyntax,
-        mutex: mutex.current,
+        mutex,
         runFiles,
         interrupt,
       }}

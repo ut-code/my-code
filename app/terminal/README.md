@@ -10,6 +10,11 @@ runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、そ
 
 ### 共通
 
+* init?: `() => void`
+    * useRuntime() 内のuseEffectなどで呼び出されます。ランタイムを使う側では通常呼び出す必要はないです。
+    * ランタイムの初期化にコストがかかるものは、init()で初期化フラグがトリガーされたときだけ初期化するようにします。
+    * useRuntime() が複数回使われた場合はinitも複数回呼ばれます。
+        * init()はフラグを立てるだけにし、完了する前にreturnしてよいです。初期化とcleanupはuseEffect()で非同期に行うのがよいと思います。
 * ready: `boolean`
     * ランタイムの初期化が完了したか、不要である場合true
 * mutex?: `MutexInterface`

@@ -16,17 +16,19 @@ import { RuntimeContext } from "../runtime";
 
 export const compilerOptions: CompilerOptions = {};
 
-const TypeScriptContext = createContext<VirtualTypeScriptEnvironment | null>(
-  null
-);
+const TypeScriptContext = createContext<{
+  init: () => void;
+  tsEnv: VirtualTypeScriptEnvironment | null;
+}>({ init: () => undefined, tsEnv: null });
 export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
-
+  const [doInit, setDoInit] = useState(false);
+  const init = useCallback(() => setDoInit(true), []);
   useEffect(() => {
     // useEffectはサーバーサイドでは実行されないが、
     // typeof window !== "undefined" でガードしないとなぜかesbuildが"typescript"を
     // サーバーサイドでのインポート対象とみなしてしまう。
-    if (tsEnv === null && typeof window !== "undefined") {
+    if (doInit && tsEnv === null && typeof window !== "undefined") {
       const abortController = new AbortController();
       (async () => {
         const ts = await import("typescript");
@@ -67,16 +69,16 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
         abortController.abort();
       };
     }
-  }, [tsEnv, setTSEnv]);
+  }, [tsEnv, setTSEnv, doInit]);
   return (
-    <TypeScriptContext.Provider value={tsEnv}>
+    <TypeScriptContext.Provider value={{ init, tsEnv }}>
       {children}
     </TypeScriptContext.Provider>
   );
 }
 
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
-  const tsEnv = useContext(TypeScriptContext);
+  const { init, tsEnv } = useContext(TypeScriptContext);
 
   const { writeFile } = useEmbedContext();
   const runFiles = useCallback(
@@ -139,6 +141,7 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
     [tsEnv, writeFile, jsEval]
   );
   return {
+    init,
     ready: tsEnv !== null,
     runFiles,
     getCommandlineStr,
