@@ -159,6 +159,7 @@ export function WorkerProvider({
         void mutex.runExclusive(async () => {
           workerRef.current?.terminate();
           workerRef.current = null;
+          setReady(false);
         });
       };
     }
