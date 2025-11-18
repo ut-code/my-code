@@ -62,6 +62,9 @@ export interface CompileParameter {
   is_private?: boolean;
   "compiler-info"?: CompilerInfo;
 }
+/**
+ * Represents a single line in the ndjson response from /api/compile.ndjson
+ */
 export interface CompileNdjsonResult {
   type: string;
   data: string;
