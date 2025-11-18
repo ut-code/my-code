@@ -24,7 +24,7 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="ja">
-      <body className="w-screen h-screen bg-inherit! text-inherit! m-0!">
+      <body className="w-screen min-h-screen bg-transparent! text-inherit! m-0!">
         {/* mocha.css がbodyに背景色などを設定してしまうので、それを上書きしている */}
         <AutoAnonymousLogin />
         <SidebarMdProvider>
