@@ -62,6 +62,11 @@ export interface CompileParameter {
   is_private?: boolean;
   "compiler-info"?: CompilerInfo;
 }
+export interface CompileNdjsonResult {
+  type: string;
+  data: string;
+}
+
 export interface CompileResult {
   status: string;
   signal: string;
@@ -102,8 +107,9 @@ export interface CompileResultWithOutput extends CompileResult {
 export async function compileAndRun(
   options: CompileProps
 ): Promise<CompileResultWithOutput> {
-  const result: CompileResult = await fetch(
-    new URL("/api/compile.json", WANDBOX),
+  // Call the ndjson API instead of json API
+  const response = await fetch(
+    new URL("/api/compile.ndjson", WANDBOX),
     {
       method: "post",
       headers: {
@@ -121,7 +127,62 @@ export async function compileAndRun(
         is_private: true,
       } satisfies CompileParameter),
     }
-  ).then((res) => res.json());
+  );
+
+  // Read the ndjson response line by line
+  const text = await response.text();
+  const lines = text.trim().split("\n");
+  const ndjsonResults: CompileNdjsonResult[] = lines
+    .filter((line) => line.trim().length > 0)
+    .map((line) => JSON.parse(line) as CompileNdjsonResult);
+
+  // Merge ndjson results into a CompileResult (same logic as Rust merge_compile_result)
+  const result: CompileResult = {
+    status: "",
+    signal: "",
+    compiler_output: "",
+    compiler_error: "",
+    compiler_message: "",
+    program_output: "",
+    program_error: "",
+    program_message: "",
+    permlink: "",
+    url: "",
+  };
+
+  for (const r of ndjsonResults) {
+    switch (r.type) {
+      case "Control":
+        // Ignore control messages
+        break;
+      case "CompilerMessageS":
+        result.compiler_output += r.data;
+        result.compiler_message += r.data;
+        break;
+      case "CompilerMessageE":
+        result.compiler_error += r.data;
+        result.compiler_message += r.data;
+        break;
+      case "StdOut":
+        result.program_output += r.data;
+        result.program_message += r.data;
+        break;
+      case "StdErr":
+        result.program_error += r.data;
+        result.program_message += r.data;
+        break;
+      case "ExitCode":
+        result.status += r.data;
+        break;
+      case "Signal":
+        result.signal += r.data;
+        break;
+      default:
+        // Ignore unknown types
+        break;
+    }
+  }
+
   return {
     ...result,
     compilerOutput: result.compiler_output.trim()
