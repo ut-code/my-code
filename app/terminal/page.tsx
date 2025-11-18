@@ -57,7 +57,7 @@ interface SampleConfig {
 const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   python: {
     repl: true,
-    replInitContent: '>>> print("Hello, World!")\x1b[0m\nHello, World!',
+    replInitContent: '>>> print("Hello, World!")\nHello, World!',
     editor: {
       "main.py": 'print("Hello, World!")',
     },
@@ -66,7 +66,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   ruby: {
     repl: true,
     replInitContent:
-      'irb(main):001:0> puts "Hello, World!"\x1b[0m\nHello, World!',
+      'irb(main):001:0> puts "Hello, World!"\nHello, World!',
     editor: {
       "main.rb": 'puts "Hello, World!"',
     },
@@ -74,7 +74,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   },
   javascript: {
     repl: true,
-    replInitContent: '> console.log("Hello, World!");\x1b[0m\nHello, World!',
+    replInitContent: '> console.log("Hello, World!");\nHello, World!',
     editor: {
       "main.js": 'console.log("Hello, World!");',
     },
@@ -84,7 +84,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     repl: false,
     editor: {
       "main.ts":
-        'function greet(name: string): void {\x1b[0m\n  console.log("Hello, " + name + "!");\x1b[0m\n}\x1b[0m\n\x1b[0m\ngreet("World");',
+        'function greet(name: string): void {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("World");',
     },
     exec: ["main.ts"],
   },
