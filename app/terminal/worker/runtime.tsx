@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Context,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Context, ReactNode, useCallback, useRef, useState } from "react";
 import { RuntimeContext, RuntimeLang } from "../runtime";
 import { ReplOutput, SyntaxStatus } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
