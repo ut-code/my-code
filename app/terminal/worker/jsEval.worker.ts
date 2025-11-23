@@ -42,12 +42,10 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
     // This will preserve variables across calls
     const result = self.eval(code);
 
-    if (result !== undefined) {
-      jsOutput.push({
-        type: "return",
-        message: String(result),
-      });
-    }
+    jsOutput.push({
+      type: "return",
+      message: JSON.stringify(result),
+    });
   } catch (e) {
     originalConsole.log(e);
     // TODO: stack trace?

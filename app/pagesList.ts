@@ -40,6 +40,15 @@ export const pagesList = [
     ],
   },
   {
+    id: "javascript",
+    lang: "JavaScript",
+    description: "hoge",
+    pages: [
+      {id: 1, title: "JavaScriptへようこそ"},
+      {id: 2, title: "基本構文とデータ型"},
+    ]
+  },
+  {
     id: "cpp",
     lang: "C++",
     description: "C++の基本から高度な機能までを学べるチュートリアル",

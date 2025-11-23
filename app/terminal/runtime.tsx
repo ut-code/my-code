@@ -73,12 +73,13 @@ export function getRuntimeLang(
     case "csv":
     case "text":
     case "txt":
+    case "html":
     case undefined:
       // unsupported languages
       return undefined;
     default:
       lang satisfies never;
-      console.warn(`Language not listed in MarkdownLang: ${lang}`);
+      console.error(`getRuntimeLang() does not handle language ${lang}`);
       return undefined;
   }
 }

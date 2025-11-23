@@ -67,12 +67,13 @@ export function getAceLang(lang: MarkdownLang | undefined): AceLang {
     case "bash":
     case "text":
     case "txt":
+    case "html":
     case undefined:
       console.warn(`Ace editor mode not implemented for language: ${lang}`);
       return "text";
     default:
       lang satisfies never;
-      console.warn(`Language not listed in MarkdownLang: ${lang}`);
+      console.error(`getAceLang() does not handle language ${lang}`);
       return "text";
   }
 }

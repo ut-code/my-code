@@ -32,6 +32,7 @@ export type MarkdownLang =
   | "sh"
   | "json"
   | "csv"
+  | "html"
   | "text"
   | "txt";
 
@@ -45,6 +46,7 @@ export type SyntaxHighlighterLang =
   | "javascript"
   | "typescript"
   | "bash"
+  | "html"
   | "json";
 export function getSyntaxHighlighterLang(
   lang: MarkdownLang | undefined
@@ -70,6 +72,8 @@ export function getSyntaxHighlighterLang(
       return "bash";
     case "json":
       return "json";
+    case "html":
+      return "html";
     case "csv": // not supported
     case "text":
     case "txt":
@@ -77,7 +81,7 @@ export function getSyntaxHighlighterLang(
       return undefined;
     default:
       lang satisfies never;
-      console.warn(`Language not listed in MarkdownLang: ${lang}`);
+      console.error(`getSyntaxHighlighterLang() does not handle language ${lang}`);
       return undefined;
   }
 }
