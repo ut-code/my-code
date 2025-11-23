@@ -124,24 +124,19 @@ mycdark:
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {
   /*
-  Variable がついているほうはlayout.tsxでインポートしているwebフォント、
-  それ以外はフォールバック (インストールされていればwebフォントをダウンロードする必要はないため)
+  Inconsolata Variable はlayout.tsxでインポートしているwebフォント
 
-  UbuntuでシステムにインストールされたInconsolataには、太字がなかったので、Inconsolataは除外
+  UbuntuでシステムにインストールされたInconsolataには、太字がなかったので、Inconsolata は使用しない
   それに加えて、 "Inconsolata", "Inconsolata Variable" という指定にしたとしても
   terminal.tsxで Inconsolata Variable をloadしているので意味ない...
 
-  NotoSansJPの指定は正直なくても良い気はするが、
+  日本語フォントは正直なんでもいいが、
   あまり変なフォントが選ばれるとxtermやaceエディターの表示が崩れる可能性があるので、
-  確実にフォントを統一するために適当に指定している
+  確実にフォントを統一するためにRoundedM+を指定することにした
+  以前NotoSansJPを指定していたが、xterm.jsで全角の（）の幅がバグった
   */
   --font-mono:
-    "Inconsolata Variable",
-    /* Inconsolataのfallbackとしての欧文フォント */ "Inconsolata",
-    "Noto Sans Mono", "Roboto Mono", "SFMono-Regular", "Menlo", "Monaco",
-    "Consolas", "Liberation Mono", "Courier New",
-    /* 日本語用にNotoSans */ "Noto Sans Mono CJK JP", "Noto Sans JP",
-    "Noto Sans CJK JP", "Source Han Sans JP", "Noto Sans JP Variable", monospace;
+    "Inconsolata Variable", "Rounded M+ 1c", "Rounded M+ 1p", "M PLUS Rounded 1c", monospace;
   /*
   本家のフォント名は Rounded M+ 1c 、または1pでもいいかも
   layout.tsxでインポートしているwebフォントが M PLUS Rounded 1c
