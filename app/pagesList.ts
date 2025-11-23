@@ -46,6 +46,7 @@ export const pagesList = [
     pages: [
       {id: 1, title: "JavaScriptへようこそ"},
       {id: 2, title: "基本構文とデータ型"},
+      {id: 3, title: "制御構文"},
     ]
   },
   {

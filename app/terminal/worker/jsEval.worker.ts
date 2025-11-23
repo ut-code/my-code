@@ -36,8 +36,17 @@ async function init({ id }: WorkerRequest["init"]) {
 }
 
 async function runCode({ id, payload }: WorkerRequest["runCode"]) {
-  const { code } = payload;
+  let { code } = payload;
   try {
+    // eval()の中でconst,letを使って変数を作成した場合、
+    // 次に実行するコマンドはスコープ外扱いでありアクセスできなくなってしまうので、
+    // varに置き換えている
+    if (code.trim().startsWith("const ")) {
+      code = "var " + code.trim().slice(6);
+    } else if (code.trim().startsWith("let ")) {
+      code = "var " + code.trim().slice(4);
+    }
+
     // Execute code directly with eval in the worker global scope
     // This will preserve variables across calls
     const result = self.eval(code);
