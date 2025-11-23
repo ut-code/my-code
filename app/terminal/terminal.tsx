@@ -133,7 +133,7 @@ export function useTerminal(props: TerminalProps) {
             lineHeight: 1.2,
             letterSpacing: 0,
             fontFamily:
-              "'Inconsolata Variable', 'Noto Sans JP', 'Noto Sans CJK JP', 'Source Han Sans JP', '源ノ角ゴシック', 'Noto Sans JP Variable', monospace",
+              "'Inconsolata Variable', 'Rounded M+ 1c', 'Rounded M+ 1p', 'M PLUS Rounded 1c', monospace",
             theme: computeTerminalTheme(),
           });
           terminalInstanceRef.current = term;
