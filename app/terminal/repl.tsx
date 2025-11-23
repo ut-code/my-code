@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { highlightCodeToAnsi, importPrism } from "./highlight";
 import chalk from "chalk";
+chalk.level = 3;
 import {
   clearTerminal,
   getRows,
