@@ -56,9 +56,9 @@ mycdark:
   default: false;
   prefersdark: true;
   color-scheme: "dark";
-  --color-base-100: oklch(23.0% 0.020 61.15);
-  --color-base-200: oklch(19.0% 0.020 61.15);
-  --color-base-300: oklch(10.0% 0.020 61.15);
+  --color-base-100: oklch(23% 0.02 61.15);
+  --color-base-200: oklch(19% 0.02 61.15);
+  --color-base-300: oklch(10% 0.02 61.15);
   --color-base-content: oklch(85% 0.01 61.15);
   --color-primary: oklch(70% 0.139 61.15);
   --color-primary-content: oklch(26% 0.07 61.15);
@@ -66,7 +66,7 @@ mycdark:
   --color-secondary-content: oklch(18% 0.191 315);
   --color-accent: oklch(61% 0.181 190);
   --color-accent-content: oklch(18% 0.152 190);
-  --color-neutral: oklch(33.0% 0.070 61.15);
+  --color-neutral: oklch(33% 0.07 61.15);
   --color-neutral-content: oklch(85% 0.01 61.15);
   --color-info: oklch(54.615% 0.215 262.88);
   --color-info-content: oklch(90.923% 0.043 262.88);
@@ -90,35 +90,29 @@ mycdark:
 
 /* Aceの背景色と文字色を上書き */
 .ace_editor {
-  background-color: var(--color-base-300) !important;
-  color: var(--color-base-content) !important;
+  @apply bg-base-300! text-base-content!;
 }
 .ace_gutter {
   /* editorと同じにする */
-  background: inherit !important;
-  color: inherit !important;
+  @apply bg-inherit! text-inherit!;
 }
 .ace_active-line {
-  /* bg-base-content/10 このdivにはテキストが入らないので、opacity:0.1で代用可能 */
-  background: var(--color-base-content) !important;
-  opacity: 0.1;
+  @apply bg-base-content/10!;
 }
 .ace_gutter-active-line {
-  /* bg-base-content/20 --color-base-contentにa=0.2を追加する方法がなさそうなのでcolor-mixで代用する */
-  background-color: color-mix(in oklch, var(--color-base-content) 20%, var(--color-base-300)) !important;
+  @apply bg-base-content/20!;
 }
 .ace_bracket {
-  border: 1px solid var(--color-primary) !important;
+  @apply border-primary!;
 }
 .ace_cursor {
-  color: var(--color-primary) !important;
+  @apply border-primary!;
 }
 .ace_selection {
-  background: var(--color-primary) !important;
-  opacity: 0.4;
+  @apply bg-primary/40!;
 }
 .ace_selected-word {
-  border: 1px solid var(--color-primary) !important;
+  @apply border-primary!;
 }
 
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
@@ -136,7 +130,8 @@ mycdark:
   以前NotoSansJPを指定していたが、xterm.jsで全角の（）の幅がバグった
   */
   --font-mono:
-    "Inconsolata Variable", "Rounded M+ 1c", "Rounded M+ 1p", "M PLUS Rounded 1c", monospace;
+    "Inconsolata Variable", "Rounded M+ 1c", "Rounded M+ 1p",
+    "M PLUS Rounded 1c", monospace;
   /*
   本家のフォント名は Rounded M+ 1c 、または1pでもいいかも
   layout.tsxでインポートしているwebフォントが M PLUS Rounded 1c
