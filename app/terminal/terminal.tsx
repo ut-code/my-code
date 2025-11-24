@@ -5,6 +5,7 @@ import type { Terminal } from "@xterm/xterm";
 import type { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import chalk from "chalk";
+chalk.level = 3;
 import { useChangeTheme } from "../[docs_id]/themeToggle";
 
 /**
@@ -133,7 +134,7 @@ export function useTerminal(props: TerminalProps) {
             lineHeight: 1.2,
             letterSpacing: 0,
             fontFamily:
-              "'Inconsolata Variable', 'Noto Sans JP', 'Noto Sans CJK JP', 'Source Han Sans JP', '源ノ角ゴシック', 'Noto Sans JP Variable', monospace",
+              "'Inconsolata Variable', 'Rounded M+ 1c', 'Rounded M+ 1p', 'M PLUS Rounded 1c', monospace",
             theme: computeTerminalTheme(),
           });
           terminalInstanceRef.current = term;
