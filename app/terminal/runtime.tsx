@@ -153,6 +153,7 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
       return {
         tabSize: 2,
         prompt: "> ",
+        promptMore: "... ",
       };
     case "c_cpp":
     case "cpp":

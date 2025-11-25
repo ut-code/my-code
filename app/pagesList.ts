@@ -49,6 +49,9 @@ export const pagesList = [
       {id: 3, title: "制御構文"},
       {id: 4, title: "関数とクロージャ"},
       {id: 5, title: "'this'の正体"},
+      {id: 6, title: "オブジェクトとプロトタイプ"},
+      {id: 7, title: "クラス構文"},
+      {id: 8, title: "配列とイテレーション"},
     ]
   },
   {
