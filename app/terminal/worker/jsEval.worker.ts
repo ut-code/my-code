@@ -2,8 +2,13 @@
 
 import type { ReplOutput } from "../repl";
 import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
-import { format, inspect } from "util"; // <- これなぜブラウザ側でimportできるの? :thinking:
+import inspect from "object-inspect";
 
+function format(...args: unknown[]): string {
+  // TODO: console.logの第1引数はフォーマット指定文字列を取ることができる
+  // https://nodejs.org/api/util.html#utilformatformat-args
+  return args.map((a) => (typeof a === "string" ? a : inspect(a))).join(" ");
+}
 let jsOutput: ReplOutput[] = [];
 
 // Helper function to capture console output
