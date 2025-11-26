@@ -40,6 +40,23 @@ export const pagesList = [
     ],
   },
   {
+    id: "javascript",
+    lang: "JavaScript",
+    description: "hoge",
+    pages: [
+      { id: 1, title: "JavaScriptへようこそ" },
+      { id: 2, title: "基本構文とデータ型" },
+      { id: 3, title: "制御構文" },
+      { id: 4, title: "関数とクロージャ" },
+      { id: 5, title: "'this'の正体" },
+      { id: 6, title: "オブジェクトとプロトタイプ" },
+      { id: 7, title: "クラス構文" },
+      { id: 8, title: "配列とイテレーション" },
+      { id: 9, title: "非同期処理①: Promise" },
+      { id: 10, title: "非同期処理②: Async/Await" },
+    ],
+  },
+  {
     id: "cpp",
     lang: "C++",
     description: "C++の基本から高度な機能までを学べるチュートリアル",

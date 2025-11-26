@@ -110,7 +110,7 @@ function CodeComponent({
     } else if (match[2] === "-repl") {
       // repl付きの言語指定
       if (!match[3]) {
-        console.warn(
+        console.error(
           `${match[1]}-repl without terminal id! content: ${String(props.children).slice(0, 20)}...`
         );
       }

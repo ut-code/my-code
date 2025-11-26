@@ -2,28 +2,30 @@
 
 import type { ReplOutput } from "../repl";
 import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
+import inspect from "object-inspect";
 
+function format(...args: unknown[]): string {
+  // TODO: console.logの第1引数はフォーマット指定文字列を取ることができる
+  // https://nodejs.org/api/util.html#utilformatformat-args
+  return args.map((a) => (typeof a === "string" ? a : inspect(a))).join(" ");
+}
 let jsOutput: ReplOutput[] = [];
 
 // Helper function to capture console output
 const originalConsole = self.console;
 self.console = {
   ...originalConsole,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  log: (...args: any[]) => {
-    jsOutput.push({ type: "stdout", message: args.join(" ") });
+  log: (...args: unknown[]) => {
+    jsOutput.push({ type: "stdout", message: format(...args) });
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error: (...args: any[]) => {
-    jsOutput.push({ type: "stderr", message: args.join(" ") });
+  error: (...args: unknown[]) => {
+    jsOutput.push({ type: "stderr", message: format(...args) });
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  warn: (...args: any[]) => {
-    jsOutput.push({ type: "stderr", message: args.join(" ") });
+  warn: (...args: unknown[]) => {
+    jsOutput.push({ type: "stderr", message: format(...args) });
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  info: (...args: any[]) => {
-    jsOutput.push({ type: "stdout", message: args.join(" ") });
+  info: (...args: unknown[]) => {
+    jsOutput.push({ type: "stdout", message: format(...args) });
   },
 };
 
@@ -36,18 +38,49 @@ async function init({ id }: WorkerRequest["init"]) {
 }
 
 async function runCode({ id, payload }: WorkerRequest["runCode"]) {
-  const { code } = payload;
+  let { code } = payload;
   try {
-    // Execute code directly with eval in the worker global scope
-    // This will preserve variables across calls
-    const result = self.eval(code);
+    let result: unknown;
 
-    if (result !== undefined) {
-      jsOutput.push({
-        type: "return",
-        message: String(result),
-      });
+    // eval()の中でconst,letを使って変数を作成した場合、
+    // 次に実行するコマンドはスコープ外扱いでありアクセスできなくなってしまうので、
+    // varに置き換えている
+    if (code.trim().startsWith("const ")) {
+      code = "var " + code.trim().slice(6);
+    } else if (code.trim().startsWith("let ")) {
+      code = "var " + code.trim().slice(4);
     }
+    // eval()の中でclassを作成した場合も同様
+    const classRegExp = /^\s*class\s+(\w+)/;
+    if (classRegExp.test(code)) {
+      code = code.replace(classRegExp, "var $1 = class $1");
+    }
+
+    if (code.trim().startsWith("{") && code.trim().endsWith("}")) {
+      // オブジェクトは ( ) で囲わなければならない
+      try {
+        result = self.eval(`(${code})`);
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          // オブジェクトではなくブロックだった場合、再度普通に実行
+          result = self.eval(code);
+        } else {
+          throw e;
+        }
+      }
+    } else if (/^\s*await\W/.test(code)) {
+      // promiseをawaitする場合は、promiseの部分だけをevalし、それを外からawaitする
+      result = await self.eval(code.trim().slice(5));
+    } else {
+      // Execute code directly with eval in the worker global scope
+      // This will preserve variables across calls
+      result = self.eval(code);
+    }
+
+    jsOutput.push({
+      type: "return",
+      message: inspect(result),
+    });
   } catch (e) {
     originalConsole.log(e);
     // TODO: stack trace?
@@ -110,7 +143,8 @@ async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
 
   try {
     // Try to create a Function to check syntax
-    new Function(code);
+    // new Function(code); // <- not working
+    self.eval(`() => {${code}}`);
     self.postMessage({
       id,
       payload: { status: "complete" },
@@ -120,8 +154,8 @@ async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
     if (e instanceof SyntaxError) {
       // Simple heuristic: check for "Unexpected end of input"
       if (
-        e.message.includes("Unexpected end of input") ||
-        e.message.includes("expected expression")
+        e.message.includes("Unexpected token '}'") ||
+        e.message.includes("Unexpected end of input")
       ) {
         self.postMessage({
           id,

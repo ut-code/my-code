@@ -14,7 +14,7 @@ export function useJSEval() {
   return {
     ...context,
     splitReplExamples,
-    // getCommandlineStr,
+    getCommandlineStr,
   };
 }
 
@@ -24,15 +24,27 @@ function splitReplExamples(content: string): ReplCommand[] {
     if (line.startsWith("> ")) {
       // Remove the prompt from the command
       initCommands.push({ command: line.slice(2), output: [] });
+    } else if (line.startsWith("... ")) {
+      if (initCommands.length > 0) {
+        initCommands[initCommands.length - 1].command += "\n" + line.slice(4);
+      }
     } else {
       // Lines without prompt are output from the previous command
+      // and the last output is return value
       if (initCommands.length > 0) {
+        initCommands[initCommands.length - 1].output.forEach(
+          (out) => (out.type = "stdout")
+        );
         initCommands[initCommands.length - 1].output.push({
-          type: "stdout",
+          type: "return",
           message: line,
         });
       }
     }
   }
   return initCommands;
+}
+
+function getCommandlineStr(filenames: string[]) {
+  return `node ${filenames[0]}`;
 }
