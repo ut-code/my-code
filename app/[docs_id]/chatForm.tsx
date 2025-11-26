@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, FormEvent, useEffect } from "react";
-import useSWR from "swr";
-import {
-  getQuestionExample,
-  QuestionExampleParams,
-} from "../actions/questionExample";
-import { getLanguageName } from "../pagesList";
+// import useSWR from "swr";
+// import {
+//   getQuestionExample,
+//   QuestionExampleParams,
+// } from "../actions/questionExample";
+// import { getLanguageName } from "../pagesList";
 import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "../terminal/embedContext";
 import { useChatHistoryContext } from "./chatHistory";
@@ -32,31 +32,31 @@ export function ChatForm({
 
   const { addChat } = useChatHistoryContext();
 
-  const lang = getLanguageName(docs_id);
+  // const lang = getLanguageName(docs_id);
 
   const { files, replOutputs, execResults } = useEmbedContext();
 
-  const documentContentInView = sectionContent
-    .filter((s) => s.inView)
-    .map((s) => s.rawContent)
-    .join("\n\n");
-  const { data: exampleData, error: exampleError } = useSWR(
-    // 質問フォームを開いたときだけで良い
-    {
-      lang,
-      documentContent: documentContentInView,
-    } satisfies QuestionExampleParams,
-    getQuestionExample,
-    {
-      // リクエストは古くても構わないので1回でいい
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-  if (exampleError) {
-    console.error("Error getting question example:", exampleError);
-  }
+  // const documentContentInView = sectionContent
+  //   .filter((s) => s.inView)
+  //   .map((s) => s.rawContent)
+  //   .join("\n\n");
+  // const { data: exampleData, error: exampleError } = useSWR(
+  //   // 質問フォームを開いたときだけで良い
+  //   {
+  //     lang,
+  //     documentContent: documentContentInView,
+  //   } satisfies QuestionExampleParams,
+  //   getQuestionExample,
+  //   {
+  //     // リクエストは古くても構わないので1回でいい
+  //     revalidateIfStale: false,
+  //     revalidateOnFocus: false,
+  //     revalidateOnReconnect: false,
+  //   }
+  // );
+  // if (exampleError) {
+  //   console.error("Error getting question example:", exampleError);
+  // }
   // 質問フォームを開くたびにランダムに選び直し、
   // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
   const [exampleChoice, setExampleChoice] = useState<number>(0); // 0〜1
@@ -71,13 +71,13 @@ export function ChatForm({
     setIsLoading(true);
     setErrorMessage(null); // Clear previous error message
 
-    let userQuestion = inputValue;
-    if (!userQuestion && exampleData) {
-      // 質問が空欄なら、質問例を使用
-      userQuestion =
-        exampleData[Math.floor(exampleChoice * exampleData.length)];
-      setInputValue(userQuestion);
-    }
+    const userQuestion = inputValue;
+    // if (!userQuestion && exampleData) {
+    //   // 質問が空欄なら、質問例を使用
+    //   userQuestion =
+    //     exampleData[Math.floor(exampleChoice * exampleData.length)];
+    //   setInputValue(userQuestion);
+    // }
 
     const result = await askAI({
       userQuestion,
@@ -114,10 +114,10 @@ export function ChatForm({
       <textarea
         className="textarea textarea-ghost textarea-md rounded-box"
         placeholder={
-          "質問を入力してください" +
+          "質問を入力してください" /* +
           (exampleData
             ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
-            : "")
+            : "")*/
         }
         style={{
           width: "100%",
