@@ -46,7 +46,7 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
       code = "var " + code.trim().slice(4);
     }
     // eval()の中でclassを作成した場合も同様
-    const classRegExp = /^\s*class\s+([A-Za-z0-9_]+)/;
+    const classRegExp = /^\s*class\s+(\w+)/;
     if (classRegExp.test(code)) {
       code = code.replace(classRegExp, "var $1 = class $1");
     }
@@ -63,6 +63,9 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
           throw e;
         }
       }
+    } else if (/^\s*await\W/.test(code)) {
+      // promiseをawaitする場合は、promiseの部分だけをevalし、それを外からawaitする
+      result = await self.eval(code.trim().slice(5));
     } else {
       // Execute code directly with eval in the worker global scope
       // This will preserve variables across calls
