@@ -57,7 +57,7 @@ export function defineTests(
             ruby: [`${varName} = ${value}`, `puts ${varName}`],
             cpp: [null, null],
             javascript: [
-              `var ${varName} = ${value}`,
+              `const ${varName} = ${value}`,
               `console.log(${varName})`,
             ],
             typescript: [null, null],
@@ -109,7 +109,7 @@ export function defineTests(
             ruby: [`testVar = 42`, `loop do\nend`, `puts testVar`],
             cpp: [null, null, null],
             javascript: [
-              `var testVar = 42`,
+              `const testVar = 42`,
               `while(true) {}`,
               `console.log(testVar)`,
             ],

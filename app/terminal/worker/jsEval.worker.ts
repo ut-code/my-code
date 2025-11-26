@@ -37,46 +37,45 @@ async function init({ id }: WorkerRequest["init"]) {
   } satisfies WorkerResponse["init"]);
 }
 
-async function runCode({ id, payload }: WorkerRequest["runCode"]) {
-  let { code } = payload;
-  try {
-    let result: unknown;
+async function replLikeEval(code: string): Promise<unknown> {
+  // eval()の中でconst,letを使って変数を作成した場合、
+  // 次に実行するコマンドはスコープ外扱いでありアクセスできなくなってしまうので、
+  // varに置き換えている
+  if (code.trim().startsWith("const ")) {
+    code = "var " + code.trim().slice(6);
+  } else if (code.trim().startsWith("let ")) {
+    code = "var " + code.trim().slice(4);
+  }
+  // eval()の中でclassを作成した場合も同様
+  const classRegExp = /^\s*class\s+(\w+)/;
+  if (classRegExp.test(code)) {
+    code = code.replace(classRegExp, "var $1 = class $1");
+  }
 
-    // eval()の中でconst,letを使って変数を作成した場合、
-    // 次に実行するコマンドはスコープ外扱いでありアクセスできなくなってしまうので、
-    // varに置き換えている
-    if (code.trim().startsWith("const ")) {
-      code = "var " + code.trim().slice(6);
-    } else if (code.trim().startsWith("let ")) {
-      code = "var " + code.trim().slice(4);
-    }
-    // eval()の中でclassを作成した場合も同様
-    const classRegExp = /^\s*class\s+(\w+)/;
-    if (classRegExp.test(code)) {
-      code = code.replace(classRegExp, "var $1 = class $1");
-    }
-
-    if (code.trim().startsWith("{") && code.trim().endsWith("}")) {
-      // オブジェクトは ( ) で囲わなければならない
-      try {
-        result = self.eval(`(${code})`);
-      } catch (e) {
-        if (e instanceof SyntaxError) {
-          // オブジェクトではなくブロックだった場合、再度普通に実行
-          result = self.eval(code);
-        } else {
-          throw e;
-        }
+  if (code.trim().startsWith("{") && code.trim().endsWith("}")) {
+    // オブジェクトは ( ) で囲わなければならない
+    try {
+      return self.eval(`(${code})`);
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        // オブジェクトではなくブロックだった場合、再度普通に実行
+        return self.eval(code);
+      } else {
+        throw e;
       }
-    } else if (/^\s*await\W/.test(code)) {
-      // promiseをawaitする場合は、promiseの部分だけをevalし、それを外からawaitする
-      result = await self.eval(code.trim().slice(5));
-    } else {
-      // Execute code directly with eval in the worker global scope
-      // This will preserve variables across calls
-      result = self.eval(code);
     }
+  } else if (/^\s*await\W/.test(code)) {
+    // promiseをawaitする場合は、promiseの部分だけをevalし、それを外からawaitする
+    return await self.eval(code.trim().slice(5));
+  } else {
+    return self.eval(code);
+  }
+}
 
+async function runCode({ id, payload }: WorkerRequest["runCode"]) {
+  const { code } = payload;
+  try {
+    const result = await replLikeEval(code);
     jsOutput.push({
       type: "return",
       message: inspect(result),
@@ -110,8 +109,6 @@ function runFile({ id, payload }: WorkerRequest["runFile"]) {
   const { name, files } = payload;
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
   try {
-    // Execute code directly with eval in the worker global scope
-    // This will preserve variables across calls
     self.eval(files[name]);
   } catch (e) {
     originalConsole.log(e);
@@ -183,7 +180,7 @@ async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
 
   for (const command of commands) {
     try {
-      self.eval(command);
+      replLikeEval(command);
     } catch (e) {
       // If restoration fails, we still continue with other commands
       originalConsole.error("Failed to restore command:", command, e);
