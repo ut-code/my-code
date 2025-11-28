@@ -53,6 +53,7 @@ interface SampleConfig {
   replInitContent?: string; // ReplOutput[] ではない。stringのパースはruntimeが行う
   editor: Record<string, string> | false;
   exec: string[] | false;
+  readonlyFiles?: string[];
 }
 const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   python: {
@@ -65,8 +66,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   },
   ruby: {
     repl: true,
-    replInitContent:
-      'irb(main):001:0> puts "Hello, World!"\nHello, World!',
+    replInitContent: 'irb(main):001:0> puts "Hello, World!"\nHello, World!',
     editor: {
       "main.rb": 'puts "Hello, World!"',
     },
@@ -83,10 +83,12 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   typescript: {
     repl: false,
     editor: {
-      "main.ts":
+      // main.tsにすると出力ファイルがjavascriptのサンプルと被る
+      "main2.ts":
         'function greet(name: string): void {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("World");',
     },
-    exec: ["main.ts"],
+    exec: ["main2.ts"],
+    readonlyFiles: ["main2.js"],
   },
   cpp: {
     repl: false,
@@ -131,6 +133,15 @@ function RuntimeSample({
       {config.exec && (
         <ExecFile filenames={config.exec} language={lang} content="" />
       )}
+      {config.readonlyFiles?.map((filename) => (
+        <EditorComponent
+          key={filename}
+          language={getAceLang(lang)}
+          filename={filename}
+          initContent=""
+          readonly
+        />
+      ))}
     </div>
   );
 }
