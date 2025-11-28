@@ -89,7 +89,7 @@ export function EditorComponent(props: EditorProps) {
   const { files, writeFile } = useEmbedContext();
   const code = files[props.filename] || props.initContent;
   useEffect(() => {
-    if (!files[props.filename]) {
+    if (!files[props.filename] && props.initContent) {
       writeFile({ [props.filename]: props.initContent });
     }
   }, [files, props.filename, props.initContent, writeFile]);

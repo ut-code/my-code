@@ -57,6 +57,21 @@ export const pagesList = [
     ],
   },
   {
+    id: "typescript",
+    lang: "TypeScript",
+    description: "にゃー",
+    pages: [
+      { id: 1, title: "TypeScriptへようこそ" },
+      { id: 2, title: "基本的な型と型推論" },
+      { id: 3, title: "オブジェクト、インターフェース、型エイリアス" },
+      { id: 4, title: "関数の型定義" },
+      { id: 5, title: "型を組み合わせる" },
+      { id: 6, title: "ジェネリクス" },
+      { id: 7, title: "クラスとアクセス修飾子" },
+      { id: 8, title: "非同期処理とユーティリティ型" },
+    ],
+  },
+  {
     id: "cpp",
     lang: "C++",
     description: "C++の基本から高度な機能までを学べるチュートリアル",

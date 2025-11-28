@@ -1,6 +1,6 @@
 "use client";
 
-import type { CompilerOptions } from "typescript";
+import type { ScriptTarget, CompilerOptions } from "typescript";
 import type { VirtualTypeScriptEnvironment } from "@typescript/vfs";
 import {
   createContext,
@@ -14,7 +14,11 @@ import { useEmbedContext } from "../embedContext";
 import { ReplOutput } from "../repl";
 import { RuntimeContext } from "../runtime";
 
-export const compilerOptions: CompilerOptions = {};
+export const compilerOptions: CompilerOptions = {
+  lib: ["ESNext", "WebWorker"],
+  target: 10 satisfies ScriptTarget.ES2023,
+  strict: true,
+};
 
 const TypeScriptContext = createContext<{
   init: () => void;
@@ -78,7 +82,12 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
 }
 
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
-  const { init, tsEnv } = useContext(TypeScriptContext);
+  const { init: tsInit, tsEnv } = useContext(TypeScriptContext);
+  const { init: jsInit } = jsEval;
+  const init = useCallback(() => {
+    tsInit();
+    jsInit?.();
+  }, [tsInit, jsInit]);
 
   const { writeFile } = useEmbedContext();
   const runFiles = useCallback(
@@ -129,6 +138,10 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
           )
         );
 
+        for (const filename of Object.keys(files)) {
+          tsEnv.deleteFile(filename);
+        }
+
         console.log(emitOutput);
         const jsOutputs = jsEval.runFiles(
           [emitOutput.outputFiles[0].name],
@@ -149,5 +162,5 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
 }
 
 function getCommandlineStr(filenames: string[]) {
-  return `tsc ${filenames.join(" ")}`;
+  return `npx tsc ${filenames.join(" ")} && node ${filenames[0].replace(/\.ts$/, ".js")}`;
 }
