@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth } from "better-auth/minimal";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { anonymous } from "better-auth/plugins";
@@ -46,6 +46,35 @@ export async function getAuthServer(
         clientSecret:
           process.env.GOOGLE_CLIENT_SECRET ??
           cloudflareEnv.GOOGLE_CLIENT_SECRET,
+      },
+    },
+    experimental: {
+      joins: true,
+    },
+    onAPIError: {
+      customizeDefaultErrorPage: {
+        colors: {
+          background: "oklch(98% 0.01 61.15)", // base-100
+          foreground: "oklch(21% 0.006 61.15)", // base-content
+          primary: "oklch(60% 0.139 61.15)",
+          primaryForeground: "oklch(98% 0.02 61.15)",
+          mutedForeground: "oklch(21% 0.006 61.15 / 70%)", // base-content/70
+          border: "oklch(21% 0.006 61.15 / 20%)", // base-content/20
+          destructive: "oklch(64% 0.246 16.439)", // error (どこで使われているのだろう?)
+          titleBorder: "oklch(60% 0.139 61.15)", // primary
+          titleColor: "oklch(21% 0.006 61.15)", // base-content
+          gridColor: "", // unused
+          cardBackground: "oklch(95% 0.013 61.15)", // base-200
+          cornerBorder: "oklch(60% 0.139 61.15)", // primary
+        },
+        font: {
+          defaultFamily:
+            "'Rounded M+ 1c', 'Rounded M+ 1p', 'M PLUS Rounded 1c', 'M+ 1c', 'MigMix 1c', 'Migu 1c', 'Hiragino Maru Gothic ProN', 'Noto Sans', 'Arial', 'Liberation Sans', sans-serif",
+          monoFamily: "Inconsolata, monospace",
+        },
+        disableTitleBorder: true,
+        disableCornerDecorations: true,
+        disableBackgroundGrid: true,
       },
     },
   });
