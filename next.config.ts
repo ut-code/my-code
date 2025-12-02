@@ -33,11 +33,16 @@ const nextConfig: NextConfig = {
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
-        "child_process": false,
+        child_process: false,
         "node:child_process": false,
         ...config.resolve.fallback,
       };
     }
+    // import hoge from "./file?raw" でfileの中身を文字列としてインポート
+    config.module.rules.push({
+      resourceQuery: /raw/,
+      type: "asset/source",
+    });
     return config;
   },
 };

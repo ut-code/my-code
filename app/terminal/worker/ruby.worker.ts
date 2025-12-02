@@ -6,6 +6,8 @@ import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
 import type { ReplOutput } from "../repl";
 
+import init_rb from "./ruby/init.rb?raw";
+
 let rubyVM: RubyVM | null = null;
 let rubyOutput: ReplOutput[] = [];
 let stdoutBuffer = "";
@@ -37,20 +39,8 @@ async function init({ id }: WorkerRequest["init"]) {
       const { vm } = await DefaultRubyVM(rubyModule);
       rubyVM = vm;
 
-      rubyVM.eval(`
-$stdout = Object.new.tap do |obj|
-  def obj.write(str)
-    require "js"
-    JS.global[:stdout].write(str)
-  end
-end
-$stderr = Object.new.tap do |obj|
-  def obj.write(str)
-    require "js"
-    JS.global[:stderr].write(str)
-  end
-end
-`);
+      rubyVM.eval(init_rb);
+
       self.postMessage({
         id,
         payload: { capabilities: { interrupt: "restart" } },

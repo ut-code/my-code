@@ -1,6 +1,8 @@
 import { ReplOutput } from "../repl";
 import { compileAndRun, CompilerInfo, SelectedCompiler } from "./api";
 
+import _stacktrace_cpp from "./cpp/_stacktrace.cpp?raw";
+
 export function selectCppCompiler(
   compilerList: CompilerInfo[]
 ): SelectedCompiler {
@@ -97,7 +99,7 @@ export async function cppRunFiles(
         file: name,
         code: code || "",
       })),
-      { file: "_stacktrace.cpp", code: CPP_STACKTRACE_HANDLER },
+      { file: "_stacktrace.cpp", code: _stacktrace_cpp },
     ],
   });
 
@@ -105,9 +107,9 @@ export async function cppRunFiles(
   const traceIndex = result.output.findIndex(
     (line) => line.type === "stderr" && line.message === "Stack trace:"
   );
-  
+
   let outputs: ReplOutput[];
-  
+
   if (traceIndex >= 0) {
     // CPP_STACKTRACE_HANDLER のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
     outputs = result.output.slice(0, traceIndex);
@@ -115,7 +117,7 @@ export async function cppRunFiles(
       type: "trace" as const,
       message: "Stack trace (filtered):",
     });
-    
+
     for (const line of result.output.slice(traceIndex + 1)) {
       // ユーザーのソースコードだけを対象にする
       if (line.type === "stderr" && line.message.includes("/home/wandbox")) {
@@ -128,7 +130,7 @@ export async function cppRunFiles(
   } else {
     outputs = [...result.output];
   }
-  
+
   if (result.status !== "0") {
     outputs.push({
       type: "system" as const,
@@ -139,45 +141,3 @@ export async function cppRunFiles(
 
   return outputs;
 }
-
-const CPP_STACKTRACE_HANDLER = `
-#define BOOST_STACKTRACE_USE_ADDR2LINE
-#include <boost/stacktrace.hpp>
-#include <iostream>
-#include <signal.h>
-void signal_handler(int signum) {
-    signal(signum, SIG_DFL);
-    switch(signum) {
-    case SIGILL:
-        std::cerr << "Illegal instruction" << std::endl;
-        break;
-    case SIGABRT:
-        std::cerr << "Aborted" << std::endl;
-        break;
-    case SIGBUS:
-        std::cerr << "Bus error" << std::endl;
-        break;
-    case SIGFPE:
-        std::cerr << "Floating point exception" << std::endl;
-        break;
-    case SIGSEGV:
-        std::cerr << "Segmentation fault" << std::endl;
-        break;
-    default:
-        std::cerr << "Signal " << signum << " received" << std::endl;
-        break;
-    }
-    std::cerr << "Stack trace:" << std::endl;
-    std::cerr << boost::stacktrace::stacktrace();
-    raise(signum);
-}
-struct _init_signal_handler {
-    _init_signal_handler() {
-        signal(SIGILL, signal_handler);
-        signal(SIGABRT, signal_handler);
-        signal(SIGBUS, signal_handler);
-        signal(SIGFPE, signal_handler);
-        signal(SIGSEGV, signal_handler);
-    }
-} _init_signal_handler_instance;
-`;
