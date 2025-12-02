@@ -72,7 +72,7 @@ export function selectCppCompiler(
 
   // その他オプション
   options.compilerOptionsRaw.push("-g");
-  // commandline.push("-g");
+  commandline.push("-g");
 
   options.getCommandlineStr = (filenames: string[]) => {
     return [...commandline, ...filenames, "&&", "./a.out"].join(" ");
@@ -103,37 +103,46 @@ export async function cppRunFiles(
     ],
   });
 
+  let outputs = result.output;
+
   // Find stack trace in the output
-  const traceIndex = result.output.findIndex(
-    (line) => line.type === "stderr" && line.message === "Stack trace:"
+  const signalIndex = outputs.findIndex(
+    (line) =>
+      line.type === "stderr" && line.message.startsWith("#!my_code_signal:")
+  );
+  const traceIndex = outputs.findIndex(
+    (line) => line.type === "stderr" && line.message === "#!my_code_stacktrace:"
   );
 
-  let outputs: ReplOutput[];
-
+  if (signalIndex >= 0) {
+    outputs[signalIndex] = {
+      type: "error",
+      message: outputs[signalIndex].message.slice(17),
+    } as const;
+  }
   if (traceIndex >= 0) {
     // CPP_STACKTRACE_HANDLER のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
-    outputs = result.output.slice(0, traceIndex);
+    const trace = outputs.slice(traceIndex + 1);
+    outputs = outputs.slice(0, traceIndex);
     outputs.push({
-      type: "trace" as const,
+      type: "trace",
       message: "Stack trace (filtered):",
     });
 
-    for (const line of result.output.slice(traceIndex + 1)) {
+    for (const line of trace) {
       // ユーザーのソースコードだけを対象にする
       if (line.type === "stderr" && line.message.includes("/home/wandbox")) {
         outputs.push({
-          type: "trace" as const,
+          type: "trace",
           message: line.message.replace("/home/wandbox/", ""),
         });
       }
     }
-  } else {
-    outputs = [...result.output];
   }
 
   if (result.status !== "0") {
     outputs.push({
-      type: "system" as const,
+      type: "system",
       message: `ステータス ${result.status} で異常終了しました`,
     });
   }

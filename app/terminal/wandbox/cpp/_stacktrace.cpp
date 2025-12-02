@@ -6,25 +6,25 @@ void signal_handler(int signum) {
     signal(signum, SIG_DFL);
     switch(signum) {
     case SIGILL:
-        std::cerr << "Illegal instruction" << std::endl;
+        std::cerr << "#!my_code_signal:Illegal instruction" << std::endl;
         break;
     case SIGABRT:
-        std::cerr << "Aborted" << std::endl;
+        std::cerr << "#!my_code_signal:Aborted" << std::endl;
         break;
     case SIGBUS:
-        std::cerr << "Bus error" << std::endl;
+        std::cerr << "#!my_code_signal:Bus error" << std::endl;
         break;
     case SIGFPE:
-        std::cerr << "Floating point exception" << std::endl;
+        std::cerr << "#!my_code_signal:Floating point exception" << std::endl;
         break;
     case SIGSEGV:
-        std::cerr << "Segmentation fault" << std::endl;
+        std::cerr << "#!my_code_signal:Segmentation fault" << std::endl;
         break;
     default:
-        std::cerr << "Signal " << signum << " received" << std::endl;
+        std::cerr << "#!my_code_signal:Signal " << signum << " received" << std::endl;
         break;
     }
-    std::cerr << "Stack trace:" << std::endl;
+    std::cerr << "#!my_code_stacktrace:" << std::endl;
     std::cerr << boost::stacktrace::stacktrace();
     raise(signum);
 }
