@@ -132,23 +132,28 @@ EditorComponent コンポーネントを提供します。
 
 ### Worker
 
-web worker でコードを実行する実装です。worker側のスクリプトは /public にあります。
+web worker でコードを実行する実装です。
 workerとの通信部分は言語によらず共通なので、それをworker/runtime.tsxで定義しています。
-Contextは言語ごとに分けて(worker/pyodide.ts などで)定義しています。
 
 Pythonの実行環境にはPyodideを使用しています。
 PyodideにはKeyboardInterruptを送信する機能があるのでinterrupt()でそれを利用しています。
 
 Rubyの実行環境にはruby.wasmを使用しています。
 
-JavaScriptはeval()を使用しています。runFiles()のAPIだけ実装していません。
+JavaScriptはeval()を使用しています。
 
 ### Wandbox
 
-wandbox.org のAPIを利用してC++コードを実行しています。C++以外にもいろいろな言語に対応しています。
+wandbox.org のAPIを利用してコードを実行します。
 
 APIから利用可能なコンパイラとオプションのリストが得られるので、言語ごとにそこからオプションを選択するロジックを実装しています。
 
 C++ではg++の中でheadでない最新のものを選択し、warningスイッチオン、boost有効、std=最新を指定しています。
 また、コード実行時にシグナルハンドラーをユーザーのコードに挿入し、エラー時にスタックトレースを表示する処理とそれをjs側でパースする処理を実装しています。
 
+Rustは最新のものを選択し、-Cdebuginfo=1を追加しています。
+ユーザーのコードをモジュールとしてprog.rsのmain()から呼び出す形に変更しており、ユーザーのコードに `mod foo;` → `use super::foo;`, `fn main()` → `pub fn main()` の改変を加えています。
+
+### TypeScript
+
+[@typescript/vfs](https://www.npmjs.com/package/@typescript/vfs) を使用してブラウザ上でTypeScriptコードをコンパイルし、jsEvalランタイムに渡します。
