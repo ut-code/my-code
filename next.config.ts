@@ -39,6 +39,18 @@ const nextConfig: NextConfig = {
       };
     }
     // import hoge from "./file?raw" でfileの中身を文字列としてインポート
+    for (const rule of config.module.rules) {
+      if (rule.resourceQuery instanceof RegExp) {
+        // skip
+      } else if (Array.isArray(rule.resourceQuery?.not)) {
+        rule.resourceQuery.not.push(/raw/);
+      } else {
+        if (rule.resourceQuery) {
+          console.warn("resourceQuery already exists:", rule.resourceQuery);
+        }
+        rule.resourceQuery = { not: /raw/ };
+      }
+    }
     config.module.rules.push({
       resourceQuery: /raw/,
       type: "asset/source",
