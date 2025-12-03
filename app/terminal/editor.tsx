@@ -20,6 +20,7 @@ const AceEditor = lazy(async () => {
     await import("ace-builds/src-min-noconflict/mode-python");
     await import("ace-builds/src-min-noconflict/mode-ruby");
     await import("ace-builds/src-min-noconflict/mode-c_cpp");
+    await import("ace-builds/src-min-noconflict/mode-rust");
     await import("ace-builds/src-min-noconflict/mode-javascript");
     await import("ace-builds/src-min-noconflict/mode-typescript");
     await import("ace-builds/src-min-noconflict/mode-json");
@@ -36,6 +37,7 @@ export type AceLang =
   | "python"
   | "ruby"
   | "c_cpp"
+  | "rust"
   | "javascript"
   | "typescript"
   | "json"
@@ -53,6 +55,9 @@ export function getAceLang(lang: MarkdownLang | undefined): AceLang {
     case "cpp":
     case "c++":
       return "c_cpp";
+    case "rust":
+    case "rs":
+      return "rust";
     case "javascript":
     case "js":
       return "javascript";

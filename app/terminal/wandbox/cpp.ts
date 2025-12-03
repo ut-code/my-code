@@ -87,20 +87,13 @@ export async function cppRunFiles(
   filenames: string[]
 ): Promise<ReplOutput[]> {
   const result = await compileAndRun({
-    compilerName: options.compilerName,
-    compilerOptions: options.compilerOptions,
+    ...options,
     compilerOptionsRaw: [
       ...options.compilerOptionsRaw,
       ...filenames,
       "_stacktrace.cpp",
     ],
-    codes: [
-      ...Object.entries(files).map(([name, code]) => ({
-        file: name,
-        code: code || "",
-      })),
-      { file: "_stacktrace.cpp", code: _stacktrace_cpp },
-    ],
+    codes: { ...files, "_stacktrace.cpp": _stacktrace_cpp },
   });
 
   let outputs = result.output;
@@ -121,23 +114,28 @@ export async function cppRunFiles(
     } as const;
   }
   if (traceIndex >= 0) {
-    // CPP_STACKTRACE_HANDLER のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
+    // _stacktrace.cpp のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
     const trace = outputs.slice(traceIndex + 1);
-    outputs = outputs.slice(0, traceIndex);
-    outputs.push({
+    const otherOutputs = outputs.slice(0, traceIndex);
+    const traceOutputs: ReplOutput[] = [{
       type: "trace",
       message: "Stack trace (filtered):",
-    });
+    }];
 
     for (const line of trace) {
-      // ユーザーのソースコードだけを対象にする
-      if (line.type === "stderr" && line.message.includes("/home/wandbox")) {
-        outputs.push({
-          type: "trace",
-          message: line.message.replace("/home/wandbox/", ""),
-        });
+      if(line.type === "stderr"){
+        // ユーザーのソースコードだけを対象にする
+        if (line.message.includes("/home/wandbox")) {
+          traceOutputs.push({
+            type: "trace",
+            message: line.message.replace("/home/wandbox/", ""),
+          });
+        }
+      }else{
+        otherOutputs.push(line);
       }
     }
+    outputs = [...otherOutputs, ...traceOutputs];
   }
 
   if (result.status !== "0") {

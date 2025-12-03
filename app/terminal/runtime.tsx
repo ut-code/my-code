@@ -44,6 +44,7 @@ export type RuntimeLang =
   | "python"
   | "ruby"
   | "cpp"
+  | "rust"
   | "javascript"
   | "typescript";
 
@@ -90,6 +91,7 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
   const jsEval = useJSEval();
   const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
+  const wandboxRust = useWandbox("rust");
 
   let runtime: RuntimeContext;
   switch (language) {
@@ -107,6 +109,9 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
       break;
     case "cpp":
       runtime = wandboxCpp;
+      break;
+    case "rust":
+      runtime = wandboxRust;
       break;
     default:
       language satisfies never;
@@ -160,6 +165,10 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
       return {
         tabSize: 2,
       };
+    case "rust":
+      return {
+        tabSize: 4,
+      }
     case "json":
       return {
         tabSize: 2,

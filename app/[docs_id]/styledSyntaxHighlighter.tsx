@@ -24,6 +24,8 @@ export type MarkdownLang =
   | "rb"
   | "cpp"
   | "c++"
+  | "rust"
+  | "rs"
   | "javascript"
   | "js"
   | "typescript"
