@@ -90,6 +90,14 @@ export const pagesList = [
       { id: 12, title: "プロジェクトの分割とビルド" },
     ],
   },
+  {
+    id: "rust",
+    lang: "Rust",
+    description: "a",
+    pages: [
+      { id: 1, title: "Rustの世界へようこそ" },
+    ],
+  },
 ] as const;
 
 // ${lang_id}-${page_id} から言語名を取得
