@@ -1,340 +1,349 @@
-# 第5章: オブジェクト指向の入口：クラスの基礎
+# 第5章: 関数の設計とデータの受け渡し：コピー、参照、ポインタ
 
-これまでの章では、C++の基本的な文法やメモリの扱い方について学んできました。この章からは、C++の最も強力な機能の一つである**オブジェクト指向プログラミング (Object-Oriented Programming, OOP)** の世界に足を踏み入れます。OOPの考え方を身につけることで、より大規模で複雑なプログラムを、現実世界の「モノ」の概念に近い形で、直感的に設計・実装できるようになります。その第一歩として、OOPの中核をなす**クラス**の基礎を学びましょう。
+前章（第4章）では、C++のメモリモデルの核心である「ポインタ」について学びました。ポインタは強力ですが、構文が複雑になりがちで、バグの温床にもなりえます。
 
-## クラスとは？: データ（メンバ変数）と処理（メンバ関数）のカプセル化
+C++では、C言語から受け継いだポインタに加え、より安全で直感的な**「参照（Reference）」**という概念が導入されています。本章では、関数の設計を通して、この「参照」がいかに強力な武器になるかを学びます。「データをどう渡すか」は、C++のパフォーマンスと設計の良し悪しを決める最も重要な要素の一つです。
 
-他のプログラミング言語でオブジェクト指向に触れたことがあるなら、「クラスはオブジェクトの設計図」という説明を聞いたことがあるかもしれません。C++でもその考え方は同じです。クラスは、ある「モノ」が持つべき**データ（属性）**と、そのデータに対する**処理（操作）**を一つにまとめたものです。
+## 関数の宣言と定義
 
-  - **データ（属性）**: クラス内に定義された変数のことで、**メンバ変数 (member variables)** または**データメンバ**と呼びます。
-  - **処理（操作）**: クラス内に定義された関数のことで、**メンバ関数 (member functions)** または**メソッド**と呼びます。
+PythonやJavaScriptのような言語では、関数をどこに書いても（あるいは実行時に解決されて）呼び出せることが多いですが、C++のコンパイラはコードを上から下へと一直線に読みます。そのため、**「使用する前に、その関数が存在すること」**をコンパイラに知らせる必要があります。
 
-このように、関連するデータと処理を一つのクラスにまとめることを、OOPの重要な概念の一つである**カプセル化 (encapsulation)** と呼びます。💊
+### プロトタイプ宣言
 
-例として、「人」を表す`Person`クラスを考えてみましょう。「人」は「名前」や「年齢」といったデータ（メンバ変数）を持ち、「自己紹介する」といった処理（メンバ関数）を行うことができます。
+関数を `main` 関数の後に定義したい場合、事前に「こういう名前と引数の関数がありますよ」と宣言だけしておく必要があります。これを**プロトタイプ宣言**と呼びます。
+
+```cpp:declaration_intro.cpp
+#include <iostream>
+
+// プロトタイプ宣言
+// 戻り値の型 関数名(引数の型1 引数名1, 引数の型2 引数名2, ...);
+// 本体（{}の中身）は書かず、セミコロンで終わる
+void greet(int times);
+
+int main() {
+    std::cout << "main関数開始" << std::endl;
+    
+    // 定義は下にあるが、宣言があるので呼び出せる
+    greet(3);
+    
+    return 0;
+}
+
+// 関数の定義
+void greet(int times) {
+    for (int i = 0; i < times; ++i) {
+        std::cout << "Hello C++!" << std::endl;
+    }
+}
+```
+
+```cpp-exec:declaration_intro.cpp
+main関数開始
+Hello C++!
+Hello C++!
+Hello C++!
+```
+
+実際の開発では、プロトタイプ宣言をヘッダーファイル（`.h`）に書き、定義をソースファイル（`.cpp`）に書くことで、大規模なプログラムを管理します（これについては次章で詳しく解説します）。
+
+### 戻り値がない場合: `void`型
+
+関数が何も値を返す必要がない場合もあります。例えば、「画面にメッセージを表示するだけ」といった関数です。その場合、戻り値の型として `void` という特別なキーワードを使います。
 
 ```cpp
-class Person {
-public:
-    // メンバ変数
-    std::string name;
-    int age;
-
-    // メンバ関数
-    void introduce() {
-        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
-    }
-};
+void printMessage(std::string message);
 ```
 
-`class Person { ... };` という構文でクラスを定義します。クラス定義の最後にはセミコロン`;`が必要なので忘れないようにしましょう。現時点では、`public:`というキーワードは「これらのメンバは外部からアクセスできます」という意味だと考えておいてください。詳細は後ほど説明します。
+第2章で学んだように、`int`や`double`などの型は変数を定義するために使えましたが、`void`は「型がない」ことを示す特殊な型なので、`void my_variable;` のように変数を定義することはできません。あくまで関数の戻り値の型としてのみ使います。
 
-## インスタンスの生成: クラスからオブジェクトを作ってみる
+## 引数の渡し方（パフォーマンスと安全性）
 
-クラスはあくまで「設計図」です。実際にプログラムで利用するためには、この設計図をもとに実体を作る必要があります。クラスから作られた実体のことを**オブジェクト (object)** または**インスタンス (instance)** と呼び、オブジェクトを作ることを**インスタンス化 (instantiation)** と言います。
+ここが本章のハイライトです。他の言語では言語仕様として決まっていることが多い引数の渡し方を、C++ではプログラマが意図的に選択できます。
 
-インスタンス化の構文は、変数の宣言とよく似ています。
+### 1\. 値渡し (Pass by Value)
 
-```cpp:instantiation.cpp
+特に何も指定しない場合のデフォルトです。変数の**コピー**が作成され、関数に渡されます。
+
+  * **メリット:** 安全。関数内で値を変更しても、呼び出し元の変数には影響しない。
+  * **デメリット:** コストが高い。巨大な配列やオブジェクトを渡す際、丸ごとコピーするためメモリと時間を浪費する。
+
+<!-- end list -->
+
+```cpp:pass_by_value.cpp
 #include <iostream>
-#include <string>
 
-// Personクラスの定義
-class Person {
-public:
-    std::string name;
-    int age;
-
-    void introduce() {
-        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
-    }
-};
+// 値渡し：xは呼び出し元のコピー
+void attemptUpdate(int x) {
+    x = 100; // コピーを変更しているだけ
+    std::cout << "関数内: " << x << " (アドレス: " << &x << ")" << std::endl;
+}
 
 int main() {
-    // Personクラスのインスタンスを生成
-    Person taro;
-
-    // メンバ変数に値を代入 (ドット演算子 . を使用)
-    taro.name = "Taro";
-    taro.age = 30;
-
-    // メンバ関数を呼び出す
-    taro.introduce(); // "My name is Taro, and I am 30 years old." と出力される
-
-    // 別のインスタンスを生成
-    Person hanako;
-    hanako.name = "Hanako";
-    hanako.age = 25;
-    hanako.introduce(); // "My name is Hanako, and I am 25 years old." と出力される
-
+    int num = 10;
+    std::cout << "呼び出し前: " << num << " (アドレス: " << &num << ")" << std::endl;
+    
+    attemptUpdate(num);
+    
+    // numは変わっていない
+    std::cout << "呼び出し後: " << num << std::endl;
     return 0;
 }
 ```
 
-```cpp-exec:instantiation.cpp
-My name is Taro, and I am 30 years old.
-My name is Hanako, and I am 25 years old.
+```cpp-exec:pass_by_value.cpp
+呼び出し前: 10 (アドレス: 0x7ff...)
+関数内: 100 (アドレス: 0x7ff...)  <-- アドレスが違う＝別の領域（コピー）
+呼び出し後: 10
 ```
 
-このように、`クラス名 インスタンス名;` という形でインスタンスを生成できます。インスタンスのメンバ変数やメンバ関数にアクセスするには、`インスタンス名.メンバ名` のように**ドット演算子 (`.`)** を使います。`taro`と`hanako`は同じ`Person`クラスから作られたインスタンスですが、それぞれが独立したデータを持っていることがわかります。
+### 2\. ポインタ渡し (Pass by Pointer)
 
-## アクセス制御: public と private による情報の隠蔽
+C言語からある手法です。第4章で学んだポインタ（アドレス）を渡します。
 
-先ほどの`Person`クラスの例では、`main`関数から`taro.age = 30;`のようにメンバ変数に直接アクセスできました。これは手軽ですが、問題を引き起こす可能性があります。例えば、年齢にマイナスの値や非現実的な値を設定できてしまうかもしれません。
+  * **メリット:** コピーが発生しない（アドレス値のコピーのみ）。呼び出し元のデータを変更できる。
+  * **デメリット:** 呼び出す際に `&` を付ける必要がある。関数内で `*` や `->` を使う必要があり、構文が汚れる。`nullptr` チェックが必要になることがある。
 
-```cpp
-Person jiro;
-jiro.name = "Jiro";
-jiro.age = -5; // 本来ありえない値が設定できてしまう！
-jiro.introduce();
-```
+<!-- end list -->
 
-このような意図しない操作を防ぐために、C++には**アクセス制御**の仕組みがあります。クラスのメンバは、外部からのアクセスの可否を指定できます。
-
-  - **`public`**: クラスの外部（`main`関数など）から自由にアクセスできます。
-  - **`private`**: そのクラスのメンバ関数からしかアクセスできません。外部からはアクセス不可です。
-
-アクセス制御の基本は、**メンバ変数は`private`にし、メンバ関数は`public`にする**ことです。これにより、データの不正な書き換えを防ぎ、クラスの内部実装を外部から隠蔽します。これを**情報の隠蔽 (information hiding)** と呼び、カプセル化の重要な目的の一つです。
-
-`private`なメンバ変数に安全にアクセスするために、`public`なメンバ関数（**ゲッター**や**セッター**と呼ばれる）を用意するのが一般的です。
-
-```cpp:access_control.cpp
+```cpp:pass_by_pointer.cpp
 #include <iostream>
-#include <string>
 
-class Person {
-private:
-    // メンバ変数は外部から隠蔽する
-    std::string name;
-    int age;
-
-public:
-    // セッター: メンバ変数に値を設定する
-    void setName(const std::string& newName) {
-        name = newName;
+// ポインタ渡し：アドレスを受け取る
+void updateByPointer(int* ptr) {
+    if (ptr != nullptr) {
+        *ptr = 200; // アドレスの指す先を書き換える
     }
-
-    void setAge(int newAge) {
-        if (newAge >= 0 && newAge < 150) { // 不正な値をチェック
-            age = newAge;
-        } else {
-            std::cout << "Error: Invalid age value." << std::endl;
-        }
-    }
-
-    // ゲッター: メンバ変数の値を取得する
-    std::string getName() const {
-        return name;
-    }
-
-    int getAge() const {
-        return age;
-    }
-
-    // このメンバ関数はクラス内部にあるので、privateメンバにアクセスできる
-    void introduce() {
-        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
-    }
-};
+}
 
 int main() {
-    Person saburo;
-
-    // saburo.name = "Saburo"; // エラー！ privateメンバには直接アクセスできない
-    // saburo.age = -10;       // エラー！
-
-    // publicなメンバ関数を経由して安全に値を設定
-    saburo.setName("Saburo");
-    saburo.setAge(28);
-
-    saburo.introduce();
-
-    saburo.setAge(-10); // エラーメッセージが出力される
-
-    // publicなメンバ関数経由で値を取得
-    std::cout << "Name: " << saburo.getName() << std::endl;
-
+    int num = 10;
+    
+    // アドレスを渡す
+    updateByPointer(&num);
+    
+    std::cout << "ポインタ渡し後: " << num << std::endl;
     return 0;
 }
 ```
 
-```cpp-exec:access_control.cpp
-My name is Saburo, and I am 28 years old.
-Error: Invalid age value.
-Name: Saburo
+```cpp-exec:pass_by_pointer.cpp
+ポインタ渡し後: 200
 ```
 
-`setAge`関数内で値の妥当性チェックを行っている点に注目してください。このように、クラスの利用者は内部の実装を気にすることなく、提供された`public`なインターフェース（メンバ関数）を通じて安全にオブジェクトを操作できます。
+### 3\. 参照渡し (Pass by Reference)
 
-> `const`キーワード: `getName() const` のようにメンバ関数の後ろに`const`を付けると、その関数がメンバ変数を変更しないことをコンパイラに約束します。このような関数を**constメンバ関数**と呼びます。
+C++の真骨頂です。**「参照（Reference）」**とは、既存の変数に別の名前（エイリアス）をつける機能です。引数の型に `&` を付けるだけで宣言できます。
 
-## コンストラクタとデストラクタ: オブジェクトが生まれてから消えるまで
+  * **メリット:** コピーが発生しない。**構文は「値渡し」と同じように書ける**（`*`や`&`を呼び出し側で意識しなくていい）。`nullptr` になることがないため安全性が高い。
+  * **デメリット:** 関数内で値を変更すると、呼び出し元も変わる（意図しない変更に注意）。
 
-オブジェクトは生成され、利用され、やがて破棄されます。このライフサイクルに合わせて特別な処理を自動的に実行するための仕組みが**コンストラクタ**と**デストラクタ**です。
+<!-- end list -->
 
-### コンストラクタ (Constructor)
-
-**コンストラクタ**は、インスタンスが生成されるときに**自動的に呼び出される**特別なメンバ関数です。主な役割は、メンバ変数の初期化です。
-
-コンストラクタには以下の特徴があります。
-
-  - 関数名がクラス名と全く同じ。
-  - 戻り値の型を指定しない（`void`も付けない）。
-  - 引数を取ることができ、複数定義できる（オーバーロード）。
-
-```cpp:constructor.cpp
-class Person {
-private:
-    std::string name;
-    int age;
-
-public:
-    // 引数付きコンストラクタ
-    Person(const std::string& initName, int initAge) {
-        std::cout << "Constructor called for " << initName << std::endl;
-        name = initName;
-        age = initAge;
-    }
-    // ...
-};
-
-int main() {
-    // インスタンス生成時にコンストラクタが呼ばれ、引数が渡される
-    Person yuko("Yuko", 22); // この時点でコンストラクタが実行される
-    yuko.introduce();
-}
-```
-
-```cpp-exec:constructor.cpp
-Constructor called for Yuko
-My name is Yuko, and I am 22 years old.
-```
-
-このように、インスタンス生成時に`()`で初期値を渡すことで、オブジェクトを生成と同時に有効な状態にできます。`set`関数を別途呼び出す手間が省け、初期化忘れを防ぐことができます。
-
-### デストラクタ (Destructor)
-
-**デストラクタ**は、インスタンスが破棄されるとき（例えば、変数のスコープを抜けるとき）に**自動的に呼び出される**特別なメンバ関数です。主な役割は、オブジェクトが使用していたリソース（メモリやファイルなど）の後片付けです。
-
-デストラクタには以下の特徴があります。
-
-  - 関数名が `~` + クラス名。
-  - 戻り値も引数も取らない。
-  - 1つのクラスに1つしか定義できない。
-
-```cpp:constructor_destructor.cpp
+```cpp:pass_by_ref.cpp
 #include <iostream>
-#include <string>
 
-class Person {
-private:
-    std::string name;
-    int age;
-
-public:
-    // コンストラクタ
-    Person(const std::string& initName, int initAge) {
-        std::cout << "Constructor called for " << initName << "." << std::endl;
-        name = initName;
-        age = initAge;
-    }
-
-    // デストラクタ
-    ~Person() {
-        std::cout << "Destructor called for " << name << "." << std::endl;
-    }
-
-    void introduce() {
-        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
-    }
-};
-
-void create_person_scope() {
-    std::cout << "--- Entering scope ---" << std::endl;
-    Person kenji("Kenji", 45); // kenjiはこのスコープ内でのみ生存
-    kenji.introduce();
-    std::cout << "--- Exiting scope ---" << std::endl;
-} // ここでkenjiのスコープが終わり、デストラクタが呼ばれる
+// 参照渡し：引数に & をつける
+// ref は呼び出し元の変数の「別名」となる
+void updateByRef(int& ref) {
+    ref = 300; // 普通の変数のように扱えるが、実体は呼び出し元
+}
 
 int main() {
-    create_person_scope();
-
-    std::cout << "--- Back in main ---" << std::endl;
-
+    int num = 10;
+    
+    // 値渡しと同じように呼び出せる（&num と書かなくていい！）
+    updateByRef(num);
+    
+    std::cout << "参照渡し後: " << num << std::endl;
     return 0;
 }
 ```
 
-```cpp-exec:constructor_destructor.cpp
---- Entering scope ---
-Constructor called for Kenji.
-My name is Kenji, and I am 45 years old.
---- Exiting scope ---
-Destructor called for Kenji.
---- Back in main ---
+```cpp-exec:pass_by_ref.cpp
+参照渡し後: 300
 ```
 
-実行結果を見ると、`kenji`オブジェクトが生成されたときにコンストラクタが、`create_person_scope`関数のスコープを抜けるときにデストラクタが自動的に呼び出されていることがわかります。動的に確保したメモリの解放など、クリーンアップ処理はデストラクタに書くのが定石です。この考え方は、今後の章で学ぶRAII（Resource Acquisition Is Initialization）という重要な概念に繋がります。
+### 4\. const 参照渡し (Pass by const Reference)
+
+これが**C++で最も頻繁に使われるパターン**です。「コピーはしたくない（重いから）。でも、関数内で書き換えられたくもない」という要求を満たします。
+
+  * **構文:** `const 型& 引数名`
+  * **用途:** `std::string`、`std::vector`、クラスのオブジェクトなど、サイズが大きくなる可能性があるデータ。
+
+<!-- end list -->
+
+```cpp:const_ref.cpp
+#include <iostream>
+#include <string>
+#include <vector>
+
+// const参照渡し
+// textの実体はコピーされないが、書き換えも禁止される
+void printMessage(const std::string& text) {
+    // text = "Modified"; // コンパイルエラーになる
+    std::cout << "Message: " << text << std::endl;
+}
+
+int main() {
+    std::string bigData = "This is a potentially very large string...";
+    
+    // コピーコストゼロで渡す
+    printMessage(bigData);
+    
+    return 0;
+}
+```
+
+```cpp-exec:const_ref.cpp
+Message: This is a potentially very large string...
+```
+
+> **ガイドライン:**
+>
+>   * `int` や `double` などの基本型 → **値渡し** でOK。
+>   * 変更させたいデータ → **参照渡し** (`T&`)。
+>   * 変更しないがサイズが大きいデータ（string, vectorなど） → **const参照渡し** (`const T&`)。
+
+## 関数の機能拡張
+
+C++には関数をより柔軟に使うための機能が備わっています。
+
+### オーバーロード (Function Overloading)
+
+引数の**型**や**数**が異なれば、同じ名前の関数を複数定義できます。C言語では関数名はユニークである必要がありましたが、C++では「名前＋引数リスト」で区別されます。
+
+```cpp:overloading.cpp
+#include <iostream>
+#include <string>
+
+// int型を受け取る関数
+void print(int i) {
+    std::cout << "Integer: " << i << std::endl;
+}
+
+// double型を受け取る関数（同名）
+void print(double d) {
+    std::cout << "Double: " << d << std::endl;
+}
+
+// 文字列を受け取る関数（同名）
+void print(const std::string& s) {
+    std::cout << "String: " << s << std::endl;
+}
+
+int main() {
+    print(42);
+    print(3.14);
+    print("Overloading");
+    return 0;
+}
+```
+
+```cpp-exec:overloading.cpp
+Integer: 42
+Double: 3.14
+String: Overloading
+```
+
+### デフォルト引数
+
+引数が省略された場合に使われるデフォルト値を設定できます。これはプロトタイプ宣言（または最初にコンパイラが見る定義）に記述します。
+※デフォルト引数は**後ろの引数から順に**設定する必要があります。
+
+```cpp:default_args.cpp
+#include <iostream>
+
+// power: 指数を省略すると2乗になる
+// verbose: 詳細出力を省略するとfalseになる
+int power(int base, int exponent = 2, bool verbose = false) {
+    int result = 1;
+    for (int i = 0; i < exponent; ++i) {
+        result *= base;
+    }
+    
+    if (verbose) {
+        std::cout << base << " の " << exponent << " 乗を計算しました。" << std::endl;
+    }
+    return result;
+}
+
+int main() {
+    std::cout << power(3) << std::endl;          // 3^2, verbose=false
+    std::cout << power(3, 3) << std::endl;       // 3^3, verbose=false
+    std::cout << power(2, 4, true) << std::endl; // 2^4, verbose=true
+    return 0;
+}
+```
+
+```cpp-exec:default_args.cpp
+9
+27
+2 の 4 乗を計算しました。
+16
+```
 
 ## この章のまとめ
 
-この章では、C++におけるオブジェクト指向プログラミングの第一歩として、クラスの基本的な概念を学びました。
+  * **プロトタイプ宣言**を使うことで、関数の定義順序に依存せずに記述できる。
+  * **値渡し**は安全だが、大きなオブジェクトではコピーコストがかかる。
+  * **参照渡し (`&`)** は、ポインタのような効率性を持ちながら、変数のエイリアスとして直感的に扱える。
+  * **`const` 参照渡し (`const T&`)** は、大きなデータを「読み取り専用」で効率的に渡すC++の定石である。
+  * **オーバーロード**により、同じ名前で異なる引数を受け取る関数を作れる。
+  * **デフォルト引数**で、呼び出し時の記述を省略できる。
 
-  - **クラス**は、データ（**メンバ変数**）と処理（**メンバ関数**）を一つにまとめた「設計図」です。
-  - クラスから実体である**オブジェクト（インスタンス）**を生成して使用します。
-  - **カプセル化**は、関連するデータと処理をまとめることです。
-  - **アクセス制御**（`public`, `private`）により、外部からアクセスされたくないメンバを保護します（**情報の隠蔽**）。
-  - **コンストラクタ**は、オブジェクト生成時に自動で呼ばれ、初期化を行います。
-  - **デストラクタ**は、オブジェクト破棄時に自動で呼ばれ、後片付けを行います。
+## 練習問題1: 値の入れ替え（Swap）
 
-クラスを使いこなすことで、プログラムの部品化が進み、再利用性やメンテナンス性が格段に向上します。次の章では、クラスのさらに進んだ機能について学んでいきましょう。
-
-### 練習問題1: 長方形クラス
-
-幅(`width`)と高さ(`height`)をメンバ変数として持つ`Rectangle`クラスを作成してください。
-
-  - メンバ変数は`private`で定義してください。
-  - コンストラクタで幅と高さを初期化できるようにしてください。
-  - 面積を計算して返す`getArea()`メソッドと、周の長さを計算して返す`getPerimeter()`メソッドを`public`で実装してください。
-  - `main`関数で`Rectangle`クラスのインスタンスをいくつか生成し、面積と周の長さを表示するプログラムを作成してください。
+2つの `int` 変数を受け取り、その値を入れ替える関数 `mySwap` を作成してください。
+ポインタではなく、**参照渡し**を使用してください。
 
 ```cpp:practice5_1.cpp
 #include <iostream>
-#include <string>
-// ここにRectangleクラスを定義してください
 
+// ここにmySwap関数を実装してください
+
+
+// main関数
 int main() {
-    // ここでRectangleクラスのインスタンスを生成し、面積と周の長さを表示してください
-
+    int a = 10;
+    int b = 20;
+    std::cout << "Before: a = " << a << ", b = " << b << std::endl;
+    mySwap(a, b);
+    std::cout << "After: a = " << a << ", b = " << b << std::endl;
     return 0;
 }
 ```
 
 ```cpp-exec:practice5_1.cpp
+(期待される実行結果)
+Before: a = 10, b = 20
+After: a = 20, b = 10
 ```
 
+### 問題2：ベクター統計
 
-### 練習問題2: 書籍クラス
+`std::vector<int>` を受け取り、その中の「最大値」を見つけて返す関数 `findMax` を作成してください。
+ただし、以下の条件を守ってください。
 
-タイトル(`title`)、著者(`author`)、ページ数(`pages`)をメンバ変数として持つ`Book`クラスを作成してください。
+1.  ベクターはコピーされないようにしてください（**参照渡し**）。
+2.  関数内でベクターの内容が変更されないことを保証してください（**const**）。
+3.  ベクターが空の場合は `0` を返すなどの処理を入れてください。
 
-  - メンバ変数は`private`で定義してください。
-  - コンストラクタで、タイトル、著者、ページ数を初期化できるようにしてください。
-  - 本の情報を整形してコンソールに出力する`printInfo()`メソッドを`public`で実装してください。（例: `Title: [タイトル], Author: [著者], Pages: [ページ数] pages`）
-  - `main`関数で`Book`クラスのインスタンスを生成し、その情報を表示してください。
+<!-- end list -->
 
 ```cpp:practice5_2.cpp
 #include <iostream>
-#include <string>
-// ここにBookクラスを定義してください
+#include <vector>
+#include <algorithm> // maxを使うなら便利ですが、for文でも可
+
+// ここに findMax を作成
+
 
 int main() {
-    // ここでBookクラスのインスタンスを生成し、情報を表示してください
-
+    std::vector<int> data = {10, 5, 8, 42, 3};
+    std::cout << "Max: " << findMax(data) << std::endl;
     return 0;
 }
 ```
-
 ```cpp-exec:practice5_2.cpp
-Title: The Great Gatsby, Author: F. Scott Fitzgerald, Pages: 180 pages
+Max: 42
 ```

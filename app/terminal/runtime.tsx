@@ -78,6 +78,8 @@ export function getRuntimeLang(
     case "text":
     case "txt":
     case "html":
+    case "makefile":
+    case "cmake":
     case undefined:
       // unsupported languages
       return undefined;
@@ -166,15 +168,17 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
     case "c_cpp":
     case "cpp":
       return {
-        tabSize: 2,
+        // 2文字派と4文字派があるが、geminiが4文字で出力するので4でいいや
+        tabSize: 4,
       };
     case "rust":
       return {
         tabSize: 4,
-      }
+      };
     case "json":
       return {
-        tabSize: 2,
+        // python-7章で使っている
+        tabSize: 4,
       };
     case "csv":
     case "text":

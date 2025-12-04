@@ -1,293 +1,301 @@
-# 第12章: プロジェクトの分割とビルド
+# 第12章: 標準テンプレートライブラリ (STL) ②：アルゴリズムとラムダ式
 
-これまでの章では、すべてのコードを1つの `.cpp` ファイルに記述してきました。しかし、プログラムが大規模で複雑になるにつれて、このアプローチは現実的ではなくなります。コードの可読性が低下し、少しの変更でもプログラム全体の再コンパイルが必要になり、開発効率が大きく損なわれるからです。
+前の章ではSTLのコンテナについて学び、様々なデータを効率的に格納する方法を見てきました。しかし、データを格納するだけではプログラムは完成しません。そのデータを並べ替えたり、検索したり、特定の処理を施したりといった「操作」が必要です。
 
-この章では、プログラムを複数のファイルに分割し、それらを効率的に管理・ビルドする方法を学びます。これは、小さなプログラムから一歩進み、本格的なソフトウェア開発を行うための重要なステップです。
+この章では、STLのもう一つの強力な柱である**アルゴリズム**ライブラリを学びます。これらのアルゴリズムは、コンテナ内のデータを操作するための汎用的な関数群です。そして、アルゴリズムをさらに柔軟かつ強力にするための現代的なC++の機能、**ラムダ式**についても解説します。これらをマスターすれば、驚くほど少ないコードで複雑なデータ操作が実現できるようになります。
 
-## ヘッダファイルとソースファイル
+## イテレータ：コンテナとアルゴリズムを繋ぐ架け橋
 
-C++では、プログラムを**ヘッダファイル**と**ソースファイル**という2種類のファイルに分割するのが一般的です。
+アルゴリズムは、特定のコンテナ（`std::vector` や `std::list` など）に直接依存しないように設計されています。では、どうやってコンテナ内の要素にアクセスするのでしょうか？そこで登場するのが**イテレータ (Iterator)** です。
 
-  * **ヘッダファイル (`.h` または `.hpp`)**: 「宣言」を置く場所です。クラスの定義、関数のプロトタイプ宣言、定数、テンプレートなどを記述します。他のファイルに対して「何ができるか（インターフェース）」を公開する役割を持ちます。
-  * **ソースファイル (`.cpp`)**: 「実装」を置く場所です。ヘッダファイルで宣言された関数の具体的な処理内容などを記述します。ヘッダファイルが公開したインターフェースを「どのように実現するか」を記述する役割を持ちます。
+イテレータは、コンテナ内の要素を指し示す「ポインタのような」オブジェクトです。ポインタのように `*` で要素の値を参照したり、`++` で次の要素に進んだりできます。
 
-### なぜ分割するのか？ 🤔
+ほとんどのコンテナは、以下の2つの重要なイテレータを取得するメンバ関数を持っています。
 
-1.  **関心の分離**: インターフェース（何ができるか）と実装（どうやるか）を分離することで、コードの見通しが良くなります。他の開発者はヘッダファイルを見るだけで、その機能の使い方がわかります。
-2.  **コンパイル時間の短縮**: ソースファイルを変更した場合、再コンパイルはそのファイルだけで済みます。プロジェクト全体を再コンパイルする必要がないため、大規模なプロジェクトでは開発サイクルが劇的に速くなります。
-3.  **再利用性の向上**: よく使う関数やクラスをまとめておけば、別のプロジェクトでそのファイルをインクルードするだけで簡単に再利用できます。
+  * `begin()`: コンテナの先頭要素を指すイテレータを返す。
+  * `end()`: コンテナの**最後の要素の次**を指すイテレータを返す。これは有効な要素を指していない「番兵」のような役割を果たします。
 
-### 分割の例
+アルゴリズムは、この `begin()` と `end()` から得られるイテレータのペアを使い、操作対象の「範囲」を指定します。範囲は半開区間 `[begin, end)` で表され、`begin` が指す要素は範囲に含まれ、`end` が指す要素は含まれません。
 
-簡単な足し算を行う関数を別のファイルに分割してみましょう。
+簡単な例を見てみましょう。イテレータを使って `vector` の全要素を表示するコードです。
 
-まず、関数の「宣言」をヘッダファイルに記述します。
-
-```cpp:math_utils.h
-// 関数の宣言を記述するヘッダファイル
-
-// この関数が他のファイルから参照されることを示す
-int add(int a, int b);
-```
-
-次に、この関数の「実装」をソースファイルに記述します。
-
-```cpp:math_utils.cpp
-// 関数の実装を記述するソースファイル
-
-#include "math_utils.h" // 対応するヘッダファイルをインクルード
-
-int add(int a, int b) {
-    return a + b;
-}
-```
-
-最後に、`main`関数を含むメインのソースファイルから、この`add`関数を呼び出します。
-
-```cpp:math_app.cpp
+```cpp:iterator_example.cpp
 #include <iostream>
-#include "math_utils.h" // 自作したヘッダファイルをインクルード
+#include <vector>
 
 int main() {
-    int result = add(5, 3);
-    std::cout << "The result is: " << result << std::endl;
-    return 0;
-}
-```
+    std::vector<int> numbers = {0, 1, 2, 3, 4};
 
-```cpp-exec:math_app.cpp,math_utils.cpp
-The result is: 8
-```
+    // イテレータを使ってコンテナを走査
+    std::cout << "Numbers: ";
+    for (auto it = numbers.begin(); it != numbers.end(); ++it) {
+        std::cout << *it << " "; // *it で要素の値にアクセス
+    }
+    std::cout << std::endl;
 
-ここで注目すべき点は、`math_app.cpp`が`add`関数の具体的な実装を知らないことです。`math_utils.h`を通じて「`int`を2つ受け取って`int`を返す`add`という関数が存在する」ことだけを知り、それを利用しています。
-
-## インクルードガード
-
-複数のファイルから同じヘッダファイルがインクルードされる状況はよくあります。例えば、`A.h`が`B.h`をインクルードし、ソースファイルが`A.h`と`B.h`の両方をインクルードするような場合です。
-
-もしヘッダファイルに何の対策もしていないと、同じ内容（クラス定義や関数宣言）が複数回読み込まれ、「再定義」としてコンパイルエラーが発生してしまいます。
-
-```cpp:A.h
-#include "B.h" // B.hをインクルード
-
-// A.hの内容
-```
-
-```cpp:B.h
-class B {
-    // Bクラスの内容
-};
-```
-
-```cpp:bad_include_app.cpp
-#include "A.h"
-#include "B.h" // B.hが二重にインクルードされる
-
-int main() {
-    [[maybe_unused]] B b; // Bクラスを使う
+    // C++11以降の範囲ベースforループ (内部ではイテレータが使われている)
+    std::cout << "Numbers (range-based for): ";
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
 
     return 0;
 }
 ```
 
-```cpp-exec:bad_include_app.cpp
-In file included from bad_include_app.cpp:2:
-B.h:1:7: error: redefinition of 'class B'
-    1 | class B {
-      |       ^
-In file included from A.h:1,
-                 from bad_include_app.cpp:1:
-B.h:1:7: note: previous definition of 'class B'
-    1 | class B {
-      |       ^
+```cpp-exec:iterator_example.cpp
+Numbers: 0 1 2 3 4 
+Numbers (range-based for): 0 1 2 3 4 
 ```
 
-この問題を解決するのが**インクルードガード**です。インクルードガードは、ヘッダファイルの内容が1つの翻訳単位（ソースファイル）内で一度しか読み込まれないようにするための仕組みです。
+このように、イテレータはコンテナの種類を問わず、統一的な方法で要素にアクセスする仕組みを提供します。これが、アルゴリズムが様々なコンテナに対して汎用的に機能する理由です。
 
-### 伝統的なインクルードガード
+## 便利なアルゴリズム
 
-プリプロセッサディレクティブである `#ifndef`, `#define`, `#endif` を使います。
+C++の標準ライブラリには、`<algorithm>` ヘッダと `<numeric>` ヘッダに数多くの便利なアルゴリズムが用意されています。ここでは、特によく使われるものをいくつか紹介します。
 
-```cpp
-#ifndef MATH_UTILS_H // もし MATH_UTILS_H が未定義なら
-#define MATH_UTILS_H // MATH_UTILS_H を定義する
+### `std::sort`: 要素を並べ替える
 
-// --- ヘッダファイルの中身 ---
-int add(int a, int b);
-// -------------------------
+名前の通り、指定された範囲の要素をソートします。デフォルトでは昇順に並べ替えます。
 
-#endif // MATH_UTILS_H
-```
-
-  * **最初のインクルード**: `MATH_UTILS_H` は未定義なので、`#define` が実行され、中身が読み込まれます。
-  * **2回目以降のインクルード**: `MATH_UTILS_H` は既に定義されているため、`#ifndef` から `#endif` までのすべてが無視されます。
-
-マクロ名 (`MATH_UTILS_H`) は、ファイル名に基づいて一意になるように命名するのが慣習です。
-
-### \#pragma once
-
-より現代的で簡潔な方法として `#pragma once` があります。多くのモダンなコンパイラがサポートしています。
-
-```cpp
-#pragma once
-
+```cpp:sort_example.cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // std::sort のために必要
 #include <string>
 
-std::string to_upper(const std::string& str);
+int main() {
+    std::vector<int> numbers = {5, 2, 8, 1, 9};
+    
+    // numbers.begin() から numbers.end() の範囲をソート
+    std::sort(numbers.begin(), numbers.end());
+
+    std::cout << "Sorted numbers: ";
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    std::vector<std::string> words = {"banana", "apple", "cherry"};
+    std::sort(words.begin(), words.end());
+
+    std::cout << "Sorted words: ";
+    for (const auto& word : words) {
+        std::cout << word << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
 ```
 
-この一行をヘッダファイルの先頭に書くだけで、コンパイラがそのファイルが一度しかインクルードされないように処理してくれます。特別な理由がない限り、現在では `#pragma once` を使うのが主流です。
-
-## プロジェクトのビルド
-
-複数のソースファイル（`.cpp`）は、それぞれがコンパイルされて**オブジェクトファイル**（`.o` や `.obj`）になります。その後、**リンカ**がこれらのオブジェクトファイルと必要なライブラリを結合して、最終的な実行可能ファイルを生成します。
-
-この一連の作業を**ビルド**と呼びます。ファイルが増えてくると、これを手動で行うのは非常に面倒です。そこで、ビルド作業を自動化する**ビルドシステム**が使われます。
-
-### 手動でのビルド (g++)
-
-先ほどの`math_app.cpp`と`math_utils.cpp`を例に、g++コンパイラで手動ビルドする手順を見てみましょう。
-
-```bash
-# 1. 各ソースファイルをコンパイルしてオブジェクトファイルを生成する (-c オプション)
-g++ -c math_app.cpp -o main.o
-g++ -c math_utils.cpp -o math_utils.o
-
-# 2. オブジェクトファイルをリンクして実行可能ファイルを生成する
-g++ main.o math_utils.o -o my_app
-
-# 3. 実行する
-./my_app
+```cpp-exec:sort_example.cpp
+Sorted numbers: 1 2 5 8 9 
+Sorted words: apple banana cherry 
 ```
 
-または、以下のように1回のg++コマンドで複数ソースファイルのコンパイルとリンクを同時に行うこともできます。
+### `std::find`: 要素を検索する
 
-```bash
-g++ math_app.cpp math_utils.cpp -o my_app
-./my_app
+指定された範囲から特定の値を持つ要素を検索します。
+
+  * **見つかった場合**: その要素を指すイテレータを返します。
+  * **見つからなかった場合**: 範囲の終端を示すイテレータ (`end()`) を返します。
+
+この性質を利用して、要素が存在するかどうかをチェックできます。
+
+```cpp:find_example.cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // std::find のために必要
+
+int main() {
+    std::vector<int> numbers = {10, 20, 30, 40, 50};
+    int value_to_find = 30;
+
+    // numbers の中から 30 を探す
+    auto it = std::find(numbers.begin(), numbers.end(), value_to_find);
+
+    if (it != numbers.end()) {
+        // 見つかった場合
+        std::cout << "Found " << *it << " at index " << std::distance(numbers.begin(), it) << std::endl;
+    } else {
+        // 見つからなかった場合
+        std::cout << value_to_find << " not found." << std::endl;
+    }
+
+    value_to_find = 99;
+    it = std::find(numbers.begin(), numbers.end(), value_to_find);
+
+    if (it != numbers.end()) {
+        std::cout << "Found " << *it << std::endl;
+    } else {
+        std::cout << value_to_find << " not found." << std::endl;
+    }
+
+    return 0;
+}
 ```
 
-### Makefileによる自動化
-
-`make`は、ファイルの依存関係と更新ルールを記述した`Makefile`というファイルに従って、ビルドプロセスを自動化するツールです。
-
-以下は、非常にシンプルな`Makefile`の例です。
-
-```makefile
-# コンパイラを指定
-CXX = g++
-# コンパイルオプションを指定
-CXXFLAGS = -std=c++17 -Wall
-
-# 最終的なターゲット（実行可能ファイル名）
-TARGET = my_app
-
-# ソースファイルとオブジェクトファイル
-SRCS = math_app.cpp math_utils.cpp
-OBJS = $(SRCS:.cpp=.o)
-
-# デフォルトのターゲット (makeコマンド実行時に最初に実行される)
-all: $(TARGET)
-
-# 実行可能ファイルの生成ルール
-$(TARGET): $(OBJS)
-    $(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
-
-# オブジェクトファイルの生成ルール (%.o: %.cpp)
-# .cppファイルから.oファイルを作るための汎用ルール
-%.o: %.cpp
-    $(CXX) $(CXXFLAGS) -c $< -o $@
-
-# 中間ファイルなどを削除するルール
-clean:
-    rm -f $(OBJS) $(TARGET)
+```cpp-exec:find_example.cpp
+Found 30 at index 2
+99 not found.
 ```
 
-この`Makefile`があるディレクトリで、ターミナルから`make`と入力するだけで、必要なコンパイルとリンクが自動的に実行されます。`math_app.cpp`だけを変更した場合、`make`は`main.o`だけを再生成し、再リンクするため、ビルド時間が短縮されます。
+### `std::for_each`: 各要素に処理を適用する
 
-### CMakeによるモダンなビルド管理
+指定された範囲の全ての要素に対して、特定の関数（処理）を適用します。ループを書くよりも意図が明確になる場合があります。
 
-`Makefile`は強力ですが、OSやコンパイラに依存する部分があり、複雑なプロジェクトでは管理が難しくなります。
-
-**CMake**は、`Makefile`やVisual Studioのプロジェクトファイルなどを自動的に生成してくれる、クロスプラットフォーム対応のビルドシステムジェネレータです。`CMakeLists.txt`という設定ファイルに、より抽象的なビルドのルールを記述します。
-
-```cmake
-# CMakeの最低要求バージョン
-cmake_minimum_required(VERSION 3.10)
-
-# プロジェクト名を設定
-project(MyAwesomeApp)
-
-# C++の標準バージョンを設定
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# 実行可能ファイルを追加
-# add_executable(実行ファイル名 ソースファイル1 ソースファイル2 ...)
-add_executable(my_app math_app.cpp math_utils.cpp)
+```cpp
+// 3番目の引数に関数を渡す
+std::for_each(numbers.begin(), numbers.end(), print_function);
 ```
 
-この`CMakeLists.txt`を使ってビルドする一般的な手順は以下の通りです。
+ここで「特定の処理」をその場で手軽に記述する方法が**ラムダ式**です。
 
-```bash
-# 1. ビルド用の中間ファイルを置くディレクトリを作成し、移動する
-mkdir build
-cd build
+## ラムダ式：その場で書ける無名関数
 
-# 2. CMakeを実行して、ビルドシステム（この場合はMakefile）を生成する
-cmake ..
+ラムダ式（Lambda Expression）は、C++11から導入された非常に強力な機能です。一言で言えば、「**その場で定義して使える名前のない小さな関数**」です。これにより、アルゴリズムに渡すためだけの短い関数をわざわざ定義する必要がなくなり、コードが非常に簡潔になります。
 
-# 3. make (または cmake --build .) を実行してビルドする
-make
+ラムダ式の基本的な構文は以下の通りです。
 
-# 4. 実行する
-./my_app
+```cpp
+[キャプチャ](引数リスト) -> 戻り値の型 { 処理本体 }
 ```
 
-CMakeは、ライブラリの検索、依存関係の管理、テストの実行など、大規模プロジェクトに必要な多くの機能を備えており、現在のC++開発における標準的なツールとなっています。
+  * `[]` **キャプチャ句**: ラムダ式の外にある変数を取り込んで、式の中で使えるようにします。
+      * `[]`: 何もキャプチャしない。
+      * `[=]`: 外の変数を全て値渡し（コピー）でキャプチャする。
+      * `[&]`: 外の変数を全て参照渡しでキャプチャする。
+      * `[x, &y]`: 変数 `x` は値渡し、変数 `y` は参照渡しでキャプチャする。
+  * `()` **引数リスト**:通常の関数と同じ引数を取ることができます。
+  * `-> 戻り値の型`: 戻り値の型を指定します。多くの場合、コンパイラが推論できるため省略可能です。
+  * `{}` **処理本体**: 関数の処理内容を記述します。
+
+`std::for_each` とラムダ式を組み合わせた例を見てみましょう。
+
+```cpp:for_each_lambda_example.cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+    // 各要素を2倍して表示する
+    std::cout << "Doubled numbers: ";
+    std::for_each(numbers.begin(), numbers.end(), [](int n) {
+        std::cout << n * 2 << " ";
+    });
+    std::cout << std::endl;
+
+    // 外部の変数をキャプチャする例
+    int sum = 0;
+    // `&sum` で sum を参照キャプチャし、ラムダ式内で変更できるようにする
+    std::for_each(numbers.begin(), numbers.end(), [&sum](int n) {
+        sum += n;
+    });
+
+    std::cout << "Sum: " << sum << std::endl;
+
+    return 0;
+}
+```
+
+```cpp-exec:for_each_lambda_example.cpp
+Doubled numbers: 2 4 6 8 10 
+Sum: 15
+```
+
+このコードは、`for_each` の3番目の引数に直接処理を書き込んでいます。非常に直感的で読みやすいと思いませんか？
+
+ラムダ式は、特に `std::sort` のソート順をカスタマイズする際に真価を発揮します。例えば、数値を降順にソートしたい場合、比較ルールをラムダ式で与えることができます。
+
+```cpp:lambda_sort_example.cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    std::vector<int> numbers = {5, 2, 8, 1, 9};
+
+    // 比較関数としてラムダ式を渡す
+    // a > b であれば true を返すことで降順ソートになる
+    std::sort(numbers.begin(), numbers.end(), [](int a, int b) {
+        return a > b;
+    });
+
+    std::cout << "Sorted in descending order: ";
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+```
+
+```cpp-exec:lambda_sort_example.cpp
+Sorted in descending order: 9 8 5 2 1 
+```
 
 ## この章のまとめ
 
-  * **プロジェクトの分割**: プログラムは「宣言」を記述する**ヘッダファイル** (`.h`) と、「実装」を記述する**ソースファイル** (`.cpp`) に分割することで、保守性や再利用性が向上します。
-  * **インクルードガード**: ヘッダファイルの多重インクルードによる再定義エラーを防ぐために、`#pragma once` や `#ifndef`/`#define`/`#endif` を使用します。
-  * **ビルドシステム**: 複数のファイルをコンパイル・リンクするプロセスを自動化するために、`make` や `CMake` といったツールが使われます。特に **CMake** はクロスプラットフォーム開発におけるデファクトスタンダードです。
+この章では、STLのアルゴリズムとラムダ式について学びました。
 
-### 練習問題1: 電卓クラスの分割
+  * **イテレータ**は、コンテナの要素を指し示すオブジェクトであり、アルゴリズムとコンテナの間のインターフェースとして機能します。
+  * `<algorithm>` ヘッダには、**`std::sort`** (ソート)、**`std::find`** (検索)、**`std::for_each`** (繰り返し処理) といった、汎用的で強力なアルゴリズムが多数用意されています。
+  * **ラムダ式**は、その場で定義できる無名関数であり、アルゴリズムに渡す処理を簡潔かつ直感的に記述することができます。
+  * **キャプチャ**機能を使うことで、ラムダ式の外にある変数を取り込んで処理に利用できます。
 
-`Calculator` というクラスを作成してください。このクラスは、加算、減算、乗算、除算のメンバ関数を持ちます。
+コンテナ、イテレータ、アルゴリズム、そしてラムダ式。これらを組み合わせることで、C++におけるデータ処理は、他の多くの言語に引けを取らない、あるいはそれ以上に表現力豊かで効率的なものになります。
 
-* `Calculator.h`: `Calculator`クラスの定義を記述します。
-* `Calculator.cpp`: 各メンバ関数の実装を記述します。
-* `practice12_1.cpp`: `Calculator`クラスのインスタンスを作成し、いくつかの計算を行って結果を表示します。
+### 練習問題1: 文字列の長さでソート
 
-これらのファイルをg++で手動ビルドして、プログラムを実行してください。
+`std::vector<std::string>` を用意し、格納されている文字列を、文字数が短い順にソートして、結果を出力するプログラムを作成してください。`std::sort` とラムダ式を使用してください。
 
-```cpp:Calculator.h
+**ヒント**: ラムダ式は2つの文字列を引数に取り、1つ目の文字列の長さが2つ目の文字列の長さより短い場合に `true` を返すように実装します。
 
-```
-
-```cpp:Calculator.cpp
-
-```
 
 ```cpp:practice12_1.cpp
 #include <iostream>
-#include "Calculator.h"
+#include <vector>
+#include <algorithm>
 
 int main() {
-    Calculator calc;
+    std::vector<std::string> words = {"apple", "banana", "kiwi", "cherry", "fig", "grape"};
 
-    std::cout << "3 + 5 = " << calc.add(3, 5) << std::endl;
-    std::cout << "10 - 2 = " << calc.subtract(10, 2) << std::endl;
-    std::cout << "4 * 7 = " << calc.multiply(4, 7) << std::endl;
-    std::cout << "20 / 4 = " << calc.divide(20, 4) << std::endl;
     return 0;
 }
 ```
 
-```cpp-exec:practice12_1.cpp,Calculator.cpp
-3 + 5 = 8
-10 - 2 = 8
-4 * 7 = 28
-20 / 4 = 5
+```cpp-exec:practice12_1.cpp
+fig kiwi grape apple banana cherry 
+```
+
+### 練習問題2: 条件に合う要素のカウント
+
+`std::vector<int>` に整数をいくつか格納します。その後、ラムダ式と `std::for_each`（または他のアルゴリズム）を使って、以下の2つの条件を満たす要素がそれぞれいくつあるかを数えて出力してください。
+
+1.  正の偶数である要素の数
+2.  負の奇数である要素の数
+
+**ヒント**: カウント用の変数を2つ用意し、ラムダ式のキャプチャ句で参照キャプチャ (`[&]`) して、式の中でインクリメントします。
+
+```cpp:practice12_2.cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    std::vector<int> numbers = {3, -1, 4, -5, 6, -7, 8, 0, -2};
+
+
+    return 0;
+}
+```
+
+```cpp-exec:practice12_2.cpp
+Positive even count: 3
+Negative odd count: 3
 ```

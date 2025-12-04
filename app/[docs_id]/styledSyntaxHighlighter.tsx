@@ -35,6 +35,8 @@ export type MarkdownLang =
   | "json"
   | "csv"
   | "html"
+  | "makefile"
+  | "cmake"
   | "text"
   | "txt";
 
@@ -50,7 +52,9 @@ export type SyntaxHighlighterLang =
   | "typescript"
   | "bash"
   | "html"
-  | "json";
+  | "json"
+  | "makefile"
+  | "cmake";
 export function getSyntaxHighlighterLang(
   lang: MarkdownLang | undefined
 ): SyntaxHighlighterLang | undefined {
@@ -80,6 +84,10 @@ export function getSyntaxHighlighterLang(
       return "json";
     case "html":
       return "html";
+    case "makefile":
+      return "makefile";
+    case "cmake":
+      return "cmake";
     case "csv": // not supported
     case "text":
     case "txt":

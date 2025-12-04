@@ -1,246 +1,310 @@
-# 第7章: 継承とポリモーフィズム
+# 第7章: オブジェクト指向の入口：クラスの基礎
 
-オブジェクト指向プログラミング(OOP)の真の力を解放する時が来ました！💪 この章では、OOPの強力な柱である「**継承 (Inheritance)**」と「**ポリモーフィズム (Polymorphism) / 多態性**」を学びます。これらの概念をマスターすることで、コードの再利用性を高め、柔軟で拡張性の高いプログラムを設計できるようになります。
+これまでの章では、C++の基本的な文法やメモリの扱い方について学んできました。この章からは、C++の最も強力な機能の一つである**オブジェクト指向プログラミング (Object-Oriented Programming, OOP)** の世界に足を踏み入れます。OOPの考え方を身につけることで、より大規模で複雑なプログラムを、現実世界の「モノ」の概念に近い形で、直感的に設計・実装できるようになります。その第一歩として、OOPの中核をなす**クラス**の基礎を学びましょう。
 
-## クラスの継承
+## クラスとは？: データ（メンバ変数）と処理（メンバ関数）のカプセル化
 
-**継承**とは、既存のクラス（**親クラス**または**基底クラス**と呼びます）の機能を引き継いで、新しいクラス（**子クラス**または**派生クラス**と呼びます）を作成する仕組みです。これにより、共通の機能を何度も書く必要がなくなり、コードの重複を避けられます。
+他のプログラミング言語でオブジェクト指向に触れたことがあるなら、「クラスはオブジェクトの設計図」という説明を聞いたことがあるかもしれません。C++でもその考え方は同じです。クラスは、ある「モノ」が持つべき**データ（属性）**と、そのデータに対する**処理（操作）**を一つにまとめたものです。
 
-例えば、「動物」という大まかなクラスがあり、その特徴を引き継いで「犬」や「猫」といった具体的なクラスを作ることができます。「犬」も「猫」も「動物」が持つ「食べる」という共通の機能を持っていますよね。
+  - **データ（属性）**: クラス内に定義された変数のことで、**メンバ変数 (member variables)** または**データメンバ**と呼びます。
+  - **処理（操作）**: クラス内に定義された関数のことで、**メンバ関数 (member functions)** または**メソッド**と呼びます。
 
-C++では、クラス名の後に `: public 親クラス名` と書くことで継承を表現します。
+このように、関連するデータと処理を一つのクラスにまとめることを、OOPの重要な概念の一つである**カプセル化 (encapsulation)** と呼びます。💊
 
-```cpp:inheritance_basic.cpp
+例として、「人」を表す`Person`クラスを考えてみましょう。「人」は「名前」や「年齢」といったデータ（メンバ変数）を持ち、「自己紹介する」といった処理（メンバ関数）を行うことができます。
+
+```cpp
+class Person {
+public:
+    // メンバ変数
+    std::string name;
+    int age;
+
+    // メンバ関数
+    void introduce() {
+        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
+    }
+};
+```
+
+`class Person { ... };` という構文でクラスを定義します。クラス定義の最後にはセミコロン`;`が必要なので忘れないようにしましょう。現時点では、`public:`というキーワードは「これらのメンバは外部からアクセスできます」という意味だと考えておいてください。詳細は後ほど説明します。
+
+## インスタンスの生成: クラスからオブジェクトを作ってみる
+
+クラスはあくまで「設計図」です。実際にプログラムで利用するためには、この設計図をもとに実体を作る必要があります。クラスから作られた実体のことを**オブジェクト (object)** または**インスタンス (instance)** と呼び、オブジェクトを作ることを**インスタンス化 (instantiation)** と言います。
+
+インスタンス化の構文は、変数の宣言とよく似ています。
+
+```cpp:instantiation.cpp
 #include <iostream>
 #include <string>
 
-// 親クラス (基底クラス)
-class Animal {
+// Personクラスの定義
+class Person {
 public:
     std::string name;
+    int age;
 
-    void eat() {
-        std::cout << name << " is eating." << std::endl;
-    }
-};
-
-// 子クラス (派生クラス)
-// Animalクラスのpublicメンバを引き継ぐ
-class Dog : public Animal {
-public:
-    void bark() {
-        std::cout << name << " says Woof!" << std::endl;
+    void introduce() {
+        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
     }
 };
 
 int main() {
-    Dog my_dog;
-    my_dog.name = "Pochi";
+    // Personクラスのインスタンスを生成
+    Person taro;
 
-    // 親クラスから継承したメンバ変数・メンバ関数
-    my_dog.eat();
+    // メンバ変数に値を代入 (ドット演算子 . を使用)
+    taro.name = "Taro";
+    taro.age = 30;
 
-    // Dogクラス独自のメンバ関数
-    my_dog.bark();
+    // メンバ関数を呼び出す
+    taro.introduce(); // "My name is Taro, and I am 30 years old." と出力される
+
+    // 別のインスタンスを生成
+    Person hanako;
+    hanako.name = "Hanako";
+    hanako.age = 25;
+    hanako.introduce(); // "My name is Hanako, and I am 25 years old." と出力される
 
     return 0;
 }
 ```
 
-```cpp-exec:inheritance_basic.cpp
-Pochi is eating.
-Pochi says Woof!
+```cpp-exec:instantiation.cpp
+My name is Taro, and I am 30 years old.
+My name is Hanako, and I am 25 years old.
 ```
 
-この例では、`Dog`クラスは`Animal`クラスを継承しています。そのため、`Dog`クラスのオブジェクト `my_dog` は、`Animal`クラスで定義されたメンバ変数 `name` やメンバ関数 `eat()` を、まるで自分のものであるかのように利用できます。
+このように、`クラス名 インスタンス名;` という形でインスタンスを生成できます。インスタンスのメンバ変数やメンバ関数にアクセスするには、`インスタンス名.メンバ名` のように**ドット演算子 (`.`)** を使います。`taro`と`hanako`は同じ`Person`クラスから作られたインスタンスですが、それぞれが独立したデータを持っていることがわかります。
 
-## 仮想関数 (virtual) とポリモーフィズム
+## アクセス制御: public と private による情報の隠蔽
 
-継承の最も強力な側面は、**ポリモーフィズム（多態性）**を実現できることです。ポリモーフィズムとは、ギリシャ語で「多くの形を持つ」という意味で、プログラミングにおいては「**同じインターフェース（指示）で、オブジェクトの種類に応じて異なる振る舞いをさせる**」ことを指します。
+先ほどの`Person`クラスの例では、`main`関数から`taro.age = 30;`のようにメンバ変数に直接アクセスできました。これは手軽ですが、問題を引き起こす可能性があります。例えば、年齢にマイナスの値や非現実的な値を設定できてしまうかもしれません。
 
-これを実現するのが **仮想関数 (virtual function)** です。親クラスの関数宣言の前に `virtual` キーワードを付けると、その関数は仮想関数になります。
+```cpp
+Person jiro;
+jiro.name = "Jiro";
+jiro.age = -5; // 本来ありえない値が設定できてしまう！
+jiro.introduce();
+```
 
-親クラスのポインタや参照は、子クラスのオブジェクトを指すことができます。このとき、呼び出された仮想関数は、ポインタが指している**オブジェクトの実際の型**に基づいて決定されます。
+このような意図しない操作を防ぐために、C++には**アクセス制御**の仕組みがあります。クラスのメンバは、外部からのアクセスの可否を指定できます。
 
-言葉だけでは難しいので、コードで見てみましょう。
+  - **`public`**: クラスの外部（`main`関数など）から自由にアクセスできます。
+  - **`private`**: そのクラスのメンバ関数からしかアクセスできません。外部からはアクセス不可です。
 
-```cpp:polymorphism_example.cpp
+アクセス制御の基本は、**メンバ変数は`private`にし、メンバ関数は`public`にする**ことです。これにより、データの不正な書き換えを防ぎ、クラスの内部実装を外部から隠蔽します。これを**情報の隠蔽 (information hiding)** と呼び、カプセル化の重要な目的の一つです。
+
+`private`なメンバ変数に安全にアクセスするために、`public`なメンバ関数（**ゲッター**や**セッター**と呼ばれる）を用意するのが一般的です。
+
+```cpp:access_control.cpp
 #include <iostream>
 #include <string>
 
-class Animal {
+class Person {
+private:
+    // メンバ変数は外部から隠蔽する
+    std::string name;
+    int age;
+
 public:
-    // speak() を仮想関数として宣言
-    virtual void speak() {
-        std::cout << "Some generic animal sound..." << std::endl;
+    // セッター: メンバ変数に値を設定する
+    void setName(const std::string& newName) {
+        name = newName;
+    }
+
+    void setAge(int newAge) {
+        if (newAge >= 0 && newAge < 150) { // 不正な値をチェック
+            age = newAge;
+        } else {
+            std::cout << "Error: Invalid age value." << std::endl;
+        }
+    }
+
+    // ゲッター: メンバ変数の値を取得する
+    std::string getName() const {
+        return name;
+    }
+
+    int getAge() const {
+        return age;
+    }
+
+    // このメンバ関数はクラス内部にあるので、privateメンバにアクセスできる
+    void introduce() {
+        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
     }
 };
-
-class Dog : public Animal {
-public:
-    // 親クラスの仮想関数を上書き (オーバーライド)
-    void speak() override { // overrideキーワードについては後述
-        std::cout << "Woof!" << std::endl;
-    }
-};
-
-class Cat : public Animal {
-public:
-    // 親クラスの仮想関数を上書き (オーバーライド)
-    void speak() override {
-        std::cout << "Meow!" << std::endl;
-    }
-};
-
-// Animalへのポインタを受け取る関数
-void make_animal_speak(Animal* animal) {
-    animal->speak(); // ポインタが指す先の実際のオブジェクトに応じて、適切な speak() が呼ばれる
-}
 
 int main() {
-    Animal generic_animal;
-    Dog dog;
-    Cat cat;
+    Person saburo;
 
-    std::cout << "Calling through function:" << std::endl;
-    make_animal_speak(&generic_animal);
-    make_animal_speak(&dog); // Dogオブジェクトを渡す
-    make_animal_speak(&cat); // Catオブジェクトを渡す
+    // saburo.name = "Saburo"; // エラー！ privateメンバには直接アクセスできない
+    // saburo.age = -10;       // エラー！
+
+    // publicなメンバ関数を経由して安全に値を設定
+    saburo.setName("Saburo");
+    saburo.setAge(28);
+
+    saburo.introduce();
+
+    saburo.setAge(-10); // エラーメッセージが出力される
+
+    // publicなメンバ関数経由で値を取得
+    std::cout << "Name: " << saburo.getName() << std::endl;
 
     return 0;
 }
 ```
 
-```cpp-exec:polymorphism_example.cpp
-Calling through function:
-Some generic animal sound...
-Woof!
-Meow!
+```cpp-exec:access_control.cpp
+My name is Saburo, and I am 28 years old.
+Error: Invalid age value.
+Name: Saburo
 ```
 
-`make_animal_speak` 関数は `Animal*` 型の引数を取りますが、`Dog`オブジェクトや`Cat`オブジェクトのアドレスを渡すことができています。そして、`animal->speak()` を呼び出すと、`animal` ポインタが実際に指しているオブジェクトの `speak()` が実行されます。これがポリモーフィズムです。もし `Animal`クラスの `speak()` に `virtual` が付いていなければ、どのオブジェクトを渡しても `Animal` の `speak()` が呼ばれてしまいます。
+`setAge`関数内で値の妥当性チェックを行っている点に注目してください。このように、クラスの利用者は内部の実装を気にすることなく、提供された`public`なインターフェース（メンバ関数）を通じて安全にオブジェクトを操作できます。
 
-## オーバーライド (override)
+> `const`キーワード: `getName() const` のようにメンバ関数の後ろに`const`を付けると、その関数がメンバ変数を変更しないことをコンパイラに約束します。このような関数を**constメンバ関数**と呼びます。
 
-先ほどの例で `override` というキーワードが登場しましたね。これはC++11から導入されたもので、子クラスの関数が**親クラスの仮想関数を上書き（オーバーライド）する意図があることを明示する**ためのものです。
+## コンストラクタとデストラクタ: オブジェクトが生まれてから消えるまで
 
-`override` を付けておくと、もし親クラスに対応する仮想関数が存在しない場合（例えば、関数名をタイプミスした場合など）に、コンパイラがエラーを検出してくれます。
+オブジェクトは生成され、利用され、やがて破棄されます。このライフサイクルに合わせて特別な処理を自動的に実行するための仕組みが**コンストラクタ**と**デストラクタ**です。
 
-```cpp
-class Dog : public Animal {
+### コンストラクタ (Constructor)
+
+**コンストラクタ**は、インスタンスが生成されるときに**自動的に呼び出される**特別なメンバ関数です。主な役割は、メンバ変数の初期化です。
+
+コンストラクタには以下の特徴があります。
+
+  - 関数名がクラス名と全く同じ。
+  - 戻り値の型を指定しない（`void`も付けない）。
+  - 引数を取ることができ、複数定義できる（オーバーロード）。
+
+```cpp:constructor.cpp
+class Person {
+private:
+    std::string name;
+    int age;
+
 public:
-    // もし親クラスのspeakがvirtualでなかったり、
-    // speek() のようにタイプミスしたりすると、コンパイルエラーになる。
-    void speak() override {
-        std::cout << "Woof!" << std::endl;
+    // 引数付きコンストラクタ
+    Person(const std::string& initName, int initAge) {
+        std::cout << "Constructor called for " << initName << std::endl;
+        name = initName;
+        age = initAge;
     }
+    // ...
 };
+
+int main() {
+    // インスタンス生成時にコンストラクタが呼ばれ、引数が渡される
+    Person yuko("Yuko", 22); // この時点でコンストラクタが実行される
+    yuko.introduce();
+}
 ```
 
-意図しないバグを防ぐために、仮想関数をオーバーライドする際は必ず `override` を付ける習慣をつけましょう。
-
-## 抽象クラス
-
-時には、「具体的な実装を持たず、子クラスに実装を強制するための設計図」としてのみ機能するクラスを定義したい場合があります。これが**抽象クラス (Abstract Class)** です。
-
-抽象クラスは、**純粋仮想関数 (pure virtual function)** を1つ以上持つクラスです。純粋仮想関数は、末尾に `= 0` を付けて宣言します。
-
-```cpp
-virtual void function_name() = 0; // これが純粋仮想関数
+```cpp-exec:constructor.cpp
+Constructor called for Yuko
+My name is Yuko, and I am 22 years old.
 ```
 
-抽象クラスは以下の特徴を持ちます。
+このように、インスタンス生成時に`()`で初期値を渡すことで、オブジェクトを生成と同時に有効な状態にできます。`set`関数を別途呼び出す手間が省け、初期化忘れを防ぐことができます。
 
-  * インスタンス化（オブジェクトの作成）ができない。
-  * 抽象クラスを継承した子クラスは、全ての純粋仮想関数をオーバーライド（実装）しなければならない。さもなければ、その子クラスもまた抽象クラスとなる。
+### デストラクタ (Destructor)
 
-```cpp:abstract_class_example.cpp
+**デストラクタ**は、インスタンスが破棄されるとき（例えば、変数のスコープを抜けるとき）に**自動的に呼び出される**特別なメンバ関数です。主な役割は、オブジェクトが使用していたリソース（メモリやファイルなど）の後片付けです。
+
+デストラクタには以下の特徴があります。
+
+  - 関数名が `~` + クラス名。
+  - 戻り値も引数も取らない。
+  - 1つのクラスに1つしか定義できない。
+
+```cpp:constructor_destructor.cpp
 #include <iostream>
+#include <string>
 
-// Shapeは純粋仮想関数 draw() を持つため、抽象クラスとなる
-class Shape {
+class Person {
+private:
+    std::string name;
+    int age;
+
 public:
-    // 純粋仮想関数
-    // このクラスを継承するクラスは、必ず draw() を実装しなければならない
-    virtual void draw() = 0;
+    // コンストラクタ
+    Person(const std::string& initName, int initAge) {
+        std::cout << "Constructor called for " << initName << "." << std::endl;
+        name = initName;
+        age = initAge;
+    }
 
-    // 仮想デストラクタ (継承を扱う際は重要。詳しくは今後の章で)
-    virtual ~Shape() {}
-};
+    // デストラクタ
+    ~Person() {
+        std::cout << "Destructor called for " << name << "." << std::endl;
+    }
 
-class Circle : public Shape {
-public:
-    void draw() override {
-        std::cout << "Drawing a circle: ○" << std::endl;
+    void introduce() {
+        std::cout << "My name is " << name << ", and I am " << age << " years old." << std::endl;
     }
 };
 
-class Square : public Shape {
-public:
-    void draw() override {
-        std::cout << "Drawing a square: □" << std::endl;
-    }
-};
+void create_person_scope() {
+    std::cout << "--- Entering scope ---" << std::endl;
+    Person kenji("Kenji", 45); // kenjiはこのスコープ内でのみ生存
+    kenji.introduce();
+    std::cout << "--- Exiting scope ---" << std::endl;
+} // ここでkenjiのスコープが終わり、デストラクタが呼ばれる
 
 int main() {
-    // Shape my_shape; // エラー！抽象クラスはインスタンス化できない
+    create_person_scope();
 
-    Circle circle;
-    Square square;
-
-    Shape* shape1 = &circle;
-    Shape* shape2 = &square;
-
-    shape1->draw();
-    shape2->draw();
+    std::cout << "--- Back in main ---" << std::endl;
 
     return 0;
 }
 ```
 
-```cpp-exec:abstract_class_example.cpp
-Drawing a circle: ○
-Drawing a square: □
+```cpp-exec:constructor_destructor.cpp
+--- Entering scope ---
+Constructor called for Kenji.
+My name is Kenji, and I am 45 years old.
+--- Exiting scope ---
+Destructor called for Kenji.
+--- Back in main ---
 ```
 
-`Shape` クラスは「図形なら描画できるはずだ」というインターフェース（契約）を定義し、具体的な描画方法は子クラスである `Circle` や `Square` に任せています。このように、抽象クラスはプログラムの骨格となる設計を強制するのに非常に役立ちます。
+実行結果を見ると、`kenji`オブジェクトが生成されたときにコンストラクタが、`create_person_scope`関数のスコープを抜けるときにデストラクタが自動的に呼び出されていることがわかります。動的に確保したメモリの解放など、クリーンアップ処理はデストラクタに書くのが定石です。この考え方は、今後の章で学ぶRAII（Resource Acquisition Is Initialization）という重要な概念に繋がります。
 
 ## この章のまとめ
 
-  * **継承**: 既存のクラスの機能を引き継ぎ、コードの再利用性を高める仕組みです。`(子クラス) : public (親クラス)` のように書きます。
-  * **ポリモーフィズム**: 「同じ指示でも、オブジェクトの種類によって異なる振る舞いをさせる」性質です。
-  * **仮想関数 (`virtual`)**: ポリモーフィズムを実現するための鍵です。親クラスの関数に `virtual` を付けると、ポインタや参照経由で呼び出した際に、オブジェクトの実際の型に応じた関数が実行されます。
-  * **オーバーライド (`override`)**: 子クラスで親クラスの仮想関数を上書きする意図を明示します。コンパイラがチェックしてくれるため、安全性が向上します。
-  * **抽象クラス**: 1つ以上の**純粋仮想関数 (`virtual ... = 0;`)** を持つクラスです。インスタンス化できず、継承されるための設計図として機能します。
+この章では、C++におけるオブジェクト指向プログラミングの第一歩として、クラスの基本的な概念を学びました。
 
-### 練習問題1:乗り物の階層構造
+  - **クラス**は、データ（**メンバ変数**）と処理（**メンバ関数**）を一つにまとめた「設計図」です。
+  - クラスから実体である**オブジェクト（インスタンス）**を生成して使用します。
+  - **カプセル化**は、関連するデータと処理をまとめることです。
+  - **アクセス制御**（`public`, `private`）により、外部からアクセスされたくないメンバを保護します（**情報の隠蔽**）。
+  - **コンストラクタ**は、オブジェクト生成時に自動で呼ばれ、初期化を行います。
+  - **デストラクタ**は、オブジェクト破棄時に自動で呼ばれ、後片付けを行います。
 
-`Vehicle` という親クラスを作成し、`move()` というメンバ関数を持たせましょう。次に、`Vehicle` を継承して `Car` クラスと `Motorcycle` クラスを作成し、それぞれが独自の `move()` の振る舞いをするようにオーバーライドしてください。
+クラスを使いこなすことで、プログラムの部品化が進み、再利用性やメンテナンス性が格段に向上します。次の章では、クラスのさらに進んだ機能について学んでいきましょう。
 
-`main` 関数では、`Vehicle` のポインタの配列を作成し、`Car` と `Motorcycle` のオブジェクトを格納して、ループでそれぞれの `move()` を呼び出してください。
+### 練習問題1: 長方形クラス
+
+幅(`width`)と高さ(`height`)をメンバ変数として持つ`Rectangle`クラスを作成してください。
+
+  - メンバ変数は`private`で定義してください。
+  - コンストラクタで幅と高さを初期化できるようにしてください。
+  - 面積を計算して返す`getArea()`メソッドと、周の長さを計算して返す`getPerimeter()`メソッドを`public`で実装してください。
+  - `main`関数で`Rectangle`クラスのインスタンスをいくつか生成し、面積と周の長さを表示するプログラムを作成してください。
 
 ```cpp:practice7_1.cpp
 #include <iostream>
 #include <string>
-
-
-// ここに Vehicle, Car, Motorcycle クラスを定義してください
-
+// ここにRectangleクラスを定義してください
 
 int main() {
-    // Vehicleのポインタの配列を作成
-    Vehicle* vehicles[2];
-
-    Car my_car;
-    Motorcycle my_motorcycle;
-
-    vehicles[0] = &my_car;
-    vehicles[1] = &my_motorcycle;
-
-    // それぞれのmove()を呼び出す
-    for (int i = 0; i < 2; ++i) {
-        vehicles[i]->move();
-    }
+    // ここでRectangleクラスのインスタンスを生成し、面積と周の長さを表示してください
 
     return 0;
 }
@@ -249,33 +313,28 @@ int main() {
 ```cpp-exec:practice7_1.cpp
 ```
 
-### 問題2: 従業員の給与計算
 
-`Employee` という抽象クラスを定義してください。このクラスは、従業員の名前を保持し、給与を計算するための純粋仮想関数 `calculate_salary()` を持ちます。
+### 練習問題2: 書籍クラス
 
-次に、`Employee` を継承して、`FullTimeEmployee`（月給制）と `PartTimeEmployee`（時給制）の2つのクラスを作成します。それぞれのクラスで `calculate_salary()` を具体的に実装してください。
+タイトル(`title`)、著者(`author`)、ページ数(`pages`)をメンバ変数として持つ`Book`クラスを作成してください。
 
-`main` 関数で、それぞれのクラスのインスタンスを作成し、給与が正しく計算されることを確認してください。
+  - メンバ変数は`private`で定義してください。
+  - コンストラクタで、タイトル、著者、ページ数を初期化できるようにしてください。
+  - 本の情報を整形してコンソールに出力する`printInfo()`メソッドを`public`で実装してください。（例: `Title: [タイトル], Author: [著者], Pages: [ページ数] pages`）
+  - `main`関数で`Book`クラスのインスタンスを生成し、その情報を表示してください。
 
 ```cpp:practice7_2.cpp
 #include <iostream>
 #include <string>
-
-// ここに Employee, FullTimeEmployee, PartTimeEmployee クラスを定義してください
-
+// ここにBookクラスを定義してください
 
 int main() {
-    FullTimeEmployee full_time_emp("Alice", 3000); // 月給3000ドル
-    PartTimeEmployee part_time_emp("Bob", 20, 80); // 時給20ドル、80時間勤務
-
-    std::cout << full_time_emp.get_name() << "'s Salary: $" << full_time_emp.calculate_salary() << std::endl;
-    std::cout << part_time_emp.get_name() << "'s Salary: $" << part_time_emp.calculate_salary() << std::endl;
+    // ここでBookクラスのインスタンスを生成し、情報を表示してください
 
     return 0;
 }
 ```
 
 ```cpp-exec:practice7_2.cpp
-Alice's Salary: $3000
-Bob's Salary: $1600
+Title: The Great Gatsby, Author: F. Scott Fitzgerald, Pages: 180 pages
 ```

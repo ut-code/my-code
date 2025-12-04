@@ -73,6 +73,8 @@ export function getAceLang(lang: MarkdownLang | undefined): AceLang {
     case "text":
     case "txt":
     case "html":
+    case "makefile":
+    case "cmake":
     case undefined:
       console.warn(`Ace editor mode not implemented for language: ${lang}`);
       return "text";
