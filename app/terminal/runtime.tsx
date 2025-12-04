@@ -62,6 +62,9 @@ export function getRuntimeLang(
     case "cpp":
     case "c++":
       return "cpp";
+    case "rust":
+    case "rs":
+      return "rust";
     case "javascript":
     case "js":
       return "javascript";

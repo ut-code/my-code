@@ -45,6 +45,7 @@ export type SyntaxHighlighterLang =
   | "ruby"
   | "c"
   | "cpp"
+  | "rust"
   | "javascript"
   | "typescript"
   | "bash"
@@ -63,6 +64,9 @@ export function getSyntaxHighlighterLang(
     case "cpp":
     case "c++":
       return "cpp";
+    case "rust":
+    case "rs":
+      return "rust";
     case "javascript":
     case "js":
       return "javascript";
@@ -83,7 +87,9 @@ export function getSyntaxHighlighterLang(
       return undefined;
     default:
       lang satisfies never;
-      console.error(`getSyntaxHighlighterLang() does not handle language ${lang}`);
+      console.error(
+        `getSyntaxHighlighterLang() does not handle language ${lang}`
+      );
       return undefined;
   }
 }

@@ -96,6 +96,10 @@ export const pagesList = [
     description: "a",
     pages: [
       { id: 1, title: "Rustの世界へようこそ" },
+      { id: 2, title: "基本構文と「不変性」" },
+      { id: 3, title: "関数と制御フロー" },
+      { id: 4, title: "所有権" },
+      { id: 5, title: "借用とスライス" },
     ],
   },
 ] as const;
