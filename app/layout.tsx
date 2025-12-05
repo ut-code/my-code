@@ -27,7 +27,7 @@ export default function RootLayout({
         {/* mocha.css がbodyに背景色などを設定してしまうので、それを上書きしている */}
         <AutoAnonymousLogin />
         <SidebarMdProvider>
-          <div className="drawer lg:drawer-open">
+          <div className="drawer lg:drawer-open min-h-screen">
             <input
               id="drawer-toggle"
               type="checkbox"
