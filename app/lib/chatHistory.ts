@@ -37,11 +37,15 @@ async function initAll(ctx?: Partial<Context>): Promise<Context> {
     ctx.auth = await getAuthServer(ctx.drizzle);
   }
   if (!ctx.userId) {
-    const session = await ctx.auth.api.getSession({
-      headers: await headers(),
-    });
-    if (session) {
-      ctx.userId = session.user.id;
+    try {
+      const session = await ctx.auth.api.getSession({
+        headers: await headers(),
+      });
+      if (session) {
+        ctx.userId = session.user.id;
+      }
+    } catch (e) {
+      console.error("Failed to get session in initAll:", e);
     }
   }
   return ctx as Context;
