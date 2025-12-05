@@ -70,6 +70,7 @@ export function getAceLang(lang: MarkdownLang | undefined): AceLang {
       return "csv";
     case "sh":
     case "bash":
+    case "powershell":
     case "text":
     case "txt":
     case "html":

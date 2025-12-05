@@ -32,6 +32,7 @@ export type MarkdownLang =
   | "ts"
   | "bash"
   | "sh"
+  | "powershell"
   | "json"
   | "csv"
   | "html"
@@ -51,6 +52,7 @@ export type SyntaxHighlighterLang =
   | "javascript"
   | "typescript"
   | "bash"
+  | "powershell"
   | "html"
   | "json"
   | "makefile"
@@ -80,6 +82,8 @@ export function getSyntaxHighlighterLang(
     case "bash":
     case "sh":
       return "bash";
+    case "powershell":
+      return "powershell";
     case "json":
       return "json";
     case "html":

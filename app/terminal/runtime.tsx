@@ -73,6 +73,7 @@ export function getRuntimeLang(
       return "typescript";
     case "bash":
     case "sh":
+    case "powershell":
     case "json":
     case "csv":
     case "text":
