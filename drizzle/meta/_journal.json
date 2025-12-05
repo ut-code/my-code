@@ -15,6 +15,13 @@
       "when": 1761476713185,
       "tag": "0001_stale_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764931132581,
+      "tag": "0002_sad_mindworm",
+      "breakpoints": true
     }
   ]
 }
