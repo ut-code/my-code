@@ -7,7 +7,7 @@ import { splitMarkdown } from "./splitMarkdown";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
 import { getChatFromCache } from "@/lib/chatHistory";
-import { getLanguageName } from "@/pagesList";
+import { getLanguageName, pagesList } from "@/pagesList";
 
 async function getMarkdownContent(docs_id: string): Promise<string> {
   try {
@@ -60,6 +60,14 @@ export default async function Page({
   params: Promise<{ docs_id: string }>;
 }) {
   const { docs_id } = await params;
+
+  if (
+    !pagesList
+      .find((lang) => docs_id.startsWith(`${lang.id}-`))
+      ?.pages.find((page) => docs_id.endsWith(`-${page.id}`))
+  ) {
+    notFound();
+  }
 
   const mdContent = getMarkdownContent(docs_id);
   const splitMdContent = mdContent.then((text) => splitMarkdown(text));
