@@ -34,6 +34,7 @@ export type MarkdownLang =
   | "sh"
   | "powershell"
   | "json"
+  | "toml"
   | "csv"
   | "html"
   | "makefile"
@@ -55,6 +56,7 @@ export type SyntaxHighlighterLang =
   | "powershell"
   | "html"
   | "json"
+  | "ini"
   | "makefile"
   | "cmake";
 export function getSyntaxHighlighterLang(
@@ -86,6 +88,8 @@ export function getSyntaxHighlighterLang(
       return "powershell";
     case "json":
       return "json";
+    case "toml":
+      return "ini";
     case "html":
       return "html";
     case "makefile":

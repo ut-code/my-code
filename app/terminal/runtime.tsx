@@ -75,6 +75,7 @@ export function getRuntimeLang(
     case "sh":
     case "powershell":
     case "json":
+    case "toml":
     case "csv":
     case "text":
     case "txt":

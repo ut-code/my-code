@@ -74,6 +74,7 @@ export function getAceLang(lang: MarkdownLang | undefined): AceLang {
     case "text":
     case "txt":
     case "html":
+    case "toml":
     case "makefile":
     case "cmake":
     case undefined:
