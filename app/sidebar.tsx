@@ -174,11 +174,16 @@ export function Sidebar() {
                     <Link
                       href={`${group.id}-${page.id}`}
                       className={clsx(
+                        "text-wrap text-justify",
                         `${group.id}-${page.id}` === currentDocsId &&
                           "menu-active"
                       )}
                     >
-                      <span className="mr-0">{page.id}.</span>
+                      <span className="w-5 text-right">
+                        <span className="float-right">
+                        {page.id}.
+                      </span>
+                      </span>
                       {page.title}
                     </Link>
                     {`${group.id}-${page.id}` === currentDocsId &&
