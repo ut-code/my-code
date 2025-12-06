@@ -104,6 +104,10 @@ export const pagesList = [
       { id: 6, title: "構造体とメソッド構文" },
       { id: 7, title: "列挙型とパターンマッチ" },
       { id: 8, title: "モジュールシステムとパッケージ管理" },
+      { id: 9, title: "コレクションと文字列" },
+      { id: 10, title: "エラーハンドリング" },
+      { id: 11, title: "ジェネリクスとトレイト" },
+      { id: 12, title: "ライフタイム" },
     ],
   },
 ] as const;
