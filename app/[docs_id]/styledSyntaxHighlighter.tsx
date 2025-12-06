@@ -24,15 +24,21 @@ export type MarkdownLang =
   | "rb"
   | "cpp"
   | "c++"
+  | "rust"
+  | "rs"
   | "javascript"
   | "js"
   | "typescript"
   | "ts"
   | "bash"
   | "sh"
+  | "powershell"
   | "json"
+  | "toml"
   | "csv"
   | "html"
+  | "makefile"
+  | "cmake"
   | "text"
   | "txt";
 
@@ -43,11 +49,16 @@ export type SyntaxHighlighterLang =
   | "ruby"
   | "c"
   | "cpp"
+  | "rust"
   | "javascript"
   | "typescript"
   | "bash"
+  | "powershell"
   | "html"
-  | "json";
+  | "json"
+  | "ini"
+  | "makefile"
+  | "cmake";
 export function getSyntaxHighlighterLang(
   lang: MarkdownLang | undefined
 ): SyntaxHighlighterLang | undefined {
@@ -61,6 +72,9 @@ export function getSyntaxHighlighterLang(
     case "cpp":
     case "c++":
       return "cpp";
+    case "rust":
+    case "rs":
+      return "rust";
     case "javascript":
     case "js":
       return "javascript";
@@ -70,10 +84,18 @@ export function getSyntaxHighlighterLang(
     case "bash":
     case "sh":
       return "bash";
+    case "powershell":
+      return "powershell";
     case "json":
       return "json";
+    case "toml":
+      return "ini";
     case "html":
       return "html";
+    case "makefile":
+      return "makefile";
+    case "cmake":
+      return "cmake";
     case "csv": // not supported
     case "text":
     case "txt":
@@ -81,7 +103,9 @@ export function getSyntaxHighlighterLang(
       return undefined;
     default:
       lang satisfies never;
-      console.error(`getSyntaxHighlighterLang() does not handle language ${lang}`);
+      console.error(
+        `getSyntaxHighlighterLang() does not handle language ${lang}`
+      );
       return undefined;
   }
 }

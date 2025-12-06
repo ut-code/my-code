@@ -34,6 +34,7 @@ export function defineTests(
             python: `print("${msg}")`,
             ruby: `puts "${msg}"`,
             cpp: null,
+            rust: null,
             javascript: `console.log("${msg}")`,
             typescript: null,
           } satisfies Record<RuntimeLang, string | null>
@@ -56,6 +57,7 @@ export function defineTests(
             python: [`${varName} = ${value}`, `print(${varName})`],
             ruby: [`${varName} = ${value}`, `puts ${varName}`],
             cpp: [null, null],
+            rust: [null, null],
             javascript: [
               `const ${varName} = ${value}`,
               `console.log(${varName})`,
@@ -86,6 +88,7 @@ export function defineTests(
             python: `raise Exception("${errorMsg}")`,
             ruby: `raise "${errorMsg}"`,
             cpp: null,
+            rust: null,
             javascript: `throw new Error("${errorMsg}")`,
             typescript: null,
           } satisfies Record<RuntimeLang, string | null>
@@ -108,6 +111,7 @@ export function defineTests(
             python: [`testVar = 42`, `while True:\n    pass`, `print(testVar)`],
             ruby: [`testVar = 42`, `loop do\nend`, `puts testVar`],
             cpp: [null, null, null],
+            rust: [null, null, null],
             javascript: [
               `const testVar = 42`,
               `while(true) {}`,
@@ -150,6 +154,7 @@ export function defineTests(
             python: `with open("${targetFile}", "w") as f:\n    f.write("${msg}")`,
             ruby: `File.open("${targetFile}", "w") {|f| f.write("${msg}") }`,
             cpp: null,
+            rust: null,
             javascript: null,
             typescript: null,
           } satisfies Record<RuntimeLang, string | null>
@@ -178,6 +183,7 @@ export function defineTests(
               "test.cpp",
               `#include <iostream>\nint main() {\n  std::cout << "${msg}" << std::endl;\n  return 0;\n}\n`,
             ],
+            rust: ["test.rs", `fn main() {\n    println!("${msg}");\n}\n`],
             javascript: ["test.js", `console.log("${msg}")`],
             typescript: ["test.ts", `console.log("${msg}")`],
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
@@ -201,6 +207,10 @@ export function defineTests(
             cpp: [
               "test_error.cpp",
               `#include <stdexcept>\nint main() {\n  throw std::runtime_error("${errorMsg}");\n  return 0;\n}\n`,
+            ],
+            rust: [
+              "test_error.rs",
+              `fn main() {\n    panic!("${errorMsg}");\n}\n`,
             ],
             javascript: ["test_error.js", `throw new Error("${errorMsg}");\n`],
             // TODO: tscが出す型エラーのテストはできていない
@@ -248,6 +258,14 @@ export function defineTests(
               },
               ["test_multi_main.cpp", "test_multi_sub.cpp"],
             ],
+            rust: [
+              {
+                "test_multi_main.rs":
+                  "mod test_multi_sub;\nfn main() {\n    test_multi_sub::print_message();\n}\n",
+                "test_multi_sub.rs": `pub fn print_message() {\n    println!("${msg}");\n}\n`,
+              },
+              ["test_multi_main.rs"],
+            ],
             javascript: [null, null],
             typescript: [null, null],
           } satisfies Record<
@@ -280,6 +298,7 @@ export function defineTests(
               `File.open("${targetFile}", "w") {|f| f.write("${msg}") }`,
             ],
             cpp: [null, null],
+            rust: [null, null],
             javascript: [null, null],
             typescript: [null, null],
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>

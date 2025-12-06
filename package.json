@@ -43,7 +43,9 @@
     "react-dom": "^19",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.0",
+    "remark-cjk-friendly": "^1.2.3",
     "remark-gfm": "^4.0.1",
+    "remark-remove-comments": "^1.1.1",
     "swr": "^2.3.6",
     "typescript": "^5.9.3",
     "zod": "^4.0.17"

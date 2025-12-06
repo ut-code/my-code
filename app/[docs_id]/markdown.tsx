@@ -1,5 +1,7 @@
 import Markdown, { Components, ExtraProps } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import removeComments from "remark-remove-comments";
+import remarkCjkFriendly from "remark-cjk-friendly";
 import { EditorComponent, getAceLang } from "../terminal/editor";
 import { ExecFile } from "../terminal/exec";
 import { JSX, ReactNode } from "react";
@@ -13,7 +15,10 @@ import {
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
-    <Markdown remarkPlugins={[remarkGfm]} components={components}>
+    <Markdown
+      remarkPlugins={[remarkGfm, removeComments, remarkCjkFriendly]}
+      components={components}
+    >
       {content}
     </Markdown>
   );

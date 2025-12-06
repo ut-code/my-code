@@ -16,6 +16,16 @@ import { ExecFile } from "./exec";
 import { useTypeScript } from "./typescript/runtime";
 import { useTerminal } from "./terminal";
 
+import main_py from "./samples/main.py?raw";
+import main_rb from "./samples/main.rb?raw";
+import main_js from "./samples/main.js?raw";
+import main2_ts from "./samples/main2.ts?raw";
+import main_cpp from "./samples/main.cpp?raw";
+import sub_h from "./samples/sub.h?raw";
+import sub_cpp from "./samples/sub.cpp?raw";
+import main2_rs from "./samples/main2.rs?raw";
+import sub_rs from "./samples/sub.rs?raw";
+
 export default function RuntimeTestPage() {
   return (
     <div className="p-4 mx-auto w-full max-w-200">
@@ -60,7 +70,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     repl: true,
     replInitContent: '>>> print("Hello, World!")\nHello, World!',
     editor: {
-      "main.py": 'print("Hello, World!")',
+      "main.py": main_py,
     },
     exec: ["main.py"],
   },
@@ -68,7 +78,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     repl: true,
     replInitContent: 'irb(main):001:0> puts "Hello, World!"\nHello, World!',
     editor: {
-      "main.rb": 'puts "Hello, World!"',
+      "main.rb": main_rb,
     },
     exec: ["main.rb"],
   },
@@ -76,7 +86,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     repl: true,
     replInitContent: '> console.log("Hello, World!");\nHello, World!',
     editor: {
-      "main.js": 'console.log("Hello, World!");',
+      "main.js": main_js,
     },
     exec: ["main.js"],
   },
@@ -84,8 +94,7 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     repl: false,
     editor: {
       // main.tsにすると出力ファイルがjavascriptのサンプルと被る
-      "main2.ts":
-        'function greet(name: string): void {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("World");',
+      "main2.ts": main2_ts,
     },
     exec: ["main2.ts"],
     readonlyFiles: ["main2.js"],
@@ -93,16 +102,19 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
   cpp: {
     repl: false,
     editor: {
-      "main.cpp": `#include <iostream>
-#include "sub.h"
-
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-}`,
-      "sub.h": ``,
-      "sub.cpp": ``,
+      "main.cpp": main_cpp,
+      "sub.h": sub_h,
+      "sub.cpp": sub_cpp,
     },
     exec: ["main.cpp", "sub.cpp"],
+  },
+  rust: {
+    repl: false,
+    editor: {
+      "main2.rs": main2_rs,
+      "sub.rs": sub_rs,
+    },
+    exec: ["main2.rs"],
   },
 };
 function RuntimeSample({
@@ -190,6 +202,7 @@ function MochaTest() {
   const jsEval = useJSEval();
   const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
+  const wandboxRust = useWandbox("rust");
   const runtimeRef = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
   runtimeRef.current = {
     python: pyodide,
@@ -197,6 +210,7 @@ function MochaTest() {
     javascript: jsEval,
     typescript: typescript,
     cpp: wandboxCpp,
+    rust: wandboxRust,
   };
 
   const [searchParams, setSearchParams] = useState<string>("");

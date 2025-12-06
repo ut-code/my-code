@@ -1,503 +1,293 @@
-# 第6章: クラスを使いこなす
+# 第6章: プロジェクトの分割とビルド
 
-第5章では、C++のオブジェクト指向プログラミングの核となる`class`の基本的な使い方を学びました。しかし、クラスを真に強力なツールとして使いこなすには、もう少し知識が必要です。この章では、オブジェクトのコピー、演算子のオーバーロード、クラスで共有されるメンバなど、より実践的でパワフルな機能について掘り下げていきます。これらの概念をマスターすることで、あなたの書くクラスはより安全で、直感的で、再利用性の高いものになるでしょう。
+これまでの章では、すべてのコードを1つの `.cpp` ファイルに記述してきました。しかし、プログラムが大規模で複雑になるにつれて、このアプローチは現実的ではなくなります。コードの可読性が低下し、少しの変更でもプログラム全体の再コンパイルが必要になり、開発効率が大きく損なわれるからです。
 
-## オブジェクトのコピー: コピーコンストラクタと代入演算子
+この章では、プログラムを複数のファイルに分割し、それらを効率的に管理・ビルドする方法を学びます。これは、小さなプログラムから一歩進み、本格的なソフトウェア開発を行うための重要なステップです。
 
-オブジェクトをコピーしたい場面は頻繁にあります。例えば、関数の引数にオブジェクトを渡すとき（値渡し）や、既存のオブジェクトで新しいオブジェクトを初期化するときなどです。
+## ヘッダファイルとソースファイル
+
+C++では、プログラムを**ヘッダファイル**と**ソースファイル**という2種類のファイルに分割するのが一般的です。
+
+  * **ヘッダファイル (`.h` または `.hpp`)**: 「宣言」を置く場所です。クラスの定義、関数のプロトタイプ宣言、定数、テンプレートなどを記述します。他のファイルに対して「何ができるか（インターフェース）」を公開する役割を持ちます。
+  * **ソースファイル (`.cpp`)**: 「実装」を置く場所です。ヘッダファイルで宣言された関数の具体的な処理内容などを記述します。ヘッダファイルが公開したインターフェースを「どのように実現するか」を記述する役割を持ちます。
+
+### なぜ分割するのか？ 🤔
+
+1.  **関心の分離**: インターフェース（何ができるか）と実装（どうやるか）を分離することで、コードの見通しが良くなります。他の開発者はヘッダファイルを見るだけで、その機能の使い方がわかります。
+2.  **コンパイル時間の短縮**: ソースファイルを変更した場合、再コンパイルはそのファイルだけで済みます。プロジェクト全体を再コンパイルする必要がないため、大規模なプロジェクトでは開発サイクルが劇的に速くなります。
+3.  **再利用性の向上**: よく使う関数やクラスをまとめておけば、別のプロジェクトでそのファイルをインクルードするだけで簡単に再利用できます。
+
+### 分割の例
+
+簡単な足し算を行う関数を別のファイルに分割してみましょう。
+
+まず、関数の「宣言」をヘッダファイルに記述します。
+
+```cpp:math_utils.h
+// 関数の宣言を記述するヘッダファイル
+
+// この関数が他のファイルから参照されることを示す
+int add(int a, int b);
+```
+
+次に、この関数の「実装」をソースファイルに記述します。
+
+```cpp:math_utils.cpp
+// 関数の実装を記述するソースファイル
+
+#include "math_utils.h" // 対応するヘッダファイルをインクルード
+
+int add(int a, int b) {
+    return a + b;
+}
+```
+
+最後に、`main`関数を含むメインのソースファイルから、この`add`関数を呼び出します。
+
+```cpp:math_app.cpp
+#include <iostream>
+#include "math_utils.h" // 自作したヘッダファイルをインクルード
+
+int main() {
+    int result = add(5, 3);
+    std::cout << "The result is: " << result << std::endl;
+    return 0;
+}
+```
+
+```cpp-exec:math_app.cpp,math_utils.cpp
+The result is: 8
+```
+
+ここで注目すべき点は、`math_app.cpp`が`add`関数の具体的な実装を知らないことです。`math_utils.h`を通じて「`int`を2つ受け取って`int`を返す`add`という関数が存在する」ことだけを知り、それを利用しています。
+
+## インクルードガード
+
+複数のファイルから同じヘッダファイルがインクルードされる状況はよくあります。例えば、`A.h`が`B.h`をインクルードし、ソースファイルが`A.h`と`B.h`の両方をインクルードするような場合です。
+
+もしヘッダファイルに何の対策もしていないと、同じ内容（クラス定義や関数宣言）が複数回読み込まれ、「再定義」としてコンパイルエラーが発生してしまいます。
+
+```cpp:A.h
+#include "B.h" // B.hをインクルード
+
+// A.hの内容
+```
+
+```cpp:B.h
+class B {
+    // Bクラスの内容
+};
+```
+
+```cpp:bad_include_app.cpp
+#include "A.h"
+#include "B.h" // B.hが二重にインクルードされる
+
+int main() {
+    [[maybe_unused]] B b; // Bクラスを使う
+
+    return 0;
+}
+```
+
+```cpp-exec:bad_include_app.cpp
+In file included from bad_include_app.cpp:2:
+B.h:1:7: error: redefinition of 'class B'
+    1 | class B {
+      |       ^
+In file included from A.h:1,
+                 from bad_include_app.cpp:1:
+B.h:1:7: note: previous definition of 'class B'
+    1 | class B {
+      |       ^
+```
+
+この問題を解決するのが**インクルードガード**です。インクルードガードは、ヘッダファイルの内容が1つの翻訳単位（ソースファイル）内で一度しか読み込まれないようにするための仕組みです。
+
+### 伝統的なインクルードガード
+
+プリプロセッサディレクティブである `#ifndef`, `#define`, `#endif` を使います。
 
 ```cpp
-Vector2D v1(1.0, 2.0);
-Vector2D v2 = v1; // ここでコピーが発生！
+#ifndef MATH_UTILS_H // もし MATH_UTILS_H が未定義なら
+#define MATH_UTILS_H // MATH_UTILS_H を定義する
+
+// --- ヘッダファイルの中身 ---
+int add(int a, int b);
+// -------------------------
+
+#endif // MATH_UTILS_H
 ```
 
-多くの場合、コンパイラが自動的に生成するコピー機能で十分です。しかし、クラスがポインタなどでリソース（メモリなど）を管理している場合、単純なコピーでは問題が発生します。
+  * **最初のインクルード**: `MATH_UTILS_H` は未定義なので、`#define` が実行され、中身が読み込まれます。
+  * **2回目以降のインクルード**: `MATH_UTILS_H` は既に定義されているため、`#ifndef` から `#endif` までのすべてが無視されます。
 
-### 何もしないとどうなる？ (浅いコピー)
+マクロ名 (`MATH_UTILS_H`) は、ファイル名に基づいて一意になるように命名するのが慣習です。
 
-まず、コピーの機能を自分で作らなかった場合に何が起きるか見てみましょう。
-コンパイラは、メンバ変数を単純にコピーするだけの「浅いコピー」を行います。
+### \#pragma once
 
-ここでは、`int`へのポインタを一つだけ持つ`ResourceHolder`（リソース保持者）というクラスを考えます。
+より現代的で簡潔な方法として `#pragma once` があります。多くのモダンなコンパイラがサポートしています。
 
-```cpp:shallow_copy.cpp
-// 悪い例：浅いコピーの問題点
-#include <iostream>
+```cpp
+#pragma once
 
-class ResourceHolder {
-private:
-    int* m_data; // 動的に確保したデータへのポインタ
-public:
-    ResourceHolder(int value) {
-        m_data = new int(value); // メモリを確保
-        std::cout << "Resource " << *m_data << " created. (at " << m_data << ")" << std::endl;
-    }
-    ~ResourceHolder() {
-        std::cout << "Resource " << *m_data << " destroyed. (at " << m_data << ")" << std::endl;
-        delete m_data; // メモリを解放
-    }
-    // コピーコンストラクタや代入演算子を定義していない！
-};
-
-int main() {
-    ResourceHolder r1(10);
-    ResourceHolder r2 = r1; // 浅いコピーが発生！
-    // r1.m_data と r2.m_data は同じアドレスを指してしまう
-    
-    // main()終了時、r1とr2のデストラクタが呼ばれる
-    // 同じメモリを2回deleteしようとしてクラッシュ！💥
-    return 0;
-}
-```
-```cpp-exec:shallow_copy.cpp
-Resource 10 created. (at 0x139f065e0)
-Resource 10 destroyed. (at 0x139f065e0)
-Resource 107521 destroyed. (at 0x1a4012b0)
-free(): double free detected in tcache 2
-```
-
-この例では、`r2`が作られるときに`r1`のポインタ`m_data`の値（メモリアドレス）だけがコピーされます。その結果、2つのオブジェクトが1つのメモリ領域を指してしまいます。プログラム終了時にそれぞれのデストラクタが呼ばれ、同じメモリを2回解放しようとしてエラーになります。
-
-### 解決策：コピー機能を自作する (深いコピー)
-
-この問題を解決するために、**コピーコンストラクタ**と**コピー代入演算子**を自分で定義して、「深いコピー」を実装します。深いコピーとは、ポインタの指す先の実体（データそのもの）を新しく作ってコピーすることです。
-
-```cpp:resource_holder.cpp
-#include <iostream>
-
-class ResourceHolder {
-private:
-    int* m_data; // リソースとして動的に確保したintへのポインタ
-
-public:
-    // コンストラクタ: intを1つ動的に確保し、値を設定
-    ResourceHolder(int value) {
-        m_data = new int(value);
-        std::cout << "Resource " << *m_data << " created. (at " << m_data << ")" << std::endl;
-    }
-
-    // デストラクタ: 確保したメモリを解放
-    ~ResourceHolder() {
-        if (m_data != nullptr) {
-            std::cout << "Resource " << *m_data << " destroyed. (at " << m_data << ")" << std::endl;
-            delete m_data;
-        }
-    }
-
-    // --- ここからが本題です ---
-
-    // 1. コピーコンストラクタ (深いコピー)
-    // ResourceHolder r2 = r1; のように、オブジェクトの作成と同時にコピーするときに呼ばれる
-    ResourceHolder(const ResourceHolder& other) {
-        // ① 新しいメモリを確保する
-        // ② otherの「値」(*other.m_data)を、新しいメモリにコピーする
-        m_data = new int(*other.m_data);
-        std::cout << "COPY CONSTRUCTOR: New resource " << *m_data << " created. (at " << m_data << ")" << std::endl;
-    }
-
-    // 2. コピー代入演算子 (深いコピー)
-    // r3 = r1; のように、既存のオブジェクトに代入するときに呼ばれる
-    ResourceHolder& operator=(const ResourceHolder& other) {
-        std::cout << "COPY ASSIGNMENT OPERATOR called." << std::endl;
-
-        // ① 自己代入のチェック (a = a; のような無駄な処理を防ぐ)
-        if (this == &other) {
-            return *this; // 何もせず自分自身を返す
-        }
-
-        // ② 自分が元々持っていた古いリソースを解放する
-        delete m_data;
-
-        // ③ 新しいリソースを確保し、相手の値をコピーする
-        m_data = new int(*other.m_data);
-
-        return *this; // 自分自身を返すことで、a = b = c; のような連続代入が可能になる
-    }
-
-    void print() const {
-        std::cout << "Value: " << *m_data << ", Address: " << m_data << std::endl;
-    }
-};
-
-int main() {
-    std::cout << "--- rh1の作成 ---" << std::endl;
-    ResourceHolder rh1(10);
-
-    std::cout << "\n--- rh2をrh1で初期化 ---" << std::endl;
-    ResourceHolder rh2 = rh1; // コピーコンストラクタが呼ばれる
-
-    std::cout << "\n--- rh3の作成 ---" << std::endl;
-    ResourceHolder rh3(20);
-
-    std::cout << "\n--- rh3にrh1を代入 ---" << std::endl;
-    rh3 = rh1; // コピー代入演算子が呼ばれる
-
-    std::cout << "\n--- 各オブジェクトの状態 ---" << std::endl;
-    std::cout << "rh1: "; rh1.print();
-    std::cout << "rh2: "; rh2.print(); // rh1とは別のメモリを持っている
-    std::cout << "rh3: "; rh3.print(); // rh1とは別のメモリを持っている
-
-    std::cout << "\n--- main関数終了 ---" << std::endl;
-    return 0; // ここでrh1, rh2, rh3のデストラクタが呼ばれ、それぞれが確保したメモリを安全に解放する
-}
-```
-
-```cpp-exec:resource_holder.cpp
---- rh1の作成 ---
-Resource 10 created. (at 0x139f065e0)
-
---- rh2をrh1で初期化 ---
-COPY CONSTRUCTOR: New resource 10 created. (at 0x139f06600)
-
---- rh3の作成 ---
-Resource 20 created. (at 0x139f06620)
-
---- rh3にrh1を代入 ---
-COPY ASSIGNMENT OPERATOR called.
-
---- 各オブジェクトの状態 ---
-rh1: Value: 10, Address: 0x139f065e0
-rh2: Value: 10, Address: 0x139f06600
-rh3: Value: 10, Address: 0x139f06640
-
---- main関数終了 ---
-Resource 10 destroyed. (at 0x139f06640)
-Resource 10 destroyed. (at 0x139f06600)
-Resource 10 destroyed. (at 0x139f065e0)
-```
-
-*(メモリアドレスは実行するたびに変わります)*
-
-実行結果を見ると、`rh1`, `rh2`, `rh3` はそれぞれ異なるメモリアドレス (`Address`) を持っていることがわかります。これにより、各オブジェクトは独立したリソースを管理でき、プログラム終了時にそれぞれのデストラクタが安全にメモリを解放できます。
-
-| 機能 | いつ呼ばれるか | 何をするか |
-| :--- | :--- | :--- |
-| **コピーコンストラクタ** | オブジェクトが**作られる時**に、他のオブジェクトで初期化される場合<br>`ResourceHolder r2 = r1;` | 新しいリソースを確保し、元のオブジェクトの**値**をコピーする。 |
-| **コピー代入演算子** | **既にあるオブジェクト**に、他のオブジェクトを代入する場合<br>`r3 = r1;` | 1. 自分が持っている古いリソースを解放する。<br>2. 新しいリソースを確保し、元のオブジェクトの**値**をコピーする。 |
-
-このように、ポインタでリソースを管理するクラスでは、安全なコピーを実現するためにこの2つの関数を自分で定義することが不可欠です。
-
-## 演算子のオーバーロード
-
-C++では、`+`, `-`, `==`, `<<` などの組み込み演算子を、自作のクラスで使えるように**再定義（オーバーロード）**できます。これにより、クラスのインスタンスをあたかも組み込み型（`int`や`double`など）のように直感的に扱えるようになります。
-
-例えば、2次元ベクトルを表す `Vector2D` クラスがあるとします。`v3 = v1 + v2;` のように、ベクトル同士の足し算を自然に記述できると便利ですよね。
-
-演算子のオーバーロードは、メンバ関数または非メンバ関数（グローバル関数）として定義します。
-
-| 演算子 | メンバ関数での定義 | 非メンバ関数での定義 |
-| :--- | :--- | :--- |
-| 二項演算子 (`+`, `==` etc.) | `T operator+(const U& rhs);` | `T operator+(const T& lhs, const U& rhs);` |
-| 単項演算子 (`-`, `!` etc.) | `T operator-();` | `T operator-(const T& obj);` |
-
-### 実装例
-
-`Vector2D` クラスで `+`（加算）、`==`（等価比較）、`<<`（ストリーム出力）をオーバーロードしてみましょう。
-
-```cpp:operator_overloading.cpp
-#include <iostream>
-
-class Vector2D {
-public:
-    double x, y;
-
-    Vector2D(double x = 0.0, double y = 0.0) : x(x), y(y) {}
-
-    // メンバ関数として + 演算子をオーバーロード
-    Vector2D operator+(const Vector2D& rhs) const {
-        return Vector2D(this->x + rhs.x, this->y + rhs.y);
-    }
-
-    // メンバ関数として == 演算子をオーバーロード
-    bool operator==(const Vector2D& rhs) const {
-        return (this->x == rhs.x) && (this->y == rhs.y);
-    }
-};
-
-// 非メンバ関数として << 演算子をオーバーロード
-// 第1引数が std::ostream& なので、メンバ関数にはできない
-std::ostream& operator<<(std::ostream& os, const Vector2D& v) {
-    os << "(" << v.x << ", " << v.y << ")";
-    return os;
-}
-
-int main() {
-    Vector2D v1(1.0, 2.0);
-    Vector2D v2(3.0, 4.0);
-
-    // operator+ が呼ばれる
-    Vector2D v3 = v1 + v2;
-    std::cout << "v1: " << v1 << std::endl; // operator<<
-    std::cout << "v2: " << v2 << std::endl; // operator<<
-    std::cout << "v3 = v1 + v2: " << v3 << std::endl; // operator<<
-
-    // operator== が呼ばれる
-    if (v1 == Vector2D(1.0, 2.0)) {
-        std::cout << "v1 is equal to (1.0, 2.0)" << std::endl;
-    }
-
-    return 0;
-}
-```
-
-```cpp-exec:operator_overloading.cpp
-v1: (1, 2)
-v2: (3, 4)
-v3 = v1 + v2: (4, 6)
-v1 is equal to (1.0, 2.0)
-```
-
-`operator<<` は、左辺のオペランドが `std::ostream` 型（`std::cout` など）であるため、`Vector2D` のメンバ関数としては定義できません。そのため、非メンバ関数として定義するのが一般的です。
-
-## staticメンバ
-
-通常、クラスのメンバ変数はオブジェクトごとに個別のメモリ領域を持ちます。しかし、あるクラスの**全てのオブジェクトで共有したい**情報もあります。例えば、「これまでに生成されたオブジェクトの総数」などです。このような場合、**staticメンバ**を使用します。
-
-### staticメンバ変数
-
-`static` キーワードを付けて宣言されたメンバ変数は、特定のオブジェクトに属さず、クラスそのものに属します。そのため、全オブジェクトでただ1つの実体を共有します。これを**クラス変数**と呼ぶこともあります。
-
-  * **宣言**: クラス定義の中で `static` を付けて行います。
-  * **定義**: クラス定義の外（ソースファイル）で、メモリ上の実体を確保し、初期化します。
-
-### staticメンバ関数
-
-`static` キーワードを付けて宣言されたメンバ関数は、特定のオブジェクトに依存せずに呼び出せます。そのため、`this` ポインタ（後述）を持ちません。
-
-  * **アクセス**: staticメンバ変数や他のstaticメンバ関数にはアクセスできますが、非staticなメンバ（インスタンスごとのメンバ変数やメンバ関数）にはアクセスできません。
-  * **呼び出し**: `クラス名::関数名()` のように、オブジェクトを生成しなくても呼び出せます。
-
-### 実装例
-
-ゲームに登場する `Player` クラスがあり、現在何人のプレイヤーが存在するかを管理する例を見てみましょう。
-
-```cpp:static_members.cpp
-#include <iostream>
 #include <string>
 
-class Player {
-private:
-    std::string name;
-    // (1) staticメンバ変数の宣言
-    static int playerCount;
-
-public:
-    Player(const std::string& name) : name(name) {
-        playerCount++; // オブジェクトが生成されるたびにインクリメント
-        std::cout << name << " がゲームに参加しました。現在のプレイヤー数: " << playerCount << std::endl;
-    }
-
-    ~Player() {
-        playerCount--; // オブジェクトが破棄されるたびにデクリメント
-        std::cout << name << " がゲームから退出しました。現在のプレイヤー数: " << playerCount << std::endl;
-    }
-
-    // (2) staticメンバ関数の宣言
-    static int getPlayerCount() {
-        // name などの非staticメンバにはアクセスできない
-        return playerCount;
-    }
-};
-
-// (3) staticメンバ変数の定義と初期化
-int Player::playerCount = 0;
-
-int main() {
-    // オブジェクトがなくてもstaticメンバ関数を呼び出せる
-    std::cout << "ゲーム開始時のプレイヤー数: " << Player::getPlayerCount() << std::endl;
-    std::cout << "---" << std::endl;
-
-    Player p1("Alice");
-    Player p2("Bob");
-
-    {
-        Player p3("Charlie");
-        std::cout << "現在のプレイヤー数 (p1経由): " << p1.getPlayerCount() << std::endl;
-    } // p3のスコープが終わり、デストラクタが呼ばれる
-
-    std::cout << "---" << std::endl;
-    std::cout << "ゲーム終了時のプレイヤー数: " << Player::getPlayerCount() << std::endl;
-
-    return 0;
-}
+std::string to_upper(const std::string& str);
 ```
 
-```cpp-exec:static_members.cpp
-ゲーム開始時のプレイヤー数: 0
----
-Alice がゲームに参加しました。現在のプレイヤー数: 1
-Bob がゲームに参加しました。現在のプレイヤー数: 2
-Charlie がゲームに参加しました。現在のプレイヤー数: 3
-現在のプレイヤー数 (p1経由): 3
-Charlie がゲームから退出しました。現在のプレイヤー数: 2
----
-ゲーム終了時のプレイヤー数: 2
-Alice がゲームから退出しました。現在のプレイヤー数: 1
-Bob がゲームから退出しました。現在のプレイヤー数: 0
+この一行をヘッダファイルの先頭に書くだけで、コンパイラがそのファイルが一度しかインクルードされないように処理してくれます。特別な理由がない限り、現在では `#pragma once` を使うのが主流です。
+
+## プロジェクトのビルド
+
+複数のソースファイル（`.cpp`）は、それぞれがコンパイルされて**オブジェクトファイル**（`.o` や `.obj`）になります。その後、**リンカ**がこれらのオブジェクトファイルと必要なライブラリを結合して、最終的な実行可能ファイルを生成します。
+
+この一連の作業を**ビルド**と呼びます。ファイルが増えてくると、これを手動で行うのは非常に面倒です。そこで、ビルド作業を自動化する**ビルドシステム**が使われます。
+
+### 手動でのビルド (g++)
+
+先ほどの`math_app.cpp`と`math_utils.cpp`を例に、g++コンパイラで手動ビルドする手順を見てみましょう。
+
+```bash
+# 1. 各ソースファイルをコンパイルしてオブジェクトファイルを生成する (-c オプション)
+g++ -c math_app.cpp -o main.o
+g++ -c math_utils.cpp -o math_utils.o
+
+# 2. オブジェクトファイルをリンクして実行可能ファイルを生成する
+g++ main.o math_utils.o -o my_app
+
+# 3. 実行する
+./my_app
 ```
 
-`playerCount` は `p1`, `p2`, `p3` の全てで共有されており、一つの値が更新されていることがわかります。
+または、以下のように1回のg++コマンドで複数ソースファイルのコンパイルとリンクを同時に行うこともできます。
 
-## thisポインタ
-
-非staticなメンバ関数が呼び出されるとき、その関数は「どのオブジェクトに対して呼び出されたか」を知る必要があります。コンパイラは、そのメンバ関数に対して、呼び出し元のオブジェクトのアドレスを暗黙的に渡します。このアドレスを保持するのが `this` ポインタです。
-
-`this` は、メンバ関数内で使用できるキーワードで、自分自身のオブジェクトを指すポインタです。
-
-`this` ポインタが主に使われるのは、以下のような場面です。
-
-1.  **メンバ変数と引数の名前が同じ場合**
-    コンストラクタの初期化子リストを使わない場合など、引数名とメンバ変数名が同じになることがあります。その際、`this->` を付けることでメンバ変数であることを明示できます。
-
-    ```cpp
-    void setX(double x) {
-        this->x = x; // this->x はメンバ変数, x は引数
-    }
-    ```
-
-2.  **自分自身の参照やポインタを返す場合**
-    コピー代入演算子で `return *this;` としたように、オブジェクト自身を返したい場合に使います。これにより、**メソッドチェーン**（`obj.setX(10).setY(20);` のような連続したメソッド呼び出し）が可能になります。
-
-### 実装例
-
-メソッドチェーンを実現する簡単な例を見てみましょう。
-
-```cpp:this_pointer.cpp
-#include <iostream>
-
-class Point {
-private:
-    int x, y;
-
-public:
-    Point(int x = 0, int y = 0) : x(x), y(y) {}
-
-    // 自身の参照を返すことで、メソッドチェーンを可能にする
-    Point& setX(int newX) {
-        this->x = newX;
-        return *this; // 自分自身の参照を返す
-    }
-
-    Point& setY(int newY) {
-        this->y = newY;
-        return *this; // 自分自身の参照を返す
-    }
-
-    void print() const {
-        std::cout << "(" << this->x << ", " << this->y << ")" << std::endl;
-    }
-};
-
-int main() {
-    Point p;
-
-    // メソッドチェーン
-    p.setX(10).setY(20);
-
-    p.print();
-
-    return 0;
-}
+```bash
+g++ math_app.cpp math_utils.cpp -o my_app
+./my_app
 ```
 
-```cpp-exec:this_pointer.cpp
-(10, 20)
+### Makefileによる自動化
+
+`make`は、ファイルの依存関係と更新ルールを記述した`Makefile`というファイルに従って、ビルドプロセスを自動化するツールです。
+
+以下は、非常にシンプルな`Makefile`の例です。
+
+```makefile
+# コンパイラを指定
+CXX = g++
+# コンパイルオプションを指定
+CXXFLAGS = -std=c++17 -Wall
+
+# 最終的なターゲット（実行可能ファイル名）
+TARGET = my_app
+
+# ソースファイルとオブジェクトファイル
+SRCS = math_app.cpp math_utils.cpp
+OBJS = $(SRCS:.cpp=.o)
+
+# デフォルトのターゲット (makeコマンド実行時に最初に実行される)
+all: $(TARGET)
+
+# 実行可能ファイルの生成ルール
+$(TARGET): $(OBJS)
+    $(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+
+# オブジェクトファイルの生成ルール (%.o: %.cpp)
+# .cppファイルから.oファイルを作るための汎用ルール
+%.o: %.cpp
+    $(CXX) $(CXXFLAGS) -c $< -o $@
+
+# 中間ファイルなどを削除するルール
+clean:
+    rm -f $(OBJS) $(TARGET)
 ```
 
-`setX` が `p` 自身の参照を返すため、その返り値に対して続けて `.setY(20)` を呼び出すことができます。
+この`Makefile`があるディレクトリで、ターミナルから`make`と入力するだけで、必要なコンパイルとリンクが自動的に実行されます。`math_app.cpp`だけを変更した場合、`make`は`main.o`だけを再生成し、再リンクするため、ビルド時間が短縮されます。
+
+### CMakeによるモダンなビルド管理
+
+`Makefile`は強力ですが、OSやコンパイラに依存する部分があり、複雑なプロジェクトでは管理が難しくなります。
+
+**CMake**は、`Makefile`やVisual Studioのプロジェクトファイルなどを自動的に生成してくれる、クロスプラットフォーム対応のビルドシステムジェネレータです。`CMakeLists.txt`という設定ファイルに、より抽象的なビルドのルールを記述します。
+
+```cmake
+# CMakeの最低要求バージョン
+cmake_minimum_required(VERSION 3.10)
+
+# プロジェクト名を設定
+project(MyAwesomeApp)
+
+# C++の標準バージョンを設定
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 実行可能ファイルを追加
+# add_executable(実行ファイル名 ソースファイル1 ソースファイル2 ...)
+add_executable(my_app math_app.cpp math_utils.cpp)
+```
+
+この`CMakeLists.txt`を使ってビルドする一般的な手順は以下の通りです。
+
+```bash
+# 1. ビルド用の中間ファイルを置くディレクトリを作成し、移動する
+mkdir build
+cd build
+
+# 2. CMakeを実行して、ビルドシステム（この場合はMakefile）を生成する
+cmake ..
+
+# 3. make (または cmake --build .) を実行してビルドする
+make
+
+# 4. 実行する
+./my_app
+```
+
+CMakeは、ライブラリの検索、依存関係の管理、テストの実行など、大規模プロジェクトに必要な多くの機能を備えており、現在のC++開発における標準的なツールとなっています。
 
 ## この章のまとめ
 
-この章では、クラスをより効果的に利用するための応用的な機能を学びました。
+  * **プロジェクトの分割**: プログラムは「宣言」を記述する**ヘッダファイル** (`.h`) と、「実装」を記述する**ソースファイル** (`.cpp`) に分割することで、保守性や再利用性が向上します。
+  * **インクルードガード**: ヘッダファイルの多重インクルードによる再定義エラーを防ぐために、`#pragma once` や `#ifndef`/`#define`/`#endif` を使用します。
+  * **ビルドシステム**: 複数のファイルをコンパイル・リンクするプロセスを自動化するために、`make` や `CMake` といったツールが使われます。特に **CMake** はクロスプラットフォーム開発におけるデファクトスタンダードです。
 
-  * **オブジェクトのコピー**: ポインタなどリソースを管理するクラスでは、**コピーコンストラクタ**と**コピー代入演算子**を定義し、**深いコピー**を実装することが重要です。これにより、リソースの二重解放などの問題を未然に防ぎます。
-  * **演算子のオーバーロード**: `+` や `==` などの演算子を自作クラスに対して定義することで、コードの可読性を高め、直感的な操作を可能にします。
-  * **staticメンバ**: `static`メンバ変数やメンバ関数は、クラスの全オブジェクトで共有されるデータや機能を提供します。オブジェクトを生成しなくてもアクセスできるのが特徴です。
-  * **thisポインタ**: 非staticメンバ関数内で、呼び出し元のオブジェクト自身を指すポインタです。メンバ変数と引数の区別や、メソッドチェーンの実装に役立ちます。
+### 練習問題1: 電卓クラスの分割
 
-これらの機能を組み合わせることで、C++のクラスは単なるデータの入れ物から、振る舞いを伴った洗練された部品へと進化します。
+`Calculator` というクラスを作成してください。このクラスは、加算、減算、乗算、除算のメンバ関数を持ちます。
 
-### 練習問題1: 複素数クラス
+* `Calculator.h`: `Calculator`クラスの定義を記述します。
+* `Calculator.cpp`: 各メンバ関数の実装を記述します。
+* `practice6_1.cpp`: `Calculator`クラスのインスタンスを作成し、いくつかの計算を行って結果を表示します。
 
-実部 (real) と虚部 (imaginary) を`double`型で持つ複素数クラス `Complex` を作成してください。以下の要件を満たすものとします。
+これらのファイルをg++で手動ビルドして、プログラムを実行してください。
 
-1.  コンストラクタで実部と虚部を初期化できるようにする。
-2.  複素数同士の足し算 (`+`) と掛け算 (`*`) を演算子オーバーロードで実装する。
-      * 加算: $(a+bi) + (c+di) = (a+c) + (b+d)i$
-      * 乗算: $(a+bi) \* (c+di) = (ac-bd) + (ad+bc)i$
-3.  `std::cout` で `(a + bi)` という形式で出力できるように、`<<` 演算子をオーバーロードする。（虚部が負の場合は `(a - bi)` のように表示されるとより良い）
+```cpp:Calculator.h
+
+```
+
+```cpp:Calculator.cpp
+
+```
 
 ```cpp:practice6_1.cpp
 #include <iostream>
-
-// ここに Complex クラスを実装してください
+#include "Calculator.h"
 
 int main() {
-    Complex c1(1.0, 2.0); // 1 + 2i
-    Complex c2(3.0, 4.0); // 3 + 4i
-    Complex sum = c1 + c2;
-    Complex product = c1 * c2;
+    Calculator calc;
 
-    std::cout << "c1: " << c1 << std::endl;
-    std::cout << "c2: " << c2 << std::endl;
-    std::cout << "c1 + c2 = " << sum << std::endl;
-    std::cout << "c1 * c2 = " << product << std::endl;
+    std::cout << "3 + 5 = " << calc.add(3, 5) << std::endl;
+    std::cout << "10 - 2 = " << calc.subtract(10, 2) << std::endl;
+    std::cout << "4 * 7 = " << calc.multiply(4, 7) << std::endl;
+    std::cout << "20 / 4 = " << calc.divide(20, 4) << std::endl;
     return 0;
 }
 ```
 
-```cpp-exec:practice6_1.cpp
-c1: (1 + 2i)
-c2: (3 + 4i)
-c1 + c2 = (4 + 6i)
-c1 * c2 = (-5 + 10i)
-```
-
-### 練習問題2: 動的配列クラスのコピー制御
-
-整数 (`int`) の動的配列を管理するクラス `IntArray` を作成してください。このクラスは、コンストラクタで指定されたサイズの配列を `new` で確保し、デストラクタで `delete[]` を使って解放します。
-
-この `IntArray` クラスに対して、**深いコピー**を正しく行うための**コピーコンストラクタ**と**コピー代入演算子**を実装してください。
-
-```cpp:practice6_2.cpp
-#include <iostream>
-
-// ここに IntArray クラスを実装してください
-
-int main() {
-    IntArray arr1(5); // サイズ5の配列を作成
-    for (int i = 0; i < 5; ++i) {
-        arr1.set(i, i * 10); // 0, 10, 20, 30, 40
-    }
-
-    IntArray arr2 = arr1; // コピーコンストラクタ
-    IntArray arr3(3);
-    arr3 = arr1;          // コピー代入演算子
-
-    std::cout << "arr1: ";
-    for (int i = 0; i < 5; ++i) {
-        std::cout << arr1.get(i) << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "arr2 (コピー): ";
-    for (int i = 0; i < 5; ++i) {
-        std::cout << arr2.get(i) << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "arr3 (代入): ";
-    for (int i = 0; i < 5; ++i) {
-        std::cout << arr3.get(i) << " ";
-    }
-    std::cout << std::endl;
-
-    return 0;
-}
-```
-
-```cpp-exec:practice6_2.cpp
-arr1: 0 10 20 30 40 
-arr2 (コピー): 0 10 20 30 40 
-arr3 (代入): 0 10 20 30 40 
+```cpp-exec:practice6_1.cpp,Calculator.cpp
+3 + 5 = 8
+10 - 2 = 8
+4 * 7 = 28
+20 / 4 = 5
 ```

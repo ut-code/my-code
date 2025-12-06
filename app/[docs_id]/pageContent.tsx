@@ -84,7 +84,7 @@ export function PageContent(props: PageContentProps) {
 
   return (
     <div
-      className="p-4 mx-auto grid"
+      className="p-4 mx-auto max-w-full grid"
       style={{
         gridTemplateColumns: `1fr auto`,
       }}
@@ -92,7 +92,7 @@ export function PageContent(props: PageContentProps) {
       {dynamicMdContent.map((section, index) => (
         <Fragment key={index}>
           <div
-            className="max-w-200"
+            className="min-w-1/2 max-w-200 text-justify"
             id={`${index}`} // 目次からaタグで飛ぶために必要
             ref={(el) => {
               sectionRefs.current[index] = el;

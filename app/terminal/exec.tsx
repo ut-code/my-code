@@ -74,9 +74,12 @@ export function ExecFile(props: ExecProps) {
 
   return (
     <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden relative">
-      <div className="bg-base-200">
+      <div className="bg-base-200 flex items-center">
         <button
-          className="btn btn-soft btn-accent rounded-none"
+          /* daisyuiのbtnはheightがvar(--size)で固定。
+          ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
+          → heightを解除し、min-heightをデフォルトのサイズと同じにする */
+          className="btn btn-soft btn-accent rounded-none h-[unset]! min-h-(--size) self-stretch"
           onClick={() => {
             if (!ready) {
               clearTerminal(terminalInstanceRef.current!);
@@ -92,7 +95,7 @@ export function ExecFile(props: ExecProps) {
         >
           ▶ 実行
         </button>
-        <code className="text-sm ml-4">
+        <code className="text-left break-all text-sm my-1 ml-4 mr-1">
           {getCommandlineStr?.(props.filenames)}
         </code>
       </div>

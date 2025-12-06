@@ -1,301 +1,224 @@
-# 第10章: 標準テンプレートライブラリ (STL) ②：アルゴリズムとラムダ式
+# 第10章: テンプレートによる汎用プログラミング
 
-ようこそ、C++チュートリアルの第10章へ！前の章ではSTLのコンテナについて学び、様々なデータを効率的に格納する方法を見てきました。しかし、データを格納するだけではプログラムは完成しません。そのデータを並べ替えたり、検索したり、特定の処理を施したりといった「操作」が必要です。
+これまでの章では、`int`や`double`、あるいは自作の`Car`クラスのように、特定の型に対して処理を行う関数やクラスを作成してきました。しかし、プログラムが複雑になるにつれて、「型は違うけれど、行いたい処理は全く同じ」という状況が頻繁に発生します。例えば、2つの値の大きい方を返す`max`という関数を考えてみましょう。
 
-この章では、STLのもう一つの強力な柱である**アルゴリズム**ライブラリを学びます。これらのアルゴリズムは、コンテナ内のデータを操作するための汎用的な関数群です。そして、アルゴリズムをさらに柔軟かつ強力にするための現代的なC++の機能、**ラムダ式**についても解説します。これらをマスターすれば、驚くほど少ないコードで複雑なデータ操作が実現できるようになります。
+```cpp
+int max_int(int a, int b) {
+    return (a > b) ? a : b;
+}
 
-## イテレータ：コンテナとアルゴリズムを繋ぐ架け橋
-
-アルゴリズムは、特定のコンテナ（`std::vector` や `std::list` など）に直接依存しないように設計されています。では、どうやってコンテナ内の要素にアクセスするのでしょうか？そこで登場するのが**イテレータ (Iterator)** です。
-
-イテレータは、コンテナ内の要素を指し示す「ポインタのような」オブジェクトです。ポインタのように `*` で要素の値を参照したり、`++` で次の要素に進んだりできます。
-
-ほとんどのコンテナは、以下の2つの重要なイテレータを取得するメンバ関数を持っています。
-
-  * `begin()`: コンテナの先頭要素を指すイテレータを返す。
-  * `end()`: コンテナの**最後の要素の次**を指すイテレータを返す。これは有効な要素を指していない「番兵」のような役割を果たします。
-
-アルゴリズムは、この `begin()` と `end()` から得られるイテレータのペアを使い、操作対象の「範囲」を指定します。範囲は半開区間 `[begin, end)` で表され、`begin` が指す要素は範囲に含まれ、`end` が指す要素は含まれません。
-
-簡単な例を見てみましょう。イテレータを使って `vector` の全要素を表示するコードです。
-
-```cpp:iterator_example.cpp
-#include <iostream>
-#include <vector>
-
-int main() {
-    std::vector<int> numbers = {0, 1, 2, 3, 4};
-
-    // イテレータを使ってコンテナを走査
-    std::cout << "Numbers: ";
-    for (auto it = numbers.begin(); it != numbers.end(); ++it) {
-        std::cout << *it << " "; // *it で要素の値にアクセス
-    }
-    std::cout << std::endl;
-
-    // C++11以降の範囲ベースforループ (内部ではイテレータが使われている)
-    std::cout << "Numbers (range-based for): ";
-    for (int num : numbers) {
-        std::cout << num << " ";
-    }
-    std::cout << std::endl;
-
-    return 0;
+double max_double(double a, double b) {
+    return (a > b) ? a : b;
 }
 ```
 
-```cpp-exec:iterator_example.cpp
-Numbers: 0 1 2 3 4 
-Numbers (range-based for): 0 1 2 3 4 
-```
+このように、型ごとに同じロジックの関数をいくつも用意するのは非効率的ですし、バグの温床にもなります。
 
-このように、イテレータはコンテナの種類を問わず、統一的な方法で要素にアクセスする仕組みを提供します。これが、アルゴリズムが様々なコンテナに対して汎用的に機能する理由です。
+この問題を解決するのが**テンプレート**です。テンプレートを使うと、具体的な型を "仮引数" のように扱い、様々な型に対応できる関数やクラスの「設計図」を作ることができます。このような、型に依存しないプログラミングスタイルを**ジェネリックプログラミング（汎用プログラミング）**と呼びます。
 
-## 便利なアルゴリズム
+## 関数テンプレート: intでもdoubleでもstringでも動く関数を作る
 
-C++の標準ライブラリには、`<algorithm>` ヘッダと `<numeric>` ヘッダに数多くの便利なアルゴリズムが用意されています。ここでは、特によく使われるものをいくつか紹介します。
+関数テンプレートを使うと、先ほどの`max`関数の問題をエレガントに解決できます。
 
-### `std::sort`: 要素を並べ替える
-
-名前の通り、指定された範囲の要素をソートします。デフォルトでは昇順に並べ替えます。
-
-```cpp:sort_example.cpp
+```cpp:function_template_intro.cpp
 #include <iostream>
-#include <vector>
-#include <algorithm> // std::sort のために必要
 #include <string>
 
+// Tという名前で型を仮引数として受け取るテンプレートを宣言
+template <typename T>
+T max_value(T a, T b) {
+    return (a > b) ? a : b;
+}
+
 int main() {
-    std::vector<int> numbers = {5, 2, 8, 1, 9};
+    // int型でmax_valueを呼び出す
+    std::cout << "max(10, 20) = " << max_value(10, 20) << std::endl;
+
+    // double型でmax_valueを呼び出す
+    std::cout << "max(3.14, 1.41) = " << max_value(3.14, 1.41) << std::endl;
+
+    // std::string型でも動作する！
+    std::string s1 = "world";
+    std::string s2 = "hello";
+    std::cout << "max(\"world\", \"hello\") = " << max_value(s1, s2) << std::endl;
+
+    return 0;
+}
+```
+
+```cpp-exec:function_template_intro.cpp
+max(10, 20) = 20
+max(3.14, 1.41) = 3.14
+max("world", "hello") = world
+```
+
+### テンプレートの仕組み
+
+`template <typename T>`という部分が、この関数がテンプレートであることを示しています。
+
+  * **`template <...>`**: テンプレートの宣言を開始します。
+  * **`typename T`**: `T`という名前の「型引数」を定義しています。`typename`の代わりに`class`と書くこともできますが、意味は同じです。`T`は、このテンプレートが実際に使われるときに具体的な型（`int`や`double`など）に置き換えられます。
+
+`main`関数で`max_value(10, 20)`のように呼び出すと、コンパイラは引数の型が`int`であることから、`T`を`int`だと自動的に判断します（これを**テンプレート引数推論**と呼びます）。そして、内部的に以下のような`int`版の関数を生成してくれるのです。
+
+```cpp
+// コンパイラが内部的に生成するコードのイメージ
+int max_value(int a, int b) {
+    return (a > b) ? a : b;
+}
+```
+
+同様に、`double`や`std::string`で呼び出されれば、それぞれの型に対応したバージョンの関数が自動的に生成されます。これにより、私たちは一つの「設計図」を書くだけで、様々な型に対応できるのです。
+
+## クラステンプレート: 様々な型のデータを格納できるクラスを作る
+
+テンプレートの力は、クラスにも適用できます。これにより、様々な型のデータを格納できる汎用的なクラス（コンテナなど）を作成できます。例えば、「2つの値をペアで保持する」クラスを考えてみましょう。
+
+```cpp:class_template_intro.cpp
+#include <iostream>
+#include <string>
+
+// 2つの型 T1, T2 を引数に取るクラステンプレート
+template <typename T1, typename T2>
+class Pair {
+public:
+    T1 first;
+    T2 second;
+
+    // コンストラクタ
+    Pair(T1 f, T2 s) : first(f), second(s) {}
+
+    void print() {
+        std::cout << "(" << first << ", " << second << ")" << std::endl;
+    }
+};
+
+int main() {
+    // T1=int, T2=std::string としてPairクラスのオブジェクトを生成
+    Pair<int, std::string> p1(1, "apple");
+    p1.print();
+
+    // T1=std::string, T2=double としてPairクラスのオブジェクトを生成
+    Pair<std::string, double> p2("pi", 3.14159);
+    p2.print();
     
-    // numbers.begin() から numbers.end() の範囲をソート
-    std::sort(numbers.begin(), numbers.end());
-
-    std::cout << "Sorted numbers: ";
-    for (int num : numbers) {
-        std::cout << num << " ";
-    }
-    std::cout << std::endl;
-
-    std::vector<std::string> words = {"banana", "apple", "cherry"};
-    std::sort(words.begin(), words.end());
-
-    std::cout << "Sorted words: ";
-    for (const auto& word : words) {
-        std::cout << word << " ";
-    }
-    std::cout << std::endl;
+    // 違う型のPair同士は当然、別の型として扱われる
+    // p1 = p2; // これはコンパイルエラーになる
 
     return 0;
 }
 ```
 
-```cpp-exec:sort_example.cpp
-Sorted numbers: 1 2 5 8 9 
-Sorted words: apple banana cherry 
+```cpp-exec:class_template_intro.cpp
+(1, apple)
+(pi, 3.14159)
 ```
 
-### `std::find`: 要素を検索する
+### クラステンプレートの仕組み
 
-指定された範囲から特定の値を持つ要素を検索します。
+関数テンプレートと基本的な考え方は同じですが、いくつか重要な違いがあります。
 
-  * **見つかった場合**: その要素を指すイテレータを返します。
-  * **見つからなかった場合**: 範囲の終端を示すイテレータ (`end()`) を返します。
+1.  **明示的な型指定**:
+    関数テンプレートではコンパイラが型を推論してくれましたが、クラステンプレートの場合は、オブジェクトを生成する際に`Pair<int, std::string>`のように、開発者が明示的に型を指定する必要があります。
 
-この性質を利用して、要素が存在するかどうかをチェックできます。
+2.  **インスタンス化**:
+    `Pair<int, std::string>`のように具体的な型を指定してオブジェクトを作ることを、テンプレートの**インスタンス化**と呼びます。コンパイラは、この指定に基づいて`T1`を`int`に、`T2`を`std::string`に置き換えた、以下のような新しいクラスを内部的に生成します。
 
-```cpp:find_example.cpp
-#include <iostream>
-#include <vector>
-#include <algorithm> // std::find のために必要
+    ```cpp
+    // コンパイラが内部的に生成するクラスのイメージ
+    class Pair_int_string { // クラス名は実際には異なります
+    public:
+        int first;
+        std::string second;
 
-int main() {
-    std::vector<int> numbers = {10, 20, 30, 40, 50};
-    int value_to_find = 30;
+        Pair_int_string(int f, std::string s) : first(f), second(s) {}
 
-    // numbers の中から 30 を探す
-    auto it = std::find(numbers.begin(), numbers.end(), value_to_find);
+        void print() {
+            std::cout << "(" << first << ", " << second << ")" << std::endl;
+        }
+    };
+    ```
 
-    if (it != numbers.end()) {
-        // 見つかった場合
-        std::cout << "Found " << *it << " at index " << std::distance(numbers.begin(), it) << std::endl;
-    } else {
-        // 見つからなかった場合
-        std::cout << value_to_find << " not found." << std::endl;
-    }
+    `Pair<int, std::string>`と`Pair<std::string, double>`は、コンパイルされると全く別のクラスとして扱われることに注意してください。
 
-    value_to_find = 99;
-    it = std::find(numbers.begin(), numbers.end(), value_to_find);
-
-    if (it != numbers.end()) {
-        std::cout << "Found " << *it << std::endl;
-    } else {
-        std::cout << value_to_find << " not found." << std::endl;
-    }
-
-    return 0;
-}
-```
-
-```cpp-exec:find_example.cpp
-Found 30 at index 2
-99 not found.
-```
-
-### `std::for_each`: 各要素に処理を適用する
-
-指定された範囲の全ての要素に対して、特定の関数（処理）を適用します。ループを書くよりも意図が明確になる場合があります。
-
-```cpp
-// 3番目の引数に関数を渡す
-std::for_each(numbers.begin(), numbers.end(), print_function);
-```
-
-ここで「特定の処理」をその場で手軽に記述する方法が**ラムダ式**です。
-
-## ラムダ式：その場で書ける無名関数
-
-ラムダ式（Lambda Expression）は、C++11から導入された非常に強力な機能です。一言で言えば、「**その場で定義して使える名前のない小さな関数**」です。これにより、アルゴリズムに渡すためだけの短い関数をわざわざ定義する必要がなくなり、コードが非常に簡潔になります。
-
-ラムダ式の基本的な構文は以下の通りです。
-
-```cpp
-[キャプチャ](引数リスト) -> 戻り値の型 { 処理本体 }
-```
-
-  * `[]` **キャプチャ句**: ラムダ式の外にある変数を取り込んで、式の中で使えるようにします。
-      * `[]`: 何もキャプチャしない。
-      * `[=]`: 外の変数を全て値渡し（コピー）でキャプチャする。
-      * `[&]`: 外の変数を全て参照渡しでキャプチャする。
-      * `[x, &y]`: 変数 `x` は値渡し、変数 `y` は参照渡しでキャプチャする。
-  * `()` **引数リスト**:通常の関数と同じ引数を取ることができます。
-  * `-> 戻り値の型`: 戻り値の型を指定します。多くの場合、コンパイラが推論できるため省略可能です。
-  * `{}` **処理本体**: 関数の処理内容を記述します。
-
-`std::for_each` とラムダ式を組み合わせた例を見てみましょう。
-
-```cpp:for_each_lambda_example.cpp
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
-int main() {
-    std::vector<int> numbers = {1, 2, 3, 4, 5};
-
-    // 各要素を2倍して表示する
-    std::cout << "Doubled numbers: ";
-    std::for_each(numbers.begin(), numbers.end(), [](int n) {
-        std::cout << n * 2 << " ";
-    });
-    std::cout << std::endl;
-
-    // 外部の変数をキャプチャする例
-    int sum = 0;
-    // `&sum` で sum を参照キャプチャし、ラムダ式内で変更できるようにする
-    std::for_each(numbers.begin(), numbers.end(), [&sum](int n) {
-        sum += n;
-    });
-
-    std::cout << "Sum: " << sum << std::endl;
-
-    return 0;
-}
-```
-
-```cpp-exec:for_each_lambda_example.cpp
-Doubled numbers: 2 4 6 8 10 
-Sum: 15
-```
-
-このコードは、`for_each` の3番目の引数に直接処理を書き込んでいます。非常に直感的で読みやすいと思いませんか？
-
-ラムダ式は、特に `std::sort` のソート順をカスタマイズする際に真価を発揮します。例えば、数値を降順にソートしたい場合、比較ルールをラムダ式で与えることができます。
-
-```cpp:lambda_sort_example.cpp
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
-int main() {
-    std::vector<int> numbers = {5, 2, 8, 1, 9};
-
-    // 比較関数としてラムダ式を渡す
-    // a > b であれば true を返すことで降順ソートになる
-    std::sort(numbers.begin(), numbers.end(), [](int a, int b) {
-        return a > b;
-    });
-
-    std::cout << "Sorted in descending order: ";
-    for (int num : numbers) {
-        std::cout << num << " ";
-    }
-    std::cout << std::endl;
-
-    return 0;
-}
-```
-
-```cpp-exec:lambda_sort_example.cpp
-Sorted in descending order: 9 8 5 2 1 
-```
+クラステンプレートは、C++の強力なライブラリである**STL (Standard Template Library)**の根幹をなす技術です。次章で学ぶ`vector`や`map`といった便利なコンテナは、すべてクラステンプレートで実装されています。
 
 ## この章のまとめ
 
-この章では、STLのアルゴリズムとラムダ式について学びました。
+  * **ジェネリックプログラミング**は、特定の型に縛られない、汎用的なコードを書くための手法です。
+  * **テンプレート**は、C++でジェネリックプログラミングを実現するための機能です。
+  * **関数テンプレート**を使うと、様々な型の引数に対して同じ処理を行う関数を定義できます。呼び出し時には、コンパイラが**テンプレート引数推論**によって型を自動的に決定します。
+  * **クラステンプレート**を使うと、様々な型を扱える汎用的なクラスを定義できます。オブジェクトを生成する際には、`< >`内に具体的な型を**明示的に指定**してインスタンス化する必要があります。
 
-  * **イテレータ**は、コンテナの要素を指し示すオブジェクトであり、アルゴリズムとコンテナの間のインターフェースとして機能します。
-  * `<algorithm>` ヘッダには、**`std::sort`** (ソート)、**`std::find`** (検索)、**`std::for_each`** (繰り返し処理) といった、汎用的で強力なアルゴリズムが多数用意されています。
-  * **ラムダ式**は、その場で定義できる無名関数であり、アルゴリズムに渡す処理を簡潔かつ直感的に記述することができます。
-  * **キャプチャ**機能を使うことで、ラムダ式の外にある変数を取り込んで処理に利用できます。
+テンプレートを使いこなすことで、コードの再利用性が劇的に向上し、より柔軟で堅牢なプログラムを記述できるようになります。
 
-コンテナ、イテレータ、アルゴリズム、そしてラムダ式。これらを組み合わせることで、C++におけるデータ処理は、他の多くの言語に引けを取らない、あるいはそれ以上に表現力豊かで効率的なものになります。
+### 練習問題1: 汎用的なprint関数
 
-### 練習問題1: 文字列の長さでソート
-
-`std::vector<std::string>` を用意し、格納されている文字列を、文字数が短い順にソートして、結果を出力するプログラムを作成してください。`std::sort` とラムダ式を使用してください。
-
-**ヒント**: ラムダ式は2つの文字列を引数に取り、1つ目の文字列の長さが2つ目の文字列の長さより短い場合に `true` を返すように実装します。
-
+任意の型の配列（ここでは`std::vector`を使いましょう）を受け取り、その要素をすべて画面に出力する関数テンプレート`print_elements`を作成してください。
 
 ```cpp:practice10_1.cpp
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <string>
+
+// ここに関数テンプレート print_elements を実装してください
+
 
 int main() {
-    std::vector<std::string> words = {"apple", "banana", "kiwi", "cherry", "fig", "grape"};
+    std::vector<int> v_int = {1, 2, 3, 4, 5};
+    std::cout << "Integers: ";
+    print_elements(v_int);
+
+    std::vector<std::string> v_str = {"C++", "is", "powerful"};
+    std::cout << "Strings: ";
+    print_elements(v_str);
 
     return 0;
 }
 ```
 
 ```cpp-exec:practice10_1.cpp
-fig kiwi grape apple banana cherry 
+Integers: 1 2 3 4 5 
+Strings: C++ is powerful 
 ```
 
-### 練習問題2: 条件に合う要素のカウント
+### 練習問題2: 汎用的なスタッククラス
 
-`std::vector<int>` に整数をいくつか格納します。その後、ラムダ式と `std::for_each`（または他のアルゴリズム）を使って、以下の2つの条件を満たす要素がそれぞれいくつあるかを数えて出力してください。
+後入れ先出し（LIFO）のデータ構造であるスタックを、クラステンプレート`SimpleStack`として実装してください。以下のメンバ関数を持つようにしてください。
 
-1.  正の偶数である要素の数
-2.  負の奇数である要素の数
+  * `void push(T item)`: スタックに要素を追加する
+  * `T pop()`: スタックの先頭から要素を取り出す
+  * `bool is_empty()`: スタックが空かどうかを返す
 
-**ヒント**: カウント用の変数を2つ用意し、ラムダ式のキャプチャ句で参照キャプチャ (`[&]`) して、式の中でインクリメントします。
+`std::vector`を内部のデータ格納場所として利用して構いません。`int`型と`char`型で動作を確認してください。
 
 ```cpp:practice10_2.cpp
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <stdexcept>
+
+// ここにクラステンプレート SimpleStack を実装してください
 
 int main() {
-    std::vector<int> numbers = {3, -1, 4, -5, 6, -7, 8, 0, -2};
+    SimpleStack<int> int_stack;
+    int_stack.push(10);
+    int_stack.push(20);
+    std::cout << "Popped from int_stack: " << int_stack.pop() << std::endl; // 20
+    std::cout << "Popped from int_stack: " << int_stack.pop() << std::endl; // 10
 
+    SimpleStack<char> char_stack;
+    char_stack.push('A');
+    char_stack.push('B');
+    std::cout << "Popped from char_stack: " << char_stack.pop() << std::endl; // B
+    std::cout << "Popped from char_stack: " << char_stack.pop() << std::endl; // A
 
     return 0;
 }
 ```
 
 ```cpp-exec:practice10_2.cpp
-Positive even count: 3
-Negative odd count: 3
+Popped from int_stack: 20
+Popped from int_stack: 10
+Popped from char_stack: B
+Popped from char_stack: A
 ```

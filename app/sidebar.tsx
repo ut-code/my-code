@@ -14,6 +14,8 @@ import {
 } from "react";
 import { DynamicMarkdownSection } from "./[docs_id]/pageContent";
 import clsx from "clsx";
+import { LanguageIcon } from "./terminal/icons";
+import { RuntimeLang } from "./terminal/runtime";
 
 export interface ISidebarMdContext {
   loadedDocsId: string;
@@ -159,18 +161,29 @@ export function Sidebar() {
                 setDetailsOpen(newDetailsOpen);
               }}
             >
-              <summary>{group.lang}</summary>
+              <summary>
+                <LanguageIcon
+                  className="w-4 h-4"
+                  lang={group.id as RuntimeLang}
+                />
+                {group.lang}
+              </summary>
               <ul>
                 {group.pages.map((page) => (
                   <li key={page.id}>
                     <Link
                       href={`${group.id}-${page.id}`}
                       className={clsx(
+                        "text-wrap text-justify",
                         `${group.id}-${page.id}` === currentDocsId &&
                           "menu-active"
                       )}
                     >
-                      <span className="mr-0">{page.id}.</span>
+                      <span className="w-5 text-right">
+                        <span className="float-right">
+                        {page.id}.
+                      </span>
+                      </span>
                       {page.title}
                     </Link>
                     {`${group.id}-${page.id}` === currentDocsId &&

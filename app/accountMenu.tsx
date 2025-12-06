@@ -42,7 +42,7 @@ export function AccountMenu() {
     }
   };
 
-  if (isPending) {
+  if (isPending || !session) {
     return <div className="w-10 h-10 skeleton rounded-full"></div>;
   }
 

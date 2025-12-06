@@ -12,8 +12,9 @@ import { compilerInfoFetcher, SelectedCompiler } from "./api";
 import { cppRunFiles, selectCppCompiler } from "./cpp";
 import { RuntimeContext, RuntimeLang } from "../runtime";
 import { ReplOutput } from "../repl";
+import { rustRunFiles, selectRustCompiler } from "./rust";
 
-type WandboxLang = "cpp";
+type WandboxLang = "cpp" | "rust";
 
 interface IWandboxContext {
   ready: boolean;
@@ -46,20 +47,14 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
     }
     return {
       cpp: selectCppCompiler(compilerList),
+      rust: selectRustCompiler(compilerList),
     };
   }, [compilerList]);
 
   const getCommandlineStrWithLang = useCallback(
     (lang: WandboxLang) => {
       if (selectedCompiler) {
-        lang satisfies RuntimeLang;
-        switch (lang) {
-          case "cpp":
-            return selectedCompiler.cpp.getCommandlineStr;
-          default:
-            lang satisfies never;
-            throw new Error(`unsupported language: ${lang}`);
-        }
+        return selectedCompiler[lang].getCommandlineStr;
       } else {
         return () => "";
       }
@@ -79,6 +74,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         switch (lang) {
           case "cpp":
             return cppRunFiles(selectedCompiler.cpp, files, filenames);
+          case "rust":
+            return rustRunFiles(selectedCompiler.rust, files, filenames);
           default:
             lang satisfies never;
             throw new Error(`unsupported language: ${lang}`);
@@ -101,6 +98,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
 }
 
 export function useWandbox(lang: WandboxLang): RuntimeContext {
+  lang satisfies RuntimeLang;
+
   const context = useContext(WandboxContext);
   if (!context) {
     throw new Error("useWandbox must be used within a WandboxProvider");

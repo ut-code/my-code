@@ -93,12 +93,14 @@ export interface SelectedCompiler {
   compilerOptions: string[];
   compilerOptionsRaw: string[];
   getCommandlineStr: (filenames: string[]) => string; // 表示用
-};
+}
 interface CompileProps {
   compilerName: string;
   compilerOptions: string[];
   compilerOptionsRaw: string[];
-  codes: Code[];
+  code?: string;
+  codes: Record<string, string | undefined>;
+  // codes: Code[];
 }
 export interface CompileResultWithOutput extends CompileResult {
   output: ReplOutput[];
@@ -108,26 +110,26 @@ export async function compileAndRun(
   options: CompileProps
 ): Promise<CompileResultWithOutput> {
   // Call the ndjson API instead of json API
-  const response = await fetch(
-    new URL("/api/compile.ndjson", WANDBOX),
-    {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        compiler: options.compilerName,
-        code: "",
-        codes: options.codes,
-        options: options.compilerOptions.join(","),
-        stdin: "",
-        "compiler-option-raw": options.compilerOptionsRaw.join("\n"),
-        "runtime-option-raw": "",
-        save: false,
-        is_private: true,
-      } satisfies CompileParameter),
-    }
-  );
+  const response = await fetch(new URL("/api/compile.ndjson", WANDBOX), {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      compiler: options.compilerName,
+      code: options.code ?? "",
+      codes: Object.entries(options.codes).map(([name, code]) => ({
+        file: name,
+        code: code ?? "",
+      })) satisfies Code[],
+      options: options.compilerOptions.join(","),
+      stdin: "",
+      "compiler-option-raw": options.compilerOptionsRaw.join("\n"),
+      "runtime-option-raw": "",
+      save: false,
+      is_private: true,
+    } satisfies CompileParameter),
+  });
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -150,7 +152,7 @@ export async function compileAndRun(
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
-      
+
       // Keep the last incomplete line in the buffer
       buffer = lines.pop() || "";
 

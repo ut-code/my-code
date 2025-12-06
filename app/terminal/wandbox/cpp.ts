@@ -1,6 +1,8 @@
 import { ReplOutput } from "../repl";
 import { compileAndRun, CompilerInfo, SelectedCompiler } from "./api";
 
+import _stacktrace_cpp from "./cpp/_stacktrace.cpp?raw";
+
 export function selectCppCompiler(
   compilerList: CompilerInfo[]
 ): SelectedCompiler {
@@ -70,7 +72,7 @@ export function selectCppCompiler(
 
   // その他オプション
   options.compilerOptionsRaw.push("-g");
-  // commandline.push("-g");
+  commandline.push("-g");
 
   options.getCommandlineStr = (filenames: string[]) => {
     return [...commandline, ...filenames, "&&", "./a.out"].join(" ");
@@ -85,53 +87,60 @@ export async function cppRunFiles(
   filenames: string[]
 ): Promise<ReplOutput[]> {
   const result = await compileAndRun({
-    compilerName: options.compilerName,
-    compilerOptions: options.compilerOptions,
+    ...options,
     compilerOptionsRaw: [
       ...options.compilerOptionsRaw,
       ...filenames,
       "_stacktrace.cpp",
     ],
-    codes: [
-      ...Object.entries(files).map(([name, code]) => ({
-        file: name,
-        code: code || "",
-      })),
-      { file: "_stacktrace.cpp", code: CPP_STACKTRACE_HANDLER },
-    ],
+    codes: { ...files, "_stacktrace.cpp": _stacktrace_cpp },
   });
 
+  let outputs = result.output;
+
   // Find stack trace in the output
-  const traceIndex = result.output.findIndex(
-    (line) => line.type === "stderr" && line.message === "Stack trace:"
+  const signalIndex = outputs.findIndex(
+    (line) =>
+      line.type === "stderr" && line.message.startsWith("#!my_code_signal:")
   );
-  
-  let outputs: ReplOutput[];
-  
+  const traceIndex = outputs.findIndex(
+    (line) => line.type === "stderr" && line.message === "#!my_code_stacktrace:"
+  );
+
+  if (signalIndex >= 0) {
+    outputs[signalIndex] = {
+      type: "error",
+      message: outputs[signalIndex].message.slice(17),
+    } as const;
+  }
   if (traceIndex >= 0) {
-    // CPP_STACKTRACE_HANDLER のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
-    outputs = result.output.slice(0, traceIndex);
-    outputs.push({
-      type: "trace" as const,
+    // _stacktrace.cpp のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
+    const trace = outputs.slice(traceIndex + 1);
+    const otherOutputs = outputs.slice(0, traceIndex);
+    const traceOutputs: ReplOutput[] = [{
+      type: "trace",
       message: "Stack trace (filtered):",
-    });
-    
-    for (const line of result.output.slice(traceIndex + 1)) {
-      // ユーザーのソースコードだけを対象にする
-      if (line.type === "stderr" && line.message.includes("/home/wandbox")) {
-        outputs.push({
-          type: "trace" as const,
-          message: line.message.replace("/home/wandbox/", ""),
-        });
+    }];
+
+    for (const line of trace) {
+      if(line.type === "stderr"){
+        // ユーザーのソースコードだけを対象にする
+        if (line.message.includes("/home/wandbox")) {
+          traceOutputs.push({
+            type: "trace",
+            message: line.message.replace("/home/wandbox/", ""),
+          });
+        }
+      }else{
+        otherOutputs.push(line);
       }
     }
-  } else {
-    outputs = [...result.output];
+    outputs = [...otherOutputs, ...traceOutputs];
   }
-  
+
   if (result.status !== "0") {
     outputs.push({
-      type: "system" as const,
+      type: "system",
       message: `ステータス ${result.status} で異常終了しました`,
     });
   }
@@ -139,45 +148,3 @@ export async function cppRunFiles(
 
   return outputs;
 }
-
-const CPP_STACKTRACE_HANDLER = `
-#define BOOST_STACKTRACE_USE_ADDR2LINE
-#include <boost/stacktrace.hpp>
-#include <iostream>
-#include <signal.h>
-void signal_handler(int signum) {
-    signal(signum, SIG_DFL);
-    switch(signum) {
-    case SIGILL:
-        std::cerr << "Illegal instruction" << std::endl;
-        break;
-    case SIGABRT:
-        std::cerr << "Aborted" << std::endl;
-        break;
-    case SIGBUS:
-        std::cerr << "Bus error" << std::endl;
-        break;
-    case SIGFPE:
-        std::cerr << "Floating point exception" << std::endl;
-        break;
-    case SIGSEGV:
-        std::cerr << "Segmentation fault" << std::endl;
-        break;
-    default:
-        std::cerr << "Signal " << signum << " received" << std::endl;
-        break;
-    }
-    std::cerr << "Stack trace:" << std::endl;
-    std::cerr << boost::stacktrace::stacktrace();
-    raise(signum);
-}
-struct _init_signal_handler {
-    _init_signal_handler() {
-        signal(SIGILL, signal_handler);
-        signal(SIGABRT, signal_handler);
-        signal(SIGBUS, signal_handler);
-        signal(SIGFPE, signal_handler);
-        signal(SIGSEGV, signal_handler);
-    }
-} _init_signal_handler_instance;
-`;

@@ -1,252 +1,281 @@
-# 第9章: 標準テンプレートライブラリ (STL) ①：コンテナ
+# 第9章: 継承とポリモーフィズム
 
-C++の大きな魅力の一つに、**標準テンプレートライブラリ (Standard Template Library, STL)** の存在があります。STLは、よく使われるデータ構造やアルゴリズムを、汎用的かつ効率的に実装したライブラリ群です。この章では、STLの心臓部である**コンテナ**に焦点を当て、データの格納と管理を劇的に楽にする方法を学びます。
+オブジェクト指向プログラミング(OOP)の真の力を解放する時が来ました！💪 この章では、OOPの強力な柱である「**継承 (Inheritance)**」と「**ポリモーフィズム (Polymorphism) / 多態性**」を学びます。これらの概念をマスターすることで、コードの再利用性を高め、柔軟で拡張性の高いプログラムを設計できるようになります。
 
-## STLの全体像: コンテナ、アルゴリズム、イテレータ
+## クラスの継承
 
-STLは、主に3つの要素から構成されています。
+**継承**とは、既存のクラス（**親クラス**または**基底クラス**と呼びます）の機能を引き継いで、新しいクラス（**子クラス**または**派生クラス**と呼びます）を作成する仕組みです。これにより、共通の機能を何度も書く必要がなくなり、コードの重複を避けられます。
 
-1.  **コンテナ (Containers)**: データを格納するためのデータ構造です。`vector`（可変長配列）や`map`（連想配列）など、様々な種類があります。
-2.  **アルゴリズム (Algorithms)**: ソート、検索、変換など、コンテナ上のデータに対して操作を行う関数群です。
-3.  **イテレータ (Iterators)**: コンテナの要素を指し示し、アルゴリズムがコンテナの種類に依存せずに各要素にアクセスするための統一的なインターフェースを提供します。ポインタを一般化したようなものです。
+例えば、「動物」という大まかなクラスがあり、その特徴を引き継いで「犬」や「猫」といった具体的なクラスを作ることができます。「犬」も「猫」も「動物」が持つ「食べる」という共通の機能を持っていますよね。
 
-これら3つが連携することで、C++プログラマは効率的で再利用性の高いコードを素早く書くことができます。この章では「コンテナ」を、次の章では「アルゴリズム」と、それらをつなぐ「イテレータ」の応用を詳しく見ていきます。
+C++では、クラス名の後に `: public 親クラス名` と書くことで継承を表現します。
 
-## std::vector: 最もよく使う可変長配列
-
-`std::vector`は、最も基本的で最もよく使われるコンテナです。他の言語でいうところの「リスト」や「動的配列」に相当し、要素を連続したメモリ領域に格納します。
-
-**主な特徴**:
-
-  * **動的なサイズ**: 必要に応じて自動的にサイズが拡張されます。
-  * **高速なランダムアクセス**: インデックス（添字）を使って `[i]` の形式で要素に高速にアクセスできます (`O(1)`)。
-  * **末尾への高速な追加・削除**: `push_back()` や `pop_back()` を使った末尾への操作は非常に高速です。
-
-`std::vector`を使うには、`<vector>`ヘッダをインクルードする必要があります。
-
-```cpp:vector_example.cpp
+```cpp:inheritance_basic.cpp
 #include <iostream>
-#include <vector>
 #include <string>
 
+// 親クラス (基底クラス)
+class Animal {
+public:
+    std::string name;
+
+    void eat() {
+        std::cout << name << " is eating." << std::endl;
+    }
+};
+
+// 子クラス (派生クラス)
+// Animalクラスのpublicメンバを引き継ぐ
+class Dog : public Animal {
+public:
+    void bark() {
+        std::cout << name << " says Woof!" << std::endl;
+    }
+};
+
 int main() {
-    // string型の要素を格納するvectorを作成
-    std::vector<std::string> names;
+    Dog my_dog;
+    my_dog.name = "Pochi";
 
-    // push_backで末尾に要素を追加
-    names.push_back("Alice");
-    names.push_back("Bob");
-    names.push_back("Charlie");
+    // 親クラスから継承したメンバ変数・メンバ関数
+    my_dog.eat();
 
-    // インデックスを使った要素へのアクセス
-    std::cout << "Index 1: " << names[1] << std::endl;
-
-    // 範囲for文 (range-based for loop) を使った全要素の走査
-    std::cout << "\nAll names:" << std::endl;
-    for (const std::string& name : names) {
-        std::cout << "- " << name << std::endl;
-    }
-
-    // size()で現在の要素数を取得
-    std::cout << "\nCurrent size: " << names.size() << std::endl;
-
-    // pop_backで末尾の要素を削除
-    names.pop_back(); // "Charlie"を削除
-
-    std::cout << "\nAfter pop_back:" << std::endl;
-    for (const std::string& name : names) {
-        std::cout << "- " << name << std::endl;
-    }
-    std::cout << "Current size: " << names.size() << std::endl;
+    // Dogクラス独自のメンバ関数
+    my_dog.bark();
 
     return 0;
 }
 ```
 
-```cpp-exec:vector_example.cpp
-Index 1: Bob
-
-All names:
-- Alice
-- Bob
-- Charlie
-
-Current size: 3
-
-After pop_back:
-- Alice
-- Bob
-Current size: 2
+```cpp-exec:inheritance_basic.cpp
+Pochi is eating.
+Pochi says Woof!
 ```
 
-`std::vector`は、どのコンテナを使うか迷ったら、まず最初に検討すべきデフォルトの選択肢と言えるほど万能です。
+この例では、`Dog`クラスは`Animal`クラスを継承しています。そのため、`Dog`クラスのオブジェクト `my_dog` は、`Animal`クラスで定義されたメンバ変数 `name` やメンバ関数 `eat()` を、まるで自分のものであるかのように利用できます。
 
-## std::map: キーと値のペアを管理する連想配列
+## 仮想関数 (virtual) とポリモーフィズム
 
-`std::map`は、キー (key) と値 (value) のペアを管理するためのコンテナです。他の言語の「辞書 (dictionary)」や「ハッシュマップ (hash map)」に似ています。キーを使って値を高速に検索、追加、削除できます。
+継承の最も強力な側面は、**ポリモーフィズム（多態性）**を実現できることです。ポリモーフィズムとは、ギリシャ語で「多くの形を持つ」という意味で、プログラミングにおいては「**同じインターフェース（指示）で、オブジェクトの種類に応じて異なる振る舞いをさせる**」ことを指します。
 
-**主な特徴**:
+これを実現するのが **仮想関数 (virtual function)** です。親クラスの関数宣言の前に `virtual` キーワードを付けると、その関数は仮想関数になります。
 
-  * **キーによる高速な検索**: キーに基づいて要素が自動的にソートされて格納されるため、検索、挿入、削除が高速です (`O(log n)`)。
-  * **一意なキー**: `std::map`内のキーは重複しません。同じキーで値を挿入しようとすると、既存の値が上書きされます。
+親クラスのポインタや参照は、子クラスのオブジェクトを指すことができます。このとき、呼び出された仮想関数は、ポインタが指している**オブジェクトの実際の型**に基づいて決定されます。
 
-`std::map`を使うには、`<map>`ヘッダをインクルードする必要があります。
+言葉だけでは難しいので、コードで見てみましょう。
 
-```cpp:map_example.cpp
+```cpp:polymorphism_example.cpp
 #include <iostream>
-#include <map>
 #include <string>
 
+class Animal {
+public:
+    // speak() を仮想関数として宣言
+    virtual void speak() {
+        std::cout << "Some generic animal sound..." << std::endl;
+    }
+};
+
+class Dog : public Animal {
+public:
+    // 親クラスの仮想関数を上書き (オーバーライド)
+    void speak() override { // overrideキーワードについては後述
+        std::cout << "Woof!" << std::endl;
+    }
+};
+
+class Cat : public Animal {
+public:
+    // 親クラスの仮想関数を上書き (オーバーライド)
+    void speak() override {
+        std::cout << "Meow!" << std::endl;
+    }
+};
+
+// Animalへのポインタを受け取る関数
+void make_animal_speak(Animal* animal) {
+    animal->speak(); // ポインタが指す先の実際のオブジェクトに応じて、適切な speak() が呼ばれる
+}
+
 int main() {
-    // キーがstring型、値がint型のmapを作成
-    std::map<std::string, int> scores;
+    Animal generic_animal;
+    Dog dog;
+    Cat cat;
 
-    // []演算子で要素を追加・更新
-    scores["Alice"] = 95;
-    scores["Bob"] = 88;
-    scores["Charlie"] = 76;
-
-    // []演算子で値にアクセス
-    std::cout << "Bob's score: " << scores["Bob"] << std::endl;
-
-    // 新しいキーで追加
-    scores["David"] = 100;
-    
-    // 既存のキーの値を更新
-    scores["Alice"] = 98;
-
-    // 範囲for文を使った全要素の走査
-    // autoキーワードを使うと型推論が効いて便利
-    std::cout << "\nAll scores:" << std::endl;
-    for (const auto& pair : scores) {
-        std::cout << "- " << pair.first << ": " << pair.second << std::endl;
-    }
-
-    // count()でキーの存在を確認
-    std::string search_key = "Charlie";
-    if (scores.count(search_key)) {
-        std::cout << "\n" << search_key << " is in the map." << std::endl;
-    }
-
-    // erase()で要素を削除
-    scores.erase("Bob");
-
-    std::cout << "\nAfter erasing Bob:" << std::endl;
-    for (const auto& pair : scores) {
-        std::cout << "- " << pair.first << ": " << pair.second << std::endl;
-    }
+    std::cout << "Calling through function:" << std::endl;
+    make_animal_speak(&generic_animal);
+    make_animal_speak(&dog); // Dogオブジェクトを渡す
+    make_animal_speak(&cat); // Catオブジェクトを渡す
 
     return 0;
 }
 ```
 
-```cpp-exec:map_example.cpp
-Bob's score: 88
-
-All scores:
-- Alice: 98
-- Bob: 88
-- Charlie: 76
-- David: 100
-
-Charlie is in the map.
-
-After erasing Bob:
-- Alice: 98
-- Charlie: 76
-- David: 100
+```cpp-exec:polymorphism_example.cpp
+Calling through function:
+Some generic animal sound...
+Woof!
+Meow!
 ```
 
-`std::map`は、キーと値のペアを効率的に管理したい場合に非常に強力なツールです。
+`make_animal_speak` 関数は `Animal*` 型の引数を取りますが、`Dog`オブジェクトや`Cat`オブジェクトのアドレスを渡すことができています。そして、`animal->speak()` を呼び出すと、`animal` ポインタが実際に指しているオブジェクトの `speak()` が実行されます。これがポリモーフィズムです。もし `Animal`クラスの `speak()` に `virtual` が付いていなければ、どのオブジェクトを渡しても `Animal` の `speak()` が呼ばれてしまいます。
 
-## その他: 目的に応じたコンテナ
+## オーバーライド (override)
 
-STLには、他にも特定の目的に特化したコンテナが多数用意されています。ここでは代表的なものをいくつか紹介します。
+先ほどの例で `override` というキーワードが登場しましたね。これはC++11から導入されたもので、子クラスの関数が**親クラスの仮想関数を上書き（オーバーライド）する意図があることを明示する**ためのものです。
 
-  * `std::list`: 双方向リスト。要素の途中への挿入・削除が非常に高速 (`O(1)`) ですが、ランダムアクセスはできません（先頭から順番にたどる必要があります）。`<list>`ヘッダが必要です。
-  * `std::set`: 重複しない要素の集合を管理します。要素は自動的にソートされます。特定の要素が集合内に存在するかどうかを高速に判定したい場合 (`O(log n)`) に便利です。`<set>`ヘッダが必要です。
-  * `std::unordered_map`: `std::map`と同様にキーと値のペアを管理しますが、内部的にハッシュテーブルを使うため、平均的な検索・挿入・削除がさらに高速 (`O(1)`) です。ただし、要素はソートされません。`<unordered_map>`ヘッダが必要です。
-  * `std::queue`, `std::stack`: それぞれ先入れ先出し (FIFO)、後入れ先出し (LIFO) のデータ構造を実装するためのコンテナアダプタです。
+`override` を付けておくと、もし親クラスに対応する仮想関数が存在しない場合（例えば、関数名をタイプミスした場合など）に、コンパイラがエラーを検出してくれます。
 
-どのコンテナを選択するかは、プログラムの要件（データのアクセスパターン、挿入・削除の頻度など）によって決まります。まずは`std::vector`を基本とし、必要に応じて他のコンテナを検討するのが良いアプローチです。
+```cpp
+class Dog : public Animal {
+public:
+    // もし親クラスのspeakがvirtualでなかったり、
+    // speek() のようにタイプミスしたりすると、コンパイルエラーになる。
+    void speak() override {
+        std::cout << "Woof!" << std::endl;
+    }
+};
+```
+
+意図しないバグを防ぐために、仮想関数をオーバーライドする際は必ず `override` を付ける習慣をつけましょう。
+
+## 抽象クラス
+
+時には、「具体的な実装を持たず、子クラスに実装を強制するための設計図」としてのみ機能するクラスを定義したい場合があります。これが**抽象クラス (Abstract Class)** です。
+
+抽象クラスは、**純粋仮想関数 (pure virtual function)** を1つ以上持つクラスです。純粋仮想関数は、末尾に `= 0` を付けて宣言します。
+
+```cpp
+virtual void function_name() = 0; // これが純粋仮想関数
+```
+
+抽象クラスは以下の特徴を持ちます。
+
+  * インスタンス化（オブジェクトの作成）ができない。
+  * 抽象クラスを継承した子クラスは、全ての純粋仮想関数をオーバーライド（実装）しなければならない。さもなければ、その子クラスもまた抽象クラスとなる。
+
+```cpp:abstract_class_example.cpp
+#include <iostream>
+
+// Shapeは純粋仮想関数 draw() を持つため、抽象クラスとなる
+class Shape {
+public:
+    // 純粋仮想関数
+    // このクラスを継承するクラスは、必ず draw() を実装しなければならない
+    virtual void draw() = 0;
+
+    // 仮想デストラクタ (継承を扱う際は重要。詳しくは今後の章で)
+    virtual ~Shape() {}
+};
+
+class Circle : public Shape {
+public:
+    void draw() override {
+        std::cout << "Drawing a circle: ○" << std::endl;
+    }
+};
+
+class Square : public Shape {
+public:
+    void draw() override {
+        std::cout << "Drawing a square: □" << std::endl;
+    }
+};
+
+int main() {
+    // Shape my_shape; // エラー！抽象クラスはインスタンス化できない
+
+    Circle circle;
+    Square square;
+
+    Shape* shape1 = &circle;
+    Shape* shape2 = &square;
+
+    shape1->draw();
+    shape2->draw();
+
+    return 0;
+}
+```
+
+```cpp-exec:abstract_class_example.cpp
+Drawing a circle: ○
+Drawing a square: □
+```
+
+`Shape` クラスは「図形なら描画できるはずだ」というインターフェース（契約）を定義し、具体的な描画方法は子クラスである `Circle` や `Square` に任せています。このように、抽象クラスはプログラムの骨格となる設計を強制するのに非常に役立ちます。
 
 ## この章のまとめ
 
-  * **STL**は、**コンテナ**、**アルゴリズム**、**イテレータ**の3つの主要コンポーネントから構成される、C++の強力な標準ライブラリです。
-  * **コンテナ**は、データを格納するためのクラスです。
-  * `std::vector`は、最も一般的に使われる動的配列で、高速なランダムアクセスと末尾への簡単な要素追加が特徴です。
-  * `std::map`は、キーと値のペアを管理する連想配列で、キーによる高速な検索が可能です。
-  * 他にも`std::list`, `std::set`など、特定の用途に合わせた様々なコンテナが用意されています。
+  * **継承**: 既存のクラスの機能を引き継ぎ、コードの再利用性を高める仕組みです。`(子クラス) : public (親クラス)` のように書きます。
+  * **ポリモーフィズム**: 「同じ指示でも、オブジェクトの種類によって異なる振る舞いをさせる」性質です。
+  * **仮想関数 (`virtual`)**: ポリモーフィズムを実現するための鍵です。親クラスの関数に `virtual` を付けると、ポインタや参照経由で呼び出した際に、オブジェクトの実際の型に応じた関数が実行されます。
+  * **オーバーライド (`override`)**: 子クラスで親クラスの仮想関数を上書きする意図を明示します。コンパイラがチェックしてくれるため、安全性が向上します。
+  * **抽象クラス**: 1つ以上の**純粋仮想関数 (`virtual ... = 0;`)** を持つクラスです。インスタンス化できず、継承されるための設計図として機能します。
 
-### 練習問題1: 数値ベクタの操作
+### 練習問題1:乗り物の階層構造
 
-`std::vector<int>`型の整数のリストに対して、以下の処理を行うプログラムを作成してください。
+`Vehicle` という親クラスを作成し、`move()` というメンバ関数を持たせましょう。次に、`Vehicle` を継承して `Car` クラスと `Motorcycle` クラスを作成し、それぞれが独自の `move()` の振る舞いをするようにオーバーライドしてください。
 
-1.  ベクタに格納されている全ての数値の合計値を計算して表示する。
-2.  ベクタの中の最大値を検索して表示する。
-3.  ベクタの要素を逆順にして、その内容を表示する。（ヒント：新しいベクタを作っても良いですし、`std::swap`を使っても構いません）
+`main` 関数では、`Vehicle` のポインタの配列を作成し、`Car` と `Motorcycle` のオブジェクトを格納して、ループでそれぞれの `move()` を呼び出してください。
 
 ```cpp:practice9_1.cpp
 #include <iostream>
-#include <vector>
+#include <string>
+
+
+// ここに Vehicle, Car, Motorcycle クラスを定義してください
+
 
 int main() {
-    std::vector<int> numbers = {3, 5, 2, 8, 6};
+    // Vehicleのポインタの配列を作成
+    Vehicle* vehicles[2];
 
-    // 1. 合計値の計算
+    Car my_car;
+    Motorcycle my_motorcycle;
 
+    vehicles[0] = &my_car;
+    vehicles[1] = &my_motorcycle;
 
-    // 2. 最大値の検索
-
-
-    // 3. 要素の逆順表示
-
+    // それぞれのmove()を呼び出す
+    for (int i = 0; i < 2; ++i) {
+        vehicles[i]->move();
+    }
 
     return 0;
 }
 ```
 
 ```cpp-exec:practice9_1.cpp
-Sum: 24
-Max: 8
-Reversed: 6 8 2 5 3 
 ```
 
+### 問題2: 従業員の給与計算
 
-### 練習問題2: 簡単な単語カウンター
+`Employee` という抽象クラスを定義してください。このクラスは、従業員の名前を保持し、給与を計算するための純粋仮想関数 `calculate_salary()` を持ちます。
 
-英文（スペースで区切られた単語の列）を読み込み、各単語が何回出現したかをカウントするプログラムを`std::map<std::string, int>`を使って作成してください。最後に、出現した全単語とその出現回数をアルファベット順に表示してください。
+次に、`Employee` を継承して、`FullTimeEmployee`（月給制）と `PartTimeEmployee`（時給制）の2つのクラスを作成します。それぞれのクラスで `calculate_salary()` を具体的に実装してください。
 
-> 文字列を単語ごとに分割するには、以下のように`std::istringstream`を使うと便利です。
-```cpp
-#include <sstream>
-
-std::string text = "this is a sample text";
-std::istringstream iss(text);
-std::string word;
-while (iss >> word) {
-    // wordには1単語ずつ格納される
-}
-```
-
-
+`main` 関数で、それぞれのクラスのインスタンスを作成し、給与が正しく計算されることを確認してください。
 
 ```cpp:practice9_2.cpp
 #include <iostream>
-#include <map>
 #include <string>
-#include <sstream>
+
+// ここに Employee, FullTimeEmployee, PartTimeEmployee クラスを定義してください
+
 
 int main() {
-    std::string text = "cpp is fun and cpp is powerful";
+    FullTimeEmployee full_time_emp("Alice", 3000); // 月給3000ドル
+    PartTimeEmployee part_time_emp("Bob", 20, 80); // 時給20ドル、80時間勤務
 
+    std::cout << full_time_emp.get_name() << "'s Salary: $" << full_time_emp.calculate_salary() << std::endl;
+    std::cout << part_time_emp.get_name() << "'s Salary: $" << part_time_emp.calculate_salary() << std::endl;
 
+    return 0;
 }
 ```
+
 ```cpp-exec:practice9_2.cpp
-and: 1
-cpp: 2
-fun: 1
-is: 2
-powerful: 1
+Alice's Salary: $3000
+Bob's Salary: $1600
 ```

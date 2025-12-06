@@ -44,6 +44,7 @@ export type RuntimeLang =
   | "python"
   | "ruby"
   | "cpp"
+  | "rust"
   | "javascript"
   | "typescript";
 
@@ -61,6 +62,9 @@ export function getRuntimeLang(
     case "cpp":
     case "c++":
       return "cpp";
+    case "rust":
+    case "rs":
+      return "rust";
     case "javascript":
     case "js":
       return "javascript";
@@ -69,11 +73,15 @@ export function getRuntimeLang(
       return "typescript";
     case "bash":
     case "sh":
+    case "powershell":
     case "json":
+    case "toml":
     case "csv":
     case "text":
     case "txt":
     case "html":
+    case "makefile":
+    case "cmake":
     case undefined:
       // unsupported languages
       return undefined;
@@ -90,6 +98,7 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
   const jsEval = useJSEval();
   const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
+  const wandboxRust = useWandbox("rust");
 
   let runtime: RuntimeContext;
   switch (language) {
@@ -107,6 +116,9 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
       break;
     case "cpp":
       runtime = wandboxCpp;
+      break;
+    case "rust":
+      runtime = wandboxRust;
       break;
     default:
       language satisfies never;
@@ -158,11 +170,17 @@ export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
     case "c_cpp":
     case "cpp":
       return {
-        tabSize: 2,
+        // 2文字派と4文字派があるが、geminiが4文字で出力するので4でいいや
+        tabSize: 4,
+      };
+    case "rust":
+      return {
+        tabSize: 4,
       };
     case "json":
       return {
-        tabSize: 2,
+        // python-7章で使っている
+        tabSize: 4,
       };
     case "csv":
     case "text":

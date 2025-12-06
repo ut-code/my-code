@@ -8,7 +8,11 @@ import type { PyCallable } from "pyodide/ffi";
 import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
 import type { ReplOutput } from "../repl";
 
+import execfile_py from "./pyodide/execfile.py?raw";
+import check_syntax_py from "./pyodide/check_syntax.py?raw";
+
 const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`;
+const HOME = `/home/pyodide/`;
 
 let pyodide: PyodideInterface;
 let pyodideOutput: ReplOutput[] = [];
@@ -134,7 +138,7 @@ async function runFile({ id, payload }: WorkerRequest["runFile"]) {
       }
     }
 
-    const pyExecFile = pyodide.runPython(EXECFILE_CODE) as PyCallable;
+    const pyExecFile = pyodide.runPython(execfile_py) as PyCallable;
     pyExecFile(`${HOME}/${name}`);
   } catch (e: unknown) {
     console.log(e);
@@ -198,7 +202,7 @@ async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
 
   try {
     // Pythonのコードを実行して結果を受け取る
-    const status = (pyodide.runPython(CHECK_SYNTAX_CODE) as PyCallable)(code);
+    const status = (pyodide.runPython(check_syntax_py) as PyCallable)(code);
     self.postMessage({
       id,
       payload: { status },
@@ -238,39 +242,3 @@ self.onmessage = async (event: MessageEvent<WorkerRequest[MessageType]>) => {
       return;
   }
 };
-
-// Python側で実行する構文チェックのコード
-// codeop.compile_commandは、コードが不完全な場合はNoneを返します。
-const CHECK_SYNTAX_CODE = `
-def __check_syntax(code):
-    import codeop
-
-    compiler = codeop.compile_command
-    try:
-        # compile_commandは、コードが完結していればコンパイルオブジェクトを、
-        # 不完全(まだ続きがある)であればNoneを返す
-        if compiler(code) is not None:
-            return "complete"
-        else:
-            return "incomplete"
-    except (SyntaxError, ValueError, OverflowError):
-        # 明らかな構文エラーの場合
-        return "invalid"
-
-__check_syntax
-`;
-
-const HOME = `/home/pyodide/`;
-
-// https://stackoverflow.com/questions/436198/what-alternative-is-there-to-execfile-in-python-3-how-to-include-a-python-fil
-const EXECFILE_CODE = `
-def __execfile(filepath):
-  with open(filepath, 'rb') as file:
-      exec_globals = {
-          "__file__": filepath,
-          "__name__": "__main__",
-      }
-      exec(compile(file.read(), filepath, 'exec'), exec_globals)
-
-__execfile
-`;
