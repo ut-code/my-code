@@ -1,11 +1,12 @@
 /// <reference lib="webworker" />
 /// <reference lib="ES2023" />
 
+import { expose } from "comlink";
 import type { PyodideInterface } from "pyodide";
 // import { loadPyodide } from "pyodide"; -> Reading from "node:child_process" is not handled by plugins
 import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
-import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
+import type { WorkerCapabilities } from "./runtime";
 import type { ReplOutput } from "../repl";
 
 import execfile_py from "./pyodide/execfile.py?raw";
@@ -36,8 +37,9 @@ function readAllFiles(): Record<string, string> {
   return updatedFiles;
 }
 
-async function init({ id, payload }: WorkerRequest["init"]) {
-  const { interruptBuffer } = payload;
+async function init(
+  interruptBuffer: Uint8Array
+): Promise<{ capabilities: WorkerCapabilities }> {
   if (!pyodide) {
     self.importScripts(`${PYODIDE_CDN}pyodide.js`);
 
@@ -57,20 +59,15 @@ async function init({ id, payload }: WorkerRequest["init"]) {
 
     pyodide.setInterruptBuffer(interruptBuffer);
   }
-  self.postMessage({
-    id,
-    payload: { capabilities: { interrupt: "buffer" } },
-  } satisfies WorkerResponse["init"]);
+  return { capabilities: { interrupt: "buffer" } };
 }
 
-async function runCode({ id, payload }: WorkerRequest["runCode"]) {
-  const { code } = payload;
+async function runCode(code: string): Promise<{
+  output: ReplOutput[];
+  updatedFiles: Record<string, string>;
+}> {
   if (!pyodide) {
-    self.postMessage({
-      id,
-      error: "Pyodide not initialized",
-    } satisfies WorkerResponse["runCode"]);
-    return;
+    throw new Error("Pyodide not initialized");
   }
   try {
     const result = await pyodide.runPythonAsync(code);
@@ -115,20 +112,15 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
 
-  self.postMessage({
-    id,
-    payload: { output, updatedFiles },
-  } satisfies WorkerResponse["runCode"]);
+  return { output, updatedFiles };
 }
 
-async function runFile({ id, payload }: WorkerRequest["runFile"]) {
-  const { name, files } = payload;
+async function runFile(
+  name: string,
+  files: Record<string, string>
+): Promise<{ output: ReplOutput[]; updatedFiles: Record<string, string> }> {
   if (!pyodide) {
-    self.postMessage({
-      id,
-      error: "Pyodide not initialized",
-    } satisfies WorkerResponse["runFile"]);
-    return;
+    throw new Error("Pyodide not initialized");
   }
   try {
     // Use Pyodide FS API to write files to the file system
@@ -175,70 +167,41 @@ async function runFile({ id, payload }: WorkerRequest["runFile"]) {
   const updatedFiles = readAllFiles();
   const output = [...pyodideOutput];
   pyodideOutput = []; // 出力をクリア
-  self.postMessage({
-    id,
-    payload: { output, updatedFiles },
-  } satisfies WorkerResponse["runFile"]);
+  return { output, updatedFiles };
 }
 
-async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
-  const { code } = payload;
+async function checkSyntax(
+  code: string
+): Promise<{ status: "complete" | "incomplete" | "invalid" }> {
   if (!pyodide) {
-    self.postMessage({
-      id,
-      payload: { status: "invalid" },
-    } satisfies WorkerResponse["checkSyntax"]);
-    return;
+    return { status: "invalid" };
   }
 
   // 複数行コマンドは最後に空行を入れないと完了しないものとする
   if (code.includes("\n") && code.split("\n").at(-1) !== "") {
-    self.postMessage({
-      id,
-      payload: { status: "incomplete" },
-    } satisfies WorkerResponse["checkSyntax"]);
-    return;
+    return { status: "incomplete" };
   }
 
   try {
     // Pythonのコードを実行して結果を受け取る
     const status = (pyodide.runPython(check_syntax_py) as PyCallable)(code);
-    self.postMessage({
-      id,
-      payload: { status },
-    } satisfies WorkerResponse["checkSyntax"]);
+    return { status };
   } catch (e) {
     console.error("Syntax check error:", e);
-    self.postMessage({
-      id,
-      payload: { status: "invalid" },
-    } satisfies WorkerResponse["checkSyntax"]);
+    return { status: "invalid" };
   }
 }
 
-self.onmessage = async (event: MessageEvent<WorkerRequest[MessageType]>) => {
-  switch (event.data.type) {
-    case "init":
-      await init(event.data);
-      return;
-    case "runCode":
-      await runCode(event.data);
-      return;
-    case "runFile":
-      await runFile(event.data);
-      return;
-    case "checkSyntax":
-      await checkSyntax(event.data);
-      return;
-    case "restoreState":
-      self.postMessage({
-        id: event.data.id,
-        error: "not implemented",
-      } satisfies WorkerResponse["restoreState"]);
-      return;
-    default:
-      event.data satisfies never;
-      console.error(`Unknown message: ${event.data}`);
-      return;
-  }
+async function restoreState(): Promise<object> {
+  throw new Error("not implemented");
+}
+
+const api = {
+  init,
+  runCode,
+  runFile,
+  checkSyntax,
+  restoreState,
 };
+
+expose(api);
