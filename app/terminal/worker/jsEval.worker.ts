@@ -102,7 +102,7 @@ async function runCode(code: string): Promise<{
   const output = [...jsOutput];
   jsOutput = []; // Clear output
 
-  return { output, updatedFiles: {} };
+  return { output, updatedFiles: {} as Record<string, string> };
 }
 
 function runFile(
@@ -131,7 +131,7 @@ function runFile(
   const output = [...jsOutput];
   jsOutput = []; // Clear output
 
-  return { output, updatedFiles: {} };
+  return { output, updatedFiles: {} as Record<string, string> };
 }
 
 async function checkSyntax(
