@@ -57,8 +57,7 @@ export function WorkerProvider({
   const commandHistory = useRef<string[]>([]);
   
   // Track pending promises for restart-based interruption
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pendingPromises = useRef<Set<(reason: any) => void>>(new Set());
+  const pendingPromises = useRef<Set<(reason: unknown) => void>>(new Set());
 
   const initializeWorker = useCallback(async () => {
     if (!mutex.isLocked()) {
@@ -152,7 +151,7 @@ export function WorkerProvider({
         break;
       case "restart": {
         // Reject all pending promises
-        const error = "Worker interrupted";
+        const error = new Error("Worker interrupted");
         pendingPromises.current.forEach((reject) => reject(error));
         pendingPromises.current.clear();
 
