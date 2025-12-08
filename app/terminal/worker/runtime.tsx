@@ -55,6 +55,10 @@ export function WorkerProvider({
   const interruptBuffer = useRef<Uint8Array | null>(null);
   const capabilities = useRef<WorkerCapabilities | null>(null);
   const commandHistory = useRef<string[]>([]);
+  
+  // Track pending promises for restart-based interruption
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pendingPromises = useRef<Set<(reason: any) => void>>(new Set());
 
   const initializeWorker = useCallback(async () => {
     if (!mutex.isLocked()) {
@@ -96,6 +100,30 @@ export function WorkerProvider({
   const [doInit, setDoInit] = useState(false);
   const init = useCallback(() => setDoInit(true), []);
 
+  // Helper function to wrap worker API calls and track pending promises
+  // This ensures promises are rejected when the worker is terminated
+  const trackPromise = useCallback(
+    <T,>(promise: Promise<T>): Promise<T> => {
+      return new Promise((resolve, reject) => {
+        // Store the reject function
+        pendingPromises.current.add(reject);
+
+        promise
+          .then((result) => {
+            // Remove reject function on success
+            pendingPromises.current.delete(reject);
+            resolve(result);
+          })
+          .catch((error) => {
+            // Remove reject function on error
+            pendingPromises.current.delete(reject);
+            reject(error);
+          });
+      });
+    },
+    []
+  );
+
   // Initialization effect
   useEffect(() => {
     if (doInit) {
@@ -123,6 +151,11 @@ export function WorkerProvider({
         }
         break;
       case "restart": {
+        // Reject all pending promises
+        const error = "Worker interrupted";
+        pendingPromises.current.forEach((reject) => reject(error));
+        pendingPromises.current.clear();
+
         // Terminate the worker
         workerRef.current?.terminate();
         workerRef.current = null;
@@ -169,8 +202,8 @@ export function WorkerProvider({
       }
 
       try {
-        const { output, updatedFiles } = await workerApiRef.current.runCode(
-          code
+        const { output, updatedFiles } = await trackPromise(
+          workerApiRef.current.runCode(code)
         );
 
         writeFile(updatedFiles);
@@ -191,18 +224,18 @@ export function WorkerProvider({
         return [{ type: "error", message: String(error) }];
       }
     },
-    [ready, writeFile, mutex]
+    [ready, writeFile, mutex, trackPromise]
   );
 
   const checkSyntax = useCallback(
     async (code: string): Promise<SyntaxStatus> => {
       if (!workerApiRef.current || !ready) return "invalid";
       const { status } = await mutex.runExclusive(() =>
-        workerApiRef.current!.checkSyntax(code)
+        trackPromise(workerApiRef.current!.checkSyntax(code))
       );
       return status;
     },
-    [ready, mutex]
+    [ready, mutex, trackPromise]
   );
 
   const runFiles = useCallback(
@@ -233,15 +266,14 @@ export function WorkerProvider({
         interruptBuffer.current[0] = 0;
       }
       return mutex.runExclusive(async () => {
-        const { output, updatedFiles } = await workerApiRef.current!.runFile(
-          filenames[0],
-          files
+        const { output, updatedFiles } = await trackPromise(
+          workerApiRef.current!.runFile(filenames[0], files)
         );
         writeFile(updatedFiles);
         return output;
       });
     },
-    [ready, writeFile, mutex]
+    [ready, writeFile, mutex, trackPromise]
   );
 
   return (
