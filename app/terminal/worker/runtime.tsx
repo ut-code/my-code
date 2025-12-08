@@ -108,15 +108,10 @@ export function WorkerProvider({
         pendingPromises.current.add(reject);
 
         promise
-          .then((result) => {
-            // Remove reject function on success
+          .then(resolve, reject)
+          .finally(() => {
+            // Remove reject function after promise settles
             pendingPromises.current.delete(reject);
-            resolve(result);
-          })
-          .catch((error) => {
-            // Remove reject function on error
-            pendingPromises.current.delete(reject);
-            reject(error);
           });
       });
     },
