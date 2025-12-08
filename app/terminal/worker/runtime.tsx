@@ -145,7 +145,7 @@ export function WorkerProvider({
         }
         break;
       case "restart": {
-        // Reject all pending promises
+        // Reject all pending promises by calling their reject handlers
         const error = new Error("Worker interrupted");
         pendingPromises.current.forEach((reject) => reject(error));
         pendingPromises.current.clear();
