@@ -1,7 +1,8 @@
 /// <reference lib="webworker" />
 
+import { expose } from "comlink";
 import type { ReplOutput } from "../repl";
-import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
+import type { WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
 
 function format(...args: unknown[]): string {
@@ -29,12 +30,12 @@ self.console = {
   },
 };
 
-async function init({ id }: WorkerRequest["init"]) {
+async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
+  capabilities: WorkerCapabilities;
+}> {
   // Initialize the worker and report capabilities
-  self.postMessage({
-    id,
-    payload: { capabilities: { interrupt: "restart" } },
-  } satisfies WorkerResponse["init"]);
+  // interruptBuffer is not used for JavaScript (restart-based interruption)
+  return { capabilities: { interrupt: "restart" } };
 }
 
 async function replLikeEval(code: string): Promise<unknown> {
@@ -72,8 +73,10 @@ async function replLikeEval(code: string): Promise<unknown> {
   }
 }
 
-async function runCode({ id, payload }: WorkerRequest["runCode"]) {
-  const { code } = payload;
+async function runCode(code: string): Promise<{
+  output: ReplOutput[];
+  updatedFiles: Record<string, string>;
+}> {
   try {
     const result = await replLikeEval(code);
     jsOutput.push({
@@ -99,14 +102,13 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   const output = [...jsOutput];
   jsOutput = []; // Clear output
 
-  self.postMessage({
-    id,
-    payload: { output, updatedFiles: [] },
-  } satisfies WorkerResponse["runCode"]);
+  return { output, updatedFiles: {} as Record<string, string> };
 }
 
-function runFile({ id, payload }: WorkerRequest["runFile"]) {
-  const { name, files } = payload;
+function runFile(
+  name: string,
+  files: Record<string, string>
+): { output: ReplOutput[]; updatedFiles: Record<string, string> } {
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
   try {
     self.eval(files[name]);
@@ -129,23 +131,17 @@ function runFile({ id, payload }: WorkerRequest["runFile"]) {
   const output = [...jsOutput];
   jsOutput = []; // Clear output
 
-  self.postMessage({
-    id,
-    payload: { output, updatedFiles: [] },
-  } satisfies WorkerResponse["runFile"]);
+  return { output, updatedFiles: {} as Record<string, string> };
 }
 
-async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
-  const { code } = payload;
-
+async function checkSyntax(
+  code: string
+): Promise<{ status: "complete" | "incomplete" | "invalid" }> {
   try {
     // Try to create a Function to check syntax
     // new Function(code); // <- not working
     self.eval(`() => {${code}}`);
-    self.postMessage({
-      id,
-      payload: { status: "complete" },
-    } satisfies WorkerResponse["checkSyntax"]);
+    return { status: "complete" };
   } catch (e) {
     // Check if it's a syntax error or if more input is expected
     if (e instanceof SyntaxError) {
@@ -154,28 +150,18 @@ async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
         e.message.includes("Unexpected token '}'") ||
         e.message.includes("Unexpected end of input")
       ) {
-        self.postMessage({
-          id,
-          payload: { status: "incomplete" },
-        } satisfies WorkerResponse["checkSyntax"]);
+        return { status: "incomplete" };
       } else {
-        self.postMessage({
-          id,
-          payload: { status: "invalid" },
-        } satisfies WorkerResponse["checkSyntax"]);
+        return { status: "invalid" };
       }
     } else {
-      self.postMessage({
-        id,
-        payload: { status: "invalid" },
-      } satisfies WorkerResponse["checkSyntax"]);
+      return { status: "invalid" };
     }
   }
 }
 
-async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
+async function restoreState(commands: string[]): Promise<object> {
   // Re-execute all previously successful commands to restore state
-  const { commands } = payload;
   jsOutput = []; // Clear output for restoration
 
   for (const command of commands) {
@@ -188,32 +174,15 @@ async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
   }
 
   jsOutput = []; // Clear any output from restoration
-  self.postMessage({
-    id,
-    payload: {},
-  } satisfies WorkerResponse["restoreState"]);
+  return {};
 }
 
-self.onmessage = async (event: MessageEvent<WorkerRequest[MessageType]>) => {
-  switch (event.data.type) {
-    case "init":
-      await init(event.data);
-      return;
-    case "runCode":
-      await runCode(event.data);
-      return;
-    case "runFile":
-      runFile(event.data);
-      return;
-    case "checkSyntax":
-      await checkSyntax(event.data);
-      return;
-    case "restoreState":
-      await restoreState(event.data);
-      return;
-    default:
-      event.data satisfies never;
-      originalConsole.error(`Unknown message: ${event.data}`);
-      return;
-  }
+const api = {
+  init,
+  runCode,
+  runFile,
+  checkSyntax,
+  restoreState,
 };
+
+expose(api);

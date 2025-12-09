@@ -1,9 +1,10 @@
 /// <reference lib="webworker" />
 /// <reference lib="ES2023" />
 
+import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
-import type { MessageType, WorkerRequest, WorkerResponse } from "./runtime";
+import type { WorkerCapabilities } from "./runtime";
 import type { ReplOutput } from "../repl";
 
 import init_rb from "./ruby/init.rb?raw";
@@ -28,7 +29,10 @@ self.stderr = {
   },
 };
 
-async function init({ id }: WorkerRequest["init"]) {
+async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
+  capabilities: WorkerCapabilities;
+}> {
+  // interruptBuffer is not used for Ruby (restart-based interruption)
   if (!rubyVM) {
     try {
       // Fetch and compile the Ruby WASM module
@@ -41,18 +45,13 @@ async function init({ id }: WorkerRequest["init"]) {
 
       rubyVM.eval(init_rb);
 
-      self.postMessage({
-        id,
-        payload: { capabilities: { interrupt: "restart" } },
-      } satisfies WorkerResponse["init"]);
+      return { capabilities: { interrupt: "restart" } };
     } catch (e: unknown) {
       console.error("Failed to initialize Ruby VM:", e);
-      self.postMessage({
-        id,
-        error: `Failed to initialize Ruby: ${e}`,
-      } satisfies WorkerResponse["init"]);
+      throw new Error(`Failed to initialize Ruby: ${e}`);
     }
   }
+  return { capabilities: { interrupt: "restart" } };
 }
 
 function flushOutput() {
@@ -102,15 +101,12 @@ function formatRubyError(error: unknown, isFile: boolean): string {
   return errorMessage;
 }
 
-async function runCode({ id, payload }: WorkerRequest["runCode"]) {
-  const { code } = payload;
-
+async function runCode(code: string): Promise<{
+  output: ReplOutput[];
+  updatedFiles: Record<string, string>;
+}> {
   if (!rubyVM) {
-    self.postMessage({
-      id,
-      error: "Ruby VM not initialized",
-    } satisfies WorkerResponse["runCode"]);
-    return;
+    throw new Error("Ruby VM not initialized");
   }
 
   try {
@@ -144,21 +140,15 @@ async function runCode({ id, payload }: WorkerRequest["runCode"]) {
   const output = [...rubyOutput];
   rubyOutput = [];
 
-  self.postMessage({
-    id,
-    payload: { output, updatedFiles },
-  } satisfies WorkerResponse["runCode"]);
+  return { output, updatedFiles };
 }
 
-async function runFile({ id, payload }: WorkerRequest["runFile"]) {
-  const { name, files } = payload;
-
+async function runFile(
+  name: string,
+  files: Record<string, string>
+): Promise<{ output: ReplOutput[]; updatedFiles: Record<string, string> }> {
   if (!rubyVM) {
-    self.postMessage({
-      id,
-      error: "Ruby VM not initialized",
-    } satisfies WorkerResponse["runFile"]);
-    return;
+    throw new Error("Ruby VM not initialized");
   }
 
   try {
@@ -199,21 +189,14 @@ async function runFile({ id, payload }: WorkerRequest["runFile"]) {
   const output = [...rubyOutput];
   rubyOutput = [];
 
-  self.postMessage({
-    id,
-    payload: { output, updatedFiles },
-  } satisfies WorkerResponse["runFile"]);
+  return { output, updatedFiles };
 }
 
-async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
-  const { code } = payload;
-
+async function checkSyntax(
+  code: string
+): Promise<{ status: "complete" | "incomplete" | "invalid" }> {
   if (!rubyVM) {
-    self.postMessage({
-      id,
-      payload: { status: "invalid" },
-    } satisfies WorkerResponse["checkSyntax"]);
-    return;
+    return { status: "invalid" };
   }
 
   try {
@@ -231,37 +214,19 @@ async function checkSyntax({ id, payload }: WorkerRequest["checkSyntax"]) {
           e.message.includes("expected a `}` to close the hash literal") ||
           e.message.includes("unterminated string meets end of file"))
       ) {
-        self.postMessage({
-          id,
-          payload: { status: "incomplete" },
-        } satisfies WorkerResponse["checkSyntax"]);
-        return;
+        return { status: "incomplete" };
       }
       // If it's our check exception, syntax is valid
       if (e instanceof Error && e.message && e.message.includes("check")) {
-        self.postMessage({
-          id,
-          payload: { status: "complete" },
-        } satisfies WorkerResponse["checkSyntax"]);
-        return;
+        return { status: "complete" };
       }
       // Otherwise it's a syntax error
-      self.postMessage({
-        id,
-        payload: { status: "invalid" },
-      } satisfies WorkerResponse["checkSyntax"]);
-      return;
+      return { status: "invalid" };
     }
-    self.postMessage({
-      id,
-      payload: { status: "complete" },
-    } satisfies WorkerResponse["checkSyntax"]);
+    return { status: "complete" };
   } catch (e) {
     console.error("Syntax check error:", e);
-    self.postMessage({
-      id,
-      payload: { status: "invalid" },
-    } satisfies WorkerResponse["checkSyntax"]);
+    return { status: "invalid" };
   }
 }
 
@@ -295,15 +260,10 @@ function readAllFiles(): Record<string, string> {
   return updatedFiles;
 }
 
-async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
+async function restoreState(commands: string[]): Promise<object> {
   // Re-execute all previously successful commands to restore state
-  const { commands } = payload;
   if (!rubyVM) {
-    self.postMessage({
-      id,
-      error: "Ruby VM not initialized",
-    } satisfies WorkerResponse["restoreState"]);
-    return;
+    throw new Error("Ruby VM not initialized");
   }
 
   rubyOutput = []; // Clear output for restoration
@@ -323,32 +283,15 @@ async function restoreState({ id, payload }: WorkerRequest["restoreState"]) {
   flushOutput();
   rubyOutput = [];
 
-  self.postMessage({
-    id,
-    payload: {},
-  } satisfies WorkerResponse["restoreState"]);
+  return {};
 }
 
-self.onmessage = async (event: MessageEvent<WorkerRequest[MessageType]>) => {
-  switch (event.data.type) {
-    case "init":
-      await init(event.data);
-      return;
-    case "runCode":
-      await runCode(event.data);
-      return;
-    case "runFile":
-      await runFile(event.data);
-      return;
-    case "checkSyntax":
-      await checkSyntax(event.data);
-      return;
-    case "restoreState":
-      await restoreState(event.data);
-      return;
-    default:
-      event.data satisfies never;
-      console.error(`Unknown message: ${event.data}`);
-      return;
-  }
+const api = {
+  init,
+  runCode,
+  runFile,
+  checkSyntax,
+  restoreState,
 };
+
+expose(api);
