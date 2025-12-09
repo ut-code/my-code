@@ -23,7 +23,7 @@ export type WorkerCapabilities = {
 // Define the worker API interface
 export interface WorkerAPI {
   init(
-    interruptBuffer?: Uint8Array
+    interruptBuffer: Uint8Array
   ): Promise<{ capabilities: WorkerCapabilities }>;
   runCode(
     code: string
@@ -55,7 +55,7 @@ export function WorkerProvider({
   const interruptBuffer = useRef<Uint8Array | null>(null);
   const capabilities = useRef<WorkerCapabilities | null>(null);
   const commandHistory = useRef<string[]>([]);
-  
+
   // Track pending promises for restart-based interruption
   const pendingPromises = useRef<Set<(reason: unknown) => void>>(new Set());
 
@@ -101,22 +101,17 @@ export function WorkerProvider({
 
   // Helper function to wrap worker API calls and track pending promises
   // This ensures promises are rejected when the worker is terminated
-  const trackPromise = useCallback(
-    <T,>(promise: Promise<T>): Promise<T> => {
-      return new Promise((resolve, reject) => {
-        // Store the reject function
-        pendingPromises.current.add(reject);
+  const trackPromise = useCallback(<T,>(promise: Promise<T>): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      // Store the reject function
+      pendingPromises.current.add(reject);
 
-        promise
-          .then(resolve, reject)
-          .finally(() => {
-            // Remove reject function after promise settles
-            pendingPromises.current.delete(reject);
-          });
+      promise.then(resolve, reject).finally(() => {
+        // Remove reject function after promise settles
+        pendingPromises.current.delete(reject);
       });
-    },
-    []
-  );
+    });
+  }, []);
 
   // Initialization effect
   useEffect(() => {

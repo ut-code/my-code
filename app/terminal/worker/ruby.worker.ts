@@ -29,9 +29,9 @@ self.stderr = {
   },
 };
 
-async function init(
-  _interruptBuffer?: Uint8Array
-): Promise<{ capabilities: WorkerCapabilities }> {
+async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
+  capabilities: WorkerCapabilities;
+}> {
   // interruptBuffer is not used for Ruby (restart-based interruption)
   if (!rubyVM) {
     try {

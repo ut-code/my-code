@@ -30,9 +30,9 @@ self.console = {
   },
 };
 
-async function init(
-  _interruptBuffer?: Uint8Array
-): Promise<{ capabilities: WorkerCapabilities }> {
+async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
+  capabilities: WorkerCapabilities;
+}> {
   // Initialize the worker and report capabilities
   // interruptBuffer is not used for JavaScript (restart-based interruption)
   return { capabilities: { interrupt: "restart" } };

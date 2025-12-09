@@ -38,7 +38,7 @@ function readAllFiles(): Record<string, string> {
 }
 
 async function init(
-  interruptBuffer?: Uint8Array
+  interruptBuffer: Uint8Array
 ): Promise<{ capabilities: WorkerCapabilities }> {
   if (!pyodide) {
     self.importScripts(`${PYODIDE_CDN}pyodide.js`);
@@ -57,9 +57,7 @@ async function init(
       },
     });
 
-    if (interruptBuffer) {
-      pyodide.setInterruptBuffer(interruptBuffer);
-    }
+    pyodide.setInterruptBuffer(interruptBuffer);
   }
   return { capabilities: { interrupt: "buffer" } };
 }
