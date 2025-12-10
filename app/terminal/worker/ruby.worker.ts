@@ -10,7 +10,7 @@ import type { ReplOutput } from "../repl";
 import init_rb from "./ruby/init.rb?raw";
 
 let rubyVM: RubyVM | null = null;
-let rubyOutput: ReplOutput[] = [];
+let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
 let stdoutBuffer = "";
 let stderrBuffer = "";
 
@@ -55,28 +55,30 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
 }
 
 function flushOutput() {
+  if (!currentOutputCallback) return;
+
   if (stdoutBuffer) {
     const lines = stdoutBuffer.split("\n");
     for (let i = 0; i < lines.length - 1; i++) {
-      rubyOutput.push({ type: "stdout", message: lines[i] });
+      currentOutputCallback({ type: "stdout", message: lines[i] });
     }
     stdoutBuffer = lines[lines.length - 1];
   }
   // Final flush if there's remaining non-empty text
   if (stdoutBuffer && stdoutBuffer.trim()) {
-    rubyOutput.push({ type: "stdout", message: stdoutBuffer });
+    currentOutputCallback({ type: "stdout", message: stdoutBuffer });
   }
   stdoutBuffer = "";
 
   if (stderrBuffer) {
     const lines = stderrBuffer.split("\n");
     for (let i = 0; i < lines.length - 1; i++) {
-      rubyOutput.push({ type: "stderr", message: lines[i] });
+      currentOutputCallback({ type: "stderr", message: lines[i] });
     }
     stderrBuffer = lines[lines.length - 1];
   }
   if (stderrBuffer && stderrBuffer.trim()) {
-    rubyOutput.push({ type: "stderr", message: stderrBuffer });
+    currentOutputCallback({ type: "stderr", message: stderrBuffer });
   }
   stderrBuffer = "";
 }
@@ -101,16 +103,18 @@ function formatRubyError(error: unknown, isFile: boolean): string {
   return errorMessage;
 }
 
-async function runCode(code: string): Promise<{
-  output: ReplOutput[];
+async function runCode(
+  code: string,
+  onOutput: (output: ReplOutput) => void
+): Promise<{
   updatedFiles: Record<string, string>;
 }> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
   }
 
+  currentOutputCallback = onOutput;
   try {
-    rubyOutput = [];
     stdoutBuffer = "";
     stderrBuffer = "";
 
@@ -122,7 +126,7 @@ async function runCode(code: string): Promise<{
     const resultStr = await result.callAsync("inspect");
 
     // Add result to output if it's not nil and not empty
-    rubyOutput.push({
+    onOutput({
       type: "return",
       message: resultStr.toString(),
     });
@@ -130,29 +134,30 @@ async function runCode(code: string): Promise<{
     console.log(e);
     flushOutput();
 
-    rubyOutput.push({
+    onOutput({
       type: "error",
       message: formatRubyError(e, false),
     });
+  } finally {
+    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();
-  const output = [...rubyOutput];
-  rubyOutput = [];
 
-  return { output, updatedFiles };
+  return { updatedFiles };
 }
 
 async function runFile(
   name: string,
-  files: Record<string, string>
-): Promise<{ output: ReplOutput[]; updatedFiles: Record<string, string> }> {
+  files: Record<string, string>,
+  onOutput: (output: ReplOutput) => void
+): Promise<{ updatedFiles: Record<string, string> }> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
   }
 
+  currentOutputCallback = onOutput;
   try {
-    rubyOutput = [];
     stdoutBuffer = "";
     stderrBuffer = "";
 
@@ -179,17 +184,17 @@ async function runFile(
     console.log(e);
     flushOutput();
 
-    rubyOutput.push({
+    onOutput({
       type: "error",
       message: formatRubyError(e, true),
     });
+  } finally {
+    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();
-  const output = [...rubyOutput];
-  rubyOutput = [];
 
-  return { output, updatedFiles };
+  return { updatedFiles };
 }
 
 async function checkSyntax(
@@ -266,7 +271,6 @@ async function restoreState(commands: string[]): Promise<object> {
     throw new Error("Ruby VM not initialized");
   }
 
-  rubyOutput = []; // Clear output for restoration
   stdoutBuffer = "";
   stderrBuffer = "";
 
@@ -279,9 +283,9 @@ async function restoreState(commands: string[]): Promise<object> {
     }
   }
 
-  // Clear any output from restoration
-  flushOutput();
-  rubyOutput = [];
+  // Clear any buffered output from restoration
+  stdoutBuffer = "";
+  stderrBuffer = "";
 
   return {};
 }

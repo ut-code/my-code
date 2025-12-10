@@ -10,23 +10,31 @@ function format(...args: unknown[]): string {
   // https://nodejs.org/api/util.html#utilformatformat-args
   return args.map((a) => (typeof a === "string" ? a : inspect(a))).join(" ");
 }
-let jsOutput: ReplOutput[] = [];
+let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
 
 // Helper function to capture console output
 const originalConsole = self.console;
 self.console = {
   ...originalConsole,
   log: (...args: unknown[]) => {
-    jsOutput.push({ type: "stdout", message: format(...args) });
+    if (currentOutputCallback) {
+      currentOutputCallback({ type: "stdout", message: format(...args) });
+    }
   },
   error: (...args: unknown[]) => {
-    jsOutput.push({ type: "stderr", message: format(...args) });
+    if (currentOutputCallback) {
+      currentOutputCallback({ type: "stderr", message: format(...args) });
+    }
   },
   warn: (...args: unknown[]) => {
-    jsOutput.push({ type: "stderr", message: format(...args) });
+    if (currentOutputCallback) {
+      currentOutputCallback({ type: "stderr", message: format(...args) });
+    }
   },
   info: (...args: unknown[]) => {
-    jsOutput.push({ type: "stdout", message: format(...args) });
+    if (currentOutputCallback) {
+      currentOutputCallback({ type: "stdout", message: format(...args) });
+    }
   },
 };
 
@@ -73,13 +81,16 @@ async function replLikeEval(code: string): Promise<unknown> {
   }
 }
 
-async function runCode(code: string): Promise<{
-  output: ReplOutput[];
+async function runCode(
+  code: string,
+  onOutput: (output: ReplOutput) => void
+): Promise<{
   updatedFiles: Record<string, string>;
 }> {
+  currentOutputCallback = onOutput;
   try {
     const result = await replLikeEval(code);
-    jsOutput.push({
+    onOutput({
       type: "return",
       message: inspect(result),
     });
@@ -87,51 +98,51 @@ async function runCode(code: string): Promise<{
     originalConsole.log(e);
     // TODO: stack trace?
     if (e instanceof Error) {
-      jsOutput.push({
+      onOutput({
         type: "error",
         message: `${e.name}: ${e.message}`,
       });
     } else {
-      jsOutput.push({
+      onOutput({
         type: "error",
         message: `${String(e)}`,
       });
     }
+  } finally {
+    currentOutputCallback = null;
   }
 
-  const output = [...jsOutput];
-  jsOutput = []; // Clear output
-
-  return { output, updatedFiles: {} as Record<string, string> };
+  return { updatedFiles: {} as Record<string, string> };
 }
 
 function runFile(
   name: string,
-  files: Record<string, string>
-): { output: ReplOutput[]; updatedFiles: Record<string, string> } {
+  files: Record<string, string>,
+  onOutput: (output: ReplOutput) => void
+): { updatedFiles: Record<string, string> } {
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
+  currentOutputCallback = onOutput;
   try {
     self.eval(files[name]);
   } catch (e) {
     originalConsole.log(e);
     // TODO: stack trace?
     if (e instanceof Error) {
-      jsOutput.push({
+      onOutput({
         type: "error",
         message: `${e.name}: ${e.message}`,
       });
     } else {
-      jsOutput.push({
+      onOutput({
         type: "error",
         message: `${String(e)}`,
       });
     }
+  } finally {
+    currentOutputCallback = null;
   }
 
-  const output = [...jsOutput];
-  jsOutput = []; // Clear output
-
-  return { output, updatedFiles: {} as Record<string, string> };
+  return { updatedFiles: {} as Record<string, string> };
 }
 
 async function checkSyntax(
@@ -162,8 +173,6 @@ async function checkSyntax(
 
 async function restoreState(commands: string[]): Promise<object> {
   // Re-execute all previously successful commands to restore state
-  jsOutput = []; // Clear output for restoration
-
   for (const command of commands) {
     try {
       replLikeEval(command);
@@ -173,7 +182,6 @@ async function restoreState(commands: string[]): Promise<object> {
     }
   }
 
-  jsOutput = []; // Clear any output from restoration
   return {};
 }
 
