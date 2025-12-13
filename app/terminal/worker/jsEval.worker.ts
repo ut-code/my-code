@@ -17,24 +17,16 @@ const originalConsole = self.console;
 self.console = {
   ...originalConsole,
   log: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      currentOutputCallback({ type: "stdout", message: format(...args) });
-    }
+    currentOutputCallback?.({ type: "stdout", message: format(...args) });
   },
   error: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      currentOutputCallback({ type: "stderr", message: format(...args) });
-    }
+    currentOutputCallback?.({ type: "stderr", message: format(...args) });
   },
   warn: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      currentOutputCallback({ type: "stderr", message: format(...args) });
-    }
+    currentOutputCallback?.({ type: "stderr", message: format(...args) });
   },
   info: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      currentOutputCallback({ type: "stdout", message: format(...args) });
-    }
+    currentOutputCallback?.({ type: "stdout", message: format(...args) });
   },
 };
 

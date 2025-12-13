@@ -21,11 +21,27 @@ declare global {
 self.stdout = {
   write(str: string) {
     stdoutBuffer += str;
+    // If buffer contains newlines, flush complete lines immediately
+    if (stdoutBuffer.includes("\n")) {
+      const lines = stdoutBuffer.split("\n");
+      for (let i = 0; i < lines.length - 1; i++) {
+        currentOutputCallback?.({ type: "stdout", message: lines[i] });
+      }
+      stdoutBuffer = lines[lines.length - 1];
+    }
   },
 };
 self.stderr = {
   write(str: string) {
     stderrBuffer += str;
+    // If buffer contains newlines, flush complete lines immediately
+    if (stderrBuffer.includes("\n")) {
+      const lines = stderrBuffer.split("\n");
+      for (let i = 0; i < lines.length - 1; i++) {
+        currentOutputCallback?.({ type: "stderr", message: lines[i] });
+      }
+      stderrBuffer = lines[lines.length - 1];
+    }
   },
 };
 
@@ -55,30 +71,14 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
 }
 
 function flushOutput() {
-  if (!currentOutputCallback) return;
-
-  if (stdoutBuffer) {
-    const lines = stdoutBuffer.split("\n");
-    for (let i = 0; i < lines.length - 1; i++) {
-      currentOutputCallback({ type: "stdout", message: lines[i] });
-    }
-    stdoutBuffer = lines[lines.length - 1];
-  }
-  // Final flush if there's remaining non-empty text
+  // Flush any remaining non-empty text without newlines
   if (stdoutBuffer && stdoutBuffer.trim()) {
-    currentOutputCallback({ type: "stdout", message: stdoutBuffer });
+    currentOutputCallback?.({ type: "stdout", message: stdoutBuffer });
   }
   stdoutBuffer = "";
 
-  if (stderrBuffer) {
-    const lines = stderrBuffer.split("\n");
-    for (let i = 0; i < lines.length - 1; i++) {
-      currentOutputCallback({ type: "stderr", message: lines[i] });
-    }
-    stderrBuffer = lines[lines.length - 1];
-  }
   if (stderrBuffer && stderrBuffer.trim()) {
-    currentOutputCallback({ type: "stderr", message: stderrBuffer });
+    currentOutputCallback?.({ type: "stderr", message: stderrBuffer });
   }
   stderrBuffer = "";
 }
@@ -120,9 +120,6 @@ async function runCode(
 
     const result = rubyVM.eval(code);
 
-    // Flush any buffered output
-    flushOutput();
-
     const resultStr = await result.callAsync("inspect");
 
     // Add result to output if it's not nil and not empty
@@ -132,13 +129,14 @@ async function runCode(
     });
   } catch (e) {
     console.log(e);
-    flushOutput();
 
     onOutput({
       type: "error",
       message: formatRubyError(e, false),
     });
   } finally {
+    // Flush any buffered output
+    flushOutput();
     currentOutputCallback = null;
   }
 
@@ -177,18 +175,16 @@ async function runFile(
 
     // Run the specified file
     rubyVM.eval(`load ${JSON.stringify(name)}`);
-
-    // Flush any buffered output
-    flushOutput();
   } catch (e) {
     console.log(e);
-    flushOutput();
 
     onOutput({
       type: "error",
       message: formatRubyError(e, true),
     });
   } finally {
+    // Flush any buffered output
+    flushOutput();
     currentOutputCallback = null;
   }
 
