@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { wrap, Remote } from "comlink";
+import { wrap, Remote, proxy } from "comlink";
 import { RuntimeContext, RuntimeLang } from "../runtime";
 import { ReplOutput, SyntaxStatus } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
@@ -26,12 +26,14 @@ export interface WorkerAPI {
     interruptBuffer: Uint8Array
   ): Promise<{ capabilities: WorkerCapabilities }>;
   runCode(
-    code: string
-  ): Promise<{ output: ReplOutput[]; updatedFiles: Record<string, string> }>;
+    code: string,
+    onOutput: (output: ReplOutput) => void
+  ): Promise<{ updatedFiles: Record<string, string> }>;
   runFile(
     name: string,
-    files: Record<string, string>
-  ): Promise<{ output: ReplOutput[]; updatedFiles: Record<string, string> }>;
+    files: Record<string, string>,
+    onOutput: (output: ReplOutput) => void
+  ): Promise<{ updatedFiles: Record<string, string> }>;
   checkSyntax(code: string): Promise<{ status: SyntaxStatus }>;
   restoreState(commands: string[]): Promise<object>;
 }
@@ -191,8 +193,14 @@ export function WorkerProvider({
       }
 
       try {
-        const { output, updatedFiles } = await trackPromise(
-          workerApiRef.current.runCode(code)
+        const output: ReplOutput[] = [];
+        const { updatedFiles } = await trackPromise(
+          workerApiRef.current.runCode(
+            code,
+            proxy((item: ReplOutput) => {
+              output.push(item);
+            })
+          )
         );
 
         writeFile(updatedFiles);
@@ -255,8 +263,15 @@ export function WorkerProvider({
         interruptBuffer.current[0] = 0;
       }
       return mutex.runExclusive(async () => {
-        const { output, updatedFiles } = await trackPromise(
-          workerApiRef.current!.runFile(filenames[0], files)
+        const output: ReplOutput[] = [];
+        const { updatedFiles } = await trackPromise(
+          workerApiRef.current!.runFile(
+            filenames[0],
+            files,
+            proxy((item: ReplOutput) => {
+              output.push(item);
+            })
+          )
         );
         writeFile(updatedFiles);
         return output;

@@ -48,7 +48,6 @@
     "remark-gfm": "^4.0.1",
     "remark-remove-comments": "^1.1.1",
     "swr": "^2.3.6",
-    "typescript": "^5.9.3",
     "zod": "^4.0.17"
   },
   "devDependencies": {
@@ -71,6 +70,7 @@
     "prisma": "^6.18.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
+    "typescript": "5.9.3",
     "wrangler": "^4.27.0"
   }
 }

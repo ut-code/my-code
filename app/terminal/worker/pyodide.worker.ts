@@ -16,7 +16,7 @@ const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`;
 const HOME = `/home/pyodide/`;
 
 let pyodide: PyodideInterface;
-let pyodideOutput: ReplOutput[] = [];
+let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
 
 // Helper function to read all files from the Pyodide file system
 function readAllFiles(): Record<string, string> {
@@ -47,14 +47,12 @@ async function init(
     pyodide = await (self as any).loadPyodide({ indexURL: PYODIDE_CDN });
 
     pyodide.setStdout({
-      batched: (str: string) => {
-        pyodideOutput.push({ type: "stdout", message: str });
-      },
+      batched: (str: string) =>
+        currentOutputCallback?.({ type: "stdout", message: str }),
     });
     pyodide.setStderr({
-      batched: (str: string) => {
-        pyodideOutput.push({ type: "stderr", message: str });
-      },
+      batched: (str: string) =>
+        currentOutputCallback?.({ type: "stderr", message: str }),
     });
 
     pyodide.setInterruptBuffer(interruptBuffer);
@@ -62,17 +60,20 @@ async function init(
   return { capabilities: { interrupt: "buffer" } };
 }
 
-async function runCode(code: string): Promise<{
-  output: ReplOutput[];
+async function runCode(
+  code: string,
+  onOutput: (output: ReplOutput) => void
+): Promise<{
   updatedFiles: Record<string, string>;
 }> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
   }
+  currentOutputCallback = onOutput;
   try {
     const result = await pyodide.runPythonAsync(code);
     if (result !== undefined) {
-      pyodideOutput.push({
+      onOutput({
         type: "return",
         message: String(result),
       });
@@ -86,7 +87,7 @@ async function runCode(code: string): Promise<{
         const execLineIndex = lines.findIndex((line) =>
           line.includes("<exec>")
         );
-        pyodideOutput.push({
+        onOutput({
           type: "error",
           message: lines
             .slice(0, 1)
@@ -95,33 +96,35 @@ async function runCode(code: string): Promise<{
             .trim(),
         });
       } else {
-        pyodideOutput.push({
+        onOutput({
           type: "error",
           message: `予期せぬエラー: ${e.message.trim()}`,
         });
       }
     } else {
-      pyodideOutput.push({
+      onOutput({
         type: "error",
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
     }
+  } finally {
+    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();
-  const output = [...pyodideOutput];
-  pyodideOutput = []; // 出力をクリア
 
-  return { output, updatedFiles };
+  return { updatedFiles };
 }
 
 async function runFile(
   name: string,
-  files: Record<string, string>
-): Promise<{ output: ReplOutput[]; updatedFiles: Record<string, string> }> {
+  files: Record<string, string>,
+  onOutput: (output: ReplOutput) => void
+): Promise<{ updatedFiles: Record<string, string> }> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
   }
+  currentOutputCallback = onOutput;
   try {
     // Use Pyodide FS API to write files to the file system
     for (const filename of Object.keys(files)) {
@@ -142,7 +145,7 @@ async function runFile(
         const execLineIndex = lines.findLastIndex((line) =>
           line.includes("<exec>")
         );
-        pyodideOutput.push({
+        onOutput({
           type: "error",
           message: lines
             .slice(0, 1)
@@ -151,23 +154,23 @@ async function runFile(
             .trim(),
         });
       } else {
-        pyodideOutput.push({
+        onOutput({
           type: "error",
           message: `予期せぬエラー: ${e.message.trim()}`,
         });
       }
     } else {
-      pyodideOutput.push({
+      onOutput({
         type: "error",
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
     }
+  } finally {
+    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();
-  const output = [...pyodideOutput];
-  pyodideOutput = []; // 出力をクリア
-  return { output, updatedFiles };
+  return { updatedFiles };
 }
 
 async function checkSyntax(
