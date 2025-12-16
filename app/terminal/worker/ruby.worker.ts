@@ -5,7 +5,7 @@ import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { WorkerCapabilities } from "./runtime";
-import type { ReplOutput } from "../repl";
+import type { ReplOutput, ReplOutputType } from "../repl";
 
 import init_rb from "./ruby/init.rb?raw";
 
@@ -21,29 +21,26 @@ declare global {
 self.stdout = {
   write(str: string) {
     stdoutBuffer += str;
-    // If buffer contains newlines, flush complete lines immediately
-    if (stdoutBuffer.includes("\n")) {
-      const lines = stdoutBuffer.split("\n");
-      for (let i = 0; i < lines.length - 1; i++) {
-        currentOutputCallback?.({ type: "stdout", message: lines[i] });
-      }
-      stdoutBuffer = lines[lines.length - 1];
-    }
+    stdoutBuffer = handleBatchOutput(stdoutBuffer, "stdout");
   },
 };
 self.stderr = {
   write(str: string) {
     stderrBuffer += str;
-    // If buffer contains newlines, flush complete lines immediately
-    if (stderrBuffer.includes("\n")) {
-      const lines = stderrBuffer.split("\n");
-      for (let i = 0; i < lines.length - 1; i++) {
-        currentOutputCallback?.({ type: "stderr", message: lines[i] });
-      }
-      stderrBuffer = lines[lines.length - 1];
-    }
+    stderrBuffer = handleBatchOutput(stderrBuffer, "stderr");
   },
 };
+function handleBatchOutput(buffer: string, type: ReplOutputType): string {
+  // If buffer contains newlines, flush complete lines immediately
+  if (buffer.includes("\n")) {
+    const lines = buffer.split("\n");
+    for (let i = 0; i < lines.length - 1; i++) {
+      currentOutputCallback?.({ type, message: lines[i] });
+    }
+    return lines[lines.length - 1];
+  }
+  return buffer;
+}
 
 async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
   capabilities: WorkerCapabilities;
@@ -122,6 +119,9 @@ async function runCode(
 
     const resultStr = await result.callAsync("inspect");
 
+    // Flush any buffered output
+    flushOutput();
+
     // Add result to output if it's not nil and not empty
     onOutput({
       type: "return",
@@ -130,13 +130,14 @@ async function runCode(
   } catch (e) {
     console.log(e);
 
+    // Flush any buffered output
+    flushOutput();
+
     onOutput({
       type: "error",
       message: formatRubyError(e, false),
     });
   } finally {
-    // Flush any buffered output
-    flushOutput();
     currentOutputCallback = null;
   }
 
@@ -175,16 +176,20 @@ async function runFile(
 
     // Run the specified file
     rubyVM.eval(`load ${JSON.stringify(name)}`);
+
+    // Flush any buffered output
+    flushOutput();
   } catch (e) {
     console.log(e);
+
+    // Flush any buffered output
+    flushOutput();
 
     onOutput({
       type: "error",
       message: formatRubyError(e, true),
     });
   } finally {
-    // Flush any buffered output
-    flushOutput();
     currentOutputCallback = null;
   }
 

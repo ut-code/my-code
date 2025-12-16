@@ -17,8 +17,9 @@ import { useEmbedContext } from "./embedContext";
 import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 import clsx from "clsx";
 
+export type ReplOutputType = "stdout" | "stderr" | "error" | "return" | "trace" | "system";
 export interface ReplOutput {
-  type: "stdout" | "stderr" | "error" | "return" | "trace" | "system"; // 出力の種類
+  type: ReplOutputType; // 出力の種類
   message: string; // 出力メッセージ
 }
 export interface ReplCommand {
