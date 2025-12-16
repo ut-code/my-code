@@ -16,18 +16,14 @@ let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
 const originalConsole = self.console;
 self.console = {
   ...originalConsole,
-  log: (...args: unknown[]) => {
-    currentOutputCallback?.({ type: "stdout", message: format(...args) });
-  },
-  error: (...args: unknown[]) => {
-    currentOutputCallback?.({ type: "stderr", message: format(...args) });
-  },
-  warn: (...args: unknown[]) => {
-    currentOutputCallback?.({ type: "stderr", message: format(...args) });
-  },
-  info: (...args: unknown[]) => {
-    currentOutputCallback?.({ type: "stdout", message: format(...args) });
-  },
+  log: (...args: unknown[]) =>
+    currentOutputCallback?.({ type: "stdout", message: format(...args) }),
+  error: (...args: unknown[]) =>
+    currentOutputCallback?.({ type: "stderr", message: format(...args) }),
+  warn: (...args: unknown[]) =>
+    currentOutputCallback?.({ type: "stderr", message: format(...args) }),
+  info: (...args: unknown[]) =>
+    currentOutputCallback?.({ type: "stdout", message: format(...args) }),
 };
 
 async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{

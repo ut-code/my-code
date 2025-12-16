@@ -47,18 +47,12 @@ async function init(
     pyodide = await (self as any).loadPyodide({ indexURL: PYODIDE_CDN });
 
     pyodide.setStdout({
-      batched: (str: string) => {
-        if (currentOutputCallback) {
-          currentOutputCallback({ type: "stdout", message: str });
-        }
-      },
+      batched: (str: string) =>
+        currentOutputCallback?.({ type: "stdout", message: str }),
     });
     pyodide.setStderr({
-      batched: (str: string) => {
-        if (currentOutputCallback) {
-          currentOutputCallback({ type: "stderr", message: str });
-        }
-      },
+      batched: (str: string) =>
+        currentOutputCallback?.({ type: "stderr", message: str }),
     });
 
     pyodide.setInterruptBuffer(interruptBuffer);
