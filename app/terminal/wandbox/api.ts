@@ -102,9 +102,6 @@ interface CompileProps {
   codes: Record<string, string | undefined>;
   // codes: Code[];
 }
-export interface CompileResultWithOutput extends CompileResult {
-  output: ReplOutput[];
-}
 
 export async function compileAndRun(
   options: CompileProps,
