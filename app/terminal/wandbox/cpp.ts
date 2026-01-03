@@ -84,8 +84,15 @@ export function selectCppCompiler(
 export async function cppRunFiles(
   options: SelectedCompiler,
   files: Record<string, string | undefined>,
-  filenames: string[]
-): Promise<ReplOutput[]> {
+  filenames: string[],
+  onOutput: (output: ReplOutput) => void
+): Promise<string> {
+  const outputs: ReplOutput[] = [];
+  const captureOutput = (output: ReplOutput) => {
+    outputs.push(output);
+    onOutput(output);
+  };
+
   const result = await compileAndRun({
     ...options,
     compilerOptionsRaw: [
@@ -94,9 +101,7 @@ export async function cppRunFiles(
       "_stacktrace.cpp",
     ],
     codes: { ...files, "_stacktrace.cpp": _stacktrace_cpp },
-  });
-
-  let outputs = result.output;
+  }, captureOutput);
 
   // Find stack trace in the output
   const signalIndex = outputs.findIndex(
@@ -116,7 +121,6 @@ export async function cppRunFiles(
   if (traceIndex >= 0) {
     // _stacktrace.cpp のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
     const trace = outputs.slice(traceIndex + 1);
-    const otherOutputs = outputs.slice(0, traceIndex);
     const traceOutputs: ReplOutput[] = [{
       type: "trace",
       message: "Stack trace (filtered):",
@@ -131,20 +135,22 @@ export async function cppRunFiles(
             message: line.message.replace("/home/wandbox/", ""),
           });
         }
-      }else{
-        otherOutputs.push(line);
       }
     }
-    outputs = [...otherOutputs, ...traceOutputs];
+    
+    // Output trace messages
+    for (const traceOutput of traceOutputs) {
+      onOutput(traceOutput);
+    }
   }
 
   if (result.status !== "0") {
-    outputs.push({
+    onOutput({
       type: "system",
       message: `ステータス ${result.status} で異常終了しました`,
     });
   }
   // TODO: result.signal はいつ使われるのか？
 
-  return outputs;
+  return result.status;
 }

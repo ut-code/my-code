@@ -30,8 +30,15 @@ export function selectRustCompiler(
 export async function rustRunFiles(
   options: SelectedCompiler,
   files: Record<string, string | undefined>,
-  filenames: string[]
-): Promise<ReplOutput[]> {
+  filenames: string[],
+  onOutput: (output: ReplOutput) => void
+): Promise<string> {
+  const outputs: ReplOutput[] = [];
+  const captureOutput = (output: ReplOutput) => {
+    outputs.push(output);
+    onOutput(output);
+  };
+
   const mainModule = filenames[0].replace(/\.rs$/, "");
   const result = await compileAndRun({
     ...options,
@@ -50,9 +57,7 @@ export async function rustRunFiles(
         ?.replace(/(?:pub\s+)?(fn\s+main\s*\()/g, "pub $1")
         .replaceAll(/mod\s+(\w+)\s*;/g, "use super::$1;"),
     },
-  });
-
-  let outputs = result.output;
+  }, captureOutput);
 
   // Find stack trace in the output
   const panicIndex = outputs.findIndex(
@@ -68,7 +73,6 @@ export async function rustRunFiles(
           (line) =>
             line.type === "stderr" && line.message === "stack backtrace:"
         );
-    const otherOutputs = outputs.slice(0, panicIndex);
     const traceOutputs: ReplOutput[] = [
       {
         type: "trace",
@@ -77,12 +81,10 @@ export async function rustRunFiles(
     ];
     for (const line of outputs.slice(panicIndex + 1, traceIndex)) {
       if (line.type === "stderr") {
-        otherOutputs.push({
+        onOutput({
           type: "error",
           message: line.message,
         });
-      } else {
-        otherOutputs.push(line);
       }
     }
     for (let i = traceIndex + 1; i < outputs.length; i++) {
@@ -106,20 +108,21 @@ export async function rustRunFiles(
           });
           i++; // skip next line
         }
-      } else {
-        otherOutputs.push(line);
       }
     }
 
-    outputs = [...otherOutputs, ...traceOutputs];
+    // Output trace messages
+    for (const traceOutput of traceOutputs) {
+      onOutput(traceOutput);
+    }
   }
 
   if (result.status !== "0") {
-    outputs.push({
+    onOutput({
       type: "system",
       message: `ステータス ${result.status} で異常終了しました`,
     });
   }
 
-  return outputs;
+  return result.status;
 }

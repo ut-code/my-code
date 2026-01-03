@@ -107,8 +107,9 @@ export interface CompileResultWithOutput extends CompileResult {
 }
 
 export async function compileAndRun(
-  options: CompileProps
-): Promise<CompileResultWithOutput> {
+  options: CompileProps,
+  onOutput: (output: ReplOutput) => void
+): Promise<CompileResult> {
   // Call the ndjson API instead of json API
   const response = await fetch(new URL("/api/compile.ndjson", WANDBOX), {
     method: "post",
@@ -158,14 +159,80 @@ export async function compileAndRun(
 
       for (const line of lines) {
         if (line.trim().length > 0) {
-          ndjsonResults.push(JSON.parse(line) as CompileNdjsonResult);
+          const r = JSON.parse(line) as CompileNdjsonResult;
+          ndjsonResults.push(r);
+          
+          // Call onOutput in real-time as we receive data
+          switch (r.type) {
+            case "CompilerMessageS":
+              if (r.data.trim()) {
+                for (const line of r.data.trim().split("\n")) {
+                  onOutput({ type: "stdout", message: line });
+                }
+              }
+              break;
+            case "CompilerMessageE":
+              if (r.data.trim()) {
+                for (const line of r.data.trim().split("\n")) {
+                  onOutput({ type: "error", message: line });
+                }
+              }
+              break;
+            case "StdOut":
+              if (r.data.trim()) {
+                for (const line of r.data.trim().split("\n")) {
+                  onOutput({ type: "stdout", message: line });
+                }
+              }
+              break;
+            case "StdErr":
+              if (r.data.trim()) {
+                for (const line of r.data.trim().split("\n")) {
+                  onOutput({ type: "stderr", message: line });
+                }
+              }
+              break;
+          }
         }
       }
     }
 
     // Process any remaining data in the buffer
     if (buffer.trim().length > 0) {
-      ndjsonResults.push(JSON.parse(buffer) as CompileNdjsonResult);
+      const r = JSON.parse(buffer) as CompileNdjsonResult;
+      ndjsonResults.push(r);
+      
+      // Call onOutput for remaining data
+      switch (r.type) {
+        case "CompilerMessageS":
+          if (r.data.trim()) {
+            for (const line of r.data.trim().split("\n")) {
+              onOutput({ type: "stdout", message: line });
+            }
+          }
+          break;
+        case "CompilerMessageE":
+          if (r.data.trim()) {
+            for (const line of r.data.trim().split("\n")) {
+              onOutput({ type: "error", message: line });
+            }
+          }
+          break;
+        case "StdOut":
+          if (r.data.trim()) {
+            for (const line of r.data.trim().split("\n")) {
+              onOutput({ type: "stdout", message: line });
+            }
+          }
+          break;
+        case "StdErr":
+          if (r.data.trim()) {
+            for (const line of r.data.trim().split("\n")) {
+              onOutput({ type: "stderr", message: line });
+            }
+          }
+          break;
+      }
     }
   } finally {
     reader.releaseLock();
@@ -185,9 +252,6 @@ export async function compileAndRun(
     url: "",
   };
 
-  // Build output array in the order messages are received
-  const output: ReplOutput[] = [];
-
   for (const r of ndjsonResults) {
     switch (r.type) {
       case "Control":
@@ -196,42 +260,18 @@ export async function compileAndRun(
       case "CompilerMessageS":
         result.compiler_output += r.data;
         result.compiler_message += r.data;
-        // Add to output in order
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            output.push({ type: "stdout", message: line });
-          }
-        }
         break;
       case "CompilerMessageE":
         result.compiler_error += r.data;
         result.compiler_message += r.data;
-        // Add to output in order
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            output.push({ type: "error", message: line });
-          }
-        }
         break;
       case "StdOut":
         result.program_output += r.data;
         result.program_message += r.data;
-        // Add to output in order
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            output.push({ type: "stdout", message: line });
-          }
-        }
         break;
       case "StdErr":
         result.program_error += r.data;
         result.program_message += r.data;
-        // Add to output in order
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            output.push({ type: "stderr", message: line });
-          }
-        }
         break;
       case "ExitCode":
         result.status += r.data;
@@ -245,8 +285,5 @@ export async function compileAndRun(
     }
   }
 
-  return {
-    ...result,
-    output,
-  };
+  return result;
 }

@@ -25,8 +25,9 @@ interface IWandboxContext {
     lang: WandboxLang
   ) => (
     filenames: string[],
-    files: Readonly<Record<string, string>>
-  ) => Promise<ReplOutput[]>;
+    files: Readonly<Record<string, string>>,
+    onOutput: (output: ReplOutput) => void
+  ) => Promise<void>;
 }
 
 const WandboxContext = createContext<IWandboxContext>(null!);
@@ -65,17 +66,22 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
   // Curried function for language-specific file execution
   const runFilesWithLang = useCallback(
     (lang: WandboxLang) =>
-      async (filenames: string[], files: Readonly<Record<string, string>>) => {
+      async (
+        filenames: string[],
+        files: Readonly<Record<string, string>>,
+        onOutput: (output: ReplOutput) => void
+      ) => {
         if (!selectedCompiler) {
-          return [
-            { type: "error" as const, message: "Wandbox is not ready yet." },
-          ];
+          onOutput({ type: "error", message: "Wandbox is not ready yet." });
+          return;
         }
         switch (lang) {
           case "cpp":
-            return cppRunFiles(selectedCompiler.cpp, files, filenames);
+            await cppRunFiles(selectedCompiler.cpp, files, filenames, onOutput);
+            break;
           case "rust":
-            return rustRunFiles(selectedCompiler.rust, files, filenames);
+            await rustRunFiles(selectedCompiler.rust, files, filenames, onOutput);
+            break;
           default:
             lang satisfies never;
             throw new Error(`unsupported language: ${lang}`);

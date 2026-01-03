@@ -91,24 +91,25 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
 
   const { writeFile } = useEmbedContext();
   const runFiles = useCallback(
-    async (filenames: string[], files: Readonly<Record<string, string>>) => {
+    async (
+      filenames: string[],
+      files: Readonly<Record<string, string>>,
+      onOutput: (output: ReplOutput) => void
+    ) => {
       if (tsEnv === null || typeof window === "undefined") {
-        return [
-          { type: "error" as const, message: "TypeScript is not ready yet." },
-        ];
+        onOutput({ type: "error", message: "TypeScript is not ready yet." });
+        return;
       } else {
         for (const [filename, content] of Object.entries(files)) {
           tsEnv.createFile(filename, content);
         }
-
-        const outputs: ReplOutput[] = [];
 
         const ts = await import("typescript");
 
         for (const diagnostic of tsEnv.languageService.getSyntacticDiagnostics(
           filenames[0]
         )) {
-          outputs.push({
+          onOutput({
             type: "error",
             message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
               getCurrentDirectory: () => "",
@@ -121,7 +122,7 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
         for (const diagnostic of tsEnv.languageService.getSemanticDiagnostics(
           filenames[0]
         )) {
-          outputs.push({
+          onOutput({
             type: "error",
             message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
               getCurrentDirectory: () => "",
@@ -143,12 +144,11 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
         }
 
         console.log(emitOutput);
-        const jsOutputs = jsEval.runFiles(
+        await jsEval.runFiles(
           [emitOutput.outputFiles[0].name],
-          files
+          files,
+          onOutput
         );
-
-        return outputs.concat(await jsOutputs);
       }
     },
     [tsEnv, writeFile, jsEval]
