@@ -47,19 +47,23 @@ export function ExecFile(props: ExecProps) {
         clearTerminal(terminalInstanceRef.current!);
         terminalInstanceRef.current!.write(systemMessageColor("実行中です..."));
         const outputs: ReplOutput[] = [];
+        let isFirstOutput = true;
         await runFiles(props.filenames, files, (output) => {
           outputs.push(output);
-          if (terminalInstanceRef.current) {
-            clearTerminal(terminalInstanceRef.current);
-            writeOutput(
-              terminalInstanceRef.current,
-              outputs,
-              false,
-              undefined,
-              null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
-              props.language
-            );
+          if (isFirstOutput) {
+            // Clear "実行中です..." message only on first output
+            clearTerminal(terminalInstanceRef.current!);
+            isFirstOutput = false;
           }
+          // Append only the new output
+          writeOutput(
+            terminalInstanceRef.current!,
+            [output],
+            true,
+            undefined,
+            null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
+            props.language
+          );
         });
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
         setExecResult(props.filenames.join(","), outputs);

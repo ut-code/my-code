@@ -110,6 +110,40 @@ export async function compileAndRun(
   options: CompileProps,
   onOutput: (output: ReplOutput) => void
 ): Promise<CompileResult> {
+  // Helper function to process NDJSON result and call onOutput
+  const processNdjsonResult = (r: CompileNdjsonResult) => {
+    switch (r.type) {
+      case "CompilerMessageS":
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            onOutput({ type: "stdout", message: line });
+          }
+        }
+        break;
+      case "CompilerMessageE":
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            onOutput({ type: "error", message: line });
+          }
+        }
+        break;
+      case "StdOut":
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            onOutput({ type: "stdout", message: line });
+          }
+        }
+        break;
+      case "StdErr":
+        if (r.data.trim()) {
+          for (const line of r.data.trim().split("\n")) {
+            onOutput({ type: "stderr", message: line });
+          }
+        }
+        break;
+    }
+  };
+
   // Call the ndjson API instead of json API
   const response = await fetch(new URL("/api/compile.ndjson", WANDBOX), {
     method: "post",
@@ -161,38 +195,8 @@ export async function compileAndRun(
         if (line.trim().length > 0) {
           const r = JSON.parse(line) as CompileNdjsonResult;
           ndjsonResults.push(r);
-          
           // Call onOutput in real-time as we receive data
-          switch (r.type) {
-            case "CompilerMessageS":
-              if (r.data.trim()) {
-                for (const line of r.data.trim().split("\n")) {
-                  onOutput({ type: "stdout", message: line });
-                }
-              }
-              break;
-            case "CompilerMessageE":
-              if (r.data.trim()) {
-                for (const line of r.data.trim().split("\n")) {
-                  onOutput({ type: "error", message: line });
-                }
-              }
-              break;
-            case "StdOut":
-              if (r.data.trim()) {
-                for (const line of r.data.trim().split("\n")) {
-                  onOutput({ type: "stdout", message: line });
-                }
-              }
-              break;
-            case "StdErr":
-              if (r.data.trim()) {
-                for (const line of r.data.trim().split("\n")) {
-                  onOutput({ type: "stderr", message: line });
-                }
-              }
-              break;
-          }
+          processNdjsonResult(r);
         }
       }
     }
@@ -201,38 +205,8 @@ export async function compileAndRun(
     if (buffer.trim().length > 0) {
       const r = JSON.parse(buffer) as CompileNdjsonResult;
       ndjsonResults.push(r);
-      
       // Call onOutput for remaining data
-      switch (r.type) {
-        case "CompilerMessageS":
-          if (r.data.trim()) {
-            for (const line of r.data.trim().split("\n")) {
-              onOutput({ type: "stdout", message: line });
-            }
-          }
-          break;
-        case "CompilerMessageE":
-          if (r.data.trim()) {
-            for (const line of r.data.trim().split("\n")) {
-              onOutput({ type: "error", message: line });
-            }
-          }
-          break;
-        case "StdOut":
-          if (r.data.trim()) {
-            for (const line of r.data.trim().split("\n")) {
-              onOutput({ type: "stdout", message: line });
-            }
-          }
-          break;
-        case "StdErr":
-          if (r.data.trim()) {
-            for (const line of r.data.trim().split("\n")) {
-              onOutput({ type: "stderr", message: line });
-            }
-          }
-          break;
-      }
+      processNdjsonResult(r);
     }
   } finally {
     reader.releaseLock();
