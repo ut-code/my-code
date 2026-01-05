@@ -128,11 +128,11 @@ mycdark:
   あまり変なフォントが選ばれるとxtermやaceエディターの表示が崩れる可能性があるので、
   確実にフォントを統一するために本文と同じフォントを指定することにした
   以前NotoSansJPを指定していたが、xterm.jsで全角の（）の幅がバグった
-  BIZUDゴシックは全角の”’の幅がおかしいが、まあ使うことないやろ
+  BIZUDゴシックとMeiryoは全角の”’の幅がおかしいが、まあ使うことないやろ
   */
   --font-mono:
-    "Inconsolata Variable", "BIZ UDゴシック", "Rounded M+ 1c", "Rounded M+ 1p",
-    "M PLUS Rounded 1c", monospace;
+    "Inconsolata Variable", "BIZ UDゴシック", "Meiryo", "Rounded M+ 1c",
+    "Rounded M+ 1p", "M PLUS Rounded 1c", monospace;
   /*
   本家のフォント名は Rounded M+ 1c 、または1pでもいいかも
   layout.tsxでインポートしているwebフォントが M PLUS Rounded 1c
@@ -144,7 +144,7 @@ mycdark:
   Hiragino Maru Gothic は見た目はめっちゃきれいなんだけど太字がない :cry:
   */
   --font-sans:
-    "Segoe UI", "BIZ UDゴシック", "Rounded M+ 1c", "Rounded M+ 1p",
+    "Segoe UI", "BIZ UDゴシック", "Meiryo", "Rounded M+ 1c", "Rounded M+ 1p",
     "M PLUS Rounded 1c", /* 以下fallback */ "M+ 1c", "MigMix 1c", "Migu 1c",
     "Hiragino Maru Gothic ProN", "Noto Sans", "Arial", "Liberation Sans",
     sans-serif,

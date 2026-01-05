@@ -134,7 +134,7 @@ export function useTerminal(props: TerminalProps) {
             lineHeight: 1.2,
             letterSpacing: 0,
             fontFamily:
-              "'Inconsolata Variable', 'BIZ UDゴシック', 'Rounded M+ 1c', 'Rounded M+ 1p', 'M PLUS Rounded 1c', monospace",
+              "'Inconsolata Variable', 'BIZ UDゴシック', 'Meiryo', 'Rounded M+ 1c', 'Rounded M+ 1p', 'M PLUS Rounded 1c', monospace",
             theme: computeTerminalTheme(),
           });
           terminalInstanceRef.current = term;
