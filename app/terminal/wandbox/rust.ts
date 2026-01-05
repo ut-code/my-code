@@ -81,19 +81,21 @@ export async function rustRunFiles(
         // Look for pattern: "   N: ..." followed by "      at ./file.rs:line"
         if (/^\s*\d+:/.test(output.message)) {
           traceLines.push(output.message);
-        } else if (/^\s*at .\//.test(output.message) && traceLines.length > 0) {
-          // Check if this is user code (not prog.rs)
-          if (!/^\s*at .\/prog.rs/.test(output.message)) {
-            onOutput({
-              type: "trace",
-              message: traceLines[traceLines.length - 1].replace("prog::", ""),
-            });
-            onOutput({
-              type: "trace",
-              message: output.message,
-            });
+        } else if (/^\s*at .\//.test(output.message)) {
+          if (traceLines.length > 0) {
+            // Check if this is user code (not prog.rs)
+            if (!/^\s*at .\/prog.rs/.test(output.message)) {
+              onOutput({
+                type: "trace",
+                message: traceLines[traceLines.length - 1].replace("prog::", ""),
+              });
+              onOutput({
+                type: "trace",
+                message: output.message,
+              });
+            }
+            traceLines.pop(); // Remove the processed line whether matched or not
           }
-          traceLines.pop(); // Remove the processed line
         }
         return;
       }

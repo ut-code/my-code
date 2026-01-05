@@ -90,7 +90,6 @@ export async function cppRunFiles(
   // Track state for processing stack traces
   let inStackTrace = false;
   let foundSignal = false;
-  const bufferedStderrForTrace: ReplOutput[] = [];
 
   const result = await compileAndRun({
     ...options,
