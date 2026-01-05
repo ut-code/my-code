@@ -70,6 +70,14 @@ export interface CompileNdjsonResult {
   data: string;
 }
 
+/**
+ * Output event with original NDJSON type and converted ReplOutput
+ */
+export interface CompileOutputEvent {
+  ndjsonType: string;
+  output: ReplOutput;
+}
+
 export interface CompileResult {
   status: string;
   signal: string;
@@ -105,7 +113,7 @@ interface CompileProps {
 
 export async function compileAndRun(
   options: CompileProps,
-  onOutput: (output: ReplOutput) => void
+  onOutput: (event: CompileOutputEvent) => void
 ): Promise<CompileResult> {
   // Helper function to process NDJSON result and call onOutput
   const processNdjsonResult = (r: CompileNdjsonResult) => {
@@ -113,28 +121,40 @@ export async function compileAndRun(
       case "CompilerMessageS":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ type: "stdout", message: line });
+            onOutput({ 
+              ndjsonType: r.type, 
+              output: { type: "stdout", message: line } 
+            });
           }
         }
         break;
       case "CompilerMessageE":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ type: "error", message: line });
+            onOutput({ 
+              ndjsonType: r.type, 
+              output: { type: "error", message: line } 
+            });
           }
         }
         break;
       case "StdOut":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ type: "stdout", message: line });
+            onOutput({ 
+              ndjsonType: r.type, 
+              output: { type: "stdout", message: line } 
+            });
           }
         }
         break;
       case "StdErr":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ type: "stderr", message: line });
+            onOutput({ 
+              ndjsonType: r.type, 
+              output: { type: "stderr", message: line } 
+            });
           }
         }
         break;

@@ -33,11 +33,10 @@ export async function rustRunFiles(
   filenames: string[],
   onOutput: (output: ReplOutput) => void
 ): Promise<string> {
-  const outputs: ReplOutput[] = [];
-  const captureOutput = (output: ReplOutput) => {
-    outputs.push(output);
-    onOutput(output);
-  };
+  // Track state for processing panic traces
+  let inPanicHook = false;
+  let foundBacktraceHeader = false;
+  const traceLines: string[] = [];
 
   const mainModule = filenames[0].replace(/\.rs$/, "");
   const result = await compileAndRun({
@@ -57,65 +56,59 @@ export async function rustRunFiles(
         ?.replace(/(?:pub\s+)?(fn\s+main\s*\()/g, "pub $1")
         .replaceAll(/mod\s+(\w+)\s*;/g, "use super::$1;"),
     },
-  }, captureOutput);
-
-  // Find stack trace in the output
-  const panicIndex = outputs.findIndex(
-    (line) => line.type === "stderr" && line.message === "#!my_code_panic_hook:"
-  );
-
-  if (panicIndex >= 0) {
-    const traceIndex =
-      panicIndex +
-      outputs
-        .slice(panicIndex)
-        .findLastIndex(
-          (line) =>
-            line.type === "stderr" && line.message === "stack backtrace:"
-        );
-    const traceOutputs: ReplOutput[] = [
-      {
-        type: "trace",
-        message: "Stack trace (filtered):",
-      },
-    ];
-    for (const line of outputs.slice(panicIndex + 1, traceIndex)) {
-      if (line.type === "stderr") {
+  }, (event) => {
+    const { ndjsonType, output } = event;
+    
+    // Check for panic hook marker
+    if (ndjsonType === "StdErr" && output.message === "#!my_code_panic_hook:") {
+      inPanicHook = true;
+      return;
+    }
+    
+    if (inPanicHook && ndjsonType === "StdErr") {
+      // Check for stack backtrace header
+      if (output.message === "stack backtrace:") {
+        foundBacktraceHeader = true;
         onOutput({
-          type: "error",
-          message: line.message,
+          type: "trace",
+          message: "Stack trace (filtered):",
         });
+        return;
       }
-    }
-    for (let i = traceIndex + 1; i < outputs.length; i++) {
-      const line = outputs.at(i)!;
-      const nextLine = outputs.at(i + 1);
-      if (line.type === "stderr") {
-        // ユーザーのソースコードだけを対象にする
-        if (
-          /^\s*\d+:/.test(line.message) &&
-          nextLine &&
-          /^\s*at .\//.test(nextLine.message) &&
-          !/^\s*at .\/prog.rs/.test(nextLine.message)
-        ) {
-          traceOutputs.push({
-            type: "trace",
-            message: line.message.replace("prog::", ""),
-          });
-          traceOutputs.push({
-            type: "trace",
-            message: nextLine.message,
-          });
-          i++; // skip next line
+      
+      if (foundBacktraceHeader) {
+        // Process stack trace lines
+        // Look for pattern: "   N: ..." followed by "      at ./file.rs:line"
+        if (/^\s*\d+:/.test(output.message)) {
+          traceLines.push(output.message);
+        } else if (/^\s*at .\//.test(output.message) && traceLines.length > 0) {
+          // Check if this is user code (not prog.rs)
+          if (!/^\s*at .\/prog.rs/.test(output.message)) {
+            onOutput({
+              type: "trace",
+              message: traceLines[traceLines.length - 1].replace("prog::", ""),
+            });
+            onOutput({
+              type: "trace",
+              message: output.message,
+            });
+          }
+          traceLines.pop(); // Remove the processed line
         }
+        return;
       }
+      
+      // Output panic messages as errors
+      onOutput({
+        type: "error",
+        message: output.message,
+      });
+      return;
     }
-
-    // Output trace messages
-    for (const traceOutput of traceOutputs) {
-      onOutput(traceOutput);
-    }
-  }
+    
+    // Output normally
+    onOutput(output);
+  });
 
   if (result.status !== "0") {
     onOutput({
