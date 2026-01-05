@@ -92,7 +92,6 @@ export async function cppRunFiles(
   
   // Track state for processing stack traces
   let inStackTrace = false;
-  let foundSignal = false;
 
   const result = await compileAndRun({
     ...options,
@@ -107,7 +106,6 @@ export async function cppRunFiles(
     
     // Check for signal marker in stderr
     if (ndjsonType === "StdErr" && output.message.startsWith("#!my_code_signal:")) {
-      foundSignal = true;
       onOutput({
         type: "error",
         message: output.message.slice(17),
