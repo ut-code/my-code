@@ -87,6 +87,9 @@ export async function cppRunFiles(
   filenames: string[],
   onOutput: (output: ReplOutput) => void
 ): Promise<string> {
+  // Constants for stack trace processing
+  const WANDBOX_PATH = "/home/wandbox";
+  
   // Track state for processing stack traces
   let inStackTrace = false;
   let foundSignal = false;
@@ -125,10 +128,10 @@ export async function cppRunFiles(
     // Process stack trace lines
     if (inStackTrace && ndjsonType === "StdErr") {
       // Filter to show only user source code
-      if (output.message.includes("/home/wandbox")) {
+      if (output.message.includes(WANDBOX_PATH)) {
         onOutput({
           type: "trace",
-          message: output.message.replace("/home/wandbox/", ""),
+          message: output.message.replace(WANDBOX_PATH + "/", ""),
         });
       }
       return;

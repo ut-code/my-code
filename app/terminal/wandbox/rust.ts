@@ -33,6 +33,11 @@ export async function rustRunFiles(
   filenames: string[],
   onOutput: (output: ReplOutput) => void
 ): Promise<string> {
+  // Regular expressions for parsing stack traces
+  const STACK_FRAME_PATTERN = /^\s*\d+:/;
+  const LOCATION_PATTERN = /^\s*at .\//;
+  const SYSTEM_CODE_PATTERN = /^\s*at .\/prog.rs/;
+  
   // Track state for processing panic traces
   let inPanicHook = false;
   let foundBacktraceHeader = false;
@@ -79,12 +84,12 @@ export async function rustRunFiles(
       if (foundBacktraceHeader) {
         // Process stack trace lines
         // Look for pattern: "   N: ..." followed by "      at ./file.rs:line"
-        if (/^\s*\d+:/.test(output.message)) {
+        if (STACK_FRAME_PATTERN.test(output.message)) {
           traceLines.push(output.message);
-        } else if (/^\s*at .\//.test(output.message)) {
+        } else if (LOCATION_PATTERN.test(output.message)) {
           if (traceLines.length > 0) {
             // Check if this is user code (not prog.rs)
-            if (!/^\s*at .\/prog.rs/.test(output.message)) {
+            if (!SYSTEM_CODE_PATTERN.test(output.message)) {
               onOutput({
                 type: "trace",
                 message: traceLines[traceLines.length - 1].replace("prog::", ""),
