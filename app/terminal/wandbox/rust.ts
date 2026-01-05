@@ -99,7 +99,7 @@ export async function rustRunFiles(
                 message: output.message,
               });
             }
-            traceLines.pop(); // Remove the processed line whether matched or not
+            traceLines.pop(); // Remove the associated trace line (regardless of match)
           }
         }
         return;

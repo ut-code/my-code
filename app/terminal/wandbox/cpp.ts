@@ -131,7 +131,7 @@ export async function cppRunFiles(
       if (output.message.includes(WANDBOX_PATH)) {
         onOutput({
           type: "trace",
-          message: output.message.replace(WANDBOX_PATH + "/", ""),
+          message: output.message.replace(`${WANDBOX_PATH}/`, ""),
         });
       }
       return;
