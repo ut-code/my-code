@@ -1,7 +1,7 @@
 // node_modules/typescript/lib からd.tsファイルをすべてpublic/typescript/version/にコピーする。
 
 import { knownLibFilesForCompilerOptions } from "@typescript/vfs";
-import { compilerOptions } from "./app/terminal/typescript/runtime";
+import { compilerOptions } from "../app/terminal/typescript/runtime";
 import ts from "typescript";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
