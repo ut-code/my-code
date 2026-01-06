@@ -134,7 +134,7 @@ export function useTerminal(props: TerminalProps) {
             lineHeight: 1.2,
             letterSpacing: 0,
             fontFamily:
-              "'Inconsolata Variable', 'Rounded M+ 1c', 'Rounded M+ 1p', 'M PLUS Rounded 1c', monospace",
+              "'Inconsolata Variable', 'M PLUS Rounded 1c NoHint', monospace",
             theme: computeTerminalTheme(),
           });
           terminalInstanceRef.current = term;

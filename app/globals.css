@@ -129,22 +129,21 @@ mycdark:
   確実にフォントを統一するためにRoundedM+を指定することにした
   以前NotoSansJPを指定していたが、xterm.jsで全角の（）の幅がバグった
   */
-  --font-mono:
-    "Inconsolata Variable", "Rounded M+ 1c", "Rounded M+ 1p",
-    "M PLUS Rounded 1c", monospace;
+  --font-mono: "Inconsolata Variable", "M PLUS Rounded 1c NoHint", monospace;
   /*
   本家のフォント名は Rounded M+ 1c 、または1pでもいいかも
-  layout.tsxでインポートしているwebフォントが M PLUS Rounded 1c
+  layout.tsxでインポートしているwebフォントが M PLUS Rounded 1c NoHint
+  scripts/removeHinting.ts で M PLUS Rounded 1c からHintingを除去したものを使っている
+  (HintingがあるとWindowsでジャギーが発生する)
 
   それ以下はM+をダウンロードするまでの間表示されるswap用フォールバックとしてM+に見た目が近いものを指定。
   Hiragino Maru Gothic は見た目はめっちゃきれいなんだけど太字がない :cry:
-  Meiryo は日本語の形がM+に近いが、英数がダメ
   */
   --font-sans:
-    "Rounded M+ 1c", "Rounded M+ 1p", "M PLUS Rounded 1c",
-    /* 以下fallback */ "M+ 1c", "MigMix 1c", "Migu 1c",
-    "Hiragino Maru Gothic ProN", "Noto Sans", "Arial", "Liberation Sans",
-    "Meiryo", sans-serif,
+    "M PLUS Rounded 1c NoHint", /* 以下fallback */ "Rounded M+ 1c",
+    "Rounded M+ 1p", "M+ 1c", "MigMix 1c", "Migu 1c",
+    "Hiragino Maru Gothic ProN", "Segoe UI", "Noto Sans", "Arial",
+    "Liberation Sans", "BIZ UDゴシック", "Meiryo", sans-serif,
     /* TailwindCSSでデフォルトで指定されていた絵文字フォントは一応残しておく */
       "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
