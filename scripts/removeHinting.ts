@@ -35,7 +35,7 @@ if (existsSync(outPath)) {
       deflate: (data) => Array.from(pako.deflate(Uint8Array.from(data))),
     }) as Buffer;
     const outFileName = path.parse(file).name + `-nohint.woff`;
-    writeFile(path.join(outPath, outFileName), woffBuffer).then(() => {
+    await writeFile(path.join(outPath, outFileName), woffBuffer).then(() => {
       console.log(`Processed ${file} -> ${outFileName}`);
     });
 
@@ -45,7 +45,7 @@ if (existsSync(outPath)) {
       kerning: true,
     }) as Buffer;
     const outFileName2 = path.parse(file).name + `-nohint.woff2`;
-    writeFile(path.join(outPath, outFileName2), woff2Buffer).then(() => {
+    await writeFile(path.join(outPath, outFileName2), woff2Buffer).then(() => {
       console.log(`Processed ${file} -> ${outFileName2}`);
     });
   }
@@ -77,7 +77,7 @@ if (existsSync(outPath)) {
       path.extname(file) === ".css" &&
       weights.some((w) => file.includes(w.toString()))
     ) {
-      rewriteCSS(file);
+      await rewriteCSS(file);
     }
   }
 }
