@@ -4,3 +4,7 @@
   Cross-Origin-Embedder-Policy: require-corp
 /typescript/*
   Cache-Control: public,max-age=31536000,immutable
+/m-plus-rounded-1c-nohint/*.woff
+  Cache-Control: public,max-age=31536000,immutable
+/m-plus-rounded-1c-nohint/*.woff2
+  Cache-Control: public,max-age=31536000,immutable
