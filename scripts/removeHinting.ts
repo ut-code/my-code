@@ -3,16 +3,12 @@ import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import pako from "pako";
-import crypto from "node:crypto";
 
 const fontsPath = "./node_modules/@fontsource/m-plus-rounded-1c/files/";
 const cssPath = "./node_modules/@fontsource/m-plus-rounded-1c/";
-const outPath = "./public/m-plus-rounded-1c-nohint/";
-const outURLBase = "/m-plus-rounded-1c-nohint";
+const outPath = "./app/m-plus-rounded-1c-nohint/";
 
 const weights = [400, 700];
-const woffHashes = new Map<string, string>();
-const woff2Hashes = new Map<string, string>();
 
 if (existsSync(outPath)) {
   console.log(`Output directory ${outPath} already exists.`);
@@ -38,17 +34,8 @@ if (existsSync(outPath)) {
       kerning: true,
       deflate: (data) => Array.from(pako.deflate(Uint8Array.from(data))),
     }) as Buffer;
-    const woffHash = crypto
-      .createHash("sha256")
-      .update(woffBuffer)
-      .digest("hex")
-      .slice(0, 8);
-    woffHashes.set(path.parse(file).name, woffHash);
-    const outFileName = path.parse(file).name + `-nohint-${woffHash}.woff`;
-    writeFile(
-      `./public/m-plus-rounded-1c-nohint/${outFileName}`,
-      woffBuffer
-    ).then(() => {
+    const outFileName = path.parse(file).name + `-nohint.woff`;
+    writeFile(path.join(outPath, outFileName), woffBuffer).then(() => {
       console.log(`Processed ${file} -> ${outFileName}`);
     });
 
@@ -57,17 +44,8 @@ if (existsSync(outPath)) {
       hinting: false,
       kerning: true,
     }) as Buffer;
-    const woff2Hash = crypto
-      .createHash("sha256")
-      .update(woff2Buffer)
-      .digest("hex")
-      .slice(0, 8);
-    woff2Hashes.set(path.parse(file).name, woff2Hash);
-    const outFileName2 = path.parse(file).name + `-nohint-${woff2Hash}.woff2`;
-    writeFile(
-      `./public/m-plus-rounded-1c-nohint/${outFileName2}`,
-      woff2Buffer
-    ).then(() => {
+    const outFileName2 = path.parse(file).name + `-nohint.woff2`;
+    writeFile(path.join(outPath, outFileName2), woff2Buffer).then(() => {
       console.log(`Processed ${file} -> ${outFileName2}`);
     });
   }
@@ -76,11 +54,7 @@ if (existsSync(outPath)) {
     let css = await readFile(path.join(cssPath, file), "utf-8");
     css = css.replace(/url\((.+?)\)/g, (match, p1) => {
       const parsedPath = path.parse(p1);
-      const hash =
-        path.extname(p1) === ".woff"
-          ? woffHashes.get(parsedPath.name)
-          : woff2Hashes.get(parsedPath.name);
-      return `url(${outURLBase}/${parsedPath.name}-nohint-${hash}${path.extname(p1)})`;
+      return `url(./${parsedPath.name}-nohint${parsedPath.ext})`;
     });
     css = css.replaceAll(
       "font-family: 'M PLUS Rounded 1c'",
