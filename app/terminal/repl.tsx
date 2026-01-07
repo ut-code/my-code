@@ -176,21 +176,19 @@ export function ReplTerminal({
 
   // ランタイムからのoutputを描画し、inputBufferをリセット
   const handleOutput = useCallback(
-    (outputs: ReplOutput[]) => {
+    (output: ReplOutput) => {
       if (terminalInstanceRef.current) {
         writeOutput(
           terminalInstanceRef.current,
-          outputs,
-          true,
+          [output],
+          false,
           returnPrefix,
           Prism,
           language
         );
-        // 出力が終わったらプロンプトを表示
-        updateBuffer(() => [""]);
       }
     },
-    [Prism, updateBuffer, terminalInstanceRef, returnPrefix, language]
+    [Prism, terminalInstanceRef, returnPrefix, language]
   );
 
   const keyHandler = useCallback(
@@ -220,11 +218,20 @@ export function ReplTerminal({
               terminalInstanceRef.current.writeln("");
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
-              const outputs = await runtimeMutex.runExclusive(() =>
-                runCommand(command)
-              );
-              handleOutput(outputs);
-              addReplOutput?.(terminalId, command, outputs);
+              const collectedOutputs: ReplOutput[] = [];
+              let isFirstOutput = true;
+              await runtimeMutex.runExclusive(async () => {
+                await runCommand(command, (output) => {
+                  collectedOutputs.push(output);
+                  handleOutput(output);
+                  isFirstOutput = false;
+                });
+              });
+              if (!isFirstOutput && terminalInstanceRef.current) {
+                terminalInstanceRef.current.writeln("");
+              }
+              updateBuffer(() => [""]);
+              addReplOutput?.(terminalId, command, collectedOutputs);
             }
           } else if (code === 127) {
             // Backspace
@@ -301,8 +308,14 @@ export function ReplTerminal({
           updateBuffer(() => cmd.command.split("\n"));
           terminalInstanceRef.current!.writeln("");
           inputBuffer.current = [];
-          handleOutput(cmd.output);
+          for (const output of cmd.output) {
+            handleOutput(output);
+          }
+          terminalInstanceRef.current!.writeln("");
+          updateBuffer(() => [""]);
         }
+      } else {
+        updateBuffer(() => [""]);
       }
       terminalInstanceRef.current!.scrollToTop();
       setInitCommandState("idle");
@@ -320,7 +333,10 @@ export function ReplTerminal({
           const initCommandResult: ReplCommand[] = [];
           await runtimeMutex.runExclusive(async () => {
             for (const cmd of initCommand!) {
-              const outputs = await runCommand(cmd.command);
+              const outputs: ReplOutput[] = [];
+              await runCommand(cmd.command, (output) => {
+                outputs.push(output);
+              });
               initCommandResult.push({
                 command: cmd.command,
                 output: outputs,
@@ -333,7 +349,11 @@ export function ReplTerminal({
             updateBuffer(() => cmd.command.split("\n"));
             terminalInstanceRef.current!.writeln("");
             inputBuffer.current = [];
-            handleOutput(cmd.output);
+            for (const output of cmd.output) {
+              handleOutput(output);
+            }
+            terminalInstanceRef.current!.writeln("");
+            updateBuffer(() => [""]);
           }
         }
         updateBuffer(() => [""]);

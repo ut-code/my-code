@@ -172,17 +172,16 @@ export function WorkerProvider({
   }, [initializeWorker, mutex]);
 
   const runCommand = useCallback(
-    async (code: string): Promise<ReplOutput[]> => {
+    async (code: string, onOutput: (output: ReplOutput) => void): Promise<void> => {
       if (!mutex.isLocked()) {
         throw new Error(`mutex of context must be locked for runCommand`);
       }
       if (!workerApiRef.current || !ready) {
-        return [
-          {
-            type: "error",
-            message: `worker runtime is not ready yet.`,
-          },
-        ];
+        onOutput({
+          type: "error",
+          message: `worker runtime is not ready yet.`,
+        });
+        return;
       }
 
       if (
@@ -199,6 +198,7 @@ export function WorkerProvider({
             code,
             proxy((item: ReplOutput) => {
               output.push(item);
+              onOutput(item);
             })
           )
         );
@@ -212,13 +212,12 @@ export function WorkerProvider({
             commandHistory.current.push(code);
           }
         }
-
-        return output;
       } catch (error) {
         if (error instanceof Error) {
-          return [{ type: "error", message: error.message }];
+          onOutput({ type: "error", message: error.message });
+        } else {
+          onOutput({ type: "error", message: String(error) });
         }
-        return [{ type: "error", message: String(error) }];
       }
     },
     [ready, writeFile, mutex, trackPromise]
@@ -238,23 +237,22 @@ export function WorkerProvider({
   const runFiles = useCallback(
     async (
       filenames: string[],
-      files: Readonly<Record<string, string>>
-    ): Promise<ReplOutput[]> => {
+      files: Readonly<Record<string, string>>,
+      onOutput: (output: ReplOutput) => void
+    ): Promise<void> => {
       if (filenames.length !== 1) {
-        return [
-          {
-            type: "error",
-            message: `worker runtime requires exactly one filename.`,
-          },
-        ];
+        onOutput({
+          type: "error",
+          message: `worker runtime requires exactly one filename.`,
+        });
+        return;
       }
       if (!workerApiRef.current || !ready) {
-        return [
-          {
-            type: "error",
-            message: `worker runtime is not ready yet.`,
-          },
-        ];
+        onOutput({
+          type: "error",
+          message: `worker runtime is not ready yet.`,
+        });
+        return;
       }
       if (
         capabilities.current?.interrupt === "buffer" &&
@@ -263,18 +261,16 @@ export function WorkerProvider({
         interruptBuffer.current[0] = 0;
       }
       return mutex.runExclusive(async () => {
-        const output: ReplOutput[] = [];
         const { updatedFiles } = await trackPromise(
           workerApiRef.current!.runFile(
             filenames[0],
             files,
             proxy((item: ReplOutput) => {
-              output.push(item);
+              onOutput(item);
             })
           )
         );
         writeFile(updatedFiles);
-        return output;
       });
     },
     [ready, writeFile, mutex, trackPromise]
