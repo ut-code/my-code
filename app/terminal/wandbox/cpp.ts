@@ -84,67 +84,67 @@ export function selectCppCompiler(
 export async function cppRunFiles(
   options: SelectedCompiler,
   files: Record<string, string | undefined>,
-  filenames: string[]
-): Promise<ReplOutput[]> {
-  const result = await compileAndRun({
-    ...options,
-    compilerOptionsRaw: [
-      ...options.compilerOptionsRaw,
-      ...filenames,
-      "_stacktrace.cpp",
-    ],
-    codes: { ...files, "_stacktrace.cpp": _stacktrace_cpp },
-  });
+  filenames: string[],
+  onOutput: (output: ReplOutput) => void
+): Promise<void> {
+  // Constants for stack trace processing
+  const WANDBOX_PATH = "/home/wandbox";
 
-  let outputs = result.output;
+  // Track state for processing stack traces
+  let inStackTrace = false;
 
-  // Find stack trace in the output
-  const signalIndex = outputs.findIndex(
-    (line) =>
-      line.type === "stderr" && line.message.startsWith("#!my_code_signal:")
-  );
-  const traceIndex = outputs.findIndex(
-    (line) => line.type === "stderr" && line.message === "#!my_code_stacktrace:"
-  );
+  await compileAndRun(
+    {
+      ...options,
+      compilerOptionsRaw: [
+        ...options.compilerOptionsRaw,
+        ...filenames,
+        "_stacktrace.cpp",
+      ],
+      codes: { ...files, "_stacktrace.cpp": _stacktrace_cpp },
+    },
+    (event) => {
+      const { ndjsonType, output } = event;
 
-  if (signalIndex >= 0) {
-    outputs[signalIndex] = {
-      type: "error",
-      message: outputs[signalIndex].message.slice(17),
-    } as const;
-  }
-  if (traceIndex >= 0) {
-    // _stacktrace.cpp のコードで出力されるスタックトレースを、js側でパースしていい感じに表示する
-    const trace = outputs.slice(traceIndex + 1);
-    const otherOutputs = outputs.slice(0, traceIndex);
-    const traceOutputs: ReplOutput[] = [{
-      type: "trace",
-      message: "Stack trace (filtered):",
-    }];
+      // Check for signal marker in stderr
+      if (
+        ndjsonType === "StdErr" &&
+        output.message.startsWith("#!my_code_signal:")
+      ) {
+        onOutput({
+          type: "error",
+          message: output.message.slice(17),
+        });
+        return;
+      }
 
-    for (const line of trace) {
-      if(line.type === "stderr"){
-        // ユーザーのソースコードだけを対象にする
-        if (line.message.includes("/home/wandbox")) {
-          traceOutputs.push({
+      // Check for stack trace marker
+      if (
+        ndjsonType === "StdErr" &&
+        output.message === "#!my_code_stacktrace:"
+      ) {
+        inStackTrace = true;
+        onOutput({
+          type: "trace",
+          message: "Stack trace (filtered):",
+        });
+        return;
+      }
+
+      // Process stack trace lines
+      if (inStackTrace && ndjsonType === "StdErr") {
+        // Filter to show only user source code
+        if (output.message.includes(WANDBOX_PATH)) {
+          onOutput({
             type: "trace",
-            message: line.message.replace("/home/wandbox/", ""),
+            message: output.message.replace(`${WANDBOX_PATH}/`, ""),
           });
         }
-      }else{
-        otherOutputs.push(line);
+        return;
       }
+
+      // Output normally
+      onOutput(output);
     }
-    outputs = [...otherOutputs, ...traceOutputs];
-  }
-
-  if (result.status !== "0") {
-    outputs.push({
-      type: "system",
-      message: `ステータス ${result.status} で異常終了しました`,
-    });
-  }
-  // TODO: result.signal はいつ使われるのか？
-
-  return outputs;
+  );
 }

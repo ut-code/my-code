@@ -24,14 +24,18 @@ export interface RuntimeContext {
   mutex?: MutexInterface;
   interrupt?: () => void;
   // repl
-  runCommand?: (command: string) => Promise<ReplOutput[]>;
+  runCommand?: (
+    command: string,
+    onOutput: (output: ReplOutput) => void
+  ) => Promise<void>;
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   splitReplExamples?: (content: string) => ReplCommand[];
   // file
   runFiles: (
     filenames: string[],
-    files: Readonly<Record<string, string>>
-  ) => Promise<ReplOutput[]>;
+    files: Readonly<Record<string, string>>,
+    onOutput: (output: ReplOutput) => void
+  ) => Promise<void>;
   getCommandlineStr?: (filenames: string[]) => string;
 }
 export interface LangConstants {

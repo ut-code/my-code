@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { RefObject } from "react";
 import { emptyMutex, RuntimeContext, RuntimeLang } from "./runtime";
+import { ReplOutput } from "./repl";
 
 export function defineTests(
   lang: RuntimeLang,
@@ -42,11 +43,14 @@ export function defineTests(
         if (!printCode) {
           this.skip();
         }
-        const result = await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() => runtimeRef.current[lang].runCommand!(printCode));
-        console.log(`${lang} REPL stdout test: `, result);
-        expect(result).to.be.deep.include({ type: "stdout", message: msg });
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
+          runtimeRef.current[lang].runCommand!(printCode, (output) => {
+            outputs.push(output);
+          })
+        );
+        console.log(`${lang} REPL stdout test: `, outputs);
+        expect(outputs).to.be.deep.include({ type: "stdout", message: msg });
       });
 
       it("should preserve variables across commands", async function () {
@@ -68,14 +72,20 @@ export function defineTests(
         if (!setIntVarCode || !printIntVarCode) {
           this.skip();
         }
-        const result = await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(async () => {
-          await runtimeRef.current[lang].runCommand!(setIntVarCode);
-          return runtimeRef.current[lang].runCommand!(printIntVarCode);
-        });
-        console.log(`${lang} REPL variable preservation test: `, result);
-        expect(result).to.be.deep.include({
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(
+          async () => {
+            await runtimeRef.current[lang].runCommand!(setIntVarCode, () => {});
+            await runtimeRef.current[lang].runCommand!(
+              printIntVarCode,
+              (output) => {
+                outputs.push(output);
+              }
+            );
+          }
+        );
+        console.log(`${lang} REPL variable preservation test: `, outputs);
+        expect(outputs).to.be.deep.include({
           type: "stdout",
           message: value.toString(),
         });
@@ -96,12 +106,15 @@ export function defineTests(
         if (!errorCode) {
           this.skip();
         }
-        const result = await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() => runtimeRef.current[lang].runCommand!(errorCode));
-        console.log(`${lang} REPL error capture test: `, result);
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
+          runtimeRef.current[lang].runCommand!(errorCode, (output) => {
+            outputs.push(output);
+          })
+        );
+        console.log(`${lang} REPL error capture test: `, outputs);
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        expect(result.filter((r) => r.message.includes(errorMsg))).to.not.be
+        expect(outputs.filter((r) => r.message.includes(errorMsg))).to.not.be
           .empty;
       });
 
@@ -126,8 +139,8 @@ export function defineTests(
         const runPromise = (
           runtimeRef.current[lang].mutex || emptyMutex
         ).runExclusive(async () => {
-          await runtimeRef.current[lang].runCommand!(setIntVarCode);
-          return runtimeRef.current[lang].runCommand!(infLoopCode);
+          await runtimeRef.current[lang].runCommand!(setIntVarCode, () => {});
+          await runtimeRef.current[lang].runCommand!(infLoopCode, () => {});
         });
         // Wait a bit to ensure the infinite loop has started
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -137,13 +150,14 @@ export function defineTests(
         while (!runtimeRef.current[lang].ready) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        const result = await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() =>
-          runtimeRef.current[lang].runCommand!(printIntVarCode)
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
+          runtimeRef.current[lang].runCommand!(printIntVarCode, (output) => {
+            outputs.push(output);
+          })
         );
-        console.log(`${lang} REPL interrupt recovery test: `, result);
-        expect(result).to.be.deep.include({ type: "stdout", message: "42" });
+        console.log(`${lang} REPL interrupt recovery test: `, outputs);
+        expect(outputs).to.be.deep.include({ type: "stdout", message: "42" });
       });
 
       it("should capture files modified by command", async function () {
@@ -162,10 +176,9 @@ export function defineTests(
         if (!writeCode) {
           this.skip();
         }
-        const result = await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() => runtimeRef.current[lang].runCommand!(writeCode));
-        console.log(`${lang} REPL file modify test: `, result);
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
+          runtimeRef.current[lang].runCommand!(writeCode, () => {})
+        );
         // wait for files to be updated
         await new Promise((resolve) => setTimeout(resolve, 100));
         expect(filesRef.current[targetFile]).to.equal(msg);
@@ -191,11 +204,18 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        const result = await runtimeRef.current[lang].runFiles([filename], {
-          [filename]: code,
-        });
-        console.log(`${lang} single file stdout test: `, result);
-        expect(result).to.be.deep.include({ type: "stdout", message: msg });
+        const outputs: ReplOutput[] = [];
+        await runtimeRef.current[lang].runFiles(
+          [filename],
+          {
+            [filename]: code,
+          },
+          (output) => {
+            outputs.push(output);
+          }
+        );
+        console.log(`${lang} single file stdout test: `, outputs);
+        expect(outputs).to.be.deep.include({ type: "stdout", message: msg });
       });
 
       it("should capture errors", async function () {
@@ -220,12 +240,19 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        const result = await runtimeRef.current[lang].runFiles([filename], {
-          [filename]: code,
-        });
-        console.log(`${lang} single file error capture test: `, result);
+        const outputs: ReplOutput[] = [];
+        await runtimeRef.current[lang].runFiles(
+          [filename],
+          {
+            [filename]: code,
+          },
+          (output) => {
+            outputs.push(output);
+          }
+        );
+        console.log(`${lang} single file error capture test: `, outputs);
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        expect(result.filter((r) => r.message.includes(errorMsg))).to.not.be
+        expect(outputs.filter((r) => r.message.includes(errorMsg))).to.not.be
           .empty;
       });
 
@@ -276,12 +303,12 @@ export function defineTests(
         if (!codes || !execFiles) {
           this.skip();
         }
-        const result = await runtimeRef.current[lang].runFiles(
-          execFiles,
-          codes
-        );
-        console.log(`${lang} multifile stdout test: `, result);
-        expect(result).to.be.deep.include({ type: "stdout", message: msg });
+        const outputs: ReplOutput[] = [];
+        await runtimeRef.current[lang].runFiles(execFiles, codes, (output) => {
+          outputs.push(output);
+        });
+        console.log(`${lang} multifile stdout test: `, outputs);
+        expect(outputs).to.be.deep.include({ type: "stdout", message: msg });
       });
 
       it("should capture files modified by script", async function () {
@@ -306,10 +333,13 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        const result = await runtimeRef.current[lang].runFiles([filename], {
-          [filename]: code,
-        });
-        console.log(`${lang} file modify test: `, result);
+        await runtimeRef.current[lang].runFiles(
+          [filename],
+          {
+            [filename]: code,
+          },
+          () => {}
+        );
         // wait for files to be updated
         await new Promise((resolve) => setTimeout(resolve, 100));
         expect(filesRef.current[targetFile]).to.equal(msg);
