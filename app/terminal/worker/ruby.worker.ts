@@ -137,8 +137,6 @@ async function runCode(
       type: "error",
       message: formatRubyError(e, false),
     });
-  } finally {
-    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();
@@ -189,8 +187,6 @@ async function runFile(
       type: "error",
       message: formatRubyError(e, true),
     });
-  } finally {
-    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();

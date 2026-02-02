@@ -96,8 +96,6 @@ async function runCode(
         message: `${String(e)}`,
       });
     }
-  } finally {
-    currentOutputCallback = null;
   }
 
   return { updatedFiles: {} as Record<string, string> };
@@ -126,8 +124,6 @@ function runFile(
         message: `${String(e)}`,
       });
     }
-  } finally {
-    currentOutputCallback = null;
   }
 
   return { updatedFiles: {} as Record<string, string> };

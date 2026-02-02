@@ -107,8 +107,6 @@ async function runCode(
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
     }
-  } finally {
-    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();
@@ -165,8 +163,6 @@ async function runFile(
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
     }
-  } finally {
-    currentOutputCallback = null;
   }
 
   const updatedFiles = readAllFiles();

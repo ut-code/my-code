@@ -130,7 +130,7 @@ export function ReplTerminal({
 
   // inputBufferを更新し、画面に描画する
   const updateBuffer = useCallback(
-    (newBuffer: () => string[]) => {
+    (newBuffer: (() => string[]) | null, insertBefore?: () => void) => {
       if (terminalInstanceRef.current) {
         hideCursor(terminalInstanceRef.current);
         // バッファの行数分カーソルを戻す
@@ -142,8 +142,12 @@ export function ReplTerminal({
         terminalInstanceRef.current.write("\r");
         // バッファの内容をクリア
         terminalInstanceRef.current.write("\x1b[0J");
-        // 新しいバッファの内容を表示
-        inputBuffer.current = newBuffer();
+        // バッファの前に追加で出力する内容(前のコマンドの出力)があればここで書き込む
+        insertBefore?.();
+        // 新しいバッファの内容を表示、nullなら現状維持
+        if (newBuffer) {
+          inputBuffer.current = newBuffer();
+        }
         for (let i = 0; i < inputBuffer.current.length; i++) {
           terminalInstanceRef.current.write(
             (i === 0 ? prompt : (promptMore ?? prompt)) ?? "> "
@@ -214,12 +218,22 @@ export function ReplTerminal({
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
               const collectedOutputs: ReplOutput[] = [];
+              let executionDone = false;
               await runtimeMutex.runExclusive(async () => {
                 await runCommand(command, (output) => {
-                  collectedOutputs.push(output);
-                  handleOutput(output);
+                  if (executionDone) {
+                    // すでに完了していて次のコマンドのプロンプトが出ている場合、その前に挿入
+                    updateBuffer(null, () => {
+                      handleOutput(output);
+                    });
+                    // TODO: embedContextのaddReplOutputにも出力を追加する必要があるが、それに対応したAPIになっていない
+                  } else {
+                    collectedOutputs.push(output);
+                    handleOutput(output);
+                  }
                 });
               });
+              executionDone = true;
               updateBuffer(() => [""]);
               addReplOutput?.(terminalId, command, collectedOutputs);
             }
