@@ -17,7 +17,13 @@ import { useEmbedContext } from "./embedContext";
 import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 import clsx from "clsx";
 
-export type ReplOutputType = "stdout" | "stderr" | "error" | "return" | "trace" | "system";
+export type ReplOutputType =
+  | "stdout"
+  | "stderr"
+  | "error"
+  | "return"
+  | "trace"
+  | "system";
 export interface ReplOutput {
   type: ReplOutputType; // 出力の種類
   message: string; // 出力メッセージ
@@ -30,47 +36,37 @@ export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チ�
 
 export function writeOutput(
   term: Terminal,
-  outputs: ReplOutput[],
-  endNewLine: boolean,
+  output: ReplOutput,
   returnPrefix: string | undefined,
   Prism: typeof import("prismjs") | null,
   language: RuntimeLang
 ) {
-  for (let i = 0; i < outputs.length; i++) {
-    const output = outputs[i];
-    if (i > 0) {
-      term.writeln("");
-    }
-    // 出力内容に応じて色を変える
-    const message = String(output.message).replace(/\n/g, "\r\n");
-    switch (output.type) {
-      case "error":
-        term.write(chalk.red(message));
-        break;
-      case "trace":
-        term.write(chalk.blue.italic(message));
-        break;
-      case "system":
-        term.write(systemMessageColor(message));
-        break;
-      case "return":
-        if (returnPrefix) {
-          term.write(returnPrefix);
-        }
-        if (Prism) {
-          term.write(highlightCodeToAnsi(Prism, message, language));
-        } else {
-          console.warn("Prism is not loaded, cannot highlight return value");
-          term.write(message);
-        }
-        break;
-      default:
-        term.write(message);
-        break;
-    }
-  }
-  if (endNewLine && outputs.length > 0) {
-    term.writeln("");
+  // 出力内容に応じて色を変える
+  const message = String(output.message).replace(/\n/g, "\r\n");
+  switch (output.type) {
+    case "error":
+      term.writeln(chalk.red(message));
+      break;
+    case "trace":
+      term.writeln(chalk.blue.italic(message));
+      break;
+    case "system":
+      term.writeln(systemMessageColor(message));
+      break;
+    case "return":
+      if (returnPrefix) {
+        term.write(returnPrefix);
+      }
+      if (Prism) {
+        term.writeln(highlightCodeToAnsi(Prism, message, language));
+      } else {
+        console.warn("Prism is not loaded, cannot highlight return value");
+        term.writeln(message);
+      }
+      break;
+    default:
+      term.writeln(message);
+      break;
   }
 }
 
@@ -180,8 +176,7 @@ export function ReplTerminal({
       if (terminalInstanceRef.current) {
         writeOutput(
           terminalInstanceRef.current,
-          [output],
-          false,
+          output,
           returnPrefix,
           Prism,
           language
@@ -219,17 +214,12 @@ export function ReplTerminal({
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
               const collectedOutputs: ReplOutput[] = [];
-              let isFirstOutput = true;
               await runtimeMutex.runExclusive(async () => {
                 await runCommand(command, (output) => {
                   collectedOutputs.push(output);
                   handleOutput(output);
-                  isFirstOutput = false;
                 });
               });
-              if (!isFirstOutput && terminalInstanceRef.current) {
-                terminalInstanceRef.current.writeln("");
-              }
               updateBuffer(() => [""]);
               addReplOutput?.(terminalId, command, collectedOutputs);
             }
@@ -311,7 +301,6 @@ export function ReplTerminal({
           for (const output of cmd.output) {
             handleOutput(output);
           }
-          terminalInstanceRef.current!.writeln("");
           updateBuffer(() => [""]);
         }
       } else {
@@ -352,7 +341,6 @@ export function ReplTerminal({
             for (const output of cmd.output) {
               handleOutput(output);
             }
-            terminalInstanceRef.current!.writeln("");
             updateBuffer(() => [""]);
           }
         }

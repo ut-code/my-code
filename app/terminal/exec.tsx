@@ -58,8 +58,7 @@ export function ExecFile(props: ExecProps) {
           // Append only the new output
           writeOutput(
             terminalInstanceRef.current!,
-            [output],
-            true,
+            output,
             undefined,
             null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
             props.language

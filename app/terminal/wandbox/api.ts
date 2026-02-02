@@ -164,7 +164,7 @@ export async function compileAndRun(
           ndjsonType: r.type,
           output: {
             type: "system",
-            message: `ステータス ${result.status} で異常終了しました`,
+            message: `ステータス ${r.data} で異常終了しました`,
           }
         })
         }
