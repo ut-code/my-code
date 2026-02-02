@@ -69,7 +69,7 @@ export async function getAuthServer(
         },
         font: {
           defaultFamily:
-            "'Rounded M+ 1c', 'Rounded M+ 1p', 'M PLUS Rounded 1c', 'M+ 1c', 'MigMix 1c', 'Migu 1c', 'Hiragino Maru Gothic ProN', 'Noto Sans', 'Arial', 'Liberation Sans', sans-serif",
+            "'M PLUS Rounded 1c NoHint', 'Rounded M+ 1c', 'Rounded M+ 1p', 'M+ 1c', 'MigMix 1c', 'Migu 1c', 'Hiragino Maru Gothic ProN', 'Segoe UI', 'Noto Sans', 'Arial', 'Liberation Sans', 'BIZ UDゴシック', 'Meiryo', sans-serif",
           monoFamily: "Inconsolata, monospace",
         },
         disableTitleBorder: true,
