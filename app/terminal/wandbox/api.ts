@@ -114,7 +114,7 @@ interface CompileProps {
 export async function compileAndRun(
   options: CompileProps,
   onOutput: (event: CompileOutputEvent) => void
-): Promise<CompileResult> {
+): Promise<void> {
   // Helper function to process NDJSON result and call onOutput
   const processNdjsonResult = (r: CompileNdjsonResult) => {
     switch (r.type) {
@@ -157,6 +157,24 @@ export async function compileAndRun(
             });
           }
         }
+        break;
+      case "ExitCode":
+        if(r.data !== "0"){
+        onOutput({
+          ndjsonType: r.type,
+          output: {
+            type: "system",
+            message: `ステータス ${result.status} で異常終了しました`,
+          }
+        })
+        }
+        break;
+      case "Signal":
+        // TODO
+        break;
+      default:
+        // Ignore unknown types
+        console.warn(`Unknown ndjson type: ${r.type}`);
         break;
     }
   };
@@ -228,53 +246,4 @@ export async function compileAndRun(
   } finally {
     reader.releaseLock();
   }
-
-  // Merge ndjson results into a CompileResult (same logic as Rust merge_compile_result)
-  const result: CompileResult = {
-    status: "",
-    signal: "",
-    compiler_output: "",
-    compiler_error: "",
-    compiler_message: "",
-    program_output: "",
-    program_error: "",
-    program_message: "",
-    permlink: "",
-    url: "",
-  };
-
-  for (const r of ndjsonResults) {
-    switch (r.type) {
-      case "Control":
-        // Ignore control messages
-        break;
-      case "CompilerMessageS":
-        result.compiler_output += r.data;
-        result.compiler_message += r.data;
-        break;
-      case "CompilerMessageE":
-        result.compiler_error += r.data;
-        result.compiler_message += r.data;
-        break;
-      case "StdOut":
-        result.program_output += r.data;
-        result.program_message += r.data;
-        break;
-      case "StdErr":
-        result.program_error += r.data;
-        result.program_message += r.data;
-        break;
-      case "ExitCode":
-        result.status += r.data;
-        break;
-      case "Signal":
-        result.signal += r.data;
-        break;
-      default:
-        // Ignore unknown types
-        break;
-    }
-  }
-
-  return result;
 }

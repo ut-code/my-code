@@ -86,65 +86,65 @@ export async function cppRunFiles(
   files: Record<string, string | undefined>,
   filenames: string[],
   onOutput: (output: ReplOutput) => void
-): Promise<string> {
+): Promise<void> {
   // Constants for stack trace processing
   const WANDBOX_PATH = "/home/wandbox";
-  
+
   // Track state for processing stack traces
   let inStackTrace = false;
 
-  const result = await compileAndRun({
-    ...options,
-    compilerOptionsRaw: [
-      ...options.compilerOptionsRaw,
-      ...filenames,
-      "_stacktrace.cpp",
-    ],
-    codes: { ...files, "_stacktrace.cpp": _stacktrace_cpp },
-  }, (event) => {
-    const { ndjsonType, output } = event;
-    
-    // Check for signal marker in stderr
-    if (ndjsonType === "StdErr" && output.message.startsWith("#!my_code_signal:")) {
-      onOutput({
-        type: "error",
-        message: output.message.slice(17),
-      });
-      return;
-    }
-    
-    // Check for stack trace marker
-    if (ndjsonType === "StdErr" && output.message === "#!my_code_stacktrace:") {
-      inStackTrace = true;
-      onOutput({
-        type: "trace",
-        message: "Stack trace (filtered):",
-      });
-      return;
-    }
-    
-    // Process stack trace lines
-    if (inStackTrace && ndjsonType === "StdErr") {
-      // Filter to show only user source code
-      if (output.message.includes(WANDBOX_PATH)) {
+  await compileAndRun(
+    {
+      ...options,
+      compilerOptionsRaw: [
+        ...options.compilerOptionsRaw,
+        ...filenames,
+        "_stacktrace.cpp",
+      ],
+      codes: { ...files, "_stacktrace.cpp": _stacktrace_cpp },
+    },
+    (event) => {
+      const { ndjsonType, output } = event;
+
+      // Check for signal marker in stderr
+      if (
+        ndjsonType === "StdErr" &&
+        output.message.startsWith("#!my_code_signal:")
+      ) {
+        onOutput({
+          type: "error",
+          message: output.message.slice(17),
+        });
+        return;
+      }
+
+      // Check for stack trace marker
+      if (
+        ndjsonType === "StdErr" &&
+        output.message === "#!my_code_stacktrace:"
+      ) {
+        inStackTrace = true;
         onOutput({
           type: "trace",
-          message: output.message.replace(`${WANDBOX_PATH}/`, ""),
+          message: "Stack trace (filtered):",
         });
+        return;
       }
-      return;
+
+      // Process stack trace lines
+      if (inStackTrace && ndjsonType === "StdErr") {
+        // Filter to show only user source code
+        if (output.message.includes(WANDBOX_PATH)) {
+          onOutput({
+            type: "trace",
+            message: output.message.replace(`${WANDBOX_PATH}/`, ""),
+          });
+        }
+        return;
+      }
+
+      // Output normally
+      onOutput(output);
     }
-    
-    // Output normally
-    onOutput(output);
-  });
-
-  if (result.status !== "0") {
-    onOutput({
-      type: "system",
-      message: `ステータス ${result.status} で異常終了しました`,
-    });
-  }
-
-  return result.status;
+  );
 }

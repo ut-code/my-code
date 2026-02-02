@@ -32,7 +32,7 @@ export async function rustRunFiles(
   files: Record<string, string | undefined>,
   filenames: string[],
   onOutput: (output: ReplOutput) => void
-): Promise<string> {
+): Promise<void> {
   // Regular expressions for parsing stack traces
   const STACK_FRAME_PATTERN = /^\s*\d+:/;
   const LOCATION_PATTERN = /^\s*at .\//;
@@ -44,7 +44,7 @@ export async function rustRunFiles(
   const traceLines: string[] = [];
 
   const mainModule = filenames[0].replace(/\.rs$/, "");
-  const result = await compileAndRun({
+  await compileAndRun({
     ...options,
     // メインファイルでmod宣言したものをこちらに移す
     code:
@@ -116,13 +116,4 @@ export async function rustRunFiles(
     // Output normally
     onOutput(output);
   });
-
-  if (result.status !== "0") {
-    onOutput({
-      type: "system",
-      message: `ステータス ${result.status} で異常終了しました`,
-    });
-  }
-
-  return result.status;
 }
