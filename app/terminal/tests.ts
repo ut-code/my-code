@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { RefObject } from "react";
 import { emptyMutex, RuntimeContext, RuntimeLang } from "./runtime";
+import { ReplOutput } from "./repl";
 
 export function defineTests(
   lang: RuntimeLang,
@@ -42,10 +43,8 @@ export function defineTests(
         if (!printCode) {
           this.skip();
         }
-        const outputs: any[] = [];
-        await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() => 
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
           runtimeRef.current[lang].runCommand!(printCode, (output) => {
             outputs.push(output);
           })
@@ -73,15 +72,18 @@ export function defineTests(
         if (!setIntVarCode || !printIntVarCode) {
           this.skip();
         }
-        const outputs: any[] = [];
-        await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(async () => {
-          await runtimeRef.current[lang].runCommand!(setIntVarCode, () => {});
-          await runtimeRef.current[lang].runCommand!(printIntVarCode, (output) => {
-            outputs.push(output);
-          });
-        });
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(
+          async () => {
+            await runtimeRef.current[lang].runCommand!(setIntVarCode, () => {});
+            await runtimeRef.current[lang].runCommand!(
+              printIntVarCode,
+              (output) => {
+                outputs.push(output);
+              }
+            );
+          }
+        );
         console.log(`${lang} REPL variable preservation test: `, outputs);
         expect(outputs).to.be.deep.include({
           type: "stdout",
@@ -104,10 +106,8 @@ export function defineTests(
         if (!errorCode) {
           this.skip();
         }
-        const outputs: any[] = [];
-        await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() => 
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
           runtimeRef.current[lang].runCommand!(errorCode, (output) => {
             outputs.push(output);
           })
@@ -150,10 +150,8 @@ export function defineTests(
         while (!runtimeRef.current[lang].ready) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        const outputs: any[] = [];
-        await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() =>
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
           runtimeRef.current[lang].runCommand!(printIntVarCode, (output) => {
             outputs.push(output);
           })
@@ -178,9 +176,9 @@ export function defineTests(
         if (!writeCode) {
           this.skip();
         }
-        await (
-          runtimeRef.current[lang].mutex || emptyMutex
-        ).runExclusive(() => runtimeRef.current[lang].runCommand!(writeCode, () => {}));
+        await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
+          runtimeRef.current[lang].runCommand!(writeCode, () => {})
+        );
         // wait for files to be updated
         await new Promise((resolve) => setTimeout(resolve, 100));
         expect(filesRef.current[targetFile]).to.equal(msg);
@@ -206,12 +204,16 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        const outputs: any[] = [];
-        await runtimeRef.current[lang].runFiles([filename], {
-          [filename]: code,
-        }, (output) => {
-          outputs.push(output);
-        });
+        const outputs: ReplOutput[] = [];
+        await runtimeRef.current[lang].runFiles(
+          [filename],
+          {
+            [filename]: code,
+          },
+          (output) => {
+            outputs.push(output);
+          }
+        );
         console.log(`${lang} single file stdout test: `, outputs);
         expect(outputs).to.be.deep.include({ type: "stdout", message: msg });
       });
@@ -238,12 +240,16 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        const outputs: any[] = [];
-        await runtimeRef.current[lang].runFiles([filename], {
-          [filename]: code,
-        }, (output) => {
-          outputs.push(output);
-        });
+        const outputs: ReplOutput[] = [];
+        await runtimeRef.current[lang].runFiles(
+          [filename],
+          {
+            [filename]: code,
+          },
+          (output) => {
+            outputs.push(output);
+          }
+        );
         console.log(`${lang} single file error capture test: `, outputs);
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         expect(outputs.filter((r) => r.message.includes(errorMsg))).to.not.be
@@ -297,14 +303,10 @@ export function defineTests(
         if (!codes || !execFiles) {
           this.skip();
         }
-        const outputs: any[] = [];
-        await runtimeRef.current[lang].runFiles(
-          execFiles,
-          codes,
-          (output) => {
-            outputs.push(output);
-          }
-        );
+        const outputs: ReplOutput[] = [];
+        await runtimeRef.current[lang].runFiles(execFiles, codes, (output) => {
+          outputs.push(output);
+        });
         console.log(`${lang} multifile stdout test: `, outputs);
         expect(outputs).to.be.deep.include({ type: "stdout", message: msg });
       });
@@ -331,9 +333,13 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
-        await runtimeRef.current[lang].runFiles([filename], {
-          [filename]: code,
-        }, () => {});
+        await runtimeRef.current[lang].runFiles(
+          [filename],
+          {
+            [filename]: code,
+          },
+          () => {}
+        );
         // wait for files to be updated
         await new Promise((resolve) => setTimeout(resolve, 100));
         expect(filesRef.current[targetFile]).to.equal(msg);
