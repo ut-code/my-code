@@ -31,6 +31,7 @@ export interface ReplOutput {
 export interface ReplCommand {
   command: string;
   output: ReplOutput[];
+  commandId?: string; // Optional for backward compatibility
 }
 export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 

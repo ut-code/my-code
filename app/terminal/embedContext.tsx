@@ -104,7 +104,7 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   );
   const addReplCommand = useCallback(
     (terminalId: TerminalId, command: string): string => {
-      const commandId = `${terminalId}-${Date.now()}-${Math.random()}`;
+      const commandId = crypto.randomUUID();
       setReplOutputs((outs) => {
         outs = { ...outs };
         if (!(terminalId in outs)) {
@@ -112,7 +112,7 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
         }
         outs[terminalId] = [
           ...outs[terminalId],
-          { command: command, output: [] },
+          { command: command, output: [], commandId },
         ];
         return outs;
       });
@@ -124,13 +124,19 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
     (terminalId: TerminalId, commandId: string, output: ReplOutput) =>
       setReplOutputs((outs) => {
         outs = { ...outs };
-        if (terminalId in outs && outs[terminalId].length > 0) {
+        if (terminalId in outs) {
           outs[terminalId] = [...outs[terminalId]];
-          const lastCommand = outs[terminalId][outs[terminalId].length - 1];
-          outs[terminalId][outs[terminalId].length - 1] = {
-            ...lastCommand,
-            output: [...lastCommand.output, output],
-          };
+          // Find the command by commandId
+          const commandIndex = outs[terminalId].findIndex(
+            (cmd) => cmd.commandId === commandId
+          );
+          if (commandIndex >= 0) {
+            const command = outs[terminalId][commandIndex];
+            outs[terminalId][commandIndex] = {
+              ...command,
+              output: [...command.output, output],
+            };
+          }
         }
         return outs;
       }),
