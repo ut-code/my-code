@@ -104,7 +104,11 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   );
   const addReplCommand = useCallback(
     (terminalId: TerminalId, command: string): string => {
-      const commandId = crypto.randomUUID();
+      // Use crypto.randomUUID() with a fallback for environments without Crypto API
+      const commandId =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `${terminalId}-${Date.now()}-${Math.random()}`;
       setReplOutputs((outs) => {
         outs = { ...outs };
         if (!(terminalId in outs)) {
