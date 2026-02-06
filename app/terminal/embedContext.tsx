@@ -32,14 +32,16 @@ interface IEmbedContext {
   ) => Promise<Readonly<Record<Filename, string>>>;
 
   replOutputs: Readonly<Record<TerminalId, ReplCommand[]>>;
+  addReplCommand: (terminalId: TerminalId, command: string) => string;
   addReplOutput: (
     terminalId: TerminalId,
-    command: string,
-    output: ReplOutput[]
+    commandId: string,
+    output: ReplOutput
   ) => void;
 
   execResults: Readonly<Record<Filename, ReplOutput[]>>;
-  setExecResult: (filename: Filename, output: ReplOutput[]) => void;
+  clearExecResult: (filename: Filename) => void;
+  addExecOutput: (filename: Filename, output: ReplOutput) => void;
 }
 const EmbedContext = createContext<IEmbedContext>(null!);
 
@@ -100,8 +102,9 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
     },
     [pathname]
   );
-  const addReplOutput = useCallback(
-    (terminalId: TerminalId, command: string, output: ReplOutput[]) =>
+  const addReplCommand = useCallback(
+    (terminalId: TerminalId, command: string): string => {
+      const commandId = `${terminalId}-${Date.now()}-${Math.random()}`;
       setReplOutputs((outs) => {
         outs = { ...outs };
         if (!(terminalId in outs)) {
@@ -109,17 +112,47 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
         }
         outs[terminalId] = [
           ...outs[terminalId],
-          { command: command, output: output },
+          { command: command, output: [] },
         ];
+        return outs;
+      });
+      return commandId;
+    },
+    []
+  );
+  const addReplOutput = useCallback(
+    (terminalId: TerminalId, commandId: string, output: ReplOutput) =>
+      setReplOutputs((outs) => {
+        outs = { ...outs };
+        if (terminalId in outs && outs[terminalId].length > 0) {
+          outs[terminalId] = [...outs[terminalId]];
+          const lastCommand = outs[terminalId][outs[terminalId].length - 1];
+          outs[terminalId][outs[terminalId].length - 1] = {
+            ...lastCommand,
+            output: [...lastCommand.output, output],
+          };
+        }
         return outs;
       }),
     []
   );
-  const setExecResult = useCallback(
-    (filename: Filename, output: ReplOutput[]) =>
+  const clearExecResult = useCallback(
+    (filename: Filename) =>
       setExecResults((results) => {
         results = { ...results };
-        results[filename] = output;
+        results[filename] = [];
+        return results;
+      }),
+    []
+  );
+  const addExecOutput = useCallback(
+    (filename: Filename, output: ReplOutput) =>
+      setExecResults((results) => {
+        results = { ...results };
+        if (!(filename in results)) {
+          results[filename] = [];
+        }
+        results[filename] = [...results[filename], output];
         return results;
       }),
     []
@@ -131,9 +164,11 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
         files: files[pathname] || {},
         writeFile,
         replOutputs,
+        addReplCommand,
         addReplOutput,
         execResults,
-        setExecResult,
+        clearExecResult,
+        addExecOutput,
       }}
     >
       {children}
