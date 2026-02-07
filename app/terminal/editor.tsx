@@ -174,6 +174,7 @@ export function EditorComponent(props: EditorProps) {
             enableSnippets={false}
             value={code}
             onChange={(code: string) => writeFile({ [props.filename]: code })}
+            setOptions={{ useWorker: false }}
           />
         </Suspense>
       ) : (
