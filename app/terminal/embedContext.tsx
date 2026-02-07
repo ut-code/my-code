@@ -65,6 +65,9 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   const [replOutputs, setReplOutputs] = useState<
     Record<TerminalId, ReplCommand[]>
   >({});
+  const [commandIdCounters, setCommandIdCounters] = useState<
+    Record<TerminalId, number>
+  >({});
   const [execResults, setExecResults] = useState<
     Record<Filename, ReplOutput[]>
   >({});
@@ -73,6 +76,7 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
     if (pathname && pathname !== currentPathname) {
       setCurrentPathname(pathname);
       setReplOutputs({});
+      setCommandIdCounters({});
       setExecResults({});
     }
   }, [pathname, currentPathname]);
@@ -104,11 +108,14 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   );
   const addReplCommand = useCallback(
     (terminalId: TerminalId, command: string): string => {
-      // Use crypto.randomUUID() with a fallback for environments without Crypto API
-      const commandId =
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `${terminalId}-${Date.now()}-${Math.random()}`;
+      let commandId = "";
+      setCommandIdCounters((counters) => {
+        const newCounters = { ...counters };
+        const currentCount = newCounters[terminalId] ?? 0;
+        commandId = String(currentCount);
+        newCounters[terminalId] = currentCount + 1;
+        return newCounters;
+      });
       setReplOutputs((outs) => {
         outs = { ...outs };
         if (!(terminalId in outs)) {
