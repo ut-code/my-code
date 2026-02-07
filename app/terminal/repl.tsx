@@ -31,6 +31,7 @@ export interface ReplOutput {
 export interface ReplCommand {
   command: string;
   output: ReplOutput[];
+  commandId?: string; // Optional for backward compatibility
 }
 export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
@@ -80,7 +81,7 @@ export function ReplTerminal({
   language,
   initContent,
 }: ReplComponentProps) {
-  const { addReplOutput } = useEmbedContext();
+  const { addReplCommand, addReplOutput } = useEmbedContext();
 
   const [Prism, setPrism] = useState<typeof import("prismjs") | null>(null);
   useEffect(() => {
@@ -217,7 +218,7 @@ export function ReplTerminal({
               terminalInstanceRef.current.writeln("");
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
-              const collectedOutputs: ReplOutput[] = [];
+              const commandId = addReplCommand(terminalId, command);
               let executionDone = false;
               await runtimeMutex.runExclusive(async () => {
                 await runCommand(command, (output) => {
@@ -226,16 +227,14 @@ export function ReplTerminal({
                     updateBuffer(null, () => {
                       handleOutput(output);
                     });
-                    // TODO: embedContextのaddReplOutputにも出力を追加する必要があるが、それに対応したAPIになっていない
                   } else {
-                    collectedOutputs.push(output);
                     handleOutput(output);
                   }
+                  addReplOutput(terminalId, commandId, output);
                 });
               });
               executionDone = true;
               updateBuffer(() => [""]);
-              addReplOutput?.(terminalId, command, collectedOutputs);
             }
           } else if (code === 127) {
             // Backspace
@@ -279,6 +278,7 @@ export function ReplTerminal({
       runCommand,
       handleOutput,
       tabSize,
+      addReplCommand,
       addReplOutput,
       terminalId,
       terminalInstanceRef,
