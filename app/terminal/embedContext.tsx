@@ -65,6 +65,7 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   const [replOutputs, setReplOutputs] = useState<
     Record<TerminalId, ReplCommand[]>
   >({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [commandIdCounters, setCommandIdCounters] = useState<
     Record<TerminalId, number>
   >({});

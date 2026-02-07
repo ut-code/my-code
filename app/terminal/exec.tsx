@@ -7,7 +7,7 @@ import {
   systemMessageColor,
   useTerminal,
 } from "./terminal";
-import { writeOutput, ReplOutput } from "./repl";
+import { writeOutput } from "./repl";
 import { useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import { RuntimeLang, useRuntime } from "./runtime";
