@@ -7,7 +7,7 @@ import {
   systemMessageColor,
   useTerminal,
 } from "./terminal";
-import { writeOutput, ReplOutput } from "./repl";
+import { writeOutput } from "./repl";
 import { useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import { RuntimeLang, useRuntime } from "./runtime";
@@ -32,7 +32,7 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const { files, setExecResult } = useEmbedContext();
+  const { files, clearExecResult, addExecOutput } = useEmbedContext();
 
   const { ready, runFiles, getCommandlineStr } = useRuntime(props.language);
 
@@ -46,10 +46,12 @@ export function ExecFile(props: ExecProps) {
       (async () => {
         clearTerminal(terminalInstanceRef.current!);
         terminalInstanceRef.current!.write(systemMessageColor("実行中です..."));
-        const outputs: ReplOutput[] = [];
+        // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
+        const filenameKey = props.filenames.join(",");
+        clearExecResult(filenameKey);
         let isFirstOutput = true;
         await runFiles(props.filenames, files, (output) => {
-          outputs.push(output);
+          addExecOutput(filenameKey, output);
           if (isFirstOutput) {
             // Clear "実行中です..." message only on first output
             clearTerminal(terminalInstanceRef.current!);
@@ -64,8 +66,6 @@ export function ExecFile(props: ExecProps) {
             props.language
           );
         });
-        // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
-        setExecResult(props.filenames.join(","), outputs);
         setExecutionState("idle");
       })();
     }
@@ -74,7 +74,8 @@ export function ExecFile(props: ExecProps) {
     ready,
     props.filenames,
     runFiles,
-    setExecResult,
+    clearExecResult,
+    addExecOutput,
     terminalInstanceRef,
     props.language,
     files,

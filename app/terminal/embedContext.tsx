@@ -32,14 +32,16 @@ interface IEmbedContext {
   ) => Promise<Readonly<Record<Filename, string>>>;
 
   replOutputs: Readonly<Record<TerminalId, ReplCommand[]>>;
+  addReplCommand: (terminalId: TerminalId, command: string) => string;
   addReplOutput: (
     terminalId: TerminalId,
-    command: string,
-    output: ReplOutput[]
+    commandId: string,
+    output: ReplOutput
   ) => void;
 
   execResults: Readonly<Record<Filename, ReplOutput[]>>;
-  setExecResult: (filename: Filename, output: ReplOutput[]) => void;
+  clearExecResult: (filename: Filename) => void;
+  addExecOutput: (filename: Filename, output: ReplOutput) => void;
 }
 const EmbedContext = createContext<IEmbedContext>(null!);
 
@@ -63,6 +65,10 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   const [replOutputs, setReplOutputs] = useState<
     Record<TerminalId, ReplCommand[]>
   >({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [commandIdCounters, setCommandIdCounters] = useState<
+    Record<TerminalId, number>
+  >({});
   const [execResults, setExecResults] = useState<
     Record<Filename, ReplOutput[]>
   >({});
@@ -71,6 +77,7 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
     if (pathname && pathname !== currentPathname) {
       setCurrentPathname(pathname);
       setReplOutputs({});
+      setCommandIdCounters({});
       setExecResults({});
     }
   }, [pathname, currentPathname]);
@@ -100,8 +107,16 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
     },
     [pathname]
   );
-  const addReplOutput = useCallback(
-    (terminalId: TerminalId, command: string, output: ReplOutput[]) =>
+  const addReplCommand = useCallback(
+    (terminalId: TerminalId, command: string): string => {
+      let commandId = "";
+      setCommandIdCounters((counters) => {
+        const newCounters = { ...counters };
+        const currentCount = newCounters[terminalId] ?? 0;
+        commandId = String(currentCount);
+        newCounters[terminalId] = currentCount + 1;
+        return newCounters;
+      });
       setReplOutputs((outs) => {
         outs = { ...outs };
         if (!(terminalId in outs)) {
@@ -109,17 +124,53 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
         }
         outs[terminalId] = [
           ...outs[terminalId],
-          { command: command, output: output },
+          { command: command, output: [], commandId },
         ];
+        return outs;
+      });
+      return commandId;
+    },
+    []
+  );
+  const addReplOutput = useCallback(
+    (terminalId: TerminalId, commandId: string, output: ReplOutput) =>
+      setReplOutputs((outs) => {
+        outs = { ...outs };
+        if (terminalId in outs) {
+          outs[terminalId] = [...outs[terminalId]];
+          // Find the command by commandId
+          const commandIndex = outs[terminalId].findIndex(
+            (cmd) => cmd.commandId === commandId
+          );
+          if (commandIndex >= 0) {
+            const command = outs[terminalId][commandIndex];
+            outs[terminalId][commandIndex] = {
+              ...command,
+              output: [...command.output, output],
+            };
+          }
+        }
         return outs;
       }),
     []
   );
-  const setExecResult = useCallback(
-    (filename: Filename, output: ReplOutput[]) =>
+  const clearExecResult = useCallback(
+    (filename: Filename) =>
       setExecResults((results) => {
         results = { ...results };
-        results[filename] = output;
+        results[filename] = [];
+        return results;
+      }),
+    []
+  );
+  const addExecOutput = useCallback(
+    (filename: Filename, output: ReplOutput) =>
+      setExecResults((results) => {
+        results = { ...results };
+        if (!(filename in results)) {
+          results[filename] = [];
+        }
+        results[filename] = [...results[filename], output];
         return results;
       }),
     []
@@ -131,9 +182,11 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
         files: files[pathname] || {},
         writeFile,
         replOutputs,
+        addReplCommand,
         addReplOutput,
         execResults,
-        setExecResult,
+        clearExecResult,
+        addExecOutput,
       }}
     >
       {children}

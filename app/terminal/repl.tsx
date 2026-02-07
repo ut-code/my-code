@@ -31,6 +31,7 @@ export interface ReplOutput {
 export interface ReplCommand {
   command: string;
   output: ReplOutput[];
+  commandId?: string; // Optional for backward compatibility
 }
 export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
@@ -80,7 +81,7 @@ export function ReplTerminal({
   language,
   initContent,
 }: ReplComponentProps) {
-  const { addReplOutput } = useEmbedContext();
+  const { addReplCommand, addReplOutput } = useEmbedContext();
 
   const [Prism, setPrism] = useState<typeof import("prismjs") | null>(null);
   useEffect(() => {
@@ -130,7 +131,7 @@ export function ReplTerminal({
 
   // inputBufferを更新し、画面に描画する
   const updateBuffer = useCallback(
-    (newBuffer: () => string[]) => {
+    (newBuffer: (() => string[]) | null, insertBefore?: () => void) => {
       if (terminalInstanceRef.current) {
         hideCursor(terminalInstanceRef.current);
         // バッファの行数分カーソルを戻す
@@ -142,8 +143,12 @@ export function ReplTerminal({
         terminalInstanceRef.current.write("\r");
         // バッファの内容をクリア
         terminalInstanceRef.current.write("\x1b[0J");
-        // 新しいバッファの内容を表示
-        inputBuffer.current = newBuffer();
+        // バッファの前に追加で出力する内容(前のコマンドの出力)があればここで書き込む
+        insertBefore?.();
+        // 新しいバッファの内容を表示、nullなら現状維持
+        if (newBuffer) {
+          inputBuffer.current = newBuffer();
+        }
         for (let i = 0; i < inputBuffer.current.length; i++) {
           terminalInstanceRef.current.write(
             (i === 0 ? prompt : (promptMore ?? prompt)) ?? "> "
@@ -213,15 +218,23 @@ export function ReplTerminal({
               terminalInstanceRef.current.writeln("");
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
-              const collectedOutputs: ReplOutput[] = [];
+              const commandId = addReplCommand(terminalId, command);
+              let executionDone = false;
               await runtimeMutex.runExclusive(async () => {
                 await runCommand(command, (output) => {
-                  collectedOutputs.push(output);
-                  handleOutput(output);
+                  if (executionDone) {
+                    // すでに完了していて次のコマンドのプロンプトが出ている場合、その前に挿入
+                    updateBuffer(null, () => {
+                      handleOutput(output);
+                    });
+                  } else {
+                    handleOutput(output);
+                  }
+                  addReplOutput(terminalId, commandId, output);
                 });
               });
+              executionDone = true;
               updateBuffer(() => [""]);
-              addReplOutput?.(terminalId, command, collectedOutputs);
             }
           } else if (code === 127) {
             // Backspace
@@ -265,6 +278,7 @@ export function ReplTerminal({
       runCommand,
       handleOutput,
       tabSize,
+      addReplCommand,
       addReplOutput,
       terminalId,
       terminalInstanceRef,
