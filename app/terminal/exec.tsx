@@ -34,7 +34,8 @@ export function ExecFile(props: ExecProps) {
   });
   const { files, clearExecResult, addExecOutput } = useEmbedContext();
 
-  const { ready, runFiles, getCommandlineStr } = useRuntime(props.language);
+  const { ready, runFiles, getCommandlineStr, runtimeInfo, interrupt } =
+    useRuntime(props.language);
 
   // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)
   const [executionState, setExecutionState] = useState<
@@ -82,13 +83,16 @@ export function ExecFile(props: ExecProps) {
   ]);
 
   return (
-    <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden relative">
-      <div className="bg-base-200 flex items-center">
+    <div className="border border-accent border-2 shadow-md m-2 rounded-box relative">
+      <div className="bg-base-200 flex items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
           → heightを解除し、min-heightをデフォルトのサイズと同じにする */
-          className="btn btn-soft btn-accent rounded-none h-[unset]! min-h-(--size) self-stretch"
+          className={clsx(
+            "btn btn-soft btn-accent h-[unset]! min-h-(--size) self-stretch",
+            "rounded-none rounded-tl-[calc(var(--radius-box)-2px)]"
+          )}
           onClick={() => {
             if (!ready) {
               clearTerminal(terminalInstanceRef.current!);
@@ -98,17 +102,58 @@ export function ExecFile(props: ExecProps) {
                 )
               );
             }
-            setExecutionState("triggered");
+            if (executionState === "idle") {
+              setExecutionState("triggered");
+            }
+            if (executionState === "executing" && interrupt) {
+              // Ctrl+C
+              interrupt();
+              terminalInstanceRef.current!.write("^C");
+            }
           }}
-          disabled={!termReady || executionState !== "idle"}
+          disabled={
+            !termReady ||
+            !(
+              executionState === "idle" ||
+              (executionState === "executing" && interrupt)
+            )
+          }
         >
-          ▶ 実行
+          {executionState === "idle" ? "▶ 実行" : "■ 停止"}
         </button>
-        <code className="text-left break-all text-sm my-1 ml-4 mr-1">
+        <code className="text-left break-all text-sm my-1 ml-4">
           {getCommandlineStr?.(props.filenames)}
         </code>
+        <div className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1">
+          {/*なぜかわからないがz-1がないと後ろに隠れてしまう*/}
+          <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
+            ブラウザ上で動作する
+            <span className="mx-0.5">
+              {runtimeInfo?.prettyLangName || props.language}
+            </span>
+            {runtimeInfo?.version && (
+              <span className="mr-0.5">{runtimeInfo?.version}</span>
+            )}
+            の実行環境です。
+            <br />
+            左上の実行ボタンを押して、このページ内の
+            {props.filenames.map((fname) => (
+              <span key={fname}>
+                <span className="font-mono mx-0.5">{fname}</span>
+              </span>
+            ))}
+            に書かれている内容を実行します。
+          </div>
+          <button
+            className={clsx(
+              "btn btn-xs btn-soft btn-secondary rounded-full cursor-help"
+            )}
+          >
+            ？
+          </button>
+        </div>
       </div>
-      <div className="bg-base-300 p-4 pt-2 relative">
+      <div className="bg-base-300 p-4 pr-1 pt-2 relative rounded-b-box">
         {/*
       ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
       可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
@@ -130,10 +175,10 @@ export function ExecFile(props: ExecProps) {
           )}
           ref={terminalRef}
         />
+        {executionState !== "idle" && (
+          <div className="absolute z-10 inset-0 cursor-wait" />
+        )}
       </div>
-      {executionState !== "idle" && (
-        <div className="absolute z-10 inset-0 cursor-wait" />
-      )}
     </div>
   );
 }

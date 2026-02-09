@@ -158,10 +158,15 @@ function CodeComponent({
   } else {
     // inline
     return (
-      <code
-        className="bg-current/10 border border-current/20 px-1 py-0.5 mx-0.5 rounded-md"
-        {...props}
-      />
+      <InlineCode>{String(props.children || "").replace(/\n$/, "")}</InlineCode>
     );
   }
+}
+
+export function InlineCode({ children }: { children: ReactNode }) {
+  return (
+    <code className="bg-current/10 border border-current/20 px-1 py-0.5 mx-0.5 rounded-md">
+      {children}
+    </code>
+  );
 }

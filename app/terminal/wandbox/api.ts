@@ -1,5 +1,6 @@
 import { type Fetcher } from "swr";
 import { type ReplOutput } from "../repl";
+import { RuntimeInfo } from "../runtime";
 
 const WANDBOX = "https://wandbox.org";
 // https://github.com/melpon/wandbox/blob/ajax/kennel2/API.rst  <- 古いけど、説明と例がある
@@ -96,7 +97,7 @@ export const compilerInfoFetcher: Fetcher<CompilerInfo[]> = () =>
     (res) => res.json() as Promise<CompilerInfo[]>
   );
 
-export interface SelectedCompiler {
+export interface SelectedCompiler extends RuntimeInfo {
   compilerName: string;
   compilerOptions: string[];
   compilerOptionsRaw: string[];

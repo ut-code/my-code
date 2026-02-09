@@ -50,6 +50,7 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
     try {
       // Fetch and compile the Ruby WASM module
       const rubyWasmRes = await fetch(
+        // ruby.ts 内にもRubyのバージョン(3.4)を直書きしている箇所がある
         "https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@latest/dist/ruby+stdlib.wasm"
       );
       const rubyModule = await WebAssembly.compileStreaming(rubyWasmRes);

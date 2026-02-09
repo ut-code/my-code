@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { RuntimeContext } from "../runtime";
+import { RuntimeContext, RuntimeInfo } from "../runtime";
 import { ReplCommand, ReplOutput } from "../repl";
 
 export const RubyContext = createContext<RuntimeContext>(null!);
@@ -15,8 +15,14 @@ export function useRuby() {
     ...context,
     splitReplExamples,
     getCommandlineStr,
+    runtimeInfo,
   };
 }
+
+const runtimeInfo: RuntimeInfo = {
+  prettyLangName: "Ruby",
+  version: "3.4",
+};
 
 function splitReplExamples(content: string): ReplCommand[] {
   const initCommands: { command: string; output: ReplOutput[] }[] = [];

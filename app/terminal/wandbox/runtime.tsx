@@ -10,7 +10,7 @@ import {
 import useSWR from "swr";
 import { compilerInfoFetcher, SelectedCompiler } from "./api";
 import { cppRunFiles, selectCppCompiler } from "./cpp";
-import { RuntimeContext, RuntimeLang } from "../runtime";
+import { RuntimeContext, RuntimeInfo, RuntimeLang } from "../runtime";
 import { ReplOutput } from "../repl";
 import { rustRunFiles, selectRustCompiler } from "./rust";
 
@@ -28,6 +28,7 @@ interface IWandboxContext {
     files: Readonly<Record<string, string>>,
     onOutput: (output: ReplOutput) => void
   ) => Promise<void>;
+  runtimeInfo: Record<WandboxLang, RuntimeInfo> | undefined,
 }
 
 const WandboxContext = createContext<IWandboxContext>(null!);
@@ -96,6 +97,7 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         ready,
         getCommandlineStrWithLang,
         runFilesWithLang,
+        runtimeInfo: selectedCompiler,
       }}
     >
       {children}
@@ -124,5 +126,6 @@ export function useWandbox(lang: WandboxLang): RuntimeContext {
     ready: context.ready,
     runFiles,
     getCommandlineStr,
+    runtimeInfo: context.runtimeInfo?.[lang],
   };
 }

@@ -16,6 +16,7 @@ import type { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
 import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 import clsx from "clsx";
+import { InlineCode } from "@/[docs_id]/markdown";
 
 export type ReplOutputType =
   | "stdout"
@@ -97,6 +98,7 @@ export function ReplTerminal({
     runCommand,
     checkSyntax,
     splitReplExamples,
+    runtimeInfo,
   } = useRuntime(language);
   const { tabSize, prompt, promptMore, returnPrefix } = langConstants(language);
   if (!prompt) {
@@ -128,6 +130,10 @@ export function ReplTerminal({
 
   // REPLのユーザー入力
   const inputBuffer = useRef<string[]>([]);
+
+  const [executionState, setExecutionState] = useState<"idle" | "executing">(
+    "idle"
+  );
 
   // inputBufferを更新し、画面に描画する
   const updateBuffer = useCallback(
@@ -219,6 +225,7 @@ export function ReplTerminal({
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
               const commandId = addReplCommand(terminalId, command);
+              setExecutionState("executing");
               let executionDone = false;
               await runtimeMutex.runExclusive(async () => {
                 await runCommand(command, (output) => {
@@ -233,6 +240,7 @@ export function ReplTerminal({
                   addReplOutput(terminalId, commandId, output);
                 });
               });
+              setExecutionState("idle");
               executionDone = true;
               updateBuffer(() => [""]);
             }
@@ -378,51 +386,109 @@ export function ReplTerminal({
   ]);
 
   return (
-    <div className="bg-base-300 border border-accent border-2 shadow-md m-2 p-4 pr-1 rounded-box relative h-max">
+    <div className="bg-base-300 border border-accent border-2 shadow-md m-2 rounded-box h-max">
+      <div className="bg-base-200 flex items-center rounded-t-box">
+        <button
+          /* daisyuiのbtnはheightがvar(--size)で固定。
+          ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
+          → heightを解除し、min-heightをデフォルトのサイズと同じにする */
+          className={clsx(
+            "btn btn-soft btn-accent h-[unset]! min-h-(--size) self-stretch",
+            "rounded-none rounded-tl-[calc(var(--radius-box)-2px)]"
+          )}
+          onClick={() => {
+            // Ctrl+C
+            if (terminalInstanceRef.current && runtimeInterrupt) {
+              runtimeInterrupt();
+              terminalInstanceRef.current.write("^C");
+            }
+          }}
+          disabled={
+            !termReady ||
+            initCommandState !== "done" ||
+            executionState !== "executing"
+          }
+        >
+          ■ 停止
+        </button>
+        <span className="text-sm my-1 ml-3 text-left">
+          {runtimeInfo?.prettyLangName || language} 実行環境
+        </span>
+        <div className="ml-1 tooltip tooltip-secondary tooltip-bottom">
+          <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
+            ブラウザ上で動作する
+            <span className="mx-0.5">
+              {runtimeInfo?.prettyLangName || language}
+            </span>
+            {runtimeInfo?.version && (
+              <span className="mr-0.5">{runtimeInfo?.version}</span>
+            )}
+            のREPL実行環境です。
+            <br />
+            プロンプト (<InlineCode>{prompt?.trimEnd()}</InlineCode>)
+            の後にコマンドを入力し、
+            <kbd className="kbd kbd-sm text-base-content">Enter</kbd>
+            キーで実行します。
+            <br />
+            <kbd className="kbd kbd-sm text-base-content">Ctrl</kbd>+
+            <kbd className="kbd kbd-sm text-base-content">C</kbd>
+            または左上の停止ボタンで実行中のコマンドを中断できます。
+          </div>
+          <button
+            className={clsx(
+              "btn btn-xs btn-soft btn-secondary rounded-full cursor-help"
+            )}
+          >
+            ？
+          </button>
+        </div>
+      </div>
       {/*
       ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
       可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
       */}
-      <pre
-        className={clsx(
-          "font-mono overflow-auto cursor-wait",
-          "min-h-26", // xterm.jsで5行分の高さ
-          initCommandState !== "initializing" && "hidden"
+      <div className="relative p-4 pr-1 pt-2">
+        <pre
+          className={clsx(
+            "font-mono overflow-auto cursor-wait",
+            "min-h-26", // xterm.jsで5行分の高さ
+            initCommandState !== "initializing" && "hidden"
+          )}
+        >
+          {initContent + "\n\n"}
+        </pre>
+        {terminalInstanceRef.current &&
+          termReady &&
+          initCommandState === "idle" && (
+            <div
+              className="absolute z-10 inset-0 cursor-pointer"
+              onClick={() => {
+                if (!runtimeReady) {
+                  hideCursor(terminalInstanceRef.current!);
+                  terminalInstanceRef.current!.write(
+                    systemMessageColor(
+                      "(初期化しています...しばらくお待ちください)"
+                    )
+                  );
+                  terminalInstanceRef.current!.focus();
+                }
+                setInitCommandState("triggered");
+              }}
+            />
+          )}
+        {(initCommandState === "triggered" ||
+          initCommandState === "executing") && (
+          <div className="absolute z-10 inset-0 cursor-wait" />
         )}
-      >
-        {initContent + "\n\n"}
-      </pre>
-      {terminalInstanceRef.current &&
-        termReady &&
-        initCommandState === "idle" && (
-          <div
-            className="absolute z-10 inset-0 cursor-pointer"
-            onClick={() => {
-              if (!runtimeReady) {
-                hideCursor(terminalInstanceRef.current!);
-                terminalInstanceRef.current!.write(
-                  systemMessageColor(
-                    "(初期化しています...しばらくお待ちください)"
-                  )
-                );
-                terminalInstanceRef.current!.focus();
-              }
-              setInitCommandState("triggered");
-            }}
-          />
-        )}
-      {(initCommandState === "triggered" ||
-        initCommandState === "executing") && (
-        <div className="absolute z-10 inset-0 cursor-wait" />
-      )}
-      <div
-        className={clsx(
-          initCommandState === "initializing" &&
-            /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
-            "absolute invisible"
-        )}
-        ref={terminalRef}
-      />
+        <div
+          className={clsx(
+            initCommandState === "initializing" &&
+              /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
+              "absolute invisible"
+          )}
+          ref={terminalRef}
+        />
+      </div>
     </div>
   );
 }
