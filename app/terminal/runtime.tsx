@@ -37,6 +37,11 @@ export interface RuntimeContext {
     onOutput: (output: ReplOutput) => void
   ) => Promise<void>;
   getCommandlineStr?: (filenames: string[]) => string;
+  runtimeInfo?: RuntimeInfo;
+}
+export interface RuntimeInfo {
+  prettyLangName: string;
+  version?: string;
 }
 export interface LangConstants {
   tabSize: number;

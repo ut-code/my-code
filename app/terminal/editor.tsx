@@ -117,10 +117,14 @@ export function EditorComponent(props: EditorProps) {
   return (
     <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden">
       <div className="flex flex-row items-center bg-base-200">
-        <div className="font-mono text-sm mt-2 mb-1 ml-4 mr-2">
-          {props.filename}
-          {props.readonly && <span className="font-sans ml-2">(編集不可)</span>}
-        </div>
+        <span className="mt-2 mb-1 ml-3 mr-2 text-sm text-left">
+          <span>
+            {props.readonly
+              ? "出力されたファイル(編集不可):"
+              : "ファイルを編集:"}
+          </span>
+          <span className="font-mono ml-2">{props.filename}</span>
+        </span>
         <button
           className={clsx(
             "btn btn-xs btn-soft btn-warning mt-1 mb-1",

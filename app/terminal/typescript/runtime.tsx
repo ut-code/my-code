@@ -8,11 +8,12 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useEmbedContext } from "../embedContext";
 import { ReplOutput } from "../repl";
-import { RuntimeContext } from "../runtime";
+import { RuntimeContext, RuntimeInfo } from "../runtime";
 
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],
@@ -23,9 +24,11 @@ export const compilerOptions: CompilerOptions = {
 const TypeScriptContext = createContext<{
   init: () => void;
   tsEnv: VirtualTypeScriptEnvironment | null;
+  tsVersion?: string;
 }>({ init: () => undefined, tsEnv: null });
 export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
+  const [tsVersion, setTSVersion] = useState<string | undefined>(undefined);
   const [doInit, setDoInit] = useState(false);
   const init = useCallback(() => setDoInit(true), []);
   useEffect(() => {
@@ -68,6 +71,7 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
           compilerOptions
         );
         setTSEnv(env);
+        setTSVersion(ts.version);
       })();
       return () => {
         abortController.abort();
@@ -75,14 +79,14 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
     }
   }, [tsEnv, setTSEnv, doInit]);
   return (
-    <TypeScriptContext.Provider value={{ init, tsEnv }}>
+    <TypeScriptContext.Provider value={{ init, tsEnv, tsVersion }}>
       {children}
     </TypeScriptContext.Provider>
   );
 }
 
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
-  const { init: tsInit, tsEnv } = useContext(TypeScriptContext);
+  const { init: tsInit, tsEnv, tsVersion } = useContext(TypeScriptContext);
   const { init: jsInit } = jsEval;
   const init = useCallback(() => {
     tsInit();
@@ -153,11 +157,20 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
     },
     [tsEnv, writeFile, jsEval]
   );
+
+  const runtimeInfo = useMemo<RuntimeInfo>(
+    () => ({
+      prettyLangName: "TypeScript",
+      version: tsVersion,
+    }),
+    [tsVersion]
+  );
   return {
     init,
     ready: tsEnv !== null,
     runFiles,
     getCommandlineStr,
+    runtimeInfo,
   };
 }
 

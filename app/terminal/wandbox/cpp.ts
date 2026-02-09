@@ -20,6 +20,8 @@ export function selectCppCompiler(
     compilerOptions: [],
     compilerOptionsRaw: [],
     getCommandlineStr: () => "",
+    prettyLangName: "GCC",
+    version: selectedCompiler.version,
   };
   const commandline: string[] = ["g++"]; // selectedCompiler["display-compile-command"]
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { RuntimeContext } from "../runtime";
+import { RuntimeContext, RuntimeInfo } from "../runtime";
 import { ReplCommand, ReplOutput } from "../repl";
+import pyodideLock from "pyodide/pyodide-lock.json";
 
 export const PyodideContext = createContext<RuntimeContext>(null!);
 
@@ -15,8 +16,14 @@ export function usePyodide() {
     ...context,
     splitReplExamples,
     getCommandlineStr,
+    runtimeInfo,
   };
 }
+
+const runtimeInfo: RuntimeInfo = {
+  prettyLangName: "Python",
+  version: String(pyodideLock.info.python),
+};
 
 function splitReplExamples(content: string): ReplCommand[] {
   const initCommands: { command: string; output: ReplOutput[] }[] = [];

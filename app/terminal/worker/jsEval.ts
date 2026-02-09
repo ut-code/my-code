@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { RuntimeContext } from "../runtime";
+import { RuntimeContext, RuntimeInfo } from "../runtime";
 import { ReplCommand, ReplOutput } from "../repl";
 
 export const JSEvalContext = createContext<RuntimeContext>(null!);
@@ -15,8 +15,13 @@ export function useJSEval() {
     ...context,
     splitReplExamples,
     getCommandlineStr,
+    runtimeInfo,
   };
 }
+
+const runtimeInfo: RuntimeInfo = {
+  prettyLangName: "JavaScript",
+};
 
 function splitReplExamples(content: string): ReplCommand[] {
   const initCommands: { command: string; output: ReplOutput[] }[] = [];
