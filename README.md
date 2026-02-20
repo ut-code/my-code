@@ -55,6 +55,9 @@ npm run lint
 * GOOGLE_CLIENT_IDとGOOGLE_CLIENT_SECRETにGoogle OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/google
 * GITHUB_CLIENT_IDとGITHUB_CLIENT_SECRETにGitHub OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/github
 
+現在は本番環境(my-code.utcode.net)はCoolifyでデプロイしています。
+Cloudflare Worker のビルドログとステータス表示が見れますが、そちらは使っていません。
+
 ## ベースとなるドキュメントの作り方
 
 - web版の ~~Gemini2.5Pro~~ Gemini3Pro を用いる。
