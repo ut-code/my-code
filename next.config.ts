@@ -5,6 +5,7 @@ initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: "standalone",
   eslint: {
     ignoreDuringBuilds: true,
   },
