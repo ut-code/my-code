@@ -3,13 +3,14 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as authSchema from "../schema/auth";
 import * as chatSchema from "../schema/chat";
+import { isCloudflare } from "./detectCloudflare";
 
 export async function getDrizzle() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let cloudflareEnv: any;
-  try {
+  if (isCloudflare()) {
     cloudflareEnv = (await getCloudflareContext({ async: true })).env;
-  } catch {
+  } else {
     // @better-auth/cli generate を実行する際には initOpenNextCloudflareForDev がセットアップされていない環境になっている
     cloudflareEnv = {};
   }

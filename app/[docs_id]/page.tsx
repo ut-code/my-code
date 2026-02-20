@@ -8,15 +8,11 @@ import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
 import { getChatFromCache } from "@/lib/chatHistory";
 import { getLanguageName, pagesList } from "@/pagesList";
+import { isCloudflare } from "@/lib/detectCloudflare";
 
 async function getMarkdownContent(docs_id: string): Promise<string> {
   try {
-    if (process.env.NODE_ENV === "development") {
-      return await readFile(
-        join(process.cwd(), "public", "docs", `${docs_id}.md`),
-        "utf-8"
-      );
-    } else {
+    if (isCloudflare()) {
       const cfAssets = getCloudflareContext().env.ASSETS;
       const res = await cfAssets!.fetch(
         `https://assets.local/docs/${docs_id}.md`
@@ -25,6 +21,11 @@ async function getMarkdownContent(docs_id: string): Promise<string> {
         notFound();
       }
       return await res.text();
+    } else {
+      return await readFile(
+        join(process.cwd(), "public", "docs", `${docs_id}.md`),
+        "utf-8"
+      );
     }
   } catch (e) {
     console.error(e);

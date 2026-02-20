@@ -4,15 +4,16 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { anonymous } from "better-auth/plugins";
 import { migrateChatUser } from "./chatHistory";
 import { getDrizzle } from "./drizzle";
+import { isCloudflare } from "./detectCloudflare";
 
 export async function getAuthServer(
   drizzle: Awaited<ReturnType<typeof getDrizzle>>
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let cloudflareEnv: any;
-  try {
+  if (isCloudflare()) {
     cloudflareEnv = getCloudflareContext().env;
-  } catch {
+  } else {
     // @better-auth/cli generate を実行する際には initOpenNextCloudflareForDev がセットアップされていない環境になっている
     cloudflareEnv = {};
   }
