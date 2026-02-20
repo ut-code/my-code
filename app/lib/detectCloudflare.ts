@@ -1,7 +1,6 @@
 export function isCloudflare() {
   return (
-    typeof navigator === "undefined" &&
-    // @ts-expect-error userAgent is defined in cloudflare worker
-    navigator.userAgent === "Cloudflare-Worker"
+    typeof navigator !== "undefined" &&
+    navigator.userAgent === "Cloudflare-Workers"
   );
 }
