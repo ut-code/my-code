@@ -6,7 +6,9 @@ import { getDrizzle } from "./drizzle";
 import { chat, message } from "@/schema/chat";
 import { and, asc, eq } from "drizzle-orm";
 import { Auth } from "better-auth";
-import { inMemoryCache } from "./cache";
+import { revalidateTag, unstable_cacheLife } from "next/cache";
+import { isCloudflare } from "./detectCloudflare";
+import { unstable_cacheTag } from "next/cache";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -26,7 +28,7 @@ interface Context {
  * authが初期化されてなければ初期化し、
  * userIdがなければセッションから取得してセットする。
  */
-async function initAll(ctx?: Partial<Context>): Promise<Context> {
+export async function initContext(ctx?: Partial<Context>): Promise<Context> {
   if (!ctx) {
     ctx = {};
   }
@@ -46,15 +48,6 @@ async function initAll(ctx?: Partial<Context>): Promise<Context> {
   }
   return ctx as Context;
 }
-async function getCache() {
-  if ("caches" in globalThis) {
-    // worker
-    return await caches.open("chatHistory");
-  } else {
-    // nodejs
-    return inMemoryCache;
-  }
-}
 
 export async function addChat(
   docsId: string,
@@ -62,7 +55,7 @@ export async function addChat(
   messages: CreateChatMessage[],
   context?: Partial<Context>
 ) {
-  const { drizzle, userId } = await initAll(context);
+  const { drizzle, userId } = await initContext(context);
   if (!userId) {
     throw new Error("Not authenticated");
   }
@@ -86,13 +79,16 @@ export async function addChat(
     )
     .returning();
 
-  console.log(
-    `deleting cache for chatHistory/getChat for user ${userId} and docs ${docsId}`
-  );
-  const cache = await getCache();
-  await cache.delete(
-    `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
-  );
+  revalidateTag(`${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`);
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    console.log(
+      `deleting cache for chatHistory/getChat for user ${userId} and docs ${docsId}`
+    );
+    await cache.delete(
+      `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
+    );
+  }
 
   return {
     ...newChat,
@@ -106,7 +102,7 @@ export async function getChat(
   docsId: string,
   context?: Partial<Context>
 ): Promise<ChatWithMessages[]> {
-  const { drizzle, userId } = await initAll(context);
+  const { drizzle, userId } = await initContext(context);
   if (!userId) {
     return [];
   }
@@ -121,35 +117,47 @@ export async function getChat(
     orderBy: [asc(chat.createdAt)],
   });
 
-  const cache = await getCache();
-  await cache.put(
-    `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`,
-    new Response(JSON.stringify(chats), {
-      headers: { "Cache-Control": "max-age=86400, s-maxage=86400" },
-    })
-  );
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    await cache.put(
+      `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`,
+      new Response(JSON.stringify(chats), {
+        headers: { "Cache-Control": "max-age=86400, s-maxage=86400" },
+      })
+    );
+  }
   return chats;
 }
-export async function getChatFromCache(
-  docsId: string,
-  context?: Partial<Context>
-) {
-  const { drizzle, auth, userId } = await initAll(context);
+export async function getChatFromCache(docsId: string, context: Context) {
+  "use cache";
+  unstable_cacheLife("days");
+
+  // cacheされる関数の中でheader()にはアクセスできない。
+  // なので外でinitContext()を呼んだものを引数に渡す必要がある。
+  // しかし、drizzleオブジェクトは外から渡せないのでgetChatの中で改めてinitContext()を呼んでdrizzleだけ再初期化している
+  const { auth, userId } = context;
+  unstable_cacheTag(
+    `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
+  );
+
   if (!userId) {
     return [];
   }
 
-  const cache = await getCache();
-  const cachedResponse = await cache.match(
-    `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
-  );
-  if (cachedResponse) {
-    console.log("Cache hit for chatHistory/getChat");
-    const data = (await cachedResponse.json()) as ChatWithMessages[];
-    return data;
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    const cachedResponse = await cache.match(
+      `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
+    );
+    if (cachedResponse) {
+      console.log("Cache hit for chatHistory/getChat");
+      const data = (await cachedResponse.json()) as ChatWithMessages[];
+      return data;
+    } else {
+      console.log("Cache miss for chatHistory/getChat");
+    }
   }
-  console.log("Cache miss for chatHistory/getChat");
-  return await getChat(docsId, { drizzle, auth, userId });
+  return await getChat(docsId, { auth, userId });
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {

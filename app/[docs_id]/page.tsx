@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { splitMarkdown } from "./splitMarkdown";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
-import { getChatFromCache } from "@/lib/chatHistory";
+import { getChatFromCache, initContext } from "@/lib/chatHistory";
 import { getLanguageName, pagesList } from "@/pagesList";
 import { isCloudflare } from "@/lib/detectCloudflare";
 
@@ -72,7 +72,8 @@ export default async function Page({
 
   const mdContent = getMarkdownContent(docs_id);
   const splitMdContent = mdContent.then((text) => splitMarkdown(text));
-  const initialChatHistories = getChatFromCache(docs_id);
+  const context = await initContext();
+  const initialChatHistories = getChatFromCache(docs_id, context);
 
   return (
     <ChatHistoryProvider
