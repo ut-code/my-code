@@ -1,0 +1,11 @@
+/.git/
+/.next/
+*/out/
+/.open-next/
+/.wrangler/
+/node_modules/
+cloudflare-env.d.ts
+next-env.d.ts
+*.tsbuildinfo
+/public/typescript/
+/app/m-plus-rounded-1c-nohint/
