@@ -1,0 +1,1 @@
+Rustは、Mozillaによって開始され、現在はRust Foundationによって管理されているオープンソースのシステムプログラミング言語です。Stack OverflowのDeveloper Surveyで長年「最も愛されている言語」に選ばれ続けているのには理由があります。

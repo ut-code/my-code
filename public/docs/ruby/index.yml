@@ -1,0 +1,39 @@
+name: Ruby
+description: hoge
+pages:
+- slug: 0-intro
+  name: rubyの世界へようこそ
+  title: Rubyの世界へようこそ - 環境構築と第一歩
+- slug: 1-basics
+  name: 基本構文とデータ型
+  title: 基本構文とデータ型 - Rubyの「書き方」
+- slug: 2-control-methods
+  name: 制御構造とメソッド定義
+  title: 制御構造とメソッド定義
+- slug: 3-everything-object
+  name: すべてがオブジェクト
+  title: すべてがオブジェクト
+- slug: 4-collections
+  name: コレクション (Array, Hash, Range)
+  title: コレクション (Array, Hash, Range)
+- slug: 5-blocks-iterators
+  name: ブロックとイテレータ
+  title: ブロックとイテレータ - Rubyの最重要機能
+- slug: 6-classes
+  name: クラスとオブジェクト
+  title: クラスとオブジェクト（基本）
+- slug: 7-modules
+  name: モジュールとMix-in
+  title: モジュールとミックスイン（オブジェクト指向の拡張）
+- slug: 8-proc-lambda
+  name: Proc, Lambda, クロージャ
+  title: Proc, Lambda, クロージャ
+- slug: 9-stdlib
+  name: 標準ライブラリの活用
+  title: 標準ライブラリの活用
+- slug: 10-testing
+  name: テスト文化入門
+  title: テスト文化入門 - Minitest
+- slug: 11-metaprogramming
+  name: メタプログラミング入門
+  title: メタプログラミング入門
