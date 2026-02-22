@@ -1,0 +1,30 @@
+---
+id: cpp-classes-basics-practice2
+title: '練習問題2: 書籍クラス'
+level: 3
+---
+
+### 練習問題2: 書籍クラス
+
+タイトル(`title`)、著者(`author`)、ページ数(`pages`)をメンバ変数として持つ`Book`クラスを作成してください。
+
+  - メンバ変数は`private`で定義してください。
+  - コンストラクタで、タイトル、著者、ページ数を初期化できるようにしてください。
+  - 本の情報を整形してコンソールに出力する`printInfo()`メソッドを`public`で実装してください。（例: `Title: [タイトル], Author: [著者], Pages: [ページ数] pages`）
+  - `main`関数で`Book`クラスのインスタンスを生成し、その情報を表示してください。
+
+```cpp:practice7_2.cpp
+#include <iostream>
+#include <string>
+// ここにBookクラスを定義してください
+
+int main() {
+    // ここでBookクラスのインスタンスを生成し、情報を表示してください
+
+    return 0;
+}
+```
+
+```cpp-exec:practice7_2.cpp
+Title: The Great Gatsby, Author: F. Scott Fitzgerald, Pages: 180 pages
+```
