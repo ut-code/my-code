@@ -1,0 +1,28 @@
+---
+id: cpp-project-build-gcc-manual
+title: 手動でのビルド (g++)
+level: 3
+---
+
+### 手動でのビルド (g++)
+
+先ほどの`math_app.cpp`と`math_utils.cpp`を例に、g++コンパイラで手動ビルドする手順を見てみましょう。
+
+```bash
+# 1. 各ソースファイルをコンパイルしてオブジェクトファイルを生成する (-c オプション)
+g++ -c math_app.cpp -o main.o
+g++ -c math_utils.cpp -o math_utils.o
+
+# 2. オブジェクトファイルをリンクして実行可能ファイルを生成する
+g++ main.o math_utils.o -o my_app
+
+# 3. 実行する
+./my_app
+```
+
+または、以下のように1回のg++コマンドで複数ソースファイルのコンパイルとリンクを同時に行うこともできます。
+
+```bash
+g++ math_app.cpp math_utils.cpp -o my_app
+./my_app
+```

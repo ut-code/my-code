@@ -1,0 +1,46 @@
+---
+id: cpp-pointers-address-operator
+title: アドレスと間接参照
+level: 3
+---
+
+### アドレスと間接参照
+
+  * **アドレス演算子 `&`**: 変数のメモリ上の住所（アドレス）を取得します。
+  * **間接参照演算子 `*`**: ポインタが指し示している住所に行き、その中身（値）にアクセスします。
+
+<!-- end list -->
+
+```cpp:basic_pointer.cpp
+#include <iostream>
+
+int main() {
+    int number = 42;
+    // numberのアドレスを取得して ptr に格納
+    // int* は「int型へのポインタ」という意味
+    int* ptr = &number; 
+
+    std::cout << "numberの値: " << number << std::endl;
+    std::cout << "numberのアドレス (&number): " << &number << std::endl;
+    std::cout << "ptrの値 (アドレス): " << ptr << std::endl;
+    
+    // アドレスの中身を見る（間接参照）
+    std::cout << "ptrが指す中身 (*ptr): " << *ptr << std::endl;
+
+    // ポインタ経由で値を書き換える
+    *ptr = 100;
+    std::cout << "書き換え後のnumber: " << number << std::endl;
+
+    return 0;
+}
+```
+
+```cpp-exec:basic_pointer.cpp
+numberの値: 42
+numberのアドレス (&number): 0x7ffedffe3adc
+ptrの値 (アドレス): 0x7ffedffe3adc
+ptrが指す中身 (*ptr): 42
+書き換え後のnumber: 100
+```
+
+※ アドレス（0x...）は実行環境ごとに異なります。

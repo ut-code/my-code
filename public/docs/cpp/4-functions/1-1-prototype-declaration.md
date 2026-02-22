@@ -1,0 +1,43 @@
+---
+id: cpp-functions-prototype-declaration
+title: プロトタイプ宣言
+level: 3
+---
+
+### プロトタイプ宣言
+
+関数を `main` 関数の後に定義したい場合、事前に「こういう名前と引数の関数がありますよ」と宣言だけしておく必要があります。これを**プロトタイプ宣言**と呼びます。
+
+```cpp:declaration_intro.cpp
+#include <iostream>
+
+// プロトタイプ宣言
+// 戻り値の型 関数名(引数の型1 引数名1, 引数の型2 引数名2, ...);
+// 本体（{}の中身）は書かず、セミコロンで終わる
+void greet(int times);
+
+int main() {
+    std::cout << "main関数開始" << std::endl;
+    
+    // 定義は下にあるが、宣言があるので呼び出せる
+    greet(3);
+    
+    return 0;
+}
+
+// 関数の定義
+void greet(int times) {
+    for (int i = 0; i < times; ++i) {
+        std::cout << "Hello C++!" << std::endl;
+    }
+}
+```
+
+```cpp-exec:declaration_intro.cpp
+main関数開始
+Hello C++!
+Hello C++!
+Hello C++!
+```
+
+実際の開発では、プロトタイプ宣言をヘッダーファイル（`.h`）に書き、定義をソースファイル（`.cpp`）に書くことで、大規模なプログラムを管理します（これについては次章で詳しく解説します）。
