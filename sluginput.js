@@ -1,11 +1,9 @@
 import {readdir, readFile, unlink, writeFile}from"node:fs/promises";
 import readlinePromises from "node:readline/promises";
 
-for (const dir of await readdir("./public/docs")) {
-  if(dir.includes(".")){
-    continue;
-  }
+const dir = "javascript"
 for (const dir2 of await readdir(`./public/docs/${dir}`)) {
+  if(dir2 === "index.yml"){continue;}
   const slug2 = dir2.split("-").slice(1).join("-")
   let sec1 = 0;
   let sec2 = 0;
@@ -34,5 +32,4 @@ for (const dir2 of await readdir(`./public/docs/${dir}`)) {
     await writeFile(`./public/docs/${dir}/${dir2}/${sec1}-${sec2}-${newSlug}.md`, content, {encoding: "utf8"});
     await unlink(`./public/docs/${dir}/${dir2}/${file}`)
   }
-}
 }

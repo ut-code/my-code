@@ -1,0 +1,20 @@
+---
+id: javascript-objects-properties
+title: プロパティの追加・削除
+level: 3
+---
+
+### プロパティの追加・削除
+
+動的な言語であるJavaScriptでは、オブジェクト作成後にプロパティを追加・削除できます。
+
+```js-repl
+> const config = { env: "production" };
+undefined
+> config.port = 8080; // 追加
+8080
+> delete config.env;  // 削除
+true
+> config
+{ port: 8080 }
+```
