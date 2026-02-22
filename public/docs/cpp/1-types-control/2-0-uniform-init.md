@@ -1,5 +1,5 @@
 ---
-id: cpp-types-control-uniform-init
+id: cpp-types-uniform-init
 title: '変数の初期化：ユニフォーム初期化 {}'
 level: 2
 ---

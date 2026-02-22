@@ -1,5 +1,5 @@
 ---
-id: cpp-types-control-basic-types
+id: cpp-types-basic
 title: 基本的なデータ型
 level: 2
 ---

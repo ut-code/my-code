@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-practice2
+id: cpp-raii-smartptr-practice2
 title: '問題2: shared_ptr と所有権の共有'
 level: 3
 ---

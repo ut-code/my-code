@@ -1,5 +1,5 @@
 ---
-id: cpp-types-control-modifier
+id: cpp-types-modifier
 title: 型を厳密に扱う
 level: 2
 ---

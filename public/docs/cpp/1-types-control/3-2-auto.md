@@ -1,5 +1,5 @@
 ---
-id: cpp-types-control-auto
+id: cpp-types-auto
 title: autoによる型推論
 level: 3
 ---

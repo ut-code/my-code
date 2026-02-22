@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-smartptr
+id: cpp-smartptr
 title: 'スマートポインタ: new/deleteを自動化する'
 level: 2
 ---

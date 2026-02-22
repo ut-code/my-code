@@ -1,7 +1,7 @@
 ---
 id: cpp-types-control-practice1
 title: 練習問題1：うるう年判定機
-level: 2
+level: 3
 ---
 
 ## 練習問題1：うるう年判定機

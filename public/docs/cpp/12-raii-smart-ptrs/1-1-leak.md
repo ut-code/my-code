@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-leak
+id: cpp-trycatch-leak
 title: 例外とリソースリーク
 level: 3
 ---

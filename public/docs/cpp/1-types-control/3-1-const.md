@@ -1,5 +1,5 @@
 ---
-id: cpp-types-control-const
+id: cpp-types-const
 title: constによる不変性の保証
 level: 3
 ---

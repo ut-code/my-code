@@ -1,5 +1,5 @@
 ---
-id: cpp-functions-declaration
+id: cpp-functions-basic
 title: 関数の宣言と定義
 level: 2
 ---

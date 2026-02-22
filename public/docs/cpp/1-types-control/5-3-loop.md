@@ -1,5 +1,5 @@
 ---
-id: cpp-types-control-loop
+id: cpp-control-loop
 title: ループ構文
 level: 3
 ---
@@ -8,39 +8,10 @@ level: 3
 
 `while`, `for` も標準的です。
 
-```cpp:control.cpp
+```cpp:control-loop.cpp
 #include <iostream>
 
 int main() {
-    // --- if文 ---
-    const int score = 85;
-    if (score >= 90) {
-        std::cout << "Grade: A" << std::endl;
-    } else if (score >= 80) {
-        std::cout << "Grade: B" << std::endl;
-    } else {
-        std::cout << "Grade: C or below" << std::endl;
-    }
-
-    // --- switch文 ---
-    const int rank = 2;
-    std::cout << "Rank " << rank << ": ";
-
-    switch (rank) {
-        case 1:
-            std::cout << "Gold" << std::endl;
-            break;
-        case 2:
-            std::cout << "Silver" << std::endl;
-            // breakを忘れるとcase 3も実行される
-            [[fallthrough]]; // C++17: 意図的に下に流すことを明示
-        case 3:
-            std::cout << "(Medalist)" << std::endl;
-            break;
-        default:
-            std::cout << "Participant" << std::endl;
-    }
-
     // --- 基本的なforループ ---
     std::cout << "Countdown: ";
     for (int i = 3; i > 0; --i) {
@@ -52,9 +23,6 @@ int main() {
 }
 ```
 
-```cpp-exec:control.cpp
-Grade: B
-Rank 2: Silver
-(Medalist)
+```cpp-exec:control-loop.cpp
 Countdown: 3 2 1 Start!
 ```

@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-summary
+id: cpp-raii-smartptr-summary
 title: この章のまとめ
 level: 2
 ---
