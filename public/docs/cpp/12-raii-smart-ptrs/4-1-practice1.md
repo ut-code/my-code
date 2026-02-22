@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-practice1
+id: cpp-raii-smartptr-practice1
 title: '練習問題1: unique_ptr と所有権の移動'
 level: 3
 ---

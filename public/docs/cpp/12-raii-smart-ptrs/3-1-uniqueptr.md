@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-uniqueptr
+id: cpp-smartptr-uniqueptr
 title: 'std::unique_ptr'
 level: 3
 ---

@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-sharedptr
+id: cpp-smartptr-sharedptr
 title: 'std::shared_ptr'
 level: 3
 ---

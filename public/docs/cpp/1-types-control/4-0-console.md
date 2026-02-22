@@ -1,5 +1,5 @@
 ---
-id: cpp-types-control-console
+id: cpp-types-console
 title: 'コンソール入出力 (std::cin, std::cout)'
 level: 2
 ---

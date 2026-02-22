@@ -4,7 +4,7 @@ title: '固定長配列：std::array'
 level: 2
 ---
 
-## 固定長配列：std::array
+## 固定長配列：`std::array`
 
 データの個数が決まっている場合（例えば、3次元座標、RGB値、固定バッファなど）は、`std::vector` よりも `std::array` が適しています。
 

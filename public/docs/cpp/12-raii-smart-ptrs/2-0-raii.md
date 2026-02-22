@@ -1,5 +1,5 @@
 ---
-id: cpp-raii-smart-ptrs-raii
+id: cpp-raii
 title: RAIIイディオム
 level: 2
 ---
