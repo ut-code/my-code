@@ -20,6 +20,7 @@ console.log(`${greeting} I am running on ${target}.`);
 ```
 
 ターミナルでファイルのあるディレクトリに移動し、`node` コマンドで実行します。
+このウェブサイト上の実行環境で動かす場合は、以下の実行ボタンをクリックしてください。
 
 ```js-exec:hello.js
 Hello, World! I am running on Node.js.
