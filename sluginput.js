@@ -1,7 +1,7 @@
 import {readdir, readFile, unlink, writeFile}from"node:fs/promises";
 import readlinePromises from "node:readline/promises";
 
-const dir = "python"
+const dir = "ruby"
 for (const dir2 of await readdir(`./public/docs/${dir}`)) {
   if(dir2 === "index.yml"){continue;}
   const slug2 = dir2.split("-").slice(1).join("-")
