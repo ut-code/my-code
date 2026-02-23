@@ -1,5 +1,5 @@
 ---
-id: python-basics-
+id: python-basics-int
 title: 数値（int, float）
 level: 3
 ---
