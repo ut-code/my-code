@@ -8,7 +8,7 @@ import { MarkdownSection } from "../[docs_id]/splitMarkdown";
 import { PageContent } from "../[docs_id]/pageContent";
 import { ChatHistoryProvider } from "../[docs_id]/chatHistory";
 import { getChatFromCache, initContext } from "@/lib/chatHistory";
-import { pagesList } from "@/pagesList";
+import { getPagesList } from "@/lib/getPagesList";
 import { isCloudflare } from "@/lib/detectCloudflare";
 
 async function readDocFile(
@@ -111,14 +111,14 @@ export async function generateMetadata({
   params: Promise<{ lang: string; pageId: string }>;
 }): Promise<Metadata> {
   const { lang, pageId } = await params;
+  const pagesList = await getPagesList();
   const langEntry = pagesList.find((l) => l.id === lang);
-  const pageEntry = langEntry?.pages.find((p) => p.slug === pageId);
+  const pageIndex = langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
+  const pageEntry = pageIndex >= 0 ? langEntry?.pages[pageIndex] : undefined;
   if (!langEntry || !pageEntry) notFound();
 
-  const pageIndex = langEntry!.pages.findIndex((p) => p.slug === pageId);
-  // pageIndex will be >= 0 since pageEntry was found via the same pages array
   return {
-    title: `${langEntry!.lang}-${pageIndex + 1}. ${pageEntry!.title}`,
+    title: `${langEntry!.name}-${pageIndex + 1}. ${pageEntry!.name}`,
   };
 }
 
@@ -128,13 +128,13 @@ export default async function Page({
   params: Promise<{ lang: string; pageId: string }>;
 }) {
   const { lang, pageId } = await params;
-
+  const pagesList = await getPagesList();
   const langEntry = pagesList.find((l) => l.id === lang);
   const pageEntry = langEntry?.pages.find((p) => p.slug === pageId);
   if (!langEntry || !pageEntry) notFound();
 
   const docsId = `${lang}/${pageId}`;
-  const sections = await getMarkdownSections(lang, pageId, pageEntry!.title);
+  const sections = await getMarkdownSections(lang, pageId, pageEntry!.name);
 
   // AI用のドキュメント全文（見出し付きで結合）
   const documentContent = sections

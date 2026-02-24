@@ -7,7 +7,7 @@ import { splitMarkdown } from "./splitMarkdown";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
 import { getChatFromCache, initContext } from "@/lib/chatHistory";
-import { getLanguageName, pagesList } from "@/pagesList";
+import { getPagesList } from "@/lib/getPagesList";
 import { isCloudflare } from "@/lib/detectCloudflare";
 
 async function getMarkdownContent(docs_id: string): Promise<string> {
@@ -47,10 +47,13 @@ export async function generateMetadata({
 
   const description = splitMdContent[0].content;
 
+  const lang_id = docs_id.split("-")[0];
   const chapter = docs_id.split("-")[1];
+  const pagesList = await getPagesList();
+  const langName = pagesList.find((l) => l.id === lang_id)?.name ?? lang_id;
 
   return {
-    title: `${getLanguageName(docs_id)}-${chapter}. ${title}`,
+    title: `${langName}-${chapter}. ${title}`,
     description,
   };
 }
@@ -61,11 +64,13 @@ export default async function Page({
   params: Promise<{ docs_id: string }>;
 }) {
   const { docs_id } = await params;
-
+  const lang_id = docs_id.split("-")[0];
+  const page_num = parseInt(docs_id.split("-")[1]);
+  const pagesList = await getPagesList();
   if (
     !pagesList
-      .find((lang) => docs_id.startsWith(`${lang.id}-`))
-      ?.pages.find((page) => docs_id.endsWith(`-${page.id}`))
+      .find((lang) => lang.id === lang_id)
+      ?.pages.find((_, idx) => idx + 1 === page_num)
   ) {
     notFound();
   }

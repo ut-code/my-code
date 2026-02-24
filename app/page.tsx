@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { pagesList } from "./pagesList";
+import { getPagesList } from "@/lib/getPagesList";
 import clsx from "clsx";
 
 export const metadata: Metadata = {
@@ -9,7 +9,8 @@ export const metadata: Metadata = {
     "環境構築不要、その場で実践。AIアシスタントとの対話履歴があなただけの教材へと進化する、新しいプログラミング学習サイトです。",
 };
 
-export default function Home() {
+export default async function Home() {
+  const pagesList = await getPagesList();
   return (
     <div className="p-4">
       <div className="hero bg-gradient-to-br from-primary/30 via-secondary/15 to-accent/30 rounded-lg my-6 py-8 sm:px-4">
@@ -41,14 +42,14 @@ export default function Home() {
           return (
             <Link
               key={group.id}
-              href={`${group.id}-${group.pages[0].id}`}
+              href={`${group.id}/${group.pages[0].slug}`}
               className={clsx(
                 "card card-border card-md bg-base-200 shadow-lg",
                 "hover:shadow-xl transition-all hover:-translate-y-1",
               )}
             >
               <div className="card-body">
-                <h2 className="card-title">{group.lang}</h2>
+                <h2 className="card-title">{group.name}</h2>
                 <p>{group.description}</p>
                 <div className="justify-end card-actions">
                   <div className="btn btn-primary">はじめる</div>

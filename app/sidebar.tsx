@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { pagesList } from "./pagesList";
+import { LanguageEntry } from "@/lib/getPagesList";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./[docs_id]/themeToggle";
 import {
@@ -74,7 +74,7 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   const pathname = usePathname();
   const currentDocsId = pathname.replace(/^\//, ""); // ちょっと遅延がある
   const sidebarContext = useSidebarMdContext();
@@ -166,11 +166,11 @@ export function Sidebar() {
                   className="w-4 h-4"
                   lang={group.id as RuntimeLang}
                 />
-                {group.lang}
+                {group.name}
               </summary>
               <ul>
-                {group.pages.map((page) => (
-                  <li key={page.id}>
+                {group.pages.map((page, pageIndex) => (
+                  <li key={page.slug}>
                     <Link
                       href={`${group.id}/${page.slug}`}
                       className={clsx(
@@ -181,10 +181,10 @@ export function Sidebar() {
                     >
                       <span className="w-5 text-right">
                         <span className="float-right">
-                        {page.id}.
+                        {pageIndex + 1}.
                       </span>
                       </span>
-                      {page.title}
+                      {page.name}
                     </Link>
                     {`${group.id}/${page.slug}` === currentDocsId &&
                       sidebarMdContent.length > 0 && (
