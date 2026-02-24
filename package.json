@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run cf-typegen && npm run generateLanguages && npm run generateSections && npm run copyAllDTSFiles && npm run removeHinting && next dev",
     "build": "npm run cf-typegen && npm run generateLanguages && npm run generateSections && npm run copyAllDTSFiles && npm run removeHinting && next build",

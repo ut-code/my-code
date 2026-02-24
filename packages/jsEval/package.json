@@ -1,0 +1,16 @@
+{
+  "name": "@my-code/js-eval",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --import tsx/esm --test src/index.test.ts"
+  },
+  "devDependencies": {
+    "tsx": "*",
+    "typescript": "*"
+  }
+}
