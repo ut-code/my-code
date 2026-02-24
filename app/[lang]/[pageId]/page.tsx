@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import yaml from "js-yaml";
 import { MarkdownSection } from "../[docs_id]/splitMarkdown";
 import { PageContent } from "../[docs_id]/pageContent";
 import { ChatHistoryProvider } from "../[docs_id]/chatHistory";
@@ -51,20 +52,18 @@ function parseFrontmatter(content: string): {
   if (endIdx === -1) {
     return { id: "", title: "", level: 0, body: content };
   }
-  const fm = content.slice(4, endIdx);
+  const fm = yaml.load(content.slice(4, endIdx)) as {
+    id?: string;
+    title?: string;
+    level?: number;
+  };
   const body = content.slice(endIdx + 5);
-
-  const id = fm.match(/^id:\s*(.+)$/m)?.[1]?.trim() ?? "";
-  let title = fm.match(/^title:\s*(.+)$/m)?.[1]?.trim() ?? "";
-  // YAMLクォートを除去
-  if (
-    (title.startsWith("'") && title.endsWith("'")) ||
-    (title.startsWith('"') && title.endsWith('"'))
-  ) {
-    title = title.slice(1, -1);
-  }
-  const level = parseInt(fm.match(/^level:\s*(\d+)$/m)?.[1] ?? "2");
-  return { id, title, level, body };
+  return {
+    id: fm?.id ?? "",
+    title: fm?.title ?? "",
+    level: fm?.level ?? 2,
+    body,
+  };
 }
 
 /**
@@ -76,11 +75,7 @@ async function getMarkdownSections(
   pageTitle: string
 ): Promise<MarkdownSection[]> {
   const sectionsYml = await readDocFile(lang, pageId, "sections.yml");
-  const files = sectionsYml
-    .split("\n")
-    .filter((l) => l.trim().startsWith("- "))
-    .map((l) => l.trim().slice(2).trim())
-    .filter(Boolean);
+  const files = yaml.load(sectionsYml) as string[];
 
   const sections: MarkdownSection[] = [];
   for (const file of files) {

@@ -3,6 +3,7 @@
 
 import { readdir, writeFile, stat } from "node:fs/promises";
 import { join } from "node:path";
+import yaml from "js-yaml";
 
 const docsDir = join(process.cwd(), "public", "docs");
 
@@ -37,7 +38,7 @@ for (const langId of langEntries) {
       .filter((f) => f.endsWith(".md"))
       .sort(naturalSortMdFiles);
 
-    const yamlContent = files.map((f) => `- ${f}`).join("\n") + "\n";
+    const yamlContent = yaml.dump(files);
     await writeFile(join(pageDir, "sections.yml"), yamlContent, "utf-8");
     console.log(
       `Generated ${langId}/${pageId}/sections.yml (${files.length} files)`
