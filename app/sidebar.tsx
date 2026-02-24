@@ -206,11 +206,12 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
                               >
                                 <Link
                                   href={`#${section.id}`}
-                                  className={
+                                  className={clsx(
+                                    "text-wrap text-justify",
                                     currentSectionId === section.id
                                       ? "font-bold"
                                       : ""
-                                  }
+                                  )}
                                 >
                                   {section.title}
                                 </Link>
