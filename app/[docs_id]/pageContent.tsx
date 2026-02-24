@@ -11,7 +11,6 @@ import clsx from "clsx";
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
 export type DynamicMarkdownSection = MarkdownSection & {
   inView: boolean;
-  sectionId: string;
 };
 
 interface PageContentProps {
@@ -26,19 +25,17 @@ export function PageContent(props: PageContentProps) {
   const [dynamicMdContent, setDynamicMdContent] = useState<
     DynamicMarkdownSection[]
   >(
-    props.splitMdContent.map((section, i) => ({
+    props.splitMdContent.map((section) => ({
       ...section,
       inView: false,
-      sectionId: section.id || `${props.docs_id}-${i}`,
     }))
   );
 
   useEffect(() => {
     // props.splitMdContentが変わったときにローカルstateとcontextの両方を更新
-    const newContent = props.splitMdContent.map((section, i) => ({
+    const newContent = props.splitMdContent.map((section) => ({
       ...section,
       inView: false,
-      sectionId: section.id || `${props.docs_id}-${i}`,
     }));
     setDynamicMdContent(newContent);
     setSidebarMdContent(props.docs_id, newContent);
@@ -104,7 +101,7 @@ export function PageContent(props: PageContentProps) {
           <div>
             {/* 右側に表示するチャット履歴欄 */}
             {chatHistories
-              .filter((c) => c.sectionId === section.sectionId)
+              .filter((c) => c.sectionId === section.id)
               .map(({ chatId, messages }) => (
                 <div
                   key={chatId}
