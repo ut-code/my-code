@@ -16,8 +16,12 @@ export async function generateMetadata({
   const pageEntry = langEntry?.pages.find((p) => p.slug === pageId);
   if (!langEntry || !pageEntry) notFound();
 
+  const sections = await getMarkdownSections(lang, pageId);
+  const description = sections[0].rawContent;
+
   return {
     title: `${langEntry!.name}-${pageEntry.index}. ${pageEntry.title}`,
+    description,
   };
 }
 
