@@ -8,23 +8,23 @@ import { LanguageEntry } from "@/lib/docs";
 
 function PageTitle({ pagesList }: { pagesList: LanguageEntry[] }) {
   const pathname = usePathname();
+  const pathnameMatch = pathname.match(/^\/([\w-_]+)\/([\w-_]+).*?/);
+  const currentLang = pathnameMatch?.[1];
+  const currentPageId = pathnameMatch?.[2];
 
   if(pathname === "/"){
     return <>へようこそ</>;
   }
 
-  const currentDocsId = pathname.replace(/^\//, "");
-  const currentGroup = pagesList.find((group) => currentDocsId.startsWith(`${group.id}/`));
-  const pageIndex = currentGroup?.pages.findIndex((page) => `${currentGroup.id}/${page.slug}` === currentDocsId) ?? -1;
-  const currentPage = pageIndex >= 0 ? currentGroup?.pages[pageIndex] : undefined;
-  if(currentPage){
+  const currentGroup = pagesList.find((group) => group.id === currentLang);
+  const currentPage = currentGroup?.pages.find((page) => page.slug === currentPageId);
+  if(currentGroup && currentPage){
     return <>
-      <span className="text-base mr-2">{currentGroup?.name}-{pageIndex + 1}.</span>
+      <span className="text-base mr-2">{currentGroup.name}-{currentPage.index}.</span>
       <span>{currentPage.name}</span>
     </>
   }
 
-  console.warn(`navbar page name is not defined for pathname ${pathname}`);
   return null;
 }
 export function Navbar({ pagesList }: { pagesList: LanguageEntry[] }) {
