@@ -17,9 +17,9 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ["@prisma/client", ".prisma/client"],
   async headers() {
-    // pyodideをworkerで動作させるために必要
     return [
       {
+        // pyodideをworkerで動作させるために必要
         source: "/:path*",
         headers: [
           {
@@ -29,6 +29,15 @@ const nextConfig: NextConfig = {
           {
             key: "Cross-Origin-Embedder-Policy",
             value: "require-corp",
+          },
+        ],
+      },
+      {
+        source: "/typescript/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },

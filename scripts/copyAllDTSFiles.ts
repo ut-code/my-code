@@ -14,10 +14,14 @@ await fs.mkdir(destDir, { recursive: true });
 for (const libFile of libFiles) {
   const srcPath = `./node_modules/typescript/lib/${libFile}`;
   const destPath = `${destDir}${libFile}`;
-  if(existsSync(srcPath)) {
+  if (existsSync(srcPath)) {
     await fs.copyFile(srcPath, destPath);
     console.log(`Copied ${libFile} to ${destPath}`);
   } else {
     console.warn(`Source file does not exist: ${srcPath}`);
+    await fs.writeFile(
+      destPath,
+      `// ${libFile} not found in node_modules/typescript/lib/`
+    );
   }
 }
