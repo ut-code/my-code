@@ -195,11 +195,11 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
                               idx + 1 === currentSectionIndex;
                             return (
                               <li
-                                key={idx}
+                                key={section.id}
                                 style={{ marginLeft: section.level - 2 + "em" }}
                               >
                                 <Link
-                                  href={`#${idx + 1}`}
+                                  href={`#${section.id}`}
                                   className={
                                     isCurrentSection ? "font-bold" : ""
                                   }

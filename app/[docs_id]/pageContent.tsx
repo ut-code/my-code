@@ -87,10 +87,10 @@ export function PageContent(props: PageContentProps) {
       }}
     >
       {dynamicMdContent.map((section, index) => (
-        <Fragment key={index}>
+        <Fragment key={section.id}>
           <div
             className="min-w-1/2 max-w-200 text-justify"
-            id={`${index}`} // 目次からaタグで飛ぶために必要
+            id={section.id} // 目次からaタグで飛ぶために必要
             ref={(el) => {
               sectionRefs.current[index] = el;
             }}
