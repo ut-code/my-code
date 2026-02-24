@@ -14,11 +14,12 @@ function PageTitle() {
   }
 
   const currentDocsId = pathname.replace(/^\//, "");
-  const currentGroup = pagesList.find((group) => currentDocsId.startsWith(group.id));
-  const currentPage = currentGroup?.pages.find((page) => `${currentGroup.id}-${page.id}` === currentDocsId);
+  const currentGroup = pagesList.find((group) => currentDocsId.startsWith(`${group.id}/`));
+  const pageIndex = currentGroup?.pages.findIndex((page) => `${currentGroup.id}/${page.slug}` === currentDocsId) ?? -1;
+  const currentPage = pageIndex >= 0 ? currentGroup?.pages[pageIndex] : undefined;
   if(currentPage){
     return <>
-      <span className="text-base mr-2">{currentGroup?.lang}-{currentPage.id}.</span>
+      <span className="text-base mr-2">{currentGroup?.lang}-{pageIndex + 1}.</span>
       <span>{currentPage.title}</span>
     </>
   }

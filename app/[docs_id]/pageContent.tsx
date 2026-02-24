@@ -29,7 +29,7 @@ export function PageContent(props: PageContentProps) {
     props.splitMdContent.map((section, i) => ({
       ...section,
       inView: false,
-      sectionId: `${props.docs_id}-${i}`,
+      sectionId: section.id || `${props.docs_id}-${i}`,
     }))
   );
 
@@ -38,7 +38,7 @@ export function PageContent(props: PageContentProps) {
     const newContent = props.splitMdContent.map((section, i) => ({
       ...section,
       inView: false,
-      sectionId: `${props.docs_id}-${i}`,
+      sectionId: section.id || `${props.docs_id}-${i}`,
     }));
     setDynamicMdContent(newContent);
     setSidebarMdContent(props.docs_id, newContent);

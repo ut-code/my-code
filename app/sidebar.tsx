@@ -92,7 +92,7 @@ export function Sidebar() {
   // 目次の開閉状態
   const [detailsOpen, setDetailsOpen] = useState<boolean[]>([]);
   const currentGroupIndex = pagesList.findIndex((group) =>
-    currentDocsId.startsWith(`${group.id}-`)
+    currentDocsId.startsWith(`${group.id}/`)
   );
   useEffect(() => {
     // 表示しているグループが変わったときに現在のグループのdetailsを開く
@@ -172,10 +172,10 @@ export function Sidebar() {
                 {group.pages.map((page) => (
                   <li key={page.id}>
                     <Link
-                      href={`${group.id}-${page.id}`}
+                      href={`${group.id}/${page.slug}`}
                       className={clsx(
                         "text-wrap text-justify",
-                        `${group.id}-${page.id}` === currentDocsId &&
+                        `${group.id}/${page.slug}` === currentDocsId &&
                           "menu-active"
                       )}
                     >
@@ -186,7 +186,7 @@ export function Sidebar() {
                       </span>
                       {page.title}
                     </Link>
-                    {`${group.id}-${page.id}` === currentDocsId &&
+                    {`${group.id}/${page.slug}` === currentDocsId &&
                       sidebarMdContent.length > 0 && (
                         <ul className="ml-4 text-sm">
                           {sidebarMdContent.slice(1).map((section, idx) => {

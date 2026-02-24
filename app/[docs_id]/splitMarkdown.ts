@@ -3,6 +3,7 @@ import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 
 export interface MarkdownSection {
+  id: string;
   level: number;
   title: string;
   content: string;
@@ -31,6 +32,7 @@ export function splitMarkdown(content: string): MarkdownSection[] {
       }
     }
     sections.push({
+      id: "",
       title: splitContent[startLine - 1].replace(/#+\s*/, "").trim(),
       content: splitContent
         .slice(startLine - 1 + 1, endLine ? endLine - 1 : undefined)

@@ -64,6 +64,8 @@ export function Heading({
   children: ReactNode;
 }) {
   switch (level) {
+    case 0:
+      return null;
     case 1:
       return <h1 className="text-2xl font-bold my-4">{children}</h1>;
     case 2:
