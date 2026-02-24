@@ -86,18 +86,14 @@ async function getMarkdownSections(
         id: `${lang}-${pageId}-intro`,
         level: 1,
         title: pageTitle,
-        content: raw.trim(),
         rawContent: raw.trim(),
       });
     } else {
       const { id, title, level, body } = parseFrontmatter(raw);
-      // bodyには見出し行が含まれるので、contentとしては見出しを除いた本文のみを渡す
-      const content = body.replace(/^#{1,6} [^\n]*\n?/, "").trim();
       sections.push({
         id,
         level,
         title,
-        content,
         rawContent: body.trim(),
       });
     }
@@ -114,7 +110,7 @@ export async function generateMetadata({
   const pagesList = await getPagesList();
   const langEntry = pagesList.find((l) => l.id === lang);
   const pageIndex = langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
-  const pageEntry = pageIndex >= 0 ? langEntry?.pages[pageIndex] : undefined;
+  const pageEntry = pageIndex >= 0 ? langEntry!.pages[pageIndex] : undefined;
   if (!langEntry || !pageEntry) notFound();
 
   return {
@@ -136,12 +132,8 @@ export default async function Page({
   const docsId = `${lang}/${pageId}`;
   const sections = await getMarkdownSections(lang, pageId, pageEntry!.name);
 
-  // AI用のドキュメント全文（見出し付きで結合）
-  const documentContent = sections
-    .map((s) =>
-      s.level > 0 ? `${"#".repeat(s.level)} ${s.title}\n\n${s.content}` : s.content
-    )
-    .join("\n\n");
+  // AI用のドキュメント全文（rawContentを結合）
+  const documentContent = sections.map((s) => s.rawContent).join("\n\n");
 
   const context = await initContext();
   const initialChatHistories = await getChatFromCache(docsId, context);

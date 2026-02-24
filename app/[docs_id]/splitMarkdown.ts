@@ -6,7 +6,6 @@ export interface MarkdownSection {
   id: string;
   level: number;
   title: string;
-  content: string;
   rawContent: string; // 見出しも含めたもとのmarkdownの内容
 }
 /**
@@ -34,10 +33,6 @@ export function splitMarkdown(content: string): MarkdownSection[] {
     sections.push({
       id: "",
       title: splitContent[startLine - 1].replace(/#+\s*/, "").trim(),
-      content: splitContent
-        .slice(startLine - 1 + 1, endLine ? endLine - 1 : undefined)
-        .join("\n")
-        .trim(),
       level: headingNodes.at(i)!.depth,
       rawContent: splitContent
         .slice(startLine - 1, endLine ? endLine - 1 : undefined)

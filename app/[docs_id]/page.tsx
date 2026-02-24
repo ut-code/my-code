@@ -45,10 +45,9 @@ export async function generateMetadata({
   // 先頭の 第n章: を除いたものをタイトルとする
   const title = splitMdContent[0]?.title?.split(" ").slice(1).join(" ");
 
-  const description = splitMdContent[0].content;
+  const description = splitMdContent[0].rawContent;
 
-  const lang_id = docs_id.split("-")[0];
-  const chapter = docs_id.split("-")[1];
+  const [lang_id, chapter] = docs_id.split("-");
   const pagesList = await getPagesList();
   const langName = pagesList.find((l) => l.id === lang_id)?.name ?? lang_id;
 
@@ -64,8 +63,8 @@ export default async function Page({
   params: Promise<{ docs_id: string }>;
 }) {
   const { docs_id } = await params;
-  const lang_id = docs_id.split("-")[0];
-  const page_num = parseInt(docs_id.split("-")[1]);
+  const [lang_id, page_num_str] = docs_id.split("-");
+  const page_num = parseInt(page_num_str);
   const pagesList = await getPagesList();
   if (
     !pagesList

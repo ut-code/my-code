@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
-import { Heading, StyledMarkdown } from "./markdown";
+import { StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
 import { useSidebarMdContext } from "../sidebar";
 import clsx from "clsx";
@@ -99,8 +99,7 @@ export function PageContent(props: PageContentProps) {
             }}
           >
             {/* ドキュメントのコンテンツ */}
-            <Heading level={section.level}>{section.title}</Heading>
-            <StyledMarkdown content={section.content} />
+            <StyledMarkdown content={section.rawContent} />
           </div>
           <div>
             {/* 右側に表示するチャット履歴欄 */}
