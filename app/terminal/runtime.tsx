@@ -10,7 +10,7 @@ import { RubyContext, useRuby } from "./worker/ruby";
 import { JSEvalContext, useJSEval } from "./worker/jsEval";
 import { WorkerProvider } from "./worker/runtime";
 import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
-import { MarkdownLang } from "@/[docs_id]/styledSyntaxHighlighter";
+import { MarkdownLang } from "@/[lang]/[pageId]/styledSyntaxHighlighter";
 
 /**
  * Common runtime context interface for different languages

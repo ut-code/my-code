@@ -12,7 +12,7 @@ import { EmbedContextProvider } from "./terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./sidebar";
 import { RuntimeProvider } from "./terminal/runtime";
-import { getPagesList } from "@/lib/getPagesList";
+import { getPagesList } from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: {

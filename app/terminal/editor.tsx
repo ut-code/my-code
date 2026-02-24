@@ -2,10 +2,10 @@
 
 import { lazy, Suspense, useEffect, useState } from "react";
 import clsx from "clsx";
-import { useChangeTheme } from "../[docs_id]/themeToggle";
+import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
 import { langConstants } from "./runtime";
-import { MarkdownLang } from "@/[docs_id]/styledSyntaxHighlighter";
+import { MarkdownLang } from "@/[lang]/[pageId]/styledSyntaxHighlighter";
 
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
 const AceEditor = lazy(async () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useChangeTheme } from "./themeToggle";
+import { useChangeTheme } from "@/themeToggle";
 import {
   tomorrow,
   tomorrowNight,

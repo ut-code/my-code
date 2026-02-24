@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { AccountMenu } from "./accountMenu";
-import { ThemeToggle } from "./[docs_id]/themeToggle";
+import { ThemeToggle } from "./themeToggle";
 import { usePathname } from "next/navigation";
-import { LanguageEntry } from "@/lib/getPagesList";
+import { LanguageEntry } from "@/lib/docs";
 
 function PageTitle({ pagesList }: { pagesList: LanguageEntry[] }) {
   const pathname = usePathname();

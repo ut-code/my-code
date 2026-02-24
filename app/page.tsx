@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { getPagesList } from "@/lib/getPagesList";
+import { getPagesList } from "@/lib/docs";
 import clsx from "clsx";
 
 export const metadata: Metadata = {

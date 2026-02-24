@@ -2,7 +2,7 @@
 
 // import { z } from "zod";
 import { generateContent } from "./gemini";
-import { DynamicMarkdownSection } from "../[docs_id]/pageContent";
+import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "../terminal/repl";
 import { addChat, ChatWithMessages } from "@/lib/chatHistory";
 

@@ -6,7 +6,7 @@ import type { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import chalk from "chalk";
 chalk.level = 3;
-import { useChangeTheme } from "../[docs_id]/themeToggle";
+import { useChangeTheme } from "@/themeToggle";
 
 /**
  * 文字列の幅を計算する。

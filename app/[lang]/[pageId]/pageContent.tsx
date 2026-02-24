@@ -1,12 +1,12 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
-import { MarkdownSection } from "./splitMarkdown";
 import { ChatForm } from "./chatForm";
-import { StyledMarkdown } from "./markdown";
+import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
-import { useSidebarMdContext } from "../sidebar";
+import { useSidebarMdContext } from "@/sidebar";
 import clsx from "clsx";
+import { MarkdownSection, PageEntry } from "@/lib/docs";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
 export type DynamicMarkdownSection = MarkdownSection & {
@@ -16,6 +16,10 @@ export type DynamicMarkdownSection = MarkdownSection & {
 interface PageContentProps {
   documentContent: string;
   splitMdContent: MarkdownSection[];
+  pageEntry: PageEntry;
+  lang: string;
+  pageId: string;
+  // TODO: チャット周りのid管理をsectionIdに移行し、docs_idパラメータを削除
   docs_id: string;
 }
 export function PageContent(props: PageContentProps) {
@@ -38,8 +42,8 @@ export function PageContent(props: PageContentProps) {
       inView: false,
     }));
     setDynamicMdContent(newContent);
-    setSidebarMdContent(props.docs_id, newContent);
-  }, [props.splitMdContent, props.docs_id, setSidebarMdContent]);
+    setSidebarMdContent(props.lang, props.pageId, newContent);
+  }, [props.splitMdContent, props.lang, props.pageId, setSidebarMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
@@ -66,14 +70,14 @@ export function PageContent(props: PageContentProps) {
 
       // ローカルstateとcontextの両方を更新
       setDynamicMdContent(updateContent);
-      setSidebarMdContent(props.docs_id, updateContent);
+      setSidebarMdContent(props.lang, props.pageId, updateContent);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [setSidebarMdContent, props.docs_id]);
+  }, [setSidebarMdContent, props.lang, props.pageId]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -86,6 +90,10 @@ export function PageContent(props: PageContentProps) {
         gridTemplateColumns: `1fr auto`,
       }}
     >
+      <Heading level={1}>
+        第{props.pageEntry.index}章: {props.pageEntry.title}
+      </Heading>
+      <div />
       {dynamicMdContent.map((section, index) => (
         <Fragment key={section.id}>
           <div

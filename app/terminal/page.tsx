@@ -1,6 +1,6 @@
 "use client";
 
-import { Heading } from "@/[docs_id]/markdown";
+import { Heading } from "@/[lang]/[pageId]/markdown";
 import "mocha/mocha.css";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useWandbox } from "./wandbox/runtime";

@@ -16,7 +16,7 @@ import type { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
 import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 import clsx from "clsx";
-import { InlineCode } from "@/[docs_id]/markdown";
+import { InlineCode } from "@/[lang]/[pageId]/markdown";
 
 export type ReplOutputType =
   | "stdout"
