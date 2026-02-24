@@ -104,7 +104,12 @@ export function PageContent(props: PageContentProps) {
             }}
           >
             {/* ドキュメントのコンテンツ */}
-            <StyledMarkdown content={section.rawContent} />
+            <StyledMarkdown
+              content={section.rawContent.replace(
+                /-repl\s*\n/,
+                `-repl:${section.id}`
+              )}
+            />
           </div>
           <div>
             {/* 右側に表示するチャット履歴欄 */}
