@@ -1,0 +1,49 @@
+---
+id: cpp-templates-class-template
+title: 'クラステンプレート: 様々な型のデータを格納できるクラスを作る'
+level: 2
+---
+
+## クラステンプレート: 様々な型のデータを格納できるクラスを作る
+
+テンプレートの力は、クラスにも適用できます。これにより、様々な型のデータを格納できる汎用的なクラス（コンテナなど）を作成できます。例えば、「2つの値をペアで保持する」クラスを考えてみましょう。
+
+```cpp:class_template_intro.cpp
+#include <iostream>
+#include <string>
+
+// 2つの型 T1, T2 を引数に取るクラステンプレート
+template <typename T1, typename T2>
+class Pair {
+public:
+    T1 first;
+    T2 second;
+
+    // コンストラクタ
+    Pair(T1 f, T2 s) : first(f), second(s) {}
+
+    void print() {
+        std::cout << "(" << first << ", " << second << ")" << std::endl;
+    }
+};
+
+int main() {
+    // T1=int, T2=std::string としてPairクラスのオブジェクトを生成
+    Pair<int, std::string> p1(1, "apple");
+    p1.print();
+
+    // T1=std::string, T2=double としてPairクラスのオブジェクトを生成
+    Pair<std::string, double> p2("pi", 3.14159);
+    p2.print();
+    
+    // 違う型のPair同士は当然、別の型として扱われる
+    // p1 = p2; // これはコンパイルエラーになる
+
+    return 0;
+}
+```
+
+```cpp-exec:class_template_intro.cpp
+(1, apple)
+(pi, 3.14159)
+```

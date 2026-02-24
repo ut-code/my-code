@@ -1,0 +1,27 @@
+name: TypeScript
+description: にゃー
+pages:
+- slug: 0-intro
+  name: TypeScriptへようこそ
+  title: TypeScriptへようこそ
+- slug: 1-types
+  name: 基本的な型と型推論
+  title: 基本的な型と型推論
+- slug: 2-objects-interfaces
+  name: オブジェクト、インターフェース、型エイリアス
+  title: オブジェクト、インターフェース、型エイリアス
+- slug: 3-function-types
+  name: 関数の型定義
+  title: 関数の型定義
+- slug: 4-combining-types
+  name: 型を組み合わせる
+  title: 型を組み合わせる
+- slug: 5-generics
+  name: ジェネリクス
+  title: ジェネリクス (Generics)
+- slug: 6-classes
+  name: クラスとアクセス修飾子
+  title: クラスとアクセス修飾子
+- slug: 7-async-utilities
+  name: 非同期処理とユーティリティ型
+  title: 非同期処理とユーティリティ型

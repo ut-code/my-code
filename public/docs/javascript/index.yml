@@ -1,0 +1,33 @@
+name: JavaScript
+description: hoge
+pages:
+- slug: 0-intro
+  name: JavaScriptへようこそ
+  title: JavaScriptへようこそ
+- slug: 1-basics
+  name: 基本構文とデータ型
+  title: 基本構文とデータ型
+- slug: 2-control
+  name: 制御構文
+  title: 制御構文
+- slug: 3-functions-closures
+  name: 関数とクロージャ
+  title: 関数とクロージャ
+- slug: 4-this
+  name: '''this''の正体'
+  title: '''this''の正体'
+- slug: 5-objects-prototype
+  name: オブジェクトとプロトタイプ
+  title: オブジェクトとプロトタイプ
+- slug: 6-classes
+  name: クラス構文
+  title: クラス構文 (ES6+)
+- slug: 7-arrays
+  name: 配列とイテレーション
+  title: 配列とイテレーション
+- slug: 8-promise
+  name: '非同期処理①: Promise'
+  title: 非同期処理（1）- Promise
+- slug: 9-async-await
+  name: '非同期処理②: Async/Await'
+  title: 非同期処理（2）- Async/Await と Fetch API

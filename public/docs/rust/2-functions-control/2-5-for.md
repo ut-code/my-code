@@ -1,0 +1,42 @@
+---
+id: rust-functions-control-for
+title: for ループ
+level: 4
+---
+
+#### for ループ
+
+Rustで最も安全かつ頻繁に使用されるのが `for` ループです。配列の要素を走査したり、特定の回数だけ処理を行ったりする場合、インデックス管理が不要な `for` が推奨されます。
+
+数値の範囲を指定する場合は `Range` 型（`start..end`）を使用します。
+
+```rust:for_loop.rs
+fn main() {
+    let a = [10, 20, 30, 40, 50];
+
+    // 配列のイテレータを使ったループ
+    println!("--- 配列の走査 ---");
+    for element in a.iter() {
+        println!("値: {}", element);
+    }
+
+    // Rangeを使ったループ (1から3まで。4は含まない)
+    println!("--- 範囲指定 ---");
+    for number in 1..4 {
+        println!("カウント: {}", number);
+    }
+}
+```
+
+```rust-exec:for_loop.rs
+--- 配列の走査 ---
+値: 10
+値: 20
+値: 30
+値: 40
+値: 50
+--- 範囲指定 ---
+カウント: 1
+カウント: 2
+カウント: 3
+```

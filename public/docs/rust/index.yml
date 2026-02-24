@@ -1,0 +1,39 @@
+name: Rust
+description: a
+pages:
+- slug: 0-intro
+  name: Rustの世界へようこそ
+  title: Rustの世界へようこそ
+- slug: 1-basics
+  name: 基本構文と「不変性」
+  title: 基本構文と「不変性」の哲学
+- slug: 2-functions-control
+  name: 関数と制御フロー
+  title: 関数と制御フロー
+- slug: 3-ownership
+  name: 所有権
+  title: 所有権（Ownership）システム
+- slug: 4-borrowing-slices
+  name: 借用とスライス
+  title: 借用（Borrowing）とスライス
+- slug: 5-structs-methods
+  name: 構造体とメソッド構文
+  title: 構造体とメソッド構文
+- slug: 6-enums-pattern
+  name: 列挙型とパターンマッチ
+  title: 列挙型（Enum）とパターンマッチ
+- slug: 7-modules
+  name: モジュールシステムとパッケージ管理
+  title: モジュールシステムとパッケージ管理
+- slug: 8-collections-strings
+  name: コレクションと文字列
+  title: 一般的なコレクションと文字列
+- slug: 9-error-handling
+  name: エラーハンドリング
+  title: エラーハンドリング
+- slug: 10-generics-traits
+  name: ジェネリクスとトレイト
+  title: ジェネリクスとトレイト
+- slug: 11-lifetimes
+  name: ライフタイム
+  title: ライフタイム（Lifetimes）

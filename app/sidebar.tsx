@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { pagesList } from "./pagesList";
+import { LanguageEntry } from "@/lib/docs";
 import { AccountMenu } from "./accountMenu";
-import { ThemeToggle } from "./[docs_id]/themeToggle";
+import { ThemeToggle } from "./themeToggle";
 import {
   createContext,
   ReactNode,
@@ -12,16 +12,17 @@ import {
   useEffect,
   useState,
 } from "react";
-import { DynamicMarkdownSection } from "./[docs_id]/pageContent";
+import { DynamicMarkdownSection } from "./[lang]/[pageId]/pageContent";
 import clsx from "clsx";
 import { LanguageIcon } from "./terminal/icons";
 import { RuntimeLang } from "./terminal/runtime";
 
 export interface ISidebarMdContext {
-  loadedDocsId: string;
+  loadedDocsId: { lang: string; pageId: string } | null;
   sidebarMdContent: DynamicMarkdownSection[];
   setSidebarMdContent: (
-    docsId: string,
+    lang: string,
+    pageId: string,
     content:
       | DynamicMarkdownSection[]
       | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
@@ -48,15 +49,19 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   const [sidebarMdContent, setSidebarMdContent_] = useState<
     DynamicMarkdownSection[]
   >([]);
-  const [loadedDocsId, setLoadedDocsId] = useState<string>("");
+  const [loadedDocsId, setLoadedDocsId] = useState<{
+    lang: string;
+    pageId: string;
+  } | null>(null);
   const setSidebarMdContent = useCallback(
     (
-      docsId: string,
+      lang: string,
+      pageId: string,
       content:
         | DynamicMarkdownSection[]
         | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
     ) => {
-      setLoadedDocsId(docsId);
+      setLoadedDocsId({ lang, pageId });
       setSidebarMdContent_(content);
     },
     []
@@ -74,39 +79,43 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   const pathname = usePathname();
-  const currentDocsId = pathname.replace(/^\//, ""); // ちょっと遅延がある
+  const pathnameMatch = pathname.match(/^\/([\w-_]+)\/([\w-_]+).*?/);
+  const currentLang = pathnameMatch?.[1];
+  const currentPageId = pathnameMatch?.[2];
   const sidebarContext = useSidebarMdContext();
   // sidebarMdContextの情報が古かったら使わない
   const sidebarMdContent =
-    sidebarContext.loadedDocsId === currentDocsId
+    sidebarContext.loadedDocsId &&
+    sidebarContext.loadedDocsId.lang === currentLang &&
+    sidebarContext.loadedDocsId.pageId === currentPageId
       ? sidebarContext.sidebarMdContent
       : [];
 
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
-  const currentSectionIndex = sidebarMdContent.findIndex(
+  const currentSectionId = sidebarMdContent.find(
     (section, i) => i >= 1 && section.inView
-  );
+  )?.id;
 
   // 目次の開閉状態
   const [detailsOpen, setDetailsOpen] = useState<boolean[]>([]);
-  const currentGroupIndex = pagesList.findIndex((group) =>
-    currentDocsId.startsWith(`${group.id}-`)
+  const currentLangIndex = pagesList.findIndex(
+    (group) => currentLang === group.id
   );
   useEffect(() => {
     // 表示しているグループが変わったときに現在のグループのdetailsを開く
-    if (currentGroupIndex !== -1) {
+    if (currentLangIndex !== -1) {
       setDetailsOpen((detailsOpen) => {
         const newDetailsOpen = [...detailsOpen];
-        while (newDetailsOpen.length <= currentGroupIndex) {
+        while (newDetailsOpen.length <= currentLangIndex) {
           newDetailsOpen.push(false);
         }
-        newDetailsOpen[currentGroupIndex] = true;
+        newDetailsOpen[currentLangIndex] = true;
         return newDetailsOpen;
       });
     }
-  }, [currentGroupIndex]);
+  }, [currentLangIndex]);
 
   return (
     <div className="bg-base-200 h-full w-80 overflow-y-auto">
@@ -166,43 +175,43 @@ export function Sidebar() {
                   className="w-4 h-4"
                   lang={group.id as RuntimeLang}
                 />
-                {group.lang}
+                {group.name}
               </summary>
               <ul>
                 {group.pages.map((page) => (
-                  <li key={page.id}>
+                  <li key={page.slug}>
                     <Link
-                      href={`${group.id}-${page.id}`}
+                      href={`/${group.id}/${page.slug}`}
                       className={clsx(
                         "text-wrap text-justify",
-                        `${group.id}-${page.id}` === currentDocsId &&
+                        group.id === currentLang &&
+                          page.slug === currentPageId &&
                           "menu-active"
                       )}
                     >
                       <span className="w-5 text-right">
-                        <span className="float-right">
-                        {page.id}.
+                        <span className="float-right">{page.index}.</span>
                       </span>
-                      </span>
-                      {page.title}
+                      {page.name}
                     </Link>
-                    {`${group.id}-${page.id}` === currentDocsId &&
+                    {group.id === currentLang &&
+                      page.slug === currentPageId &&
                       sidebarMdContent.length > 0 && (
                         <ul className="ml-4 text-sm">
-                          {sidebarMdContent.slice(1).map((section, idx) => {
-                            // idx + 1 は実際のsectionIndexに対応（slice(1)で最初を除外しているため）
-                            const isCurrentSection =
-                              idx + 1 === currentSectionIndex;
+                          {sidebarMdContent.slice(1).map((section) => {
                             return (
                               <li
-                                key={idx}
+                                key={section.id}
                                 style={{ marginLeft: section.level - 2 + "em" }}
                               >
                                 <Link
-                                  href={`#${idx + 1}`}
-                                  className={
-                                    isCurrentSection ? "font-bold" : ""
-                                  }
+                                  href={`#${section.id}`}
+                                  className={clsx(
+                                    "text-wrap text-justify",
+                                    currentSectionId === section.id
+                                      ? "font-bold"
+                                      : ""
+                                  )}
                                 >
                                   {section.title}
                                 </Link>

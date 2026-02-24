@@ -1,0 +1,30 @@
+name: Python
+description: Pythonの基礎から応用までを学べるチュートリアル
+pages:
+- slug: 0-intro
+  name: 環境構築と基本思想
+  title: Pythonへようこそ：環境構築と基本思想
+- slug: 1-basics
+  name: 基本構文とデータ型
+  title: Pythonの基本構文とデータ型
+- slug: 2-collections
+  name: リスト、タプル、辞書、セット
+  title: Pythonを使いこなす：リスト、タプル、辞書、セット
+- slug: 3-control-functions
+  name: 制御構文と関数
+  title: 制御構文と関数：Pythonらしい書き方
+- slug: 4-modules
+  name: モジュールとパッケージ
+  title: コードの整理術：モジュールとパッケージ
+- slug: 5-oop
+  name: オブジェクト指向プログラミング
+  title: Pythonicなオブジェクト指向プログラミング
+- slug: 6-file-io
+  name: ファイルの入出力とコンテキストマネージャ
+  title: ファイルの入出力とコンテキストマネージャ
+- slug: 7-exceptions
+  name: 例外処理
+  title: エラーとの付き合い方：例外処理
+- slug: 8-generators-decorators
+  name: ジェネレータとデコレータ
+  title: さらに先へ：ジェネレータとデコレータ

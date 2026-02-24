@@ -1,0 +1,42 @@
+name: C++
+description: C++の基本から高度な機能までを学べるチュートリアル
+pages:
+- slug: 0-intro
+  name: C++の世界へようこそ
+  title: C++の世界へようこそ
+- slug: 1-types-control
+  name: 型システムと制御構造
+  title: C++の型システムと制御構造：静的型付けとスコープを再確認する
+- slug: 2-data-containers
+  name: データ集合とモダンな操作
+  title: データ集合とモダンな操作：「配列」ではなく「コンテナ」としてデータを扱う
+- slug: 3-pointers
+  name: ポインタとメモリ管理
+  title: ポインタとメモリ管理の深淵
+- slug: 4-functions
+  name: 関数と参照渡し
+  title: 関数の設計とデータの受け渡し：コピー、参照、ポインタ
+- slug: 5-project-build
+  name: プロジェクトの分割とビルド
+  title: プロジェクトの分割とビルド
+- slug: 6-classes-basics
+  name: クラスの基礎
+  title: オブジェクト指向の入口：クラスの基礎
+- slug: 7-classes-advanced
+  name: クラスを使いこなす
+  title: クラスを使いこなす
+- slug: 8-inheritance
+  name: 継承とポリモーフィズム
+  title: 継承とポリモーフィズム
+- slug: 9-templates
+  name: テンプレート
+  title: テンプレートによる汎用プログラミング
+- slug: 10-stl-containers
+  name: STL ①:コンテナ
+  title: 標準テンプレートライブラリ (STL) ①：コンテナ
+- slug: 11-stl-algorithms
+  name: STL ②:アルゴリズムとラムダ式
+  title: 標準テンプレートライブラリ (STL) ②：アルゴリズムとラムダ式
+- slug: 12-raii-smart-ptrs
+  name: RAIIとスマートポインタ
+  title: モダンC++の流儀：RAIIとスマートポインタ

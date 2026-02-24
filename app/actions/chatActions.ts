@@ -2,7 +2,7 @@
 
 // import { z } from "zod";
 import { generateContent } from "./gemini";
-import { DynamicMarkdownSection } from "../[docs_id]/pageContent";
+import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "../terminal/repl";
 import { addChat, ChatWithMessages } from "@/lib/chatHistory";
 
@@ -149,7 +149,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     }
     // TODO: どのセクションへの回答にするかをAIに決めさせる
     const targetSectionId =
-      sectionContent.find((s) => s.inView)?.sectionId || "";
+      sectionContent.find((s) => s.inView)?.id || "";
     const newChat = await addChat(params.docsId, targetSectionId, [
       { role: "user", content: userQuestion },
       { role: "ai", content: text },

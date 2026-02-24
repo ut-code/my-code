@@ -12,6 +12,7 @@ import { EmbedContextProvider } from "./terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./sidebar";
 import { RuntimeProvider } from "./terminal/runtime";
+import { getPagesList } from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: {
@@ -20,9 +21,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  const pagesList = await getPagesList();
   return (
     <html lang="ja">
       <body className="w-screen min-h-screen bg-transparent! text-inherit! m-0!">
@@ -36,7 +38,7 @@ export default function RootLayout({
               className="drawer-toggle"
             />
             <div className="drawer-content flex flex-col">
-              <Navbar />
+              <Navbar pagesList={pagesList} />
               <EmbedContextProvider>
                 <RuntimeProvider>{children}</RuntimeProvider>
               </EmbedContextProvider>
@@ -47,7 +49,7 @@ export default function RootLayout({
                 aria-label="close sidebar"
                 className="drawer-overlay"
               />
-              <Sidebar />
+              <Sidebar pagesList={pagesList} />
             </div>
           </div>
         </SidebarMdProvider>

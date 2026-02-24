@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { AccountMenu } from "./accountMenu";
-import { ThemeToggle } from "./[docs_id]/themeToggle";
+import { ThemeToggle } from "./themeToggle";
 import { usePathname } from "next/navigation";
-import { pagesList } from "./pagesList";
+import { LanguageEntry } from "@/lib/docs";
 
-function PageTitle() {
+function PageTitle({ pagesList }: { pagesList: LanguageEntry[] }) {
   const pathname = usePathname();
 
   if(pathname === "/"){
@@ -14,19 +14,20 @@ function PageTitle() {
   }
 
   const currentDocsId = pathname.replace(/^\//, "");
-  const currentGroup = pagesList.find((group) => currentDocsId.startsWith(group.id));
-  const currentPage = currentGroup?.pages.find((page) => `${currentGroup.id}-${page.id}` === currentDocsId);
+  const currentGroup = pagesList.find((group) => currentDocsId.startsWith(`${group.id}/`));
+  const pageIndex = currentGroup?.pages.findIndex((page) => `${currentGroup.id}/${page.slug}` === currentDocsId) ?? -1;
+  const currentPage = pageIndex >= 0 ? currentGroup?.pages[pageIndex] : undefined;
   if(currentPage){
     return <>
-      <span className="text-base mr-2">{currentGroup?.lang}-{currentPage.id}.</span>
-      <span>{currentPage.title}</span>
+      <span className="text-base mr-2">{currentGroup?.name}-{pageIndex + 1}.</span>
+      <span>{currentPage.name}</span>
     </>
   }
 
   console.warn(`navbar page name is not defined for pathname ${pathname}`);
   return null;
 }
-export function Navbar() {
+export function Navbar({ pagesList }: { pagesList: LanguageEntry[] }) {
 
   return (
     <>
@@ -66,7 +67,7 @@ export function Navbar() {
           <span className="font-bold text-xl font-mono">my.code();</span>
         </Link>
         <div className="flex-1 hidden md:inline text-nowrap overflow-hidden text-ellipsis font-bold text-xl">
-          <PageTitle />
+          <PageTitle pagesList={pagesList} />
         </div>
         <div className="flex-1 md:hidden" />
         <ThemeToggle />
