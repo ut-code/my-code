@@ -7,10 +7,10 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "node --import tsx/esm --test src/index.test.ts"
+    "test": "node --import tsx/esm --test tests/*"
   },
   "devDependencies": {
-    "tsx": "*",
-    "typescript": "*"
+    "tsx": "^4",
+    "typescript": "^5"
   }
 }
