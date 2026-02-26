@@ -1,13 +1,22 @@
 # https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile をベースに
 
-FROM node:lts-slim AS builder
+FROM node:lts-slim AS dependencies
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+COPY packages/jsEval/package.json ./packages/jsEval/
 
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
+
+FROM node:lts-slim AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy project dependencies from dependencies stage
+COPY --from=dependencies /app/node_modules ./node_modules
 
 # Copy application source code
 COPY . .
