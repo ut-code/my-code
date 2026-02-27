@@ -1,10 +1,11 @@
 # my.code(); Runtime API
 
-## runtime.tsx
+
+## RuntimeContext (interface.ts)
 
 各言語のランタイムはRuntimeContextインターフェースの実装を返すフックを実装する必要があります。
 
-runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、その中で指定された言語のランタイムを返します。
+context.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、その中で指定された言語のランタイムを返します。
 
 関数はすべてuseCallbackやuseMemoなどを用いレンダリングごとに同じインスタンスを返すように実装してください。
 
@@ -62,6 +63,8 @@ runtime.tsx の `useRuntime(lang)` は各言語のフックを呼び出し、そ
     * 呼び出し側でmutexのロックはせず、必要であればrunFiles()内でロックします。
 * getCommandlineStr: `(filenames: string[]) => string`
     * 指定されたファイルを実行するためのコマンドライン引数文字列を返します。表示用です。
+
+## languages.ts
 
 ### LangConstant
 
