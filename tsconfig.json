@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["./app/*"],
+      "@my-code/runtime/samples/*": ["./packages/runtime/samples/*"],
+      "@my-code/runtime/*": ["./packages/runtime/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

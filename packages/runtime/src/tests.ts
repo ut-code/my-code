@@ -1,7 +1,8 @@
 import { expect } from "chai";
 import { RefObject } from "react";
-import { emptyMutex, RuntimeContext, RuntimeLang } from "./runtime";
 import { ReplOutput } from "./repl";
+import { RuntimeLang } from "./languages";
+import { emptyMutex, RuntimeContext } from "./interface";
 
 export function defineTests(
   lang: RuntimeLang,

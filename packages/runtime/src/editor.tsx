@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
-import { langConstants } from "./runtime";
+import { langConstants } from "./languages";
 import { MarkdownLang } from "@/[lang]/[pageId]/styledSyntaxHighlighter";
 
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない

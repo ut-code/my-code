@@ -13,7 +13,7 @@ import {
 } from "react";
 import { useEmbedContext } from "../embedContext";
 import { ReplOutput } from "../repl";
-import { RuntimeContext, RuntimeInfo } from "../runtime";
+import { RuntimeContext, RuntimeInfo } from "../interface";
 
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],

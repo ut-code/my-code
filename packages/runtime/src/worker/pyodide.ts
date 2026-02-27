@@ -1,15 +1,16 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { RuntimeContext, RuntimeInfo } from "../runtime";
+import { RuntimeContext, RuntimeInfo } from "../interface";
 import { ReplCommand, ReplOutput } from "../repl";
+import pyodideLock from "pyodide/pyodide-lock.json";
 
-export const JSEvalContext = createContext<RuntimeContext>(null!);
+export const PyodideContext = createContext<RuntimeContext>(null!);
 
-export function useJSEval() {
-  const context = useContext(JSEvalContext);
+export function usePyodide() {
+  const context = useContext(PyodideContext);
   if (!context) {
-    throw new Error("useJSEval must be used within a JSEvalProvider");
+    throw new Error("usePyodide must be used within a PyodideProvider");
   }
   return {
     ...context,
@@ -20,28 +21,25 @@ export function useJSEval() {
 }
 
 const runtimeInfo: RuntimeInfo = {
-  prettyLangName: "JavaScript",
+  prettyLangName: "Python",
+  version: String(pyodideLock.info.python),
 };
 
 function splitReplExamples(content: string): ReplCommand[] {
   const initCommands: { command: string; output: ReplOutput[] }[] = [];
   for (const line of content.split("\n")) {
-    if (line.startsWith("> ")) {
+    if (line.startsWith(">>> ")) {
       // Remove the prompt from the command
-      initCommands.push({ command: line.slice(2), output: [] });
+      initCommands.push({ command: line.slice(4), output: [] });
     } else if (line.startsWith("... ")) {
       if (initCommands.length > 0) {
         initCommands[initCommands.length - 1].command += "\n" + line.slice(4);
       }
     } else {
       // Lines without prompt are output from the previous command
-      // and the last output is return value
       if (initCommands.length > 0) {
-        initCommands[initCommands.length - 1].output.forEach(
-          (out) => (out.type = "stdout")
-        );
         initCommands[initCommands.length - 1].output.push({
-          type: "return",
+          type: "stdout",
           message: line,
         });
       }
@@ -51,5 +49,5 @@ function splitReplExamples(content: string): ReplCommand[] {
 }
 
 function getCommandlineStr(filenames: string[]) {
-  return `node ${filenames[0]}`;
+  return `python ${filenames[0]}`;
 }

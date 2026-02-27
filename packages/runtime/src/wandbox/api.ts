@@ -1,6 +1,6 @@
 import { type Fetcher } from "swr";
 import { type ReplOutput } from "../repl";
-import { RuntimeInfo } from "../runtime";
+import { RuntimeInfo } from "../interface";
 
 const WANDBOX = "https://wandbox.org";
 // https://github.com/melpon/wandbox/blob/ajax/kennel2/API.rst  <- 古いけど、説明と例がある

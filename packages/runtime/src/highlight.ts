@@ -1,6 +1,6 @@
 import chalk from "chalk";
 chalk.level = 3;
-import { RuntimeLang } from "./runtime";
+import { RuntimeLang } from "./languages";
 
 export async function importPrism() {
   if (typeof window !== "undefined") {

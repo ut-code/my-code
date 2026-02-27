@@ -3,28 +3,29 @@
 import { Heading } from "@/[lang]/[pageId]/markdown";
 import "mocha/mocha.css";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useWandbox } from "./wandbox/runtime";
-import { RuntimeContext, RuntimeLang } from "./runtime";
-import { useEmbedContext } from "./embedContext";
-import { defineTests } from "./tests";
-import { usePyodide } from "./worker/pyodide";
-import { useRuby } from "./worker/ruby";
-import { useJSEval } from "./worker/jsEval";
-import { ReplTerminal } from "./repl";
-import { EditorComponent, getAceLang } from "./editor";
-import { ExecFile } from "./exec";
-import { useTypeScript } from "./typescript/runtime";
-import { useTerminal } from "./terminal";
+import { useWandbox } from "@my-code/runtime/wandbox/runtime";
+import { RuntimeContext } from "@my-code/runtime/interface";
+import { RuntimeLang } from "@my-code/runtime/languages";
+import { useEmbedContext } from "@my-code/runtime/embedContext";
+import { defineTests } from "@my-code/runtime/tests";
+import { usePyodide } from "@my-code/runtime/worker/pyodide";
+import { useRuby } from "@my-code/runtime/worker/ruby";
+import { useJSEval } from "@my-code/runtime/worker/jsEval";
+import { ReplTerminal } from "@my-code/runtime/repl";
+import { EditorComponent, getAceLang } from "@my-code/runtime/editor";
+import { ExecFile } from "@my-code/runtime/exec";
+import { useTypeScript } from "@my-code/runtime/typescript/runtime";
+import { useTerminal } from "@my-code/runtime/terminal";
 
-import main_py from "./samples/main.py?raw";
-import main_rb from "./samples/main.rb?raw";
-import main_js from "./samples/main.js?raw";
-import main2_ts from "./samples/main2.ts?raw";
-import main_cpp from "./samples/main.cpp?raw";
-import sub_h from "./samples/sub.h?raw";
-import sub_cpp from "./samples/sub.cpp?raw";
-import main2_rs from "./samples/main2.rs?raw";
-import sub_rs from "./samples/sub.rs?raw";
+import main_py from "@my-code/runtime/samples/main.py?raw";
+import main_rb from "@my-code/runtime/samples/main.rb?raw";
+import main_js from "@my-code/runtime/samples/main.js?raw";
+import main2_ts from "@my-code/runtime/samples/main2.ts?raw";
+import main_cpp from "@my-code/runtime/samples/main.cpp?raw";
+import sub_h from "@my-code/runtime/samples/sub.h?raw";
+import sub_cpp from "@my-code/runtime/samples/sub.cpp?raw";
+import main2_rs from "@my-code/runtime/samples/main2.rs?raw";
+import sub_rs from "@my-code/runtime/samples/sub.rs?raw";
 
 export default function RuntimeTestPage() {
   return (

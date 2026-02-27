@@ -8,7 +8,7 @@ import { useState, FormEvent, useEffect } from "react";
 // } from "../actions/questionExample";
 // import { getLanguageName } from "../pagesList";
 import { DynamicMarkdownSection } from "./pageContent";
-import { useEmbedContext } from "@/terminal/embedContext";
+import { useEmbedContext } from "@my-code/runtime/embedContext";
 import { useChatHistoryContext } from "./chatHistory";
 import { askAI } from "@/actions/chatActions";
 

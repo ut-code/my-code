@@ -1,4 +1,4 @@
-import { RuntimeLang } from "./runtime";
+import { RuntimeLang } from "./languages";
 
 interface Props {
   lang: RuntimeLang;

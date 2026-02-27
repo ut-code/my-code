@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { RuntimeContext, RuntimeInfo } from "../runtime";
+import { RuntimeContext, RuntimeInfo } from "../interface";
 import { ReplCommand, ReplOutput } from "../repl";
 
 export const RubyContext = createContext<RuntimeContext>(null!);

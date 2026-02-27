@@ -3,7 +3,7 @@
 // import { z } from "zod";
 import { generateContent } from "./gemini";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
-import { ReplCommand, ReplOutput } from "../terminal/repl";
+import { ReplCommand, ReplOutput } from "@my-code/runtime/repl";
 import { addChat, ChatWithMessages } from "@/lib/chatHistory";
 
 type ChatResult =

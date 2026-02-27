@@ -14,8 +14,8 @@ import {
 } from "react";
 import { DynamicMarkdownSection } from "./[lang]/[pageId]/pageContent";
 import clsx from "clsx";
-import { LanguageIcon } from "./terminal/icons";
-import { RuntimeLang } from "./terminal/runtime";
+import { LanguageIcon } from "@my-code/runtime/icons";
+import { RuntimeLang } from "@my-code/runtime/languages";
 
 export interface ISidebarMdContext {
   loadedDocsId: { lang: string; pageId: string } | null;

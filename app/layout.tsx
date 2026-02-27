@@ -8,10 +8,10 @@ import "./globals.css";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
 import { ReactNode } from "react";
-import { EmbedContextProvider } from "./terminal/embedContext";
+import { EmbedContextProvider } from "@my-code/runtime/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./sidebar";
-import { RuntimeProvider } from "./terminal/runtime";
+import { RuntimeProvider } from "@my-code/runtime/context";
 import { getPagesList } from "@/lib/docs";
 
 export const metadata: Metadata = {
