@@ -1,7 +1,5 @@
 "use client";
 
-import { LangConstants } from "./interface";
-
 // Markdownで指定される可能性のある言語名を列挙
 export type MarkdownLang =
   | "python"
@@ -36,171 +34,169 @@ export type RuntimeLang =
   | "javascript"
   | "typescript";
 
-// react-syntax-highliter (hljs版) が対応している言語
-// https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/AVAILABLE_LANGUAGES_HLJS.MD を参照
-export type SyntaxHighlighterLang =
-  | "python"
-  | "ruby"
-  | "c"
-  | "cpp"
-  | "rust"
-  | "javascript"
-  | "typescript"
-  | "bash"
-  | "powershell"
-  | "html"
-  | "json"
-  | "ini"
-  | "makefile"
-  | "cmake";
+export type LangConstants = {
+  originalLang: MarkdownLang | undefined;
+  // react-syntax-highliter (hljs版) が対応している言語
+  // https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/AVAILABLE_LANGUAGES_HLJS.MD を参照
+  rsh?:
+    | "python"
+    | "ruby"
+    | "c"
+    | "cpp"
+    | "rust"
+    | "javascript"
+    | "typescript"
+    | "bash"
+    | "powershell"
+    | "html"
+    | "json"
+    | "ini"
+    | "makefile"
+    | "cmake";
+} & (
+  | {
+      // terminal/editor.tsx でimportする mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値と対応する
+      ace:
+        | "python"
+        | "ruby"
+        | "c_cpp"
+        | "rust"
+        | "javascript"
+        | "typescript"
+        | "json"
+        | "csv"
+        | "text";
+      tabSize: number;
+    }
+  | {
+      ace?: undefined;
+      tabSize?: undefined; // default: 4
+    }
+) &
+  (
+    | {
+        runtime: RuntimeLang;
+        // REPLが実装されている言語の場合
+        // terminal/highlight.ts でインポートするprismの言語定義と対応
+        prism: "python" | "ruby" | "javascript";
+        prompt: string;
+        promptMore: string;
+        returnPrefix?: string;
+      }
+    | {
+        runtime?: RuntimeLang;
+        prism?: undefined;
+        prompt?: undefined;
+        promptMore?: undefined;
+        returnPrefix?: undefined;
+      }
+  );
 
-// terminal/editor.tsx でimportする mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値と対応する
-export type AceLang =
-  | "python"
-  | "ruby"
-  | "c_cpp"
-  | "rust"
-  | "javascript"
-  | "typescript"
-  | "json"
-  | "csv"
-  | "text";
-
-export function getRuntimeLang(
-  lang: MarkdownLang | undefined
-): RuntimeLang | undefined {
-  // markdownで指定される可能性のある言語名からRuntimeLangを取得
+export function langConstants(lang: MarkdownLang | undefined): LangConstants {
   switch (lang) {
     case "python":
     case "py":
-      return "python";
-    case "ruby":
-    case "rb":
-      return "ruby";
-    case "cpp":
-    case "c++":
-      return "cpp";
-    case "rust":
-    case "rs":
-      return "rust";
-    case "javascript":
-    case "js":
-      return "javascript";
-    case "typescript":
-    case "ts":
-      return "typescript";
-    case "bash":
-    case "sh":
-    case "powershell":
-    case "json":
-    case "toml":
-    case "csv":
-    case "text":
-    case "txt":
-    case "html":
-    case "makefile":
-    case "cmake":
-    case undefined:
-      // unsupported languages
-      return undefined;
-    default:
-      lang satisfies never;
-      console.error(`getRuntimeLang() does not handle language ${lang}`);
-      return undefined;
-  }
-}
-
-export function getAceLang(lang: MarkdownLang | undefined): AceLang {
-  // Markdownで指定される可能性のある言語名からAceLangを取得
-  switch (lang) {
-    case "python":
-    case "py":
-      return "python";
-    case "ruby":
-    case "rb":
-      return "ruby";
-    case "cpp":
-    case "c++":
-      return "c_cpp";
-    case "rust":
-    case "rs":
-      return "rust";
-    case "javascript":
-    case "js":
-      return "javascript";
-    case "typescript":
-    case "ts":
-      return "typescript";
-    case "json":
-      return "json";
-    case "csv":
-      return "csv";
-    case "sh":
-    case "bash":
-    case "powershell":
-    case "text":
-    case "txt":
-    case "html":
-    case "toml":
-    case "makefile":
-    case "cmake":
-    case undefined:
-      console.warn(`Ace editor mode not implemented for language: ${lang}`);
-      return "text";
-    default:
-      lang satisfies never;
-      console.error(`getAceLang() does not handle language ${lang}`);
-      return "text";
-  }
-}
-
-export function langConstants(lang: RuntimeLang | AceLang): LangConstants {
-  switch (lang) {
-    case "python":
       return {
+        originalLang: lang,
+        rsh: "python",
+        ace: "python",
         tabSize: 4,
+        runtime: "python",
+        prism: "python",
         prompt: ">>> ",
         promptMore: "... ",
       };
     case "ruby":
+    case "rb":
       return {
+        originalLang: lang,
+        rsh: "ruby",
+        ace: "ruby",
         tabSize: 2,
+        runtime: "ruby",
+        prism: "ruby",
         // TODO: 実際のirbのプロンプトは静的でなく、(main)や番号などの動的な表示がある
         prompt: "irb> ",
         promptMore: "irb* ",
         returnPrefix: "=> ",
       };
     case "javascript":
-    case "typescript":
+    case "js":
       return {
+        originalLang: lang,
+        rsh: "javascript",
+        ace: "javascript",
         tabSize: 2,
+        runtime: "javascript",
+        prism: "javascript",
         prompt: "> ",
         promptMore: "... ",
       };
-    case "c_cpp":
-    case "cpp":
+    case "typescript":
+    case "ts":
       return {
+        originalLang: lang,
+        rsh: "typescript",
+        ace: "typescript",
+        tabSize: 2,
+        runtime: "typescript",
+      };
+    case "cpp":
+    case "c++":
+      return {
+        originalLang: lang,
+        rsh: "cpp",
+        ace: "c_cpp",
         // 2文字派と4文字派があるが、geminiが4文字で出力するので4でいいや
         tabSize: 4,
+        runtime: "cpp",
       };
     case "rust":
+    case "rs":
       return {
+        originalLang: lang,
+        rsh: "rust",
+        ace: "rust",
         tabSize: 4,
+        runtime: "rust",
       };
+    case "bash":
+    case "sh":
+      return { originalLang: lang, rsh: "bash" };
+    case "powershell":
+      return { originalLang: lang, rsh: "powershell" };
     case "json":
       return {
+        originalLang: lang,
+        rsh: "json",
         // python-7章で使っている
+        ace: "json",
         tabSize: 4,
       };
+    case "toml":
+      return { originalLang: lang, rsh: "ini" };
+    case "html":
+      return { originalLang: lang, rsh: "html" };
+    case "makefile":
+      return { originalLang: lang, rsh: "makefile" };
+    case "cmake":
+      return { originalLang: lang, rsh: "cmake" };
     case "csv":
-    case "text":
       return {
+        originalLang: lang,
+        ace: "csv",
         // tabは使わないが、0は指定できないようなので適当にデフォルト値
         tabSize: 4,
       };
+    case "text":
+    case "txt":
+    case undefined:
+      return { originalLang: lang };
     default:
       lang satisfies never;
-      throw new Error(`LangConstants not defined for language: ${lang}`);
+      if (process.env.NODE_ENV === "development") {
+        throw new Error(`LangConstants not defined for language: ${lang}`);
+      }
+      return { originalLang: lang };
   }
 }
-

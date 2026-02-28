@@ -11,7 +11,7 @@ import { writeOutput } from "./repl";
 import { useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import clsx from "clsx";
-import { RuntimeLang } from "@my-code/runtime/languages";
+import { LangConstants } from "@my-code/runtime/languages";
 import { useRuntime } from "@my-code/runtime/context";
 
 interface ExecProps {
@@ -20,7 +20,7 @@ interface ExecProps {
    * C++の場合はソースコード(.cpp)を全部指定する。
    */
   filenames: string[];
-  language: RuntimeLang;
+  language: LangConstants;
   content: string;
 }
 export function ExecFile(props: ExecProps) {
@@ -33,10 +33,16 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const { files, clearExecResult, addExecOutput, writeFile } = useEmbedContext();
+  const { files, clearExecResult, addExecOutput, writeFile } =
+    useEmbedContext();
 
+  if (props.language.runtime === undefined) {
+    throw new Error(
+      `Language ${props.language.originalLang} does not have a runtime environment.`
+    );
+  }
   const { ready, runFiles, getCommandlineStr, runtimeInfo, interrupt } =
-    useRuntime(props.language);
+    useRuntime(props.language.runtime);
 
   // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)
   const [executionState, setExecutionState] = useState<
@@ -135,7 +141,7 @@ export function ExecFile(props: ExecProps) {
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">
-              {runtimeInfo?.prettyLangName || props.language}
+              {runtimeInfo?.prettyLangName || props.language.runtime}
             </span>
             {runtimeInfo?.version && (
               <span className="mr-0.5">{runtimeInfo?.version}</span>

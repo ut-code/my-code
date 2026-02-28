@@ -1,6 +1,6 @@
 import chalk from "chalk";
 chalk.level = 3;
-import { RuntimeLang } from "@my-code/runtime/languages";
+import { LangConstants } from "@my-code/runtime/languages";
 
 export async function importPrism() {
   if (typeof window !== "undefined") {
@@ -12,28 +12,6 @@ export async function importPrism() {
     return Prism;
   } else {
     return null!;
-  }
-}
-
-type PrismLang = "python" | "ruby" | "javascript";
-
-function getPrismLanguage(language: RuntimeLang): PrismLang {
-  switch (language) {
-    case "python":
-      return "python";
-    case "ruby":
-      return "ruby";
-    case "javascript":
-      return "javascript";
-    case "cpp":
-    case "typescript":
-    case "rust":
-      throw new Error(
-        `highlight for ${language} is disabled because it should not support REPL`
-      );
-    default:
-      language satisfies never;
-      throw new Error(`Prism language not implemented for: ${language}`);
   }
 }
 
@@ -87,13 +65,19 @@ const prismToAnsi: Record<string, (text: string) => string> = {
 export function highlightCodeToAnsi(
   Prism: typeof import("prismjs"),
   code: string,
-  language: RuntimeLang
+  language: LangConstants
 ): string {
+  if (!language.prism) {
+    console.error(
+      `Language ${language.originalLang} does not have a Prism definition.`
+    );
+    return code;
+  }
   // Prismでハイライト処理を行い、HTML文字列を取得
   const highlightedHtml = Prism.highlight(
     code,
-    Prism.languages[getPrismLanguage(language)],
-    getPrismLanguage(language)
+    Prism.languages[language.prism],
+    language.prism
   );
 
   // 一時的なDOM要素を作成してパース
@@ -141,4 +125,3 @@ export function highlightCodeToAnsi(
     ""
   );
 }
-

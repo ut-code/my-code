@@ -31,12 +31,6 @@ export interface RuntimeInfo {
   prettyLangName: string;
   version?: string;
 }
-export interface LangConstants {
-  tabSize: number;
-  prompt?: string;
-  promptMore?: string;
-  returnPrefix?: string;
-}
 
 export type ReplOutputType =
   | "stdout"

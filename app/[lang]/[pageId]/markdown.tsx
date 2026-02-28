@@ -5,12 +5,9 @@ import remarkCjkFriendly from "remark-cjk-friendly";
 import { EditorComponent } from "@/terminal/editor";
 import { ExecFile } from "@/terminal/exec";
 import { JSX, ReactNode } from "react";
-import { getAceLang, getRuntimeLang, MarkdownLang } from "@my-code/runtime/languages";
+import { langConstants, MarkdownLang } from "@my-code/runtime/languages";
 import { ReplTerminal } from "@/terminal/repl";
-import {
-  getSyntaxHighlighterLang,
-  StyledSyntaxHighlighter,
-} from "./styledSyntaxHighlighter";
+import { StyledSyntaxHighlighter } from "./styledSyntaxHighlighter";
 
 export function StyledMarkdown({ content }: { content: string }) {
   return (
@@ -92,7 +89,7 @@ function CodeComponent({
     className || ""
   );
   if (match) {
-    const runtimeLang = getRuntimeLang(match[1] as MarkdownLang | undefined);
+    const language = langConstants(match[1] as MarkdownLang | undefined);
     if (match[2] === "-exec" && match[3]) {
       /*
       ```python-exec:main.py
@@ -104,10 +101,10 @@ function CodeComponent({
         hello, world!
       ---------------------------
       */
-      if (runtimeLang) {
+      if (language.runtime) {
         return (
           <ExecFile
-            language={runtimeLang}
+            language={language}
             filenames={match[3].split(",")}
             content={String(props.children || "").replace(/\n$/, "")}
           />
@@ -120,39 +117,35 @@ function CodeComponent({
           `${match[1]}-repl without terminal id! content: ${String(props.children).slice(0, 20)}...`
         );
       }
-      if (runtimeLang) {
+      if (language.runtime) {
         return (
           <ReplTerminal
             terminalId={match[3]}
-            language={runtimeLang}
+            language={language}
             initContent={String(props.children || "").replace(/\n$/, "")}
           />
         );
       }
     } else if (match[3]) {
       // ファイル名指定がある場合、ファイルエディター
-      const aceLang = getAceLang(match[1] as MarkdownLang | undefined);
       return (
         <EditorComponent
-          language={aceLang}
+          language={language}
           filename={match[3]}
           readonly={match[2] === "-readonly"}
           initContent={String(props.children || "").replace(/\n$/, "")}
         />
       );
     }
-    const syntaxHighlighterLang = getSyntaxHighlighterLang(
-      match[1] as MarkdownLang | undefined
-    );
     return (
-      <StyledSyntaxHighlighter language={syntaxHighlighterLang}>
+      <StyledSyntaxHighlighter language={language}>
         {String(props.children || "").replace(/\n$/, "")}
       </StyledSyntaxHighlighter>
     );
   } else if (String(props.children).includes("\n")) {
     // 言語指定なしコードブロック
     return (
-      <StyledSyntaxHighlighter language={undefined}>
+      <StyledSyntaxHighlighter language={langConstants(undefined)}>
         {String(props.children || "").replace(/\n$/, "")}
       </StyledSyntaxHighlighter>
     );

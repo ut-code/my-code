@@ -5,8 +5,7 @@ import "mocha/mocha.css";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useWandbox } from "@my-code/runtime/wandbox/runtime";
 import { RuntimeContext } from "@my-code/runtime/interface";
-import { getAceLang, RuntimeLang } from "@my-code/runtime/languages";
-import { useEmbedContext } from "./embedContext";
+import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
 import { defineTests } from "@my-code/runtime/tests";
 import { usePyodide } from "@my-code/runtime/worker/pyodide";
 import { useRuby } from "@my-code/runtime/worker/ruby";
@@ -130,7 +129,7 @@ function RuntimeSample({
       {config.repl && (
         <ReplTerminal
           terminalId="1"
-          language={lang}
+          language={langConstants(lang)}
           initContent={config.replInitContent}
         />
       )}
@@ -138,18 +137,18 @@ function RuntimeSample({
         Object.entries(config.editor).map(([filename, initContent]) => (
           <EditorComponent
             key={filename}
-            language={getAceLang(lang)}
+            language={langConstants(lang)}
             filename={filename}
             initContent={initContent}
           />
         ))}
       {config.exec && (
-        <ExecFile filenames={config.exec} language={lang} content="" />
+        <ExecFile filenames={config.exec} language={langConstants(lang)} content="" />
       )}
       {config.readonlyFiles?.map((filename) => (
         <EditorComponent
           key={filename}
-          language={getAceLang(lang)}
+          language={langConstants(lang)}
           filename={filename}
           initContent=""
           readonly

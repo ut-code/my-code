@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
-import { AceLang, langConstants } from "@my-code/runtime/languages";
+import { LangConstants } from "@my-code/runtime/languages";
 
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
 const AceEditor = lazy(async () => {
@@ -32,7 +32,7 @@ const AceEditor = lazy(async () => {
 });
 
 interface EditorProps {
-  language?: AceLang;
+  language: LangConstants;
   filename: string;
   initContent: string;
   readonly?: boolean;
@@ -57,6 +57,15 @@ export function EditorComponent(props: EditorProps) {
   }, []);
   // 最小8行 or 初期内容+1行
   const editorHeight = Math.max(props.initContent.split("\n").length + 1, 8);
+
+  if (
+    process.env.NODE_ENV === "development" &&
+    props.language.ace === undefined
+  ) {
+    throw new Error(
+      `language ${props.language.originalLang} does not have ace mode defined!`
+    );
+  }
 
   return (
     <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden">
@@ -108,9 +117,9 @@ export function EditorComponent(props: EditorProps) {
         >
           <AceEditor
             name={`ace-editor-${props.filename}`}
-            mode={props.language}
+            mode={props.language.ace ?? "text"}
             theme={theme}
-            tabSize={langConstants(props.language || "text").tabSize}
+            tabSize={props.language.tabSize ?? 4}
             width="100%"
             height={editorHeight * (fontSize + 1) + "px"}
             className="font-mono!" // Aceのデフォルトフォントを上書き
