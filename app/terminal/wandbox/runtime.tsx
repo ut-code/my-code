@@ -10,7 +10,7 @@ import {
 import useSWR from "swr";
 import { compilerInfoFetcher, SelectedCompiler } from "./api";
 import { cppRunFiles, selectCppCompiler } from "./cpp";
-import { RuntimeContext, RuntimeInfo, RuntimeLang } from "../runtime";
+import { RuntimeContext, RuntimeInfo, RuntimeLang, UpdatedFile } from "../runtime";
 import { ReplOutput } from "../repl";
 import { rustRunFiles, selectRustCompiler } from "./rust";
 
@@ -26,7 +26,7 @@ interface IWandboxContext {
   ) => (
     filenames: string[],
     files: Readonly<Record<string, string>>,
-    onOutput: (output: ReplOutput) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => void
   ) => Promise<void>;
   runtimeInfo: Record<WandboxLang, RuntimeInfo> | undefined,
 }
@@ -70,7 +70,7 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
       async (
         filenames: string[],
         files: Readonly<Record<string, string>>,
-        onOutput: (output: ReplOutput) => void
+        onOutput: (output: ReplOutput | UpdatedFile) => void
       ) => {
         if (!selectedCompiler) {
           onOutput({ type: "error", message: "Wandbox is not ready yet." });
