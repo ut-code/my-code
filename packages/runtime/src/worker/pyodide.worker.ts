@@ -3,7 +3,7 @@
 
 import { expose } from "comlink";
 import type { PyodideInterface } from "pyodide";
-// import { loadPyodide } from "pyodide"; -> Reading from "node:child_process" is not handled by plugins
+import { loadPyodide } from "pyodide";
 import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
 import type { WorkerCapabilities } from "./runtime";
@@ -12,7 +12,6 @@ import type { ReplOutput, UpdatedFile } from "../interface";
 import execfile_py from "./pyodide/execfile.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";
 
-const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`;
 const HOME = `/home/pyodide/`;
 
 let pyodide: PyodideInterface;
@@ -41,10 +40,15 @@ async function init(
   interruptBuffer: Uint8Array
 ): Promise<{ capabilities: WorkerCapabilities }> {
   if (!pyodide) {
-    self.importScripts(`${PYODIDE_CDN}pyodide.js`);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pyodide = await (self as any).loadPyodide({ indexURL: PYODIDE_CDN });
+    try {
+      pyodide = await loadPyodide({
+        indexURL: `${self.location.origin}/_next/static/pyodide/v${pyodideVersion}`,
+      });
+    } catch {
+      pyodide = await loadPyodide({
+        indexURL: `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`,
+      });
+    }
 
     pyodide.setStdout({
       batched: (str: string) =>

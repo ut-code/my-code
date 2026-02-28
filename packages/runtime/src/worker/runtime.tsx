@@ -71,13 +71,13 @@ export function WorkerProvider({
     lang satisfies RuntimeLang;
     switch (lang) {
       case "python":
-        worker = new Worker(new URL("./pyodide.worker.ts", import.meta.url));
+        worker = new Worker(new URL("./pyodide.worker.ts", import.meta.url), { type: 'module' });
         break;
       case "ruby":
-        worker = new Worker(new URL("./ruby.worker.ts", import.meta.url));
+        worker = new Worker(new URL("./ruby.worker.ts", import.meta.url), { type: 'module' });
         break;
       case "javascript":
-        worker = new Worker(new URL("./jsEval.worker.ts", import.meta.url));
+        worker = new Worker(new URL("./jsEval.worker.ts", import.meta.url), { type: 'module' });
         break;
       default:
         lang satisfies never;

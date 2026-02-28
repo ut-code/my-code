@@ -6,6 +6,9 @@
     "./*": "./src/*",
     "./samples/*": "./samples/*"
   },
+  "scripts": {
+    "test": "vitest run"
+  },
   "dependencies": {
     "@ruby/wasm-wasi": "^2.7.2",
     "@typescript/vfs": "^1.6.2",
@@ -15,11 +18,16 @@
     "pyodide": "^0.29.0",
     "react": "^19",
     "react-dom": "^19",
+    "swr": "^2.4.1",
     "typescript": "^5"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
     "@types/object-inspect": "^1.13.0",
     "@types/react": "^19",
-    "@types/react-dom": "^19"
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/browser-webdriverio": "^4.0.18",
+    "vitest": "^4.0.18"
   }
 }
