@@ -1,29 +1,44 @@
 import { expect } from "chai";
 import { RefObject } from "react";
 import { RuntimeLang } from "./languages";
-import { emptyMutex, ReplOutput, RuntimeContext, UpdatedFile } from "./interface";
+import { ReplOutput, RuntimeContext, UpdatedFile } from "./interface";
 
 export function defineTests(
   lang: RuntimeLang,
   runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext>>
 ) {
   describe(`${lang} Runtime`, function () {
-    this.timeout(
-      (
-        {
-          python: 2000,
-          ruby: 5000,
-          cpp: 10000,
-          javascript: 2000,
-        } as Record<RuntimeLang, number>
-      )[lang]
-    );
+    const timeout = (
+      {
+        python: 2000,
+        ruby: 5000,
+        javascript: 2000,
+        typescript: 2000,
+        cpp: 10000,
+        rust: 10000,
+      } as Record<RuntimeLang, number>
+    )[lang];
+
+    if (typeof this !== "undefined" && "timeout" in this) {
+      (this as any).timeout(timeout);
+    }
 
     beforeEach(async function () {
-      this.timeout(60000);
-      while (!runtimeRef.current[lang].ready) {
+      if (typeof this !== "undefined" && "timeout" in this) {
+        (this as any).timeout(60000);
+      }
+      
+      while (true) {
+        const runtime = runtimeRef.current[lang];
+        if (runtime?.ready) {
+          const isLocked = runtime.mutex?.isLocked();
+          if (!isLocked) {
+            break;
+          }
+        }
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
+      await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
     describe("REPL", function () {
@@ -40,7 +55,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
         if (!printCode) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const outputs: ReplOutput[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
@@ -69,7 +87,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, string[] | null[]>
         )[lang];
         if (!setIntVarCode || !printIntVarCode) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const outputs: ReplOutput[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(
@@ -103,7 +124,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
         if (!errorCode) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const outputs: ReplOutput[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
@@ -133,7 +157,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, (string | null)[]>
         )[lang];
         if (!setIntVarCode || !infLoopCode || !printIntVarCode) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const runPromise = (
           runtimeRef.current[lang].mutex || emptyMutex
@@ -146,9 +173,18 @@ export function defineTests(
         runtimeRef.current[lang].interrupt!();
         await new Promise((resolve) => setTimeout(resolve, 100));
         await runPromise;
-        while (!runtimeRef.current[lang].ready) {
+        
+        // Wait for it to become ready again
+        const start = Date.now();
+        while (true) {
+          const runtime = runtimeRef.current[lang];
+          if (runtime?.ready && !runtime.mutex?.isLocked()) {
+            break;
+          }
+          if (Date.now() - start > 30000) break;
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
+
         const outputs: ReplOutput[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
           runtimeRef.current[lang].runCommand!(printIntVarCode, (output) => {
@@ -173,7 +209,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, string | null>
         )[lang];
         if (!writeCode) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const updatedFiles: UpdatedFile[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
@@ -206,7 +245,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
         if (!filename || !code) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const outputs: ReplOutput[] = [];
         await runtimeRef.current[lang].runFiles(
@@ -242,7 +284,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
         if (!filename || !code) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const outputs: ReplOutput[] = [];
         await runtimeRef.current[lang].runFiles(
@@ -305,7 +350,10 @@ export function defineTests(
           >
         )[lang];
         if (!codes || !execFiles) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const outputs: ReplOutput[] = [];
         await runtimeRef.current[lang].runFiles(execFiles, codes, (output) => {
@@ -335,7 +383,10 @@ export function defineTests(
           } satisfies Record<RuntimeLang, [string, string] | [null, null]>
         )[lang];
         if (!filename || !code) {
-          this.skip();
+          if (typeof this !== "undefined" && "skip" in this) {
+            return (this as any).skip();
+          }
+          return;
         }
         const updatedFiles: UpdatedFile[] = [];
         await runtimeRef.current[lang].runFiles(

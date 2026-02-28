@@ -12,7 +12,12 @@ import {
 import { wrap, Remote, proxy } from "comlink";
 import { RuntimeLang } from "../languages";
 import { Mutex, MutexInterface } from "async-mutex";
-import { ReplOutput, RuntimeContext, SyntaxStatus, UpdatedFile } from "../interface";
+import {
+  ReplOutput,
+  RuntimeContext,
+  SyntaxStatus,
+  UpdatedFile,
+} from "../interface";
 
 type WorkerLang = "python" | "ruby" | "javascript";
 export type WorkerCapabilities = {
@@ -71,13 +76,19 @@ export function WorkerProvider({
     lang satisfies RuntimeLang;
     switch (lang) {
       case "python":
-        worker = new Worker(new URL("./pyodide.worker.ts", import.meta.url), { type: 'module' });
+        worker = new Worker(new URL("./pyodide.worker.ts", import.meta.url), {
+          type: "module",
+        });
         break;
       case "ruby":
-        worker = new Worker(new URL("./ruby.worker.ts", import.meta.url), { type: 'module' });
+        worker = new Worker(new URL("./ruby.worker.ts", import.meta.url), {
+          type: "module",
+        });
         break;
       case "javascript":
-        worker = new Worker(new URL("./jsEval.worker.ts", import.meta.url), { type: 'module' });
+        worker = new Worker(new URL("./jsEval.worker.ts", import.meta.url), {
+          type: "module",
+        });
         break;
       default:
         lang satisfies never;
@@ -119,6 +130,11 @@ export function WorkerProvider({
       });
       return () => {
         void mutex.runExclusive(async () => {
+          // Reject all pending promises
+          const error = new Error("Worker terminated");
+          pendingPromises.current.forEach((reject) => reject(error));
+          pendingPromises.current.clear();
+
           workerRef.current?.terminate();
           workerRef.current = null;
           setReady(false);
@@ -167,7 +183,10 @@ export function WorkerProvider({
   }, [initializeWorker, mutex]);
 
   const runCommand = useCallback(
-    async (code: string, onOutput: (output: ReplOutput | UpdatedFile) => void): Promise<void> => {
+    async (
+      code: string,
+      onOutput: (output: ReplOutput | UpdatedFile) => void
+    ): Promise<void> => {
       if (!mutex.isLocked()) {
         throw new Error(`mutex of context must be locked for runCommand`);
       }

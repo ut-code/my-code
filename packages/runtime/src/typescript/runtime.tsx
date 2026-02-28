@@ -14,7 +14,7 @@ import {
 import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
 
 export const compilerOptions: CompilerOptions = {
-  lib: ["ESNext", "WebWorker"],
+  lib: ["ESNext", "WebWorker", "DOM"],
   target: 10 satisfies ScriptTarget.ES2023,
   strict: true,
 };
@@ -165,10 +165,11 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
   );
   return {
     init,
-    ready: tsEnv !== null,
+    ready: tsEnv !== null && jsEval.ready,
     runFiles,
     getCommandlineStr,
     runtimeInfo,
+    mutex: jsEval.mutex,
   };
 }
 

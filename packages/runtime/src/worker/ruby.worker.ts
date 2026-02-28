@@ -10,7 +10,7 @@ import type { ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
 import init_rb from "./ruby/init.rb?raw";
 
 let rubyVM: RubyVM | null = null;
-let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
+let currentOutputCallback: ((output: ReplOutput | UpdatedFile) => void) | null = null;
 let stdoutBuffer = "";
 let stderrBuffer = "";
 

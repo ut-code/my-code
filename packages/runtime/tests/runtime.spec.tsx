@@ -1,17 +1,67 @@
-import { render, waitFor } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { cleanup, render, waitFor } from '@testing-library/react/pure';
+import { describe, beforeAll, afterAll } from 'vitest';
 import { RuntimeProvider, useRuntime } from '../src/context';
 import { RuntimeLang } from '../src/languages';
-import { ReplOutput, RuntimeContext } from '../src/interface';
-import { ReactNode } from 'react';
+import { RuntimeContext } from '../src/interface';
+import { defineTests } from '../src/tests';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 
 const testLangs: RuntimeLang[] = ['python', 'ruby', 'javascript', 'typescript', 'cpp', 'rust'];
 
-const TestComponent = ({ lang, onReady }: { lang: RuntimeLang, onReady: (runtime: RuntimeContext) => void }) => {
-  const runtime = useRuntime(lang);
-  if (runtime.ready) {
-    onReady(runtime);
-  }
+import { usePyodide } from '../src/worker/pyodide';
+import { useRuby } from '../src/worker/ruby';
+import { useJSEval } from '../src/worker/jsEval';
+import { useTypeScript } from '../src/typescript/runtime';
+import { useWandbox } from '../src/wandbox/runtime';
+
+const RuntimeLoader = ({ onReady }: { onReady: (runtimes: Record<RuntimeLang, RuntimeContext>) => void }) => {
+  const pyodide = usePyodide();
+  const ruby = useRuby();
+  const jsEval = useJSEval();
+  const typescript = useTypeScript(jsEval);
+  const wandboxCpp = useWandbox("cpp");
+  const wandboxRust = useWandbox("rust");
+
+  const runtimes = useRef<Record<RuntimeLang, RuntimeContext>>({} as any);
+  runtimes.current = {
+    python: pyodide,
+    ruby: ruby,
+    javascript: jsEval,
+    typescript: typescript,
+    cpp: wandboxCpp,
+    rust: wandboxRust,
+  };
+
+  useEffect(() => {
+    pyodide.init?.();
+    ruby.init?.();
+    jsEval.init?.();
+    typescript.init?.();
+    wandboxCpp.init?.();
+    wandboxRust.init?.();
+  }, [pyodide, ruby, jsEval, typescript, wandboxCpp, wandboxRust]);
+
+  useEffect(() => {
+    if (
+      pyodide.ready &&
+      ruby.ready &&
+      jsEval.ready &&
+      typescript.ready &&
+      wandboxCpp.ready &&
+      wandboxRust.ready
+    ) {
+      onReady(runtimes.current);
+    }
+  }, [
+    pyodide.ready,
+    ruby.ready,
+    jsEval.ready,
+    typescript.ready,
+    wandboxCpp.ready,
+    wandboxRust.ready,
+    onReady,
+  ]);
+
   return null;
 };
 
@@ -19,44 +69,33 @@ const AllProviders = ({ children }: { children: ReactNode }) => {
   return <RuntimeProvider>{children}</RuntimeProvider>;
 };
 
-describe.each(testLangs)('%s Runtime', (lang) => {
-  const defaultTimeout = 30000;
+describe('Runtime Integration Tests', () => {
+  const runtimeRef = { current: {} as Record<RuntimeLang, RuntimeContext> };
+  
+  // Note: Vitest's describe blocks are executed during collection, 
+  // but beforeEach/beforeAll and it blocks are executed during execution.
+  // defineTests defines describe/it blocks, so it must be called during collection.
+  // The runtimeRef.current will be populated by beforeAll before any tests (it blocks) run.
 
-  const printCode = (
-    {
-      python: `print("Hello, World!")`,
-      ruby: `puts "Hello, World!"`,
-      javascript: `console.log("Hello, World!")`,
-    } as Record<string, string>
-  )[lang];
-
-  it.skipIf(!printCode)('should capture stdout in REPL', async () => {
-    let runtimeContext: RuntimeContext | undefined = undefined;
-    const outputs: ReplOutput[] = [];
-
+  beforeAll(async () => {
+    let isDone = false;
     render(
-      <TestComponent
-        lang={lang}
-        onReady={(runtime) => {
-          runtimeContext = runtime;
-        }}
-      />,
-      { wrapper: AllProviders }
+      <AllProviders>
+        <RuntimeLoader onReady={(runtimes) => {
+          runtimeRef.current = runtimes;
+          isDone = true;
+        }} />
+      </AllProviders>
     );
-    
-    await waitFor(() => expect(runtimeContext).toBeDefined(), { timeout: defaultTimeout });
-    if (!runtimeContext) throw new Error("Runtime context not initialized");
+    await waitFor(() => {
+      if (!isDone) throw new Error("Not ready");
+    }, { timeout: 60000 });
+  });
+  afterAll(() => {
+    cleanup();
+  })
 
-    await runtimeContext.mutex.runExclusive(() => 
-      runtimeContext!.runCommand!(printCode, (output: ReplOutput) => {
-        if (output.type !== "file") outputs.push(output);
-      })
-    );
-    
-    expect(outputs).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'stdout', message: "Hello, World!" })
-      ])
-    );
-  }, defaultTimeout);
+  for (const lang of testLangs) {
+    defineTests(lang, runtimeRef);
+  }
 });

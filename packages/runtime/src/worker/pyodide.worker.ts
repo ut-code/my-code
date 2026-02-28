@@ -15,7 +15,7 @@ import check_syntax_py from "./pyodide/check_syntax.py?raw";
 const HOME = `/home/pyodide/`;
 
 let pyodide: PyodideInterface;
-let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
+let currentOutputCallback: ((output: ReplOutput | UpdatedFile) => void) | null = null;
 
 // Helper function to read all files from the Pyodide file system
 function readAllFiles(): Record<string, string> {
