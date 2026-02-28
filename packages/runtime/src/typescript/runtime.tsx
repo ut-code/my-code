@@ -11,9 +11,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useEmbedContext } from "../embedContext";
-import { ReplOutput } from "../repl";
-import { RuntimeContext, RuntimeInfo } from "../interface";
+import { ReplOutput, RuntimeContext, RuntimeInfo } from "../interface";
 
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],

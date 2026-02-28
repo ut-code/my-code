@@ -4,8 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
-import { langConstants } from "./languages";
-import { MarkdownLang } from "@/[lang]/[pageId]/styledSyntaxHighlighter";
+import { AceLang, langConstants } from "@my-code/runtime/languages";
 
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
 const AceEditor = lazy(async () => {
@@ -31,61 +30,6 @@ const AceEditor = lazy(async () => {
     throw new Error("should not try SSR");
   }
 });
-
-// mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
-export type AceLang =
-  | "python"
-  | "ruby"
-  | "c_cpp"
-  | "rust"
-  | "javascript"
-  | "typescript"
-  | "json"
-  | "csv"
-  | "text";
-export function getAceLang(lang: MarkdownLang | undefined): AceLang {
-  // Markdownで指定される可能性のある言語名からAceLangを取得
-  switch (lang) {
-    case "python":
-    case "py":
-      return "python";
-    case "ruby":
-    case "rb":
-      return "ruby";
-    case "cpp":
-    case "c++":
-      return "c_cpp";
-    case "rust":
-    case "rs":
-      return "rust";
-    case "javascript":
-    case "js":
-      return "javascript";
-    case "typescript":
-    case "ts":
-      return "typescript";
-    case "json":
-      return "json";
-    case "csv":
-      return "csv";
-    case "sh":
-    case "bash":
-    case "powershell":
-    case "text":
-    case "txt":
-    case "html":
-    case "toml":
-    case "makefile":
-    case "cmake":
-    case undefined:
-      console.warn(`Ace editor mode not implemented for language: ${lang}`);
-      return "text";
-    default:
-      lang satisfies never;
-      console.error(`getAceLang() does not handle language ${lang}`);
-      return "text";
-  }
-}
 
 interface EditorProps {
   language?: AceLang;

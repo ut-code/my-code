@@ -6,6 +6,7 @@ import {
   tomorrowNight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { lazy, Suspense, useEffect, useState } from "react";
+import { MarkdownLang, SyntaxHighlighterLang } from "@my-code/runtime/languages";
 
 // SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
 const SyntaxHighlighter = lazy(() => {
@@ -16,49 +17,6 @@ const SyntaxHighlighter = lazy(() => {
   }
 });
 
-// Markdownで指定される可能性のある言語名を列挙
-export type MarkdownLang =
-  | "python"
-  | "py"
-  | "ruby"
-  | "rb"
-  | "cpp"
-  | "c++"
-  | "rust"
-  | "rs"
-  | "javascript"
-  | "js"
-  | "typescript"
-  | "ts"
-  | "bash"
-  | "sh"
-  | "powershell"
-  | "json"
-  | "toml"
-  | "csv"
-  | "html"
-  | "makefile"
-  | "cmake"
-  | "text"
-  | "txt";
-
-// react-syntax-highliter (hljs版) が対応している言語
-// https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/AVAILABLE_LANGUAGES_HLJS.MD を参照
-export type SyntaxHighlighterLang =
-  | "python"
-  | "ruby"
-  | "c"
-  | "cpp"
-  | "rust"
-  | "javascript"
-  | "typescript"
-  | "bash"
-  | "powershell"
-  | "html"
-  | "json"
-  | "ini"
-  | "makefile"
-  | "cmake";
 export function getSyntaxHighlighterLang(
   lang: MarkdownLang | undefined
 ): SyntaxHighlighterLang | undefined {

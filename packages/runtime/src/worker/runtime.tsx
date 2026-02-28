@@ -11,10 +11,8 @@ import {
 } from "react";
 import { wrap, Remote, proxy } from "comlink";
 import { RuntimeLang } from "../languages";
-import { ReplOutput, SyntaxStatus } from "../repl";
 import { Mutex, MutexInterface } from "async-mutex";
-import { useEmbedContext } from "../embedContext";
-import { RuntimeContext } from "../interface";
+import { ReplOutput, RuntimeContext, SyntaxStatus } from "../interface";
 
 type WorkerLang = "python" | "ruby" | "javascript";
 export type WorkerCapabilities = {

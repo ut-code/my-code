@@ -1,5 +1,4 @@
 import { MutexInterface } from "async-mutex";
-import { ReplCommand, ReplOutput, SyntaxStatus } from "./repl";
 
 /**
  * Common runtime context interface for different languages
@@ -38,6 +37,24 @@ export interface LangConstants {
   promptMore?: string;
   returnPrefix?: string;
 }
+
+export type ReplOutputType =
+  | "stdout"
+  | "stderr"
+  | "error"
+  | "return"
+  | "trace"
+  | "system";
+export interface ReplOutput {
+  type: ReplOutputType; // 出力の種類
+  message: string; // 出力メッセージ
+}
+export interface ReplCommand {
+  command: string;
+  output: ReplOutput[];
+  commandId?: string; // Optional for backward compatibility
+}
+export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
 export const emptyMutex: MutexInterface = {
   async runExclusive<T>(fn: () => Promise<T> | T) {

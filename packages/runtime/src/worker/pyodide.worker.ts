@@ -7,7 +7,7 @@ import type { PyodideInterface } from "pyodide";
 import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
 import type { WorkerCapabilities } from "./runtime";
-import type { ReplOutput } from "../repl";
+import type { ReplOutput } from "../interface";
 
 import execfile_py from "./pyodide/execfile.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";

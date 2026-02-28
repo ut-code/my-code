@@ -5,7 +5,7 @@ import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { WorkerCapabilities } from "./runtime";
-import type { ReplOutput, ReplOutputType } from "../repl";
+import type { ReplOutput, ReplOutputType } from "../interface";
 
 import init_rb from "./ruby/init.rb?raw";
 

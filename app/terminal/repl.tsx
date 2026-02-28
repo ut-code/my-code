@@ -14,29 +14,12 @@ import {
 } from "./terminal";
 import type { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
-import { langConstants, RuntimeLang } from "./languages";
+import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
 import clsx from "clsx";
 import { InlineCode } from "@/[lang]/[pageId]/markdown";
-import { emptyMutex } from "./interface";
-import { useRuntime } from "./context";
+import { emptyMutex, ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import { useRuntime } from "@my-code/runtime/context";
 
-export type ReplOutputType =
-  | "stdout"
-  | "stderr"
-  | "error"
-  | "return"
-  | "trace"
-  | "system";
-export interface ReplOutput {
-  type: ReplOutputType; // 出力の種類
-  message: string; // 出力メッセージ
-}
-export interface ReplCommand {
-  command: string;
-  output: ReplOutput[];
-  commandId?: string; // Optional for backward compatibility
-}
-export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
 export function writeOutput(
   term: Terminal,

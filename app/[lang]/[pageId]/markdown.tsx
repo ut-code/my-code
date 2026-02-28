@@ -2,14 +2,13 @@ import Markdown, { Components, ExtraProps } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import removeComments from "remark-remove-comments";
 import remarkCjkFriendly from "remark-cjk-friendly";
-import { EditorComponent, getAceLang } from "@my-code/runtime/editor";
-import { ExecFile } from "@my-code/runtime/exec";
+import { EditorComponent } from "@/terminal/editor";
+import { ExecFile } from "@/terminal/exec";
 import { JSX, ReactNode } from "react";
-import { getRuntimeLang } from "@my-code/runtime/languages";
-import { ReplTerminal } from "@my-code/runtime/repl";
+import { getAceLang, getRuntimeLang, MarkdownLang } from "@my-code/runtime/languages";
+import { ReplTerminal } from "@/terminal/repl";
 import {
   getSyntaxHighlighterLang,
-  MarkdownLang,
   StyledSyntaxHighlighter,
 } from "./styledSyntaxHighlighter";
 

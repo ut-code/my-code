@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { expose } from "comlink";
-import type { ReplOutput } from "../repl";
+import type { ReplOutput } from "../interface";
 import type { WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
 import { replLikeEval, checkSyntax } from "@my-code/js-eval";

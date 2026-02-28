@@ -11,9 +11,8 @@ import useSWR from "swr";
 import { compilerInfoFetcher, SelectedCompiler } from "./api";
 import { cppRunFiles, selectCppCompiler } from "./cpp";
 import { RuntimeLang } from "../languages";
-import { ReplOutput } from "../repl";
 import { rustRunFiles, selectRustCompiler } from "./rust";
-import { RuntimeContext, RuntimeInfo } from "../interface";
+import { ReplOutput, RuntimeContext, RuntimeInfo } from "../interface";
 
 type WandboxLang = "cpp" | "rust";
 

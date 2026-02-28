@@ -10,9 +10,9 @@ import {
 import { writeOutput } from "./repl";
 import { useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
-import { RuntimeLang } from "./languages";
 import clsx from "clsx";
-import { useRuntime } from "./context";
+import { RuntimeLang } from "@my-code/runtime/languages";
+import { useRuntime } from "@my-code/runtime/context";
 
 interface ExecProps {
   /*
