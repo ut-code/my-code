@@ -221,10 +221,6 @@ function MochaTest() {
   const [mochaState, setMochaState] = useState<"idle" | "running" | "finished">(
     "idle"
   );
-  const { files } = useEmbedContext();
-  const filesRef = useRef(files);
-  filesRef.current = files;
-
   const runTest = async () => {
     if (typeof window !== "undefined") {
       setMochaState("running");
@@ -235,7 +231,7 @@ function MochaTest() {
 
       for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
         runtimeRef.current[lang].init?.();
-        defineTests(lang, runtimeRef, filesRef);
+        defineTests(lang, runtimeRef);
       }
 
       const runner = mocha.run();

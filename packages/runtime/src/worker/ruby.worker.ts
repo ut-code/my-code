@@ -5,7 +5,7 @@ import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { WorkerCapabilities } from "./runtime";
-import type { ReplOutput, ReplOutputType } from "../interface";
+import type { ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
 
 import init_rb from "./ruby/init.rb?raw";
 
@@ -103,10 +103,8 @@ function formatRubyError(error: unknown, isFile: boolean): string {
 
 async function runCode(
   code: string,
-  onOutput: (output: ReplOutput) => void
-): Promise<{
-  updatedFiles: Record<string, string>;
-}> {
+  onOutput: (output: ReplOutput | UpdatedFile) => void
+): Promise<void> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
   }
@@ -141,15 +139,16 @@ async function runCode(
   }
 
   const updatedFiles = readAllFiles();
-
-  return { updatedFiles };
+  for (const [filename, content] of Object.entries(updatedFiles)) {
+    onOutput({ type: "file", filename, content });
+  }
 }
 
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput) => void
-): Promise<{ updatedFiles: Record<string, string> }> {
+  onOutput: (output: ReplOutput | UpdatedFile) => void
+): Promise<void> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
   }
@@ -191,8 +190,9 @@ async function runFile(
   }
 
   const updatedFiles = readAllFiles();
-
-  return { updatedFiles };
+  for (const [filename, content] of Object.entries(updatedFiles)) {
+    onOutput({ type: "file", filename, content });
+  }
 }
 
 async function checkSyntax(

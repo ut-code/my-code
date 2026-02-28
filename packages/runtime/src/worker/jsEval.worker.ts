@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { expose } from "comlink";
-import type { ReplOutput } from "../interface";
+import type { ReplOutput, UpdatedFile } from "../interface";
 import type { WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
 import { replLikeEval, checkSyntax } from "@my-code/js-eval";
@@ -37,10 +37,8 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
 
 async function runCode(
   code: string,
-  onOutput: (output: ReplOutput) => void
-): Promise<{
-  updatedFiles: Record<string, string>;
-}> {
+  onOutput: (output: ReplOutput | UpdatedFile) => void
+): Promise<void> {
   currentOutputCallback = onOutput;
   try {
     const result = await replLikeEval(code);
@@ -63,15 +61,13 @@ async function runCode(
       });
     }
   }
-
-  return { updatedFiles: {} as Record<string, string> };
 }
 
 function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput) => void
-): { updatedFiles: Record<string, string> } {
+  onOutput: (output: ReplOutput | UpdatedFile) => void
+): void {
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
   currentOutputCallback = onOutput;
   try {
@@ -91,8 +87,6 @@ function runFile(
       });
     }
   }
-
-  return { updatedFiles: {} as Record<string, string> };
 }
 
 async function restoreState(commands: string[]): Promise<object> {

@@ -33,7 +33,7 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const { files, clearExecResult, addExecOutput } = useEmbedContext();
+  const { files, clearExecResult, addExecOutput, writeFile } = useEmbedContext();
 
   const { ready, runFiles, getCommandlineStr, runtimeInfo, interrupt } =
     useRuntime(props.language);
@@ -53,6 +53,10 @@ export function ExecFile(props: ExecProps) {
         clearExecResult(filenameKey);
         let isFirstOutput = true;
         await runFiles(props.filenames, files, (output) => {
+          if (output.type === "file") {
+            writeFile({ [output.filename]: output.content });
+            return;
+          }
           addExecOutput(filenameKey, output);
           if (isFirstOutput) {
             // Clear "実行中です..." message only on first output
@@ -78,6 +82,7 @@ export function ExecFile(props: ExecProps) {
     runFiles,
     clearExecResult,
     addExecOutput,
+    writeFile,
     terminalInstanceRef,
     props.language,
     files,

@@ -11,7 +11,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { ReplOutput, RuntimeContext, RuntimeInfo } from "../interface";
+import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
 
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],
@@ -91,12 +91,11 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
     jsInit?.();
   }, [tsInit, jsInit]);
 
-  const { writeFile } = useEmbedContext();
   const runFiles = useCallback(
     async (
       filenames: string[],
       files: Readonly<Record<string, string>>,
-      onOutput: (output: ReplOutput) => void
+      onOutput: (output: ReplOutput | UpdatedFile) => void
     ) => {
       if (tsEnv === null || typeof window === "undefined") {
         onOutput({ type: "error", message: "TypeScript is not ready yet." });
@@ -135,25 +134,26 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
         }
 
         const emitOutput = tsEnv.languageService.getEmitOutput(filenames[0]);
-        files = await writeFile(
-          Object.fromEntries(
-            emitOutput.outputFiles.map((of) => [of.name, of.text])
-          )
+        const emittedFiles: Record<string, string> = Object.fromEntries(
+          emitOutput.outputFiles.map((of) => [of.name, of.text])
         );
+        for (const [filename, content] of Object.entries(emittedFiles)) {
+          onOutput({ type: "file", filename, content });
+        }
 
-        for (const filename of Object.keys(files)) {
+        for (const filename of Object.keys(emittedFiles)) {
           tsEnv.deleteFile(filename);
         }
 
         console.log(emitOutput);
         await jsEval.runFiles(
           [emitOutput.outputFiles[0].name],
-          files,
+          { ...files, ...emittedFiles },
           onOutput
         );
       }
     },
-    [tsEnv, writeFile, jsEval]
+    [tsEnv, jsEval]
   );
 
   const runtimeInfo = useMemo<RuntimeInfo>(

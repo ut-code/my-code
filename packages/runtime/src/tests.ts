@@ -1,12 +1,11 @@
 import { expect } from "chai";
 import { RefObject } from "react";
 import { RuntimeLang } from "./languages";
-import { emptyMutex, ReplOutput, RuntimeContext } from "./interface";
+import { emptyMutex, ReplOutput, RuntimeContext, UpdatedFile } from "./interface";
 
 export function defineTests(
   lang: RuntimeLang,
-  runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext>>,
-  filesRef: RefObject<Readonly<Record<string, string>>>
+  runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext>>
 ) {
   describe(`${lang} Runtime`, function () {
     this.timeout(
@@ -46,7 +45,7 @@ export function defineTests(
         const outputs: ReplOutput[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
           runtimeRef.current[lang].runCommand!(printCode, (output) => {
-            outputs.push(output);
+            if (output.type !== "file") outputs.push(output);
           })
         );
         console.log(`${lang} REPL stdout test: `, outputs);
@@ -79,7 +78,7 @@ export function defineTests(
             await runtimeRef.current[lang].runCommand!(
               printIntVarCode,
               (output) => {
-                outputs.push(output);
+                if (output.type !== "file") outputs.push(output);
               }
             );
           }
@@ -109,7 +108,7 @@ export function defineTests(
         const outputs: ReplOutput[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
           runtimeRef.current[lang].runCommand!(errorCode, (output) => {
-            outputs.push(output);
+            if (output.type !== "file") outputs.push(output);
           })
         );
         console.log(`${lang} REPL error capture test: `, outputs);
@@ -153,7 +152,7 @@ export function defineTests(
         const outputs: ReplOutput[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
           runtimeRef.current[lang].runCommand!(printIntVarCode, (output) => {
-            outputs.push(output);
+            if (output.type !== "file") outputs.push(output);
           })
         );
         console.log(`${lang} REPL interrupt recovery test: `, outputs);
@@ -176,12 +175,17 @@ export function defineTests(
         if (!writeCode) {
           this.skip();
         }
+        const updatedFiles: UpdatedFile[] = [];
         await (runtimeRef.current[lang].mutex || emptyMutex).runExclusive(() =>
-          runtimeRef.current[lang].runCommand!(writeCode, () => {})
+          runtimeRef.current[lang].runCommand!(writeCode, (output) => {
+            if (output.type === "file") {
+              updatedFiles.push(output);
+            }
+          })
         );
-        // wait for files to be updated
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        expect(filesRef.current[targetFile]).to.equal(msg);
+        expect(
+          updatedFiles.find((f) => f.filename === targetFile)?.content
+        ).to.equal(msg);
       });
     });
 
@@ -211,7 +215,7 @@ export function defineTests(
             [filename]: code,
           },
           (output) => {
-            outputs.push(output);
+            if (output.type !== "file") outputs.push(output);
           }
         );
         console.log(`${lang} single file stdout test: `, outputs);
@@ -247,7 +251,7 @@ export function defineTests(
             [filename]: code,
           },
           (output) => {
-            outputs.push(output);
+            if (output.type !== "file") outputs.push(output);
           }
         );
         console.log(`${lang} single file error capture test: `, outputs);
@@ -305,7 +309,7 @@ export function defineTests(
         }
         const outputs: ReplOutput[] = [];
         await runtimeRef.current[lang].runFiles(execFiles, codes, (output) => {
-          outputs.push(output);
+          if (output.type !== "file") outputs.push(output);
         });
         console.log(`${lang} multifile stdout test: `, outputs);
         expect(outputs).to.be.deep.include({ type: "stdout", message: msg });
@@ -333,16 +337,21 @@ export function defineTests(
         if (!filename || !code) {
           this.skip();
         }
+        const updatedFiles: UpdatedFile[] = [];
         await runtimeRef.current[lang].runFiles(
           [filename],
           {
             [filename]: code,
           },
-          () => {}
+          (output) => {
+            if (output.type === "file") {
+              updatedFiles.push(output);
+            }
+          }
         );
-        // wait for files to be updated
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        expect(filesRef.current[targetFile]).to.equal(msg);
+        expect(
+          updatedFiles.find((f) => f.filename === targetFile)?.content
+        ).to.equal(msg);
       });
     });
   });

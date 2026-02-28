@@ -67,7 +67,7 @@ export function ReplTerminal({
   language,
   initContent,
 }: ReplComponentProps) {
-  const { addReplCommand, addReplOutput } = useEmbedContext();
+  const { addReplCommand, addReplOutput, writeFile } = useEmbedContext();
 
   const [Prism, setPrism] = useState<typeof import("prismjs") | null>(null);
   useEffect(() => {
@@ -214,6 +214,10 @@ export function ReplTerminal({
               let executionDone = false;
               await runtimeMutex.runExclusive(async () => {
                 await runCommand(command, (output) => {
+                  if (output.type === "file") {
+                    writeFile({ [output.filename]: output.content });
+                    return;
+                  }
                   if (executionDone) {
                     // すでに完了していて次のコマンドのプロンプトが出ている場合、その前に挿入
                     updateBuffer(null, () => {
@@ -270,6 +274,7 @@ export function ReplTerminal({
       runtimeMutex,
       runCommand,
       handleOutput,
+      writeFile,
       tabSize,
       addReplCommand,
       addReplOutput,
@@ -331,6 +336,10 @@ export function ReplTerminal({
             for (const cmd of initCommand!) {
               const outputs: ReplOutput[] = [];
               await runCommand(cmd.command, (output) => {
+                if (output.type === "file") {
+                  writeFile({ [output.filename]: output.content });
+                  return;
+                }
                 outputs.push(output);
               });
               initCommandResult.push({
@@ -365,6 +374,7 @@ export function ReplTerminal({
     runtimeMutex,
     updateBuffer,
     handleOutput,
+    writeFile,
     termReady,
     terminalInstanceRef,
     Prism,

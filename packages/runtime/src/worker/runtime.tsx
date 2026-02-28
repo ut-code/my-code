@@ -12,7 +12,7 @@ import {
 import { wrap, Remote, proxy } from "comlink";
 import { RuntimeLang } from "../languages";
 import { Mutex, MutexInterface } from "async-mutex";
-import { ReplOutput, RuntimeContext, SyntaxStatus } from "../interface";
+import { ReplOutput, RuntimeContext, SyntaxStatus, UpdatedFile } from "../interface";
 
 type WorkerLang = "python" | "ruby" | "javascript";
 export type WorkerCapabilities = {
@@ -26,13 +26,13 @@ export interface WorkerAPI {
   ): Promise<{ capabilities: WorkerCapabilities }>;
   runCode(
     code: string,
-    onOutput: (output: ReplOutput) => void
-  ): Promise<{ updatedFiles: Record<string, string> }>;
+    onOutput: (output: ReplOutput | UpdatedFile) => void
+  ): Promise<void>;
   runFile(
     name: string,
     files: Record<string, string>,
-    onOutput: (output: ReplOutput) => void
-  ): Promise<{ updatedFiles: Record<string, string> }>;
+    onOutput: (output: ReplOutput | UpdatedFile) => void
+  ): Promise<void>;
   checkSyntax(code: string): Promise<{ status: SyntaxStatus }>;
   restoreState(commands: string[]): Promise<object>;
 }
@@ -50,9 +50,8 @@ export function WorkerProvider({
   const workerApiRef = useRef<Remote<WorkerAPI> | null>(null);
   const [ready, setReady] = useState<boolean>(false);
   const mutex = useMemo<MutexInterface>(() => new Mutex(), []);
-  const { writeFile } = useEmbedContext();
-
-  // Worker-specific state
+  const [doInit, setDoInit] = useState(false);
+  const init = useCallback(() => setDoInit(true), []);
   const interruptBuffer = useRef<Uint8Array | null>(null);
   const capabilities = useRef<WorkerCapabilities | null>(null);
   const commandHistory = useRef<string[]>([]);
@@ -96,9 +95,6 @@ export function WorkerProvider({
     const payload = await workerApi.init(interruptBuffer.current);
     capabilities.current = payload.capabilities;
   }, [lang, mutex]);
-
-  const [doInit, setDoInit] = useState(false);
-  const init = useCallback(() => setDoInit(true), []);
 
   // Helper function to wrap worker API calls and track pending promises
   // This ensures promises are rejected when the worker is terminated
@@ -171,7 +167,7 @@ export function WorkerProvider({
   }, [initializeWorker, mutex]);
 
   const runCommand = useCallback(
-    async (code: string, onOutput: (output: ReplOutput) => void): Promise<void> => {
+    async (code: string, onOutput: (output: ReplOutput | UpdatedFile) => void): Promise<void> => {
       if (!mutex.isLocked()) {
         throw new Error(`mutex of context must be locked for runCommand`);
       }
@@ -192,17 +188,17 @@ export function WorkerProvider({
 
       try {
         const output: ReplOutput[] = [];
-        const { updatedFiles } = await trackPromise(
+        await trackPromise(
           workerApiRef.current.runCode(
             code,
-            proxy((item: ReplOutput) => {
-              output.push(item);
+            proxy((item: ReplOutput | UpdatedFile) => {
+              if (item.type !== "file") {
+                output.push(item);
+              }
               onOutput(item);
             })
           )
         );
-
-        writeFile(updatedFiles);
 
         // Save command to history if interrupt method is 'restart'
         if (capabilities.current?.interrupt === "restart") {
@@ -219,7 +215,7 @@ export function WorkerProvider({
         }
       }
     },
-    [ready, writeFile, mutex, trackPromise]
+    [ready, mutex, trackPromise]
   );
 
   const checkSyntax = useCallback(
@@ -237,7 +233,7 @@ export function WorkerProvider({
     async (
       filenames: string[],
       files: Readonly<Record<string, string>>,
-      onOutput: (output: ReplOutput) => void
+      onOutput: (output: ReplOutput | UpdatedFile) => void
     ): Promise<void> => {
       if (filenames.length !== 1) {
         onOutput({
@@ -260,19 +256,18 @@ export function WorkerProvider({
         interruptBuffer.current[0] = 0;
       }
       return mutex.runExclusive(async () => {
-        const { updatedFiles } = await trackPromise(
+        await trackPromise(
           workerApiRef.current!.runFile(
             filenames[0],
             files,
-            proxy((item: ReplOutput) => {
+            proxy((item: ReplOutput | UpdatedFile) => {
               onOutput(item);
             })
           )
         );
-        writeFile(updatedFiles);
       });
     },
-    [ready, writeFile, mutex, trackPromise]
+    [ready, mutex, trackPromise]
   );
 
   return (
