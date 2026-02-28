@@ -8,6 +8,7 @@ import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
 import type { WorkerCapabilities } from "./runtime";
 import type { ReplOutput } from "../repl";
+import type { UpdatedFile } from "../runtime";
 
 import execfile_py from "./pyodide/execfile.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";
@@ -62,10 +63,8 @@ async function init(
 
 async function runCode(
   code: string,
-  onOutput: (output: ReplOutput) => void
-): Promise<{
-  updatedFiles: Record<string, string>;
-}> {
+  onOutput: (output: ReplOutput | UpdatedFile) => void
+): Promise<void> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
   }
@@ -110,15 +109,16 @@ async function runCode(
   }
 
   const updatedFiles = readAllFiles();
-
-  return { updatedFiles };
+  for (const [filename, content] of Object.entries(updatedFiles)) {
+    onOutput({ type: "file", filename, content });
+  }
 }
 
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput) => void
-): Promise<{ updatedFiles: Record<string, string> }> {
+  onOutput: (output: ReplOutput | UpdatedFile) => void
+): Promise<void> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
   }
@@ -166,7 +166,9 @@ async function runFile(
   }
 
   const updatedFiles = readAllFiles();
-  return { updatedFiles };
+  for (const [filename, content] of Object.entries(updatedFiles)) {
+    onOutput({ type: "file", filename, content });
+  }
 }
 
 async function checkSyntax(

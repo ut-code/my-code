@@ -12,6 +12,12 @@ import { WorkerProvider } from "./worker/runtime";
 import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
 import { MarkdownLang } from "@/[lang]/[pageId]/styledSyntaxHighlighter";
 
+export interface UpdatedFile {
+  type: "file";
+  filename: string;
+  content: string;
+}
+
 /**
  * Common runtime context interface for different languages
  *
@@ -26,7 +32,7 @@ export interface RuntimeContext {
   // repl
   runCommand?: (
     command: string,
-    onOutput: (output: ReplOutput) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => void
   ) => Promise<void>;
   checkSyntax?: (code: string) => Promise<SyntaxStatus>;
   splitReplExamples?: (content: string) => ReplCommand[];
@@ -34,7 +40,7 @@ export interface RuntimeContext {
   runFiles: (
     filenames: string[],
     files: Readonly<Record<string, string>>,
-    onOutput: (output: ReplOutput) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => void
   ) => Promise<void>;
   getCommandlineStr?: (filenames: string[]) => string;
   runtimeInfo?: RuntimeInfo;
