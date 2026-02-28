@@ -23,7 +23,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    include: ['tests/**/*.spec.tsx'],
+    include: ['tests/vitest-all.tsx'],
     browser: {
       enabled: true,
       provider: webdriverio(),

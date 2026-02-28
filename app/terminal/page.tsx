@@ -6,7 +6,6 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useWandbox } from "@my-code/runtime/wandbox/runtime";
 import { RuntimeContext } from "@my-code/runtime/interface";
 import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
-import { defineTests } from "@my-code/runtime/tests";
 import { usePyodide } from "@my-code/runtime/worker/pyodide";
 import { useRuby } from "@my-code/runtime/worker/ruby";
 import { useJSEval } from "@my-code/runtime/worker/jsEval";
@@ -25,6 +24,12 @@ import sub_h from "@my-code/runtime/samples/sub.h?raw";
 import sub_cpp from "@my-code/runtime/samples/sub.cpp?raw";
 import main2_rs from "@my-code/runtime/samples/main2.rs?raw";
 import sub_rs from "@my-code/runtime/samples/sub.rs?raw";
+import {
+  RUNTIME_TIMEOUTS,
+  waitForRuntimeReady,
+} from "@my-code/runtime/tests/utils";
+import { replTests } from "@my-code/runtime/tests/repl";
+import { fileExecutionTests } from "@my-code/runtime/tests/fileExecution";
 
 export default function RuntimeTestPage() {
   return (
@@ -143,7 +148,11 @@ function RuntimeSample({
           />
         ))}
       {config.exec && (
-        <ExecFile filenames={config.exec} language={langConstants(lang)} content="" />
+        <ExecFile
+          filenames={config.exec}
+          language={langConstants(lang)}
+          content=""
+        />
       )}
       {config.readonlyFiles?.map((filename) => (
         <EditorComponent
@@ -230,7 +239,39 @@ function MochaTest() {
 
       for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
         runtimeRef.current[lang].init?.();
-        defineTests(lang, runtimeRef);
+
+        describe(`${lang} Runtime`, function () {
+          this.timeout(RUNTIME_TIMEOUTS[lang]);
+
+          beforeEach(async function () {
+            this.timeout(60000);
+            await waitForRuntimeReady(lang, runtimeRef);
+          });
+
+          describe("REPL", function () {
+            for (const [name, generator] of Object.entries(replTests)) {
+              const body = generator(lang);
+              if (body) {
+                it(name, async () => body(runtimeRef));
+              } else {
+                it.skip(name);
+              }
+            }
+          });
+
+          describe("File Execution", function () {
+            for (const [name, generator] of Object.entries(
+              fileExecutionTests
+            )) {
+              const body = generator(lang);
+              if (body) {
+                it(name, async () => body(runtimeRef));
+              } else {
+                it.skip(name);
+              }
+            }
+          });
+        });
       }
 
       const runner = mocha.run();

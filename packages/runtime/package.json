@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     "./*": "./src/*",
-    "./samples/*": "./samples/*"
+    "./samples/*": "./samples/*",
+    "./tests/*": "./tests/*"
   },
   "scripts": {
     "test": "vitest run"
