@@ -32,4 +32,13 @@ export default defineConfig({
       ],
     },
   },
+  optimizeDeps: {
+    include: [
+      "typescript",
+      "@typescript/vfs",
+      "pyodide",
+      "@ruby/wasm-wasi",
+      "object-inspect",
+    ],
+  },
 });
