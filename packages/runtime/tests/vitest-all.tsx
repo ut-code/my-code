@@ -3,7 +3,7 @@ import { describe, beforeAll, afterAll, it, beforeEach } from "vitest";
 import { RuntimeProvider } from "../src/context";
 import { RuntimeLang } from "../src/languages";
 import { RuntimeContext } from "../src/interface";
-import { useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 
 import { usePyodide } from "../src/worker/pyodide";
 import { useRuby } from "../src/worker/ruby";
@@ -15,9 +15,9 @@ import { replTests } from "./repl";
 import { fileExecutionTests } from "./fileExecution";
 
 const RuntimeLoader = ({
-  onReady,
+  runtimeRef,
 }: {
-  onReady: (runtimes: Record<RuntimeLang, RuntimeContext>) => void;
+  runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext> | null>;
 }) => {
   const pyodide = usePyodide();
   const ruby = useRuby();
@@ -26,8 +26,7 @@ const RuntimeLoader = ({
   const wandboxCpp = useWandbox("cpp");
   const wandboxRust = useWandbox("rust");
 
-  const runtimes = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
-  runtimes.current = {
+  runtimeRef.current = {
     python: pyodide,
     ruby: ruby,
     javascript: jsEval,
@@ -36,55 +35,26 @@ const RuntimeLoader = ({
     rust: wandboxRust,
   };
 
-  useEffect(() => {
-    pyodide.init?.();
-    ruby.init?.();
-    jsEval.init?.();
-    typescript.init?.();
-    wandboxCpp.init?.();
-    wandboxRust.init?.();
-  }, [pyodide, ruby, jsEval, typescript, wandboxCpp, wandboxRust]);
-
-  useEffect(() => {
-    if (
-      pyodide.ready &&
-      ruby.ready &&
-      jsEval.ready &&
-      typescript.ready &&
-      wandboxCpp.ready &&
-      wandboxRust.ready
-    ) {
-      onReady(runtimes.current);
-    }
-  }, [
-    pyodide.ready,
-    ruby.ready,
-    jsEval.ready,
-    typescript.ready,
-    wandboxCpp.ready,
-    wandboxRust.ready,
-    onReady,
-  ]);
-
   return null;
 };
 
 describe("Runtime Integration Tests", () => {
-  const runtimeRef = { current: {} as Record<RuntimeLang, RuntimeContext> };
+  const runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext> | null> = {
+    current: null,
+  };
 
-  // Note: Vitest's describe blocks are executed during collection,
-  // but beforeEach/beforeAll and it blocks are executed during execution.
-  // describe/it blocks must be called during collection.
-  // The runtimeRef.current will be populated by beforeAll before any tests (it blocks) run.
-
+  // beforeAll/afterAll にすると、runtimeの初期化が全体で1回
+  // beforeEach/afterEach にすると、test1つごとに再初期化する。(遅い)
+  // どちらでもテストは動くが、
+  // 実際のアプリではruntimeの初期化はページ読み込み時の1回のみで、
+  // ページ移動等で再初期化されることは絶対にないので、
+  // 普段beforeEachでテストする意味はない
+  // デバッグ時にはeachに変えてvitestを動かすのもあり
   beforeAll(async () => {
+    runtimeRef.current = null;
     render(
       <RuntimeProvider>
-        <RuntimeLoader
-          onReady={(runtimes) => {
-            runtimeRef.current = runtimes;
-          }}
-        />
+        <RuntimeLoader runtimeRef={runtimeRef} />
       </RuntimeProvider>
     );
   });
@@ -105,7 +75,9 @@ describe("Runtime Integration Tests", () => {
             it(
               name,
               async () => {
-                await body(runtimeRef);
+                await body(
+                  runtimeRef as RefObject<Record<RuntimeLang, RuntimeContext>>
+                );
               },
               RUNTIME_TIMEOUTS[lang]
             );
@@ -122,7 +94,7 @@ describe("Runtime Integration Tests", () => {
             it(
               name,
               async () => {
-                await body(runtimeRef);
+                await body(runtimeRef as RefObject<Record<RuntimeLang, RuntimeContext>>);
               },
               RUNTIME_TIMEOUTS[lang]
             );

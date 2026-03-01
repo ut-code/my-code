@@ -13,14 +13,18 @@ export const RUNTIME_TIMEOUTS: Record<RuntimeLang, number> = {
 
 export async function waitForRuntimeReady(
   lang: RuntimeLang,
-  runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext>>
+  runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext> | null>
 ) {
   while (true) {
-    const runtime = runtimeRef.current![lang];
-    if (runtime?.ready) {
-      const isLocked = runtime.mutex?.isLocked();
-      if (!isLocked) {
-        break;
+    if (runtimeRef.current) {
+      const runtime = runtimeRef.current[lang];
+      if (runtime.ready) {
+        const isLocked = runtime.mutex?.isLocked();
+        if (!isLocked) {
+          break;
+        }
+      }else{
+        runtime.init?.();
       }
     }
     await new Promise((resolve) => setTimeout(resolve, 100));

@@ -25,18 +25,19 @@ export type WorkerCapabilities = {
 };
 
 // Define the worker API interface
+// comlinkを通すと関数は双方向とも必ずasyncになる。asyncでない関数を渡すとややこしいので、最初からすべてasyncで定義しておく
 export interface WorkerAPI {
   init(
     interruptBuffer: Uint8Array
   ): Promise<{ capabilities: WorkerCapabilities }>;
   runCode(
     code: string,
-    onOutput: (output: ReplOutput | UpdatedFile) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
   ): Promise<void>;
   runFile(
     name: string,
     files: Record<string, string>,
-    onOutput: (output: ReplOutput | UpdatedFile) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
   ): Promise<void>;
   checkSyntax(code: string): Promise<{ status: SyntaxStatus }>;
   restoreState(commands: string[]): Promise<object>;
@@ -210,7 +211,7 @@ export function WorkerProvider({
         await trackPromise(
           workerApiRef.current.runCode(
             code,
-            proxy((item: ReplOutput | UpdatedFile) => {
+            proxy(async (item: ReplOutput | UpdatedFile) => {
               if (item.type !== "file") {
                 output.push(item);
               }
@@ -279,7 +280,7 @@ export function WorkerProvider({
           workerApiRef.current!.runFile(
             filenames[0],
             files,
-            proxy((item: ReplOutput | UpdatedFile) => {
+            proxy(async (item: ReplOutput | UpdatedFile) => {
               onOutput(item);
             })
           )
