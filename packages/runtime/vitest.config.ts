@@ -36,6 +36,8 @@ export default defineConfig({
       "@typescript/vfs",
       "pyodide",
       "@ruby/wasm-wasi",
+      "@ruby/wasm-wasi/dist/browser",
+      "@ruby/wasm-wasi/dist/vm",
       "object-inspect",
     ],
   },
