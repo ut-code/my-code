@@ -14,7 +14,7 @@ import {
 import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
 
 export const compilerOptions: CompilerOptions = {
-  lib: ["ESNext", "WebWorker", "DOM"],
+  lib: ["ESNext", "WebWorker"],
   target: 10 satisfies ScriptTarget.ES2023,
   strict: true,
 };
