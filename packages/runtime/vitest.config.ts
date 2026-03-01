@@ -1,12 +1,12 @@
-import { defineConfig } from 'vitest/config';
-import path from 'path';
-import react from '@vitejs/plugin-react';
-import { webdriverio } from '@vitest/browser-webdriverio';
+import { defineConfig } from "vitest/config";
+import path from "path";
+import react from "@vitejs/plugin-react";
+import { webdriverio } from "@vitest/browser-webdriverio";
 
 export default defineConfig({
   resolve: {
     alias: {
-      '@my-code/js-eval': path.resolve(__dirname, '../jsEval/src'),
+      "@my-code/js-eval": path.resolve(__dirname, "../jsEval/src"),
     },
   },
   plugins: [
@@ -17,19 +17,17 @@ export default defineConfig({
   ],
   server: {
     headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp",
     },
   },
   test: {
     globals: true,
-    include: ['tests/vitest-all.tsx'],
+    include: ["tests/vitest-all.tsx"],
     browser: {
       enabled: true,
       provider: webdriverio(),
-      instances: [
-        { browser: 'chrome' },
-      ],
+      instances: [{ browser: "chrome" }],
     },
   },
   optimizeDeps: {
