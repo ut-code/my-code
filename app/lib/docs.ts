@@ -4,12 +4,15 @@ import { join } from "node:path";
 import yaml from "js-yaml";
 import { isCloudflare } from "./detectCloudflare";
 import { notFound } from "next/navigation";
+import crypto from "node:crypto";
 
 export interface MarkdownSection {
+  file: string; // ファイル名
   id: string;
   level: number;
   title: string;
   rawContent: string; // 見出しも含めたもとのmarkdownの内容
+  md5: string; // mdファイル全体のmd5
 }
 
 export interface PageEntry {
@@ -34,6 +37,17 @@ interface IndexYml {
     name: string;
     title: string;
   }[];
+}
+
+export interface RevisionYmlEntry {
+  lang?: string;
+  page?: string;
+  rev: SectionRevision[];
+}
+export interface SectionRevision {
+  md5: string; // mdファイル全体のmd5
+  commit: string;
+  path: string;
 }
 
 async function readPublicFile(path: string): Promise<string> {
@@ -119,6 +133,16 @@ export async function getSectionsList(
       .sort(naturalSortMdFiles);
   }
 }
+
+export async function getRevisions(
+  sectionId: string
+): Promise<RevisionYmlEntry | undefined> {
+  const revisionsYml = await readPublicFile(`docs/revisions.yml`);
+  return (yaml.load(revisionsYml) as Record<string, RevisionYmlEntry>)[
+    sectionId
+  ];
+}
+
 /**
  * public/docs/{lang}/{pageId}/ 以下のmdファイルを結合して MarkdownSection[] を返す。
  */
@@ -134,10 +158,12 @@ export async function getMarkdownSections(
     if (file === "-intro.md") {
       // イントロセクションはフロントマターなし・見出しなし
       sections.push({
+        file,
         id: `${lang}-${pageId}-intro`,
         level: 1,
         title: "",
         rawContent: raw,
+        md5: "",
       });
     } else {
       sections.push(parseFrontmatter(raw, file));
@@ -166,9 +192,39 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
   // TODO: validation of frontmatter using zod
   const rawContent = content.slice(endIdx + 5);
   return {
+    file,
     id: fm?.id ?? "",
     title: fm?.title ?? "",
     level: fm?.level ?? 2,
     rawContent,
+    md5: crypto.createHash("md5").update(content).digest("base64"),
   };
+}
+
+export async function getRevisionOfMarkdownSection(
+  sectionId: string,
+  md5: string
+): Promise<MarkdownSection> {
+  const revisions = await getRevisions(sectionId);
+  const targetRevision = revisions?.rev.find((r) => r.md5 === md5);
+  if (targetRevision) {
+    const rawRes = await fetch(
+      `https://raw.githubusercontent.com/ut-code/my-code/${targetRevision.commit}/${targetRevision.path}`
+    );
+    if (rawRes.ok) {
+      const raw = await rawRes.text();
+      return parseFrontmatter(
+        raw,
+        `${targetRevision.commit}/${targetRevision.path}`
+      );
+    } else {
+      throw new Error(
+        `Failed to fetch ${targetRevision.commit}/${targetRevision.path}. ${rawRes.status}: ${await rawRes.text()}`
+      );
+    }
+  } else {
+    throw new Error(
+      `Revision for sectionId=${sectionId}, md5=${md5} not found`
+    );
+  }
 }
