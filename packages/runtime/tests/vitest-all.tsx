@@ -1,15 +1,10 @@
 import { cleanup, render } from "@testing-library/react/pure";
 import { describe, beforeAll, afterAll, it, beforeEach } from "vitest";
-import { RuntimeProvider } from "../src/context";
+import { RuntimeProvider, useRuntimeAll } from "../src/context";
 import { RuntimeLang } from "../src/languages";
 import { RuntimeContext } from "../src/interface";
-import { RefObject, useEffect, useRef } from "react";
+import { RefObject } from "react";
 
-import { usePyodide } from "../src/worker/pyodide";
-import { useRuby } from "../src/worker/ruby";
-import { useJSEval } from "../src/worker/jsEval";
-import { useTypeScript } from "../src/typescript/runtime";
-import { useWandbox } from "../src/wandbox/runtime";
 import { RUNTIME_TIMEOUTS, waitForRuntimeReady } from "./utils";
 import { replTests } from "./repl";
 import { fileExecutionTests } from "./fileExecution";
@@ -19,22 +14,8 @@ const RuntimeLoader = ({
 }: {
   runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext> | null>;
 }) => {
-  const pyodide = usePyodide();
-  const ruby = useRuby();
-  const jsEval = useJSEval();
-  const typescript = useTypeScript(jsEval);
-  const wandboxCpp = useWandbox("cpp");
-  const wandboxRust = useWandbox("rust");
-
-  runtimeRef.current = {
-    python: pyodide,
-    ruby: ruby,
-    javascript: jsEval,
-    typescript: typescript,
-    cpp: wandboxCpp,
-    rust: wandboxRust,
-  };
-
+  const runtimes = useRuntimeAll();
+  runtimeRef.current = runtimes.current;
   return null;
 };
 
@@ -94,7 +75,9 @@ describe("Runtime Integration Tests", () => {
             it(
               name,
               async () => {
-                await body(runtimeRef as RefObject<Record<RuntimeLang, RuntimeContext>>);
+                await body(
+                  runtimeRef as RefObject<Record<RuntimeLang, RuntimeContext>>
+                );
               },
               RUNTIME_TIMEOUTS[lang]
             );

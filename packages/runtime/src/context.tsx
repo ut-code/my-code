@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, RefObject, useEffect, useRef } from "react";
 import { RuntimeContext } from "./interface";
 import { RuntimeLang } from "./languages";
 import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
@@ -11,6 +11,15 @@ import { RubyContext, useRuby } from "./worker/ruby";
 import { WorkerProvider } from "./worker/runtime";
 
 export function useRuntime(language: RuntimeLang): RuntimeContext {
+  const runtimes = useRuntimeAll();
+  const runtime = runtimes.current[language];
+  const { init } = runtime;
+  useEffect(() => {
+    init?.();
+  }, [init]);
+  return runtime;
+}
+export function useRuntimeAll(): RefObject<Record<RuntimeLang, RuntimeContext>> {
   // すべての言語のcontextをインスタンス化
   const pyodide = usePyodide();
   const ruby = useRuby();
@@ -19,35 +28,16 @@ export function useRuntime(language: RuntimeLang): RuntimeContext {
   const wandboxCpp = useWandbox("cpp");
   const wandboxRust = useWandbox("rust");
 
-  let runtime: RuntimeContext;
-  switch (language) {
-    case "python":
-      runtime = pyodide;
-      break;
-    case "ruby":
-      runtime = ruby;
-      break;
-    case "javascript":
-      runtime = jsEval;
-      break;
-    case "typescript":
-      runtime = typescript;
-      break;
-    case "cpp":
-      runtime = wandboxCpp;
-      break;
-    case "rust":
-      runtime = wandboxRust;
-      break;
-    default:
-      language satisfies never;
-      throw new Error(`Runtime not implemented for language: ${language}`);
-  }
-  const { init } = runtime;
-  useEffect(() => {
-    init?.();
-  }, [init]);
-  return runtime;
+  const runtimes = useRef<Record<RuntimeLang, RuntimeContext>>({} as never);
+  runtimes.current.python = pyodide;
+  runtimes.current.ruby = ruby;
+  runtimes.current.javascript = jsEval;
+  runtimes.current.typescript = typescript;
+  runtimes.current.cpp = wandboxCpp;
+  runtimes.current.rust = wandboxRust;
+
+  // initはしない。呼び出し側でする必要がある
+  return runtimes;
 }
 export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (

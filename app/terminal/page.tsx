@@ -2,17 +2,11 @@
 
 import { Heading } from "@/[lang]/[pageId]/markdown";
 import "mocha/mocha.css";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { useWandbox } from "@my-code/runtime/wandbox/runtime";
-import { RuntimeContext } from "@my-code/runtime/interface";
+import { Fragment, useEffect, useState } from "react";
 import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
-import { usePyodide } from "@my-code/runtime/worker/pyodide";
-import { useRuby } from "@my-code/runtime/worker/ruby";
-import { useJSEval } from "@my-code/runtime/worker/jsEval";
 import { ReplTerminal } from "./repl";
 import { EditorComponent } from "./editor";
 import { ExecFile } from "./exec";
-import { useTypeScript } from "@my-code/runtime/typescript/runtime";
 import { useTerminal } from "./terminal";
 
 import main_py from "@my-code/runtime/samples/main.py?raw";
@@ -30,6 +24,7 @@ import {
 } from "@my-code/runtime/tests/utils";
 import { replTests } from "@my-code/runtime/tests/repl";
 import { fileExecutionTests } from "@my-code/runtime/tests/fileExecution";
+import { useRuntimeAll } from "@my-code/runtime/context";
 
 export default function RuntimeTestPage() {
   return (
@@ -206,21 +201,7 @@ function AnsiColorSample() {
 }
 
 function MochaTest() {
-  const pyodide = usePyodide();
-  const ruby = useRuby();
-  const jsEval = useJSEval();
-  const typescript = useTypeScript(jsEval);
-  const wandboxCpp = useWandbox("cpp");
-  const wandboxRust = useWandbox("rust");
-  const runtimeRef = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
-  runtimeRef.current = {
-    python: pyodide,
-    ruby: ruby,
-    javascript: jsEval,
-    typescript: typescript,
-    cpp: wandboxCpp,
-    rust: wandboxRust,
-  };
+  const runtimeRef = useRuntimeAll();
 
   const [searchParams, setSearchParams] = useState<string>("");
   useEffect(() => {

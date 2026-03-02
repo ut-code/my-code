@@ -23,7 +23,7 @@ export async function waitForRuntimeReady(
         if (!isLocked) {
           break;
         }
-      }else{
+      } else {
         runtime.init?.();
       }
     }
