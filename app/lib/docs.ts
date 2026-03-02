@@ -90,6 +90,35 @@ export async function getPagesList(): Promise<LanguageEntry[]> {
   );
 }
 
+export async function getSectionsList(
+  lang: string,
+  pageId: string
+): Promise<string[]> {
+  if (isCloudflare()) {
+    const sectionsYml = await readPublicFile(
+      `docs/${lang}/${pageId}/sections.yml`
+    );
+    return yaml.load(sectionsYml) as string[];
+  } else {
+    function naturalSortMdFiles(a: string, b: string): number {
+      // -intro.md always comes first
+      if (a === "-intro.md") return -1;
+      if (b === "-intro.md") return 1;
+      // Sort numerically by leading N1-N2 prefix
+      const aMatch = a.match(/^(\d+)-(\d+)/);
+      const bMatch = b.match(/^(\d+)-(\d+)/);
+      if (aMatch && bMatch) {
+        const n1Diff = parseInt(aMatch[1]) - parseInt(bMatch[1]);
+        if (n1Diff !== 0) return n1Diff;
+        return parseInt(aMatch[2]) - parseInt(bMatch[2]);
+      }
+      return a.localeCompare(b);
+    }
+    return (await readdir(join(process.cwd(), "public", "docs", lang, pageId)))
+      .filter((f) => f.endsWith(".md"))
+      .sort(naturalSortMdFiles);
+  }
+}
 /**
  * public/docs/{lang}/{pageId}/ 以下のmdファイルを結合して MarkdownSection[] を返す。
  */
@@ -97,10 +126,7 @@ export async function getMarkdownSections(
   lang: string,
   pageId: string
 ): Promise<MarkdownSection[]> {
-  const sectionsYml = await readPublicFile(
-    `docs/${lang}/${pageId}/sections.yml`
-  );
-  const files = yaml.load(sectionsYml) as string[];
+  const files = await getSectionsList(lang, pageId);
 
   const sections: MarkdownSection[] = [];
   for (const file of files) {
