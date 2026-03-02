@@ -59,8 +59,8 @@ async function readPublicFile(path: string): Promise<string> {
 
 async function getLanguageIds(): Promise<string[]> {
   if (isCloudflare()) {
-    const raw = await readPublicFile("docs/languages.yml");
-    return yaml.load(raw) as string[];
+    const raw = await readPublicFile("docs/languages.json");
+    return JSON.parse(raw) as string[];
   } else {
     const docsDir = join(process.cwd(), "public", "docs");
     const entries = await readdir(docsDir, { withFileTypes: true });
@@ -95,10 +95,10 @@ export async function getSectionsList(
   pageId: string
 ): Promise<string[]> {
   if (isCloudflare()) {
-    const sectionsYml = await readPublicFile(
-      `docs/${lang}/${pageId}/sections.yml`
+    const sectionsJson = await readPublicFile(
+      `docs/${lang}/${pageId}/sections.json`
     );
-    return yaml.load(sectionsYml) as string[];
+    return JSON.parse(sectionsJson) as string[];
   } else {
     function naturalSortMdFiles(a: string, b: string): number {
       // -intro.md always comes first
