@@ -465,7 +465,7 @@ export function ReplTerminal({
       open={isModal}
       onClose={() => setIsModal(false)}
     >
-      <div className="bg-base-200 flex items-center rounded-t-box">
+      <div className="bg-base-200 w-full overflow-hidden flex items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
@@ -528,10 +528,11 @@ export function ReplTerminal({
       ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
       可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
       */}
-      <div className="flex-1 bg-base-300 relative p-4 pr-1 pt-2 rounded-b-box">
+      <div className="flex-1 w-full overflow-hidden bg-base-300 relative p-4 pr-1 pt-2 rounded-b-box">
         <pre
           className={clsx(
-            "font-mono overflow-auto cursor-wait",
+            "font-mono whitespace-pre-line cursor-wait",
+            "pr-3",
             "min-h-26", // xterm.jsで5行分の高さ
             initCommandState !== "initializing" && "hidden"
           )}
@@ -566,7 +567,7 @@ export function ReplTerminal({
             initCommandState === "initializing" &&
               /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
               "absolute invisible",
-            "h-full"
+            "w-full h-full"
           )}
           ref={terminalRef}
         />

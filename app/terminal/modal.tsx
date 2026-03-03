@@ -37,7 +37,7 @@ export function Modal(props: Props) {
         readOnly
       />
       <div
-        className={clsx(daisyModalEnabled && "modal")}
+        className={clsx(daisyModalEnabled && "modal h-dvh")}
         role={daisyModalEnabled ? "dialog" : undefined}
       >
         <div
