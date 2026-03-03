@@ -6,6 +6,7 @@ import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
 import { langConstants } from "./runtime";
 import { MarkdownLang } from "@/[lang]/[pageId]/styledSyntaxHighlighter";
+import { MinMaxButton, Modal } from "./modal";
 
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
 const AceEditor = lazy(async () => {
@@ -104,18 +105,42 @@ export function EditorComponent(props: EditorProps) {
   }, [files, props.filename, props.initContent, writeFile]);
 
   const [fontSize, setFontSize] = useState<number>();
+  const [windowHeight, setWindowHeight] = useState<number>(1000);
   const [initAce, setInitAce] = useState(false);
   useEffect(() => {
-    setFontSize(
-      parseFloat(getComputedStyle(document.documentElement).fontSize)
-    ); // 1rem
-    setInitAce(true);
+    const update = () => {
+      setFontSize(
+        parseFloat(getComputedStyle(document.documentElement).fontSize)
+      ); // 1rem
+      setWindowHeight(window.innerHeight);
+      setInitAce(true);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
-  // 最小8行 or 初期内容+1行
-  const editorHeight = Math.max(props.initContent.split("\n").length + 1, 8);
+  // 現在の内容の行数、最小8行、最大50vh
+  const editorHeight = Math.max(
+    Math.min(
+      code.split("\n").length,
+      Math.floor((windowHeight * 0.5) / ((fontSize || 16) + 1))
+    ),
+    8
+  );
+
+  const [isModal, setIsModal] = useState(false);
 
   return (
-    <div className="border border-accent border-2 shadow-md m-2 rounded-box overflow-hidden">
+    <Modal
+      className={clsx(
+        "max-w-300 p-0",
+        "border border-accent border-2 rounded-box overflow-hidden",
+        "flex flex-col"
+      )}
+      classNameNonModal="shadow-md m-2"
+      open={isModal}
+      onClose={() => setIsModal(false)}
+    >
       <div className="flex flex-row items-center bg-base-200">
         <span className="mt-2 mb-1 ml-3 mr-2 text-sm text-left">
           <span>
@@ -128,8 +153,6 @@ export function EditorComponent(props: EditorProps) {
         <button
           className={clsx(
             "btn btn-xs btn-soft btn-warning mt-1 mb-1",
-            // btn-warning は文字色を変えるがsvgの色は変えてくれないので、 stroke-warning を追加指定している
-            "stroke-warning hover:stroke-warning-content active:stroke-warning-content",
             // codeの内容が変更された場合のみ表示する
             (props.readonly || code == props.initContent) && "invisible"
           )}
@@ -140,6 +163,7 @@ export function EditorComponent(props: EditorProps) {
             className="w-3 h-3"
             viewBox="0 0 24 24"
             fill="none"
+            stroke="currentColor"
             xmlns="http://www.w3.org/2000/svg"
           >
             <g id="Edit / Undo">
@@ -155,6 +179,8 @@ export function EditorComponent(props: EditorProps) {
           </svg>
           元の内容に戻す
         </button>
+        <div className="flex-1" />
+        <MinMaxButton open={isModal} setOpen={setIsModal} />
       </div>
       {fontSize !== undefined && initAce ? (
         <Suspense
@@ -168,7 +194,7 @@ export function EditorComponent(props: EditorProps) {
             theme={theme}
             tabSize={langConstants(props.language || "text").tabSize}
             width="100%"
-            height={editorHeight * (fontSize + 1) + "px"}
+            height={isModal ? "100%" : editorHeight * (fontSize + 1) + "px"}
             className="font-mono!" // Aceのデフォルトフォントを上書き
             readOnly={props.readonly}
             fontSize={fontSize}
@@ -182,18 +208,22 @@ export function EditorComponent(props: EditorProps) {
           />
         </Suspense>
       ) : (
-        <FallbackPre editorHeight={editorHeight}>{code}</FallbackPre>
+        <FallbackPre isModal={isModal} editorHeight={editorHeight}>
+          {code}
+        </FallbackPre>
       )}
-    </div>
+    </Modal>
   );
 }
 
 function FallbackPre({
   children,
   editorHeight,
+  isModal,
 }: {
   children: string;
   editorHeight: number;
+  isModal?: boolean;
 }) {
   // AceEditorはなぜかline-heightが小さい
   // fontSize + 1px になるっぽい?
@@ -201,7 +231,7 @@ function FallbackPre({
     <pre
       className="font-mono overflow-auto bg-base-300 px-2 cursor-wait"
       style={{
-        height: `calc((1em + 1px) * ${editorHeight})`,
+        height: isModal ? "100%" : `calc((1em + 1px) * ${editorHeight})`,
         lineHeight: "calc(1em + 1px)",
       }}
     >
