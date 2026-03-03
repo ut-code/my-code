@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { highlightCodeToAnsi, importPrism } from "./highlight";
 import chalk from "chalk";
 chalk.level = 3;
 import {
+  calculateRows,
   clearTerminal,
-  getRows,
   hideCursor,
   showCursor,
   systemMessageColor,
@@ -109,23 +109,30 @@ export function ReplTerminal({
     throw new Error(`runCommand not available for language: ${language}`);
   }
 
-  const initCommand = splitReplExamples?.(initContent || "");
+  const initCommand = useMemo(
+    () => splitReplExamples?.(initContent || ""),
+    [splitReplExamples, initContent]
+  );
 
-  const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
-    getRows: (cols: number) => {
+  const getRows = useCallback(
+    (cols: number) => {
       let rows = 0;
       for (const cmd of initCommand || []) {
         // コマンドの行数をカウント
         for (const line of cmd.command.split("\n")) {
-          rows += getRows(prompt + line, cols);
+          rows += calculateRows(prompt + line, cols);
         }
         // 出力の行数をカウント
         for (const out of cmd.output) {
-          rows += getRows(out.message, cols);
+          rows += calculateRows(out.message, cols);
         }
       }
       return rows + 2; // 最後のプロンプト行を含める
     },
+    [initCommand, prompt]
+  );
+  const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
+    getRows,
   });
 
   // REPLのユーザー入力

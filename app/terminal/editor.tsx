@@ -133,7 +133,6 @@ export function EditorComponent(props: EditorProps) {
   return (
     <Modal
       className={clsx(
-        "max-w-300 p-0",
         "border border-accent border-2 rounded-box overflow-hidden",
         "flex flex-col"
       )}

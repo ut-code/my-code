@@ -1,17 +1,18 @@
 "use client";
 
 import {
+  calculateRows,
   clearTerminal,
-  getRows,
   hideCursor,
   systemMessageColor,
   useTerminal,
 } from "./terminal";
 import { writeOutput } from "./repl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import { RuntimeLang, useRuntime } from "./runtime";
 import clsx from "clsx";
+import { MinMaxButton, Modal } from "./modal";
 
 interface ExecProps {
   /*
@@ -23,8 +24,34 @@ interface ExecProps {
   content: string;
 }
 export function ExecFile(props: ExecProps) {
+  // ターミナルの行数を計算するためのstate
+  const [contents, setContents] = useState(props.content + "\n");
+  const [isModal, setIsModal] = useState(false);
+  const [fontSize, setFontSize] = useState<number>();
+  const [windowHeight, setWindowHeight] = useState<number>(1000);
+  useEffect(() => {
+    const update = () => {
+      setFontSize(
+        parseFloat(getComputedStyle(document.documentElement).fontSize)
+      ); // 1rem
+      setWindowHeight(window.innerHeight);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  const getRows = useCallback(
+    (cols: number) =>
+      isModal
+        ? "fit"
+        : Math.min(
+            calculateRows(contents, cols),
+            Math.floor((windowHeight * 0.2) / ((fontSize || 16) * 1.2))
+          ),
+    [contents, isModal, fontSize, windowHeight]
+  );
   const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
-    getRows: (cols: number) => getRows(props.content, cols) + 1,
+    getRows,
     onReady: () => {
       hideCursor(terminalInstanceRef.current!);
       for (const line of props.content.split("\n")) {
@@ -32,7 +59,8 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const { files, clearExecResult, addExecOutput, writeFile } = useEmbedContext();
+  const { files, clearExecResult, addExecOutput, writeFile } =
+    useEmbedContext();
 
   const { ready, runFiles, getCommandlineStr, runtimeInfo, interrupt } =
     useRuntime(props.language);
@@ -50,6 +78,7 @@ export function ExecFile(props: ExecProps) {
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
         const filenameKey = props.filenames.join(",");
         clearExecResult(filenameKey);
+        setContents("");
         let isFirstOutput = true;
         await runFiles(props.filenames, files, (output) => {
           if (output.type === "file") {
@@ -70,6 +99,7 @@ export function ExecFile(props: ExecProps) {
             null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
             props.language
           );
+          setContents((prev) => prev + output.message + "\n");
         });
         setExecutionState("idle");
       })();
@@ -88,7 +118,15 @@ export function ExecFile(props: ExecProps) {
   ]);
 
   return (
-    <div className="border border-accent border-2 shadow-md m-2 rounded-box relative">
+    <Modal
+      className={clsx(
+        "border border-accent border-2 rounded-box relative",
+        "flex flex-col"
+      )}
+      classNameNonModal="shadow-md m-2"
+      open={isModal}
+      onClose={() => setIsModal(false)}
+    >
       <div className="bg-base-200 flex items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
@@ -157,8 +195,10 @@ export function ExecFile(props: ExecProps) {
             ？
           </button>
         </div>
+        <div className="flex-1" />
+        <MinMaxButton open={isModal} setOpen={setIsModal} />
       </div>
-      <div className="bg-base-300 p-4 pr-1 pt-2 relative rounded-b-box">
+      <div className="flex-1 bg-base-300 p-4 pr-1 pt-2 relative rounded-b-box">
         {/*
       ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
       可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
@@ -176,7 +216,8 @@ export function ExecFile(props: ExecProps) {
           className={clsx(
             !termReady &&
               /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
-              "absolute invisible"
+              "absolute invisible",
+            "h-full"
           )}
           ref={terminalRef}
         />
@@ -184,6 +225,6 @@ export function ExecFile(props: ExecProps) {
           <div className="absolute z-10 inset-0 cursor-wait" />
         )}
       </div>
-    </div>
+    </Modal>
   );
 }

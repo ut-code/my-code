@@ -45,6 +45,7 @@ export function Modal(props: Props) {
             daisyModalEnabled
               ? clsx(
                   "modal-box",
+                  "max-w-300 p-0",
                   "size-[calc(100%-1rem)]",
                   "md:size-[calc(100%-2rem)]",
                   "lg:size-[calc(100%-4rem)]",
@@ -85,15 +86,15 @@ export function MinMaxButton(props: {
         >
           <path
             d="M2 22L9 15M9 15H3.14286M9 15V20.8571"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
           <path
             d="M22 2L15 9M15 9H20.8571M15 9V3.14286"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
       ) : (
@@ -107,15 +108,15 @@ export function MinMaxButton(props: {
         >
           <path
             d="M9 15L2 22M2 22H7.85714M2 22V16.1429"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
           <path
             d="M15 9L22 2M22 2H16.1429M22 2V7.85714"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
       )}
