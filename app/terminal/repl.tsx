@@ -17,6 +17,8 @@ import { useEmbedContext } from "./embedContext";
 import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
 import clsx from "clsx";
 import { InlineCode } from "@/[lang]/[pageId]/markdown";
+import { MinMaxButton, Modal } from "./modal";
+import { StopButtonContent } from "./exec";
 
 export type ReplOutputType =
   | "stdout"
@@ -114,6 +116,25 @@ export function ReplTerminal({
     [splitReplExamples, initContent]
   );
 
+  // REPLのユーザー入力
+  const inputBuffer = useRef<string[]>([]);
+
+  // ターミナルの行数を計算するためのstate
+  const [newContents, setNewContents] = useState("\n");
+  const [isModal, setIsModal] = useState(false);
+  const [fontSize, setFontSize] = useState<number>();
+  const [windowHeight, setWindowHeight] = useState<number>(1000);
+  useEffect(() => {
+    const update = () => {
+      setFontSize(
+        parseFloat(getComputedStyle(document.documentElement).fontSize)
+      ); // 1rem
+      setWindowHeight(window.innerHeight);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   const getRows = useCallback(
     (cols: number) => {
       let rows = 0;
@@ -127,16 +148,29 @@ export function ReplTerminal({
           rows += calculateRows(out.message, cols);
         }
       }
-      return rows + 2; // 最後のプロンプト行を含める
+      for (const line of newContents.trim().split("\n")) {
+        rows += calculateRows(line, cols);
+      }
+      // 最後のプロンプト行を含める
+      rows += Math.max(
+        2,
+        inputBuffer.current.reduce(
+          (sum, line) => sum + calculateRows(prompt + line, cols),
+          0
+        )
+      );
+      return isModal
+        ? "fit"
+        : Math.min(
+            rows,
+            Math.floor((windowHeight * 0.5) / ((fontSize || 16) * 1.2))
+          );
     },
-    [initCommand, prompt]
+    [initCommand, prompt, newContents, fontSize, isModal, windowHeight]
   );
   const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
     getRows,
   });
-
-  // REPLのユーザー入力
-  const inputBuffer = useRef<string[]>([]);
 
   const [executionState, setExecutionState] = useState<"idle" | "executing">(
     "idle"
@@ -231,6 +265,7 @@ export function ReplTerminal({
               terminalInstanceRef.current.writeln("");
               const command = inputBuffer.current.join("\n").trim();
               inputBuffer.current = [];
+              setNewContents((contents) => contents + prompt + command + "\n");
               const commandId = addReplCommand(terminalId, command);
               setExecutionState("executing");
               let executionDone = false;
@@ -248,6 +283,9 @@ export function ReplTerminal({
                   } else {
                     handleOutput(output);
                   }
+                  setNewContents(
+                    (contents) => contents + output.message + "\n"
+                  );
                   addReplOutput(terminalId, commandId, output);
                 });
               });
@@ -302,6 +340,7 @@ export function ReplTerminal({
       addReplOutput,
       terminalId,
       terminalInstanceRef,
+      prompt,
     ]
   );
   useEffect(() => {
@@ -402,16 +441,39 @@ export function ReplTerminal({
     Prism,
   ]);
 
+  const [showStopButton, setShowStopButton] = useState(false);
+  useEffect(() => {
+    if (
+      !termReady ||
+      initCommandState !== "done" ||
+      executionState !== "executing"
+    ) {
+      setShowStopButton(false);
+    } else {
+      // 一瞬で実行が完了するなら表示しない
+      const timeout = setTimeout(() => setShowStopButton(true), 300);
+      return () => clearTimeout(timeout);
+    }
+  }, [termReady, initCommandState, executionState]);
   return (
-    <div className="bg-base-300 border border-accent border-2 shadow-md m-2 rounded-box h-max">
+    <Modal
+      className={clsx(
+        "bg-base-300 border border-accent border-2 rounded-box",
+        "flex flex-col"
+      )}
+      classNameNonModal="shadow-md m-2 h-max"
+      open={isModal}
+      onClose={() => setIsModal(false)}
+    >
       <div className="bg-base-200 flex items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
           → heightを解除し、min-heightをデフォルトのサイズと同じにする */
           className={clsx(
-            "btn btn-soft btn-accent h-[unset]! min-h-(--size) self-stretch",
-            "rounded-none rounded-tl-[calc(var(--radius-box)-2px)]"
+            "btn btn-soft btn-error h-[unset]! min-h-(--size) self-stretch",
+            "rounded-none rounded-tl-[calc(var(--radius-box)-2px)]",
+            !showStopButton && "hidden"
           )}
           onClick={() => {
             // Ctrl+C
@@ -420,13 +482,13 @@ export function ReplTerminal({
               terminalInstanceRef.current.write("^C");
             }
           }}
-          disabled={
+          /*disabled={
             !termReady ||
             initCommandState !== "done" ||
             executionState !== "executing"
-          }
+          }*/
         >
-          ■ 停止
+          <StopButtonContent />
         </button>
         <span className="text-sm my-1 ml-3 text-left">
           {runtimeInfo?.prettyLangName || language} 実行環境
@@ -459,12 +521,14 @@ export function ReplTerminal({
             ？
           </button>
         </div>
+        <div className="flex-1" />
+        <MinMaxButton open={isModal} setOpen={setIsModal} />
       </div>
       {/*
       ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
       可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
       */}
-      <div className="relative p-4 pr-1 pt-2">
+      <div className="flex-1 bg-base-300 relative p-4 pr-1 pt-2 rounded-b-box">
         <pre
           className={clsx(
             "font-mono overflow-auto cursor-wait",
@@ -501,11 +565,12 @@ export function ReplTerminal({
           className={clsx(
             initCommandState === "initializing" &&
               /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
-              "absolute invisible"
+              "absolute invisible",
+            "h-full"
           )}
           ref={terminalRef}
         />
       </div>
-    </div>
+    </Modal>
   );
 }
