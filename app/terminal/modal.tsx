@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 interface Props {
   className?: string;
@@ -14,6 +14,7 @@ interface Props {
 export function Modal(props: Props) {
   const [daisyModalEnabled, setDaisyModalEnabled] = useState(false);
   const [daisyModalOpen, setDaisyModalOpen] = useState(false);
+  const modalDivRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (props.open) {
       // daisyuiのmodalモードにする → modalを開くアニメーションをする
@@ -27,6 +28,23 @@ export function Modal(props: Props) {
       return () => clearTimeout(timeout);
     }
   }, [props.open]);
+  useEffect(() => {
+    if (daisyModalEnabled) {
+      const updateHeight = () => {
+        if (modalDivRef.current && window.visualViewport) {
+          modalDivRef.current.style.height = `${window.visualViewport.height}px`;
+        }
+      };
+      updateHeight();
+      window.visualViewport?.addEventListener("resize", updateHeight);
+      return () =>
+        window.visualViewport?.removeEventListener("resize", updateHeight);
+    } else {
+      if (modalDivRef.current) {
+        modalDivRef.current.style.height = "";
+      }
+    }
+  }, [daisyModalEnabled]);
 
   return (
     <>
@@ -39,6 +57,7 @@ export function Modal(props: Props) {
       <div
         className={clsx(daisyModalEnabled && "modal h-dvh")}
         role={daisyModalEnabled ? "dialog" : undefined}
+        ref={modalDivRef}
       >
         <div
           className={clsx(

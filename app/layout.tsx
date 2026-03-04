@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import "@fontsource-variable/inconsolata";
 // import "@fontsource/m-plus-rounded-1c/400.css";
 // import "@fontsource/m-plus-rounded-1c/700.css";
@@ -13,12 +13,6 @@ import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./sidebar";
 import { RuntimeProvider } from "./terminal/runtime";
 import { getPagesList } from "@/lib/docs";
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  interactiveWidget: "resizes-content",
-};
 
 export const metadata: Metadata = {
   title: {
