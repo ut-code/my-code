@@ -425,6 +425,7 @@ export function ReplTerminal({
         // なぜかそのままscrollToTop()を呼ぶとスクロールせず、setTimeoutを入れるとscrollする(治安bad)
         setTimeout(() => terminalInstanceRef.current!.scrollToTop());
         setInitCommandState("done");
+        terminalInstanceRef.current?.focus();
       })();
     }
   }, [
@@ -458,11 +459,7 @@ export function ReplTerminal({
   return (
     <Modal
       id={"repl-" + terminalId}
-      className={clsx(
-        "bg-base-300",
-        "flex flex-col",
-        "isolate"
-      )}
+      className={clsx("bg-base-300", "flex flex-col", "isolate")}
       open={isModal}
       setOpen={setIsModal}
     >
