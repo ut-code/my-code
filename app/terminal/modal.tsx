@@ -65,13 +65,19 @@ export function Modal(props: Props) {
               ? clsx(
                   "modal-box",
                   "max-w-300 p-0",
-                  "size-[calc(100%-1rem)]",
+                  "size-full",
+                  "md:border-2 border-accent",
+                  "rounded-box-modal", // globals.cssで定義。md未満の場合、--radius-boxを上書きしこれ以下の要素のrounded-boxを無効にする
                   "md:size-[calc(100%-2rem)]",
                   "lg:size-[calc(100%-4rem)]",
                   "xl:size-[calc(100%-6rem)]",
                   props.classNameModal
                 )
-              : clsx(props.classNameNonModal),
+              : clsx(
+                  "border-2 border-accent rounded-box",
+                  "shadow-md m-2 h-max",
+                  props.classNameNonModal
+                ),
             props.className
           )}
         >
@@ -91,7 +97,7 @@ export function MinMaxButton(props: {
 }) {
   return (
     <button
-      className={clsx("btn btn-xs btn-soft btn-accent mt-1 mb-1 mr-2")}
+      className={clsx("btn btn-sm btn-soft btn-accent my-1 mr-1")}
       onClick={() => props.setOpen(!props.open)}
     >
       {props.open ? (

@@ -133,10 +133,9 @@ export function EditorComponent(props: EditorProps) {
   return (
     <Modal
       className={clsx(
-        "border border-accent border-2 rounded-box overflow-hidden",
+        "overflow-hidden",
         "flex flex-col"
       )}
-      classNameNonModal="shadow-md m-2"
       open={isModal}
       onClose={() => setIsModal(false)}
     >
@@ -151,7 +150,7 @@ export function EditorComponent(props: EditorProps) {
         </span>
         <button
           className={clsx(
-            "btn btn-xs btn-soft btn-warning mt-1 mb-1",
+            "btn btn-sm btn-soft btn-warning my-1",
             // codeの内容が変更された場合のみ表示する
             (props.readonly || code == props.initContent) && "invisible"
           )}
@@ -176,7 +175,7 @@ export function EditorComponent(props: EditorProps) {
               />
             </g>
           </svg>
-          元の内容に戻す
+          <span className="hidden md:inline">元の内容に戻す</span>
         </button>
         <div className="flex-1" />
         <MinMaxButton open={isModal} setOpen={setIsModal} />

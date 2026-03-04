@@ -115,6 +115,13 @@ mycdark:
   @apply border-primary!;
 }
 
+.rounded-box-modal {
+  @apply rounded-box;
+  @variant max-md {
+    --radius-box: 0px !important;
+  }
+}
+
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {
   /*

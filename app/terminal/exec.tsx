@@ -119,16 +119,11 @@ export function ExecFile(props: ExecProps) {
 
   return (
     <Modal
-      className={clsx(
-        "border border-accent border-2 rounded-box relative",
-        "flex flex-col",
-        "isolate"
-      )}
-      classNameNonModal="shadow-md m-2"
+      className={clsx("relative", "flex flex-col", "isolate")}
       open={isModal}
       onClose={() => setIsModal(false)}
     >
-      <div className="bg-base-200 flex w-full items-center rounded-t-box">
+      <div className="bg-base-200 flex w-full overflow-x-clip overflow-y-visible items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
