@@ -1,35 +1,41 @@
 "use client";
 
 import clsx from "clsx";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef } from "react";
+
+/*
+https://daisyui.com/components/modal/ の3の方法を採用している。
+ただし、modalのコンテナ自体を条件付きでレンダリングするので、aタグでの開閉だけでなくstateが必要になる。
+urlハッシュとstateを両方同時にtrueにしてもモーダルを開くアニメーションはするっぽい
+*/
 
 interface Props {
+  id: string;
   className?: string;
   classNameModal?: string;
   classNameNonModal?: string;
   open: boolean;
-  onClose: () => void;
+  setOpen: (open: boolean) => void;
   children: ReactNode;
 }
 export function Modal(props: Props) {
-  const [daisyModalEnabled, setDaisyModalEnabled] = useState(false);
-  const [daisyModalOpen, setDaisyModalOpen] = useState(false);
   const modalDivRef = useRef<HTMLDivElement>(null);
+  const { id, open, setOpen } = props;
   useEffect(() => {
-    if (props.open) {
-      // daisyuiのmodalモードにする → modalを開くアニメーションをする
-      setDaisyModalEnabled(true);
-      requestAnimationFrame(() => setDaisyModalOpen(true));
-    } else {
-      // 逆順
-      setDaisyModalOpen(false);
-      // アニメーションが終わった後にmodalモードを解除する
-      const timeout = setTimeout(() => setDaisyModalEnabled(false), 300);
-      return () => clearTimeout(timeout);
-    }
-  }, [props.open]);
+    const onHashChange = () => {
+      if (location.hash === `#${id}`) {
+        setOpen(true);
+      } else {
+        // アニメーションが終わった後にmodalモードを解除する
+        setTimeout(() => setOpen(false), 300);
+      }
+    };
+    onHashChange();
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, [id, setOpen]);
   useEffect(() => {
-    if (daisyModalEnabled) {
+    if (open) {
       const updateHeight = () => {
         if (modalDivRef.current && window.visualViewport) {
           modalDivRef.current.style.height = `${window.visualViewport.height}px`;
@@ -44,61 +50,58 @@ export function Modal(props: Props) {
         modalDivRef.current.style.height = "";
       }
     }
-  }, [daisyModalEnabled]);
+  }, [open]);
 
   return (
-    <>
-      <input
-        type="checkbox"
-        className="modal-toggle"
-        checked={daisyModalOpen}
-        readOnly
-      />
+    <div
+      className={clsx(open && "modal h-dvh")}
+      role={open ? "dialog" : undefined}
+      ref={modalDivRef}
+      id={id}
+    >
       <div
-        className={clsx(daisyModalEnabled && "modal h-dvh")}
-        role={daisyModalEnabled ? "dialog" : undefined}
-        ref={modalDivRef}
+        className={clsx(
+          open
+            ? clsx(
+                "modal-box",
+                "max-w-300 p-0",
+                "size-full",
+                "md:border-2 border-accent",
+                "rounded-box-modal", // globals.cssで定義。md未満の場合、--radius-boxを上書きしこれ以下の要素のrounded-boxを無効にする
+                "md:size-[calc(100%-2rem)]",
+                "lg:size-[calc(100%-4rem)]",
+                "xl:size-[calc(100%-6rem)]",
+                props.classNameModal
+              )
+            : clsx(
+                "border-2 border-accent rounded-box",
+                "shadow-md m-2 h-max",
+                props.classNameNonModal
+              ),
+          props.className
+        )}
       >
-        <div
-          className={clsx(
-            daisyModalEnabled
-              ? clsx(
-                  "modal-box",
-                  "max-w-300 p-0",
-                  "size-full",
-                  "md:border-2 border-accent",
-                  "rounded-box-modal", // globals.cssで定義。md未満の場合、--radius-boxを上書きしこれ以下の要素のrounded-boxを無効にする
-                  "md:size-[calc(100%-2rem)]",
-                  "lg:size-[calc(100%-4rem)]",
-                  "xl:size-[calc(100%-6rem)]",
-                  props.classNameModal
-                )
-              : clsx(
-                  "border-2 border-accent rounded-box",
-                  "shadow-md m-2 h-max",
-                  props.classNameNonModal
-                ),
-            props.className
-          )}
-        >
-          {props.children}
-        </div>
-        <div className={daisyModalEnabled ? "modal-backdrop" : "hidden"}>
-          <button onClick={props.onClose}>close</button>
-        </div>
+        {props.children}
       </div>
-    </>
+      <div className={open ? "modal-backdrop" : "hidden"}>
+        <button onClick={() => history.back()}>close</button>
+      </div>
+    </div>
   );
 }
 
-export function MinMaxButton(props: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}) {
+export function MinMaxButton(props: { open: boolean; id: string }) {
   return (
     <button
       className={clsx("btn btn-sm btn-soft btn-accent my-1 mr-1")}
-      onClick={() => props.setOpen(!props.open)}
+      onClick={() => {
+        if (props.open) {
+          history.back();
+        } else {
+          // props.setOpen(true);
+          location.href = `#${props.id}`;
+        }
+      }}
     >
       {props.open ? (
         /*<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->*/

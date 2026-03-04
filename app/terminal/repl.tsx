@@ -457,13 +457,14 @@ export function ReplTerminal({
   }, [termReady, initCommandState, executionState]);
   return (
     <Modal
+      id={"repl-" + terminalId}
       className={clsx(
         "bg-base-300",
         "flex flex-col",
         "isolate"
       )}
       open={isModal}
-      onClose={() => setIsModal(false)}
+      setOpen={setIsModal}
     >
       <div className="bg-base-200 w-full overflow-x-clip overflow-y-visible flex items-center rounded-t-box">
         <button
@@ -522,7 +523,7 @@ export function ReplTerminal({
           </button>
         </div>
         <div className="flex-1" />
-        <MinMaxButton open={isModal} setOpen={setIsModal} />
+        <MinMaxButton open={isModal} id={`repl-${terminalId}`} />
       </div>
       {/*
       ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。

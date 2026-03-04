@@ -119,9 +119,10 @@ export function ExecFile(props: ExecProps) {
 
   return (
     <Modal
+      id={`exec-${props.filenames.join("-")}`}
       className={clsx("relative", "flex flex-col", "isolate")}
       open={isModal}
-      onClose={() => setIsModal(false)}
+      setOpen={setIsModal}
     >
       <div className="bg-base-200 flex w-full overflow-x-clip overflow-y-visible items-center rounded-t-box">
         <button
@@ -196,7 +197,7 @@ export function ExecFile(props: ExecProps) {
           </button>
         </div>
         <div className="flex-1" />
-        <MinMaxButton open={isModal} setOpen={setIsModal} />
+        <MinMaxButton open={isModal} id={`exec-${props.filenames.join("-")}`} />
       </div>
       <div className="flex-1 w-full overflow-hidden bg-base-300 p-4 pr-1 pt-2 relative rounded-b-box">
         {/*

@@ -132,12 +132,10 @@ export function EditorComponent(props: EditorProps) {
 
   return (
     <Modal
-      className={clsx(
-        "overflow-hidden",
-        "flex flex-col"
-      )}
+      id={`edit-${props.filename}`}
+      className={clsx("overflow-hidden", "flex flex-col")}
       open={isModal}
-      onClose={() => setIsModal(false)}
+      setOpen={setIsModal}
     >
       <div className="flex flex-row items-center bg-base-200">
         <span className="mt-2 mb-1 ml-3 mr-2 text-sm text-left">
@@ -178,7 +176,7 @@ export function EditorComponent(props: EditorProps) {
           <span className="hidden md:inline">元の内容に戻す</span>
         </button>
         <div className="flex-1" />
-        <MinMaxButton open={isModal} setOpen={setIsModal} />
+        <MinMaxButton open={isModal} id={`edit-${props.filename}`} />
       </div>
       {fontSize !== undefined && initAce ? (
         <Suspense
