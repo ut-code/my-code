@@ -107,7 +107,7 @@ export function PageContent(props: PageContentProps) {
             <StyledMarkdown
               content={section.rawContent.replace(
                 /-repl\s*\n/,
-                `-repl:${section.id}`
+                `-repl:${section.id}\n`
               )}
             />
           </div>

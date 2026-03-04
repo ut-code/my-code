@@ -118,7 +118,7 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   }, [currentLangIndex]);
 
   return (
-    <div className="bg-base-200 h-full w-80 overflow-y-auto">
+    <div className="bg-base-200 h-full w-80 flex flex-col">
       <h2 className="hidden lg:flex flex-row items-center p-4 gap-2">
         {/* サイドバーが常時表示されているlg以上の場合のみ */}
         <Link href="/" className="flex-1 flex items-center">
@@ -136,7 +136,7 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
         <label
           htmlFor="drawer-toggle"
           aria-label="open sidebar"
-          className="btn btn-ghost"
+          className="btn btn-ghost w-full justify-start"
         >
           <svg
             className="w-8 h-8"
@@ -156,7 +156,16 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
         </label>
       </span>
 
-      <ul className="menu w-full">
+      <ul
+        className="menu w-full h-max flex-nowrap grow-1 overflow-y-auto overflow-x-clip"
+        style={{
+          scrollbarGutter: "stable",
+          // DaisyUIはスクロールバーカラーを変更しているが、sidebarを開いた際にはさらに暗い色に変更してしまう
+          // ここではsidebarの状態によらずDaisyUIがデフォルトで設定しているスクロールバーカラーを復元
+          scrollbarColor:
+            "color-mix(in oklch, currentColor 35%, transparent) transparent",
+        }}
+      >
         {pagesList.map((group, i) => (
           <li key={group.id}>
             <details

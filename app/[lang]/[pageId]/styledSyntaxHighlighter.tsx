@@ -7,6 +7,7 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { LangConstants } from "@my-code/runtime/languages";
+import clsx from "clsx";
 
 // SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
 const SyntaxHighlighter = lazy(() => {
@@ -44,7 +45,12 @@ export function StyledSyntaxHighlighter(props: {
 }
 function FallbackPre({ children }: { children: string }) {
   return (
-    <pre className="border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!">
+    <pre
+      className={clsx(
+        "border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!",
+        "w-full overflow-auto"
+      )}
+    >
       {children}
     </pre>
   );

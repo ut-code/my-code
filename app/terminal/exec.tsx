@@ -1,18 +1,19 @@
 "use client";
 
 import {
+  calculateRows,
   clearTerminal,
-  getRows,
   hideCursor,
   systemMessageColor,
   useTerminal,
 } from "./terminal";
 import { writeOutput } from "./repl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useEmbedContext } from "./embedContext";
 import clsx from "clsx";
 import { LangConstants } from "@my-code/runtime/languages";
 import { useRuntime } from "@my-code/runtime/context";
+import { MinMaxButton, Modal } from "./modal";
 
 interface ExecProps {
   /*
@@ -24,8 +25,34 @@ interface ExecProps {
   content: string;
 }
 export function ExecFile(props: ExecProps) {
+  // ターミナルの行数を計算するためのstate
+  const [contents, setContents] = useState(props.content + "\n");
+  const [isModal, setIsModal] = useState(false);
+  const [fontSize, setFontSize] = useState<number>();
+  const [windowHeight, setWindowHeight] = useState<number>(1000);
+  useEffect(() => {
+    const update = () => {
+      setFontSize(
+        parseFloat(getComputedStyle(document.documentElement).fontSize)
+      ); // 1rem
+      setWindowHeight(window.innerHeight);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  const getRows = useCallback(
+    (cols: number) =>
+      isModal
+        ? "fit"
+        : Math.min(
+            calculateRows(contents, cols),
+            Math.floor((windowHeight * 0.2) / ((fontSize || 16) * 1.2))
+          ),
+    [contents, isModal, fontSize, windowHeight]
+  );
   const { terminalRef, terminalInstanceRef, termReady } = useTerminal({
-    getRows: (cols: number) => getRows(props.content, cols) + 1,
+    getRows,
     onReady: () => {
       hideCursor(terminalInstanceRef.current!);
       for (const line of props.content.split("\n")) {
@@ -57,6 +84,7 @@ export function ExecFile(props: ExecProps) {
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
         const filenameKey = props.filenames.join(",");
         clearExecResult(filenameKey);
+        setContents("");
         let isFirstOutput = true;
         await runFiles(props.filenames, files, (output) => {
           if (output.type === "file") {
@@ -77,8 +105,13 @@ export function ExecFile(props: ExecProps) {
             null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
             props.language
           );
+          setContents((prev) => prev + output.message + "\n");
         });
         setExecutionState("idle");
+        if (isFirstOutput) {
+          // If there was no output, clear the "実行中です..." message
+          clearTerminal(terminalInstanceRef.current!);
+        }
       })();
     }
   }, [
@@ -95,14 +128,20 @@ export function ExecFile(props: ExecProps) {
   ]);
 
   return (
-    <div className="border border-accent border-2 shadow-md m-2 rounded-box relative">
-      <div className="bg-base-200 flex items-center rounded-t-box">
+    <Modal
+      id={`exec-${props.filenames.join("-")}`}
+      className={clsx("relative", "flex flex-col", "isolate")}
+      open={isModal}
+      setOpen={setIsModal}
+    >
+      <div className="bg-base-200 flex w-full overflow-x-clip overflow-y-visible items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
           → heightを解除し、min-heightをデフォルトのサイズと同じにする */
           className={clsx(
-            "btn btn-soft btn-accent h-[unset]! min-h-(--size) self-stretch",
+            "btn btn-soft h-[unset]! min-h-(--size) self-stretch",
+            executionState === "idle" ? "btn-accent" : "btn-error",
             "rounded-none rounded-tl-[calc(var(--radius-box)-2px)]"
           )}
           onClick={() => {
@@ -131,13 +170,16 @@ export function ExecFile(props: ExecProps) {
             )
           }
         >
-          {executionState === "idle" ? "▶ 実行" : "■ 停止"}
+          {executionState === "idle" ? (
+            <StartButtonContent />
+          ) : (
+            <StopButtonContent />
+          )}
         </button>
         <code className="text-left break-all text-sm my-1 ml-4">
           {getCommandlineStr?.(props.filenames)}
         </code>
         <div className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1">
-          {/*なぜかわからないがz-1がないと後ろに隠れてしまう*/}
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">
@@ -164,15 +206,18 @@ export function ExecFile(props: ExecProps) {
             ？
           </button>
         </div>
+        <div className="flex-1" />
+        <MinMaxButton open={isModal} id={`exec-${props.filenames.join("-")}`} />
       </div>
-      <div className="bg-base-300 p-4 pr-1 pt-2 relative rounded-b-box">
+      <div className="flex-1 w-full overflow-hidden bg-base-300 p-4 pr-1 pt-2 relative rounded-b-box">
         {/*
       ターミナル表示の初期化が完了するまでの間、ターミナルは隠し、内容をそのまま表示する。
       可能な限りレイアウトが崩れないようにするため & SSRでも内容が読めるように(SEO?)という意味もある
       */}
         <pre
           className={clsx(
-            "font-mono overflow-auto cursor-wait",
+            "font-mono whitespace-pre-line cursor-wait",
+            "pr-3",
             "min-h-26", // xterm.jsで5行分の高さ
             termReady && "hidden"
           )}
@@ -183,7 +228,8 @@ export function ExecFile(props: ExecProps) {
           className={clsx(
             !termReady &&
               /* "hidden" だとterminalがdivのサイズを取得しようとしたときにバグる*/
-              "absolute invisible"
+              "absolute invisible",
+            "w-full h-full"
           )}
           ref={terminalRef}
         />
@@ -191,6 +237,49 @@ export function ExecFile(props: ExecProps) {
           <div className="absolute z-10 inset-0 cursor-wait" />
         )}
       </div>
-    </div>
+    </Modal>
+  );
+}
+
+export function StartButtonContent() {
+  return (
+    <>
+      {/*<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->*/}
+      <svg
+        fill="currentColor"
+        className="w-4 h-4"
+        viewBox="0 0 32 32"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M5.92 24.096q0 1.088 0.928 1.728 0.512 0.288 1.088 0.288 0.448 0 0.896-0.224l16.16-8.064q0.48-0.256 0.8-0.736t0.288-1.088-0.288-1.056-0.8-0.736l-16.16-8.064q-0.448-0.224-0.896-0.224-0.544 0-1.088 0.288-0.928 0.608-0.928 1.728v16.16z"></path>
+      </svg>
+      <span className="inline-block w-7">実行</span>
+    </>
+  );
+}
+export function StopButtonContent() {
+  /*<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->*/
+  return (
+    <>
+      <svg
+        className="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M6 12C6 12.5523 6.44772 13 7 13L17 13C17.5523 13 18 12.5523 18 12C18 11.4477 17.5523 11 17 11H7C6.44772 11 6 11.4477 6 12Z"
+          fill="currentColor"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23ZM12 20.9932C7.03321 20.9932 3.00683 16.9668 3.00683 12C3.00683 7.03321 7.03321 3.00683 12 3.00683C16.9668 3.00683 20.9932 7.03321 20.9932 12C20.9932 16.9668 16.9668 20.9932 12 20.9932Z"
+          fill="currentColor"
+        />
+      </svg>
+      <span className="inline-block w-7">停止</span>
+    </>
   );
 }

@@ -15,12 +15,23 @@ npx prisma dev
 ```
 を実行し、`t` キーを押して表示される DATABASE_URL をコピー
 
-ルートディレクトリに .env.local という名前のファイルを作成し、以下の内容を記述
+ルートディレクトリに .env または .env.local という名前のファイルを作成し、以下の内容を記述
 ```dotenv
 API_KEY=GeminiAPIキー
 BETTER_AUTH_URL=http://localhost:3000
 DATABASE_URL="postgres://... (prisma devの出力)"
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
 ```
+
+* `API_KEY` はGeminiのAPIキーを作成して設定します。未設定の場合チャットが使えません
+* `GITHUB_CLIENT_ID` `GITHUB_CLIENT_SECRET` はGitHub OAuthのクライアントIDとシークレットを設定します。未設定の場合「GitHubでログイン」が使えません。
+作り方については https://www.better-auth.com/docs/authentication/github を参照
+* `GOOGLE_CLIENT_ID` `GOOGLE_CLIENT_SECRET` はGoogle OAuthのクライアントIDとシークレットを設定します。未設定の場合「Googleでログイン」が使えません。
+作り方については https://www.better-auth.com/docs/authentication/google を参照 (GitHubのほうがかんたんかも)
+
 
 別のターミナルで、
 ```bash
@@ -51,9 +62,10 @@ npm run lint
 ### 本番環境の場合
 
 上記の環境変数以外に、
-* BETTER_AUTH_SECRET に任意の文字列
-* GOOGLE_CLIENT_IDとGOOGLE_CLIENT_SECRETにGoogle OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/google
-* GITHUB_CLIENT_IDとGITHUB_CLIENT_SECRETにGitHub OAuthのクライアントIDとシークレット https://www.better-auth.com/docs/authentication/github
+
+* `BETTER_AUTH_SECRET` に任意の文字列
+
+が必要です。
 
 現在は本番環境(my-code.utcode.net)はCoolifyでデプロイしています。
 Cloudflare Worker のビルドログとステータス表示が見れますが、そちらは使っていません。
