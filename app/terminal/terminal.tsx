@@ -134,6 +134,7 @@ export function useTerminal(props: TerminalProps) {
       ]).then(([{ Terminal }, { FitAddon }]) => {
         if (!abortController.signal.aborted) {
           const term = new Terminal({
+            screenReaderMode: true,
             cursorBlink: true,
             convertEol: true,
             cursorStyle: "bar",

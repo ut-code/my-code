@@ -571,6 +571,7 @@ export function ReplTerminal({
             "w-full h-full"
           )}
           ref={terminalRef}
+          onTouchEnd={() => terminalInstanceRef.current?.focus()}
         />
       </div>
     </Modal>
