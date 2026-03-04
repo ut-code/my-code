@@ -121,13 +121,14 @@ export function ExecFile(props: ExecProps) {
     <Modal
       className={clsx(
         "border border-accent border-2 rounded-box relative",
-        "flex flex-col"
+        "flex flex-col",
+        "isolate"
       )}
       classNameNonModal="shadow-md m-2"
       open={isModal}
       onClose={() => setIsModal(false)}
     >
-      <div className="bg-base-200 flex w-full overflow-hidden items-center rounded-t-box">
+      <div className="bg-base-200 flex w-full items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
@@ -173,7 +174,6 @@ export function ExecFile(props: ExecProps) {
           {getCommandlineStr?.(props.filenames)}
         </code>
         <div className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1">
-          {/*なぜかわからないがz-1がないと後ろに隠れてしまう*/}
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">

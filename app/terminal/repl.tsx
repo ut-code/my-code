@@ -459,13 +459,14 @@ export function ReplTerminal({
     <Modal
       className={clsx(
         "bg-base-300 border border-accent border-2 rounded-box",
-        "flex flex-col"
+        "flex flex-col",
+        "isolate"
       )}
       classNameNonModal="shadow-md m-2 h-max"
       open={isModal}
       onClose={() => setIsModal(false)}
     >
-      <div className="bg-base-200 w-full overflow-hidden flex items-center rounded-t-box">
+      <div className="bg-base-200 w-full flex items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
@@ -493,7 +494,7 @@ export function ReplTerminal({
         <span className="text-sm my-1 ml-3 text-left">
           {runtimeInfo?.prettyLangName || language} 実行環境
         </span>
-        <div className="ml-1 tooltip tooltip-secondary tooltip-bottom">
+        <div className="ml-1 tooltip tooltip-secondary tooltip-bottom z-1">
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">
