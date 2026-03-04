@@ -102,6 +102,10 @@ export function ExecFile(props: ExecProps) {
           setContents((prev) => prev + output.message + "\n");
         });
         setExecutionState("idle");
+        if (isFirstOutput) {
+          // If there was no output, clear the "実行中です..." message
+          clearTerminal(terminalInstanceRef.current!);
+        }
       })();
     }
   }, [
