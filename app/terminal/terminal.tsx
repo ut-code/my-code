@@ -105,7 +105,6 @@ export function useTerminal(props: TerminalProps) {
       if (rows === "fit") {
         rows = dims.rows;
       }
-      console.log(dims)
       terminalInstanceRef.current?.resize(dims.cols, Math.max(5, rows));
     }
   }, [getRows]);
