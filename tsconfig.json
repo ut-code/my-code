@@ -20,7 +20,6 @@
     ],
     "paths": {
       "@/*": ["./app/*"],
-      "@my-code/runtime/samples/*": ["./packages/runtime/samples/*"],
       "@my-code/runtime/tests/*": ["./packages/runtime/tests/*"],
       "@my-code/runtime/*": ["./packages/runtime/src/*"]
     }

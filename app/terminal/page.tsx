@@ -8,16 +8,6 @@ import { ReplTerminal } from "./repl";
 import { EditorComponent } from "./editor";
 import { ExecFile } from "./exec";
 import { useTerminal } from "./terminal";
-
-import main_py from "@my-code/runtime/samples/main.py?raw";
-import main_rb from "@my-code/runtime/samples/main.rb?raw";
-import main_js from "@my-code/runtime/samples/main.js?raw";
-import main2_ts from "@my-code/runtime/samples/main2.ts?raw";
-import main_cpp from "@my-code/runtime/samples/main.cpp?raw";
-import sub_h from "@my-code/runtime/samples/sub.h?raw";
-import sub_cpp from "@my-code/runtime/samples/sub.cpp?raw";
-import main2_rs from "@my-code/runtime/samples/main2.rs?raw";
-import sub_rs from "@my-code/runtime/samples/sub.rs?raw";
 import {
   RUNTIME_TIMEOUTS,
   waitForRuntimeReady,
@@ -25,6 +15,16 @@ import {
 import { replTests } from "@my-code/runtime/tests/repl";
 import { fileExecutionTests } from "@my-code/runtime/tests/fileExecution";
 import { useRuntimeAll } from "@my-code/runtime/context";
+
+import main_py from "./samples/main.py?raw";
+import main_rb from "./samples/main.rb?raw";
+import main_js from "./samples/main.js?raw";
+import main2_ts from "./samples/main2.ts?raw";
+import main_cpp from "./samples/main.cpp?raw";
+import sub_h from "./samples/sub.h?raw";
+import sub_cpp from "./samples/sub.cpp?raw";
+import main2_rs from "./samples/main2.rs?raw";
+import sub_rs from "./samples/sub.rs?raw";
 
 export default function RuntimeTestPage() {
   return (
