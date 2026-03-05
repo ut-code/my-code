@@ -138,7 +138,10 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
     level?: number;
   };
   // TODO: validation of frontmatter using zod
-  const rawContent = content.slice(endIdx + 5);
+  // replコードブロックにはセクションidをターミナルidとして与える。
+  const rawContent = content
+    .slice(endIdx + 5)
+    .replace(/-repl\s*\n/, `-repl:${fm?.id ?? ""}\n`);
   return {
     id: fm?.id ?? "",
     title: fm?.title ?? "",

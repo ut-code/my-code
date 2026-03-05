@@ -50,7 +50,6 @@ export async function initContext(ctx?: Partial<Context>): Promise<Context> {
 }
 
 export async function addChat(
-  docsId: string,
   sectionId: string,
   messages: CreateChatMessage[],
   context?: Partial<Context>
@@ -63,7 +62,6 @@ export async function addChat(
     .insert(chat)
     .values({
       userId,
-      docsId,
       sectionId,
     })
     .returning();

@@ -19,8 +19,7 @@ interface PageContentProps {
   pageEntry: PageEntry;
   lang: string;
   pageId: string;
-  // TODO: チャット周りのid管理をsectionIdに移行し、docs_idパラメータを削除
-  docs_id: string;
+  langName: string;
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
@@ -104,12 +103,7 @@ export function PageContent(props: PageContentProps) {
             }}
           >
             {/* ドキュメントのコンテンツ */}
-            <StyledMarkdown
-              content={section.rawContent.replace(
-                /-repl\s*\n/,
-                `-repl:${section.id}\n`
-              )}
-            />
+            <StyledMarkdown content={section.rawContent} />
           </div>
           <div>
             {/* 右側に表示するチャット履歴欄 */}
@@ -150,9 +144,8 @@ export function PageContent(props: PageContentProps) {
         // replがz-10を使用することからそれの上にするためz-20
         <div className="fixed bottom-4 right-4 left-4 lg:left-84 z-20">
           <ChatForm
-            documentContent={props.documentContent}
+            langName={props.langName}
             sectionContent={dynamicMdContent}
-            docs_id={props.docs_id}
             close={() => setIsFormVisible(false)}
           />
         </div>

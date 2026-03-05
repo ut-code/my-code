@@ -54,9 +54,9 @@ export default async function Page({
         documentContent={documentContent}
         splitMdContent={sections}
         pageEntry={pageEntry}
-        docs_id={docsId}
         lang={lang}
         pageId={pageId}
+        langName={langEntry.name}
       />
     </ChatHistoryProvider>
   );

@@ -2,10 +2,13 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-export async function generateContent(prompt: string) {
+export async function generateContent(prompt: string, systemInstruction?: string) {
   const params = {
     model: "gemini-2.5-flash",
     contents: prompt,
+    config: {
+      systemInstruction,
+    }
   };
 
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
