@@ -25,25 +25,18 @@ const revisions = yaml.load(revisionsPrevYml) as Record<
   RevisionYmlEntry
 >;
 
-for (const id in revisions) {
-  delete revisions[id].lang;
-  delete revisions[id].page;
-}
-
 for (const lang of langEntries) {
   for (const page of lang.pages) {
     const sections = await getMarkdownSections(lang.id, page.slug);
     for (const section of sections) {
-      if (section.file === "-intro.md") continue;
       if (section.id in revisions) {
-        revisions[section.id].lang = lang.id;
-        revisions[section.id].page = page.slug;
+        revisions[section.id].page = `${lang.id}/${page.slug}`;
         if (!revisions[section.id].rev.some((r) => r.md5 === section.md5)) {
           // ドキュメントが変更された場合
           console.log(`${section.id} has new md5: ${section.md5}`);
           revisions[section.id].rev.push({
             md5: section.md5,
-            commit,
+            git: commit,
             path: `public/docs/${lang.id}/${page.slug}/${section.file}`,
           });
         }
@@ -54,22 +47,33 @@ for (const lang of langEntries) {
           rev: [
             {
               md5: section.md5,
-              commit,
+              git: commit,
               path: `public/docs/${lang.id}/${page.slug}/${section.file}`,
             },
           ],
-          lang: lang.id,
-          page: page.slug,
+          page: `${lang.id}/${page.slug}`,
         };
       }
     }
   }
 }
 
-const revisionsYml = yaml.dump(revisions);
+for (const id in revisions) {
+  if (!existsSync(join(docsDir, revisions[id].page))) {
+    throw new Error(
+      `The page slug ${revisions[id].page} previously used by section ${id} does not exist. ` +
+        `Please replace 'page: ${revisions[id].page}' in public/docs/revisions.yml with new page path manually.`
+    );
+  }
+}
+
+const revisionsYml = yaml.dump(revisions, {
+  sortKeys: true,
+  noArrayIndent: true,
+});
 await writeFile(
   join(docsDir, "revisions.yml"),
-  "# This file will be updated by scripts/updateDocsRevisions.ts. Do not edit manually.\n" +
+  "# This file will be updated by CI. Do not edit manually, unless CI failed.\n" +
     revisionsYml,
   "utf-8"
 );

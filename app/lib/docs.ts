@@ -40,13 +40,12 @@ interface IndexYml {
 }
 
 export interface RevisionYmlEntry {
-  lang?: string;
-  page?: string;
+  page: string;
   rev: SectionRevision[];
 }
 export interface SectionRevision {
   md5: string; // mdファイル全体のmd5
-  commit: string;
+  git: string; // git上のコミットハッシュ
   path: string;
 }
 
@@ -163,7 +162,7 @@ export async function getMarkdownSections(
         level: 1,
         title: "",
         rawContent: raw,
-        md5: "",
+        md5: crypto.createHash("md5").update(raw).digest("base64"),
       });
     } else {
       sections.push(parseFrontmatter(raw, file));
@@ -197,7 +196,7 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
     title: fm?.title ?? "",
     level: fm?.level ?? 2,
     rawContent,
-    md5: crypto.createHash("md5").update(content).digest("base64"),
+    md5: crypto.createHash("md5").update(rawContent).digest("base64"),
   };
 }
 
@@ -209,17 +208,17 @@ export async function getRevisionOfMarkdownSection(
   const targetRevision = revisions?.rev.find((r) => r.md5 === md5);
   if (targetRevision) {
     const rawRes = await fetch(
-      `https://raw.githubusercontent.com/ut-code/my-code/${targetRevision.commit}/${targetRevision.path}`
+      `https://raw.githubusercontent.com/ut-code/my-code/${targetRevision.git}/${targetRevision.path}`
     );
     if (rawRes.ok) {
       const raw = await rawRes.text();
       return parseFrontmatter(
         raw,
-        `${targetRevision.commit}/${targetRevision.path}`
+        `${targetRevision.git}/${targetRevision.path}`
       );
     } else {
       throw new Error(
-        `Failed to fetch ${targetRevision.commit}/${targetRevision.path}. ${rawRes.status}: ${await rawRes.text()}`
+        `Failed to fetch ${targetRevision.git}/${targetRevision.path}. ${rawRes.status}: ${await rawRes.text()}`
       );
     }
   } else {
