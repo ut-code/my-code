@@ -14,36 +14,21 @@ import {
 } from "./terminal";
 import type { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
-import { emptyMutex, langConstants, RuntimeLang, useRuntime } from "./runtime";
+import { LangConstants } from "@my-code/runtime/languages";
 import clsx from "clsx";
 import { InlineCode } from "@/[lang]/[pageId]/markdown";
+import { emptyMutex, ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import { useRuntime } from "@my-code/runtime/context";
 import { MinMaxButton, Modal } from "./modal";
 import { StopButtonContent } from "./exec";
 
-export type ReplOutputType =
-  | "stdout"
-  | "stderr"
-  | "error"
-  | "return"
-  | "trace"
-  | "system";
-export interface ReplOutput {
-  type: ReplOutputType; // 出力の種類
-  message: string; // 出力メッセージ
-}
-export interface ReplCommand {
-  command: string;
-  output: ReplOutput[];
-  commandId?: string; // Optional for backward compatibility
-}
-export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
 export function writeOutput(
   term: Terminal,
   output: ReplOutput,
   returnPrefix: string | undefined,
   Prism: typeof import("prismjs") | null,
-  language: RuntimeLang
+  language: LangConstants
 ) {
   // 出力内容に応じて色を変える
   const message = String(output.message).replace(/\n/g, "\r\n");
@@ -76,7 +61,7 @@ export function writeOutput(
 
 interface ReplComponentProps {
   terminalId: string;
-  language: RuntimeLang;
+  language: LangConstants;
   initContent?: string; // markdownで書かれている内容 (初期化時に実行するコマンドを含む文字列)
 }
 export function ReplTerminal({
@@ -93,6 +78,12 @@ export function ReplTerminal({
     }
   }, [Prism]);
 
+  if (language.runtime === undefined) {
+    throw new Error(
+      `Language ${language.originalLang} does not have a runtime environment.`
+    );
+  }
+
   const {
     ready: runtimeReady,
     mutex: runtimeMutex = emptyMutex,
@@ -101,8 +92,8 @@ export function ReplTerminal({
     checkSyntax,
     splitReplExamples,
     runtimeInfo,
-  } = useRuntime(language);
-  const { tabSize, prompt, promptMore, returnPrefix } = langConstants(language);
+  } = useRuntime(language.runtime);
+  const { tabSize, prompt, promptMore, returnPrefix } = language;
   if (!prompt) {
     console.warn(`prompt not defined for language: ${language}`);
   }
@@ -309,7 +300,7 @@ export function ReplTerminal({
           } else if (code === 9) {
             // Tab
             // タブをスペースに変換
-            const spaces = " ".repeat(tabSize);
+            const spaces = " ".repeat(tabSize ?? 4);
             updateBuffer(() => {
               const newBuffer = [...inputBuffer.current];
               // 最後の行にスペースを追加
@@ -489,13 +480,13 @@ export function ReplTerminal({
           <StopButtonContent />
         </button>
         <span className="text-sm my-1 ml-3 text-left">
-          {runtimeInfo?.prettyLangName || language} 実行環境
+          {runtimeInfo?.prettyLangName || language.runtime} 実行環境
         </span>
         <div className="ml-1 tooltip tooltip-secondary tooltip-bottom z-1">
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">
-              {runtimeInfo?.prettyLangName || language}
+              {runtimeInfo?.prettyLangName || language.runtime}
             </span>
             {runtimeInfo?.version && (
               <span className="mr-0.5">{runtimeInfo?.version}</span>

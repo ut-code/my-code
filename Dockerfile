@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 COPY packages/jsEval/package.json ./packages/jsEval/
+COPY packages/runtime/package.json ./packages/runtime/
 
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund

@@ -1,4 +1,4 @@
-import { ReplOutput } from "../repl";
+import { ReplOutput } from "../interface";
 import { compileAndRun, CompilerInfo, SelectedCompiler } from "./api";
 
 import _stacktrace_cpp from "./cpp/_stacktrace.cpp?raw";

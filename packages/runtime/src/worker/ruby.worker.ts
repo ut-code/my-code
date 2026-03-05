@@ -4,39 +4,41 @@
 import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
-import type { WorkerCapabilities } from "./runtime";
-import type { ReplOutput, ReplOutputType } from "../repl";
-import type { UpdatedFile } from "../runtime";
+import type { WorkerAPI, WorkerCapabilities } from "./runtime";
+import type { ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
 
 import init_rb from "./ruby/init.rb?raw";
 
 let rubyVM: RubyVM | null = null;
-let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
+let currentOutputCallback: ((output: ReplOutput | UpdatedFile) => Promise<void>) | null = null;
 let stdoutBuffer = "";
 let stderrBuffer = "";
 
+// Pyodide,jsEvalと違ってrubyは標準出力を非同期関数で置き換えることが可能
+// onOutputの戻り値のPromiseを配列にためておいて最後にまとめてawaitする実装にすることもできるが、
+// どちらがシンプルか?
 declare global {
   var stdout: { write: (str: string) => void };
   var stderr: { write: (str: string) => void };
 }
 self.stdout = {
-  write(str: string) {
+  async write(str: string) {
     stdoutBuffer += str;
-    stdoutBuffer = handleBatchOutput(stdoutBuffer, "stdout");
+    stdoutBuffer = await handleBatchOutput(stdoutBuffer, "stdout");
   },
 };
 self.stderr = {
-  write(str: string) {
+  async write(str: string) {
     stderrBuffer += str;
-    stderrBuffer = handleBatchOutput(stderrBuffer, "stderr");
+    stderrBuffer = await handleBatchOutput(stderrBuffer, "stderr");
   },
 };
-function handleBatchOutput(buffer: string, type: ReplOutputType): string {
+async function handleBatchOutput(buffer: string, type: ReplOutputType): Promise<string> {
   // If buffer contains newlines, flush complete lines immediately
   if (buffer.includes("\n")) {
     const lines = buffer.split("\n");
     for (let i = 0; i < lines.length - 1; i++) {
-      currentOutputCallback?.({ type, message: lines[i] });
+      await currentOutputCallback?.({ type, message: lines[i] });
     }
     return lines[lines.length - 1];
   }
@@ -69,15 +71,15 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
   return { capabilities: { interrupt: "restart" } };
 }
 
-function flushOutput() {
+async function flushOutput() {
   // Flush any remaining non-empty text without newlines
   if (stdoutBuffer && stdoutBuffer.trim()) {
-    currentOutputCallback?.({ type: "stdout", message: stdoutBuffer });
+    await currentOutputCallback?.({ type: "stdout", message: stdoutBuffer });
   }
   stdoutBuffer = "";
 
   if (stderrBuffer && stderrBuffer.trim()) {
-    currentOutputCallback?.({ type: "stderr", message: stderrBuffer });
+    await currentOutputCallback?.({ type: "stderr", message: stderrBuffer });
   }
   stderrBuffer = "";
 }
@@ -104,7 +106,7 @@ function formatRubyError(error: unknown, isFile: boolean): string {
 
 async function runCode(
   code: string,
-  onOutput: (output: ReplOutput | UpdatedFile) => void
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
 ): Promise<void> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
@@ -115,15 +117,15 @@ async function runCode(
     stdoutBuffer = "";
     stderrBuffer = "";
 
-    const result = rubyVM.eval(code);
+    const result = await rubyVM.evalAsync(code);
 
     const resultStr = await result.callAsync("inspect");
 
     // Flush any buffered output
-    flushOutput();
+    await flushOutput();
 
     // Add result to output if it's not nil and not empty
-    onOutput({
+    await onOutput({
       type: "return",
       message: resultStr.toString(),
     });
@@ -131,9 +133,9 @@ async function runCode(
     console.log(e);
 
     // Flush any buffered output
-    flushOutput();
+    await flushOutput();
 
-    onOutput({
+    await onOutput({
       type: "error",
       message: formatRubyError(e, false),
     });
@@ -141,14 +143,14 @@ async function runCode(
 
   const updatedFiles = readAllFiles();
   for (const [filename, content] of Object.entries(updatedFiles)) {
-    onOutput({ type: "file", filename, content });
+    await onOutput({ type: "file", filename, content });
   }
 }
 
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => void
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
 ): Promise<void> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
@@ -174,17 +176,17 @@ async function runFile(
     rubyVM.eval(`$LOADED_FEATURES.reject! { |f| f =~ /^\\/[^\\/]*\\.rb$/ }`);
 
     // Run the specified file
-    rubyVM.eval(`load ${JSON.stringify(name)}`);
+    await rubyVM.evalAsync(`load ${JSON.stringify(name)}`);
 
     // Flush any buffered output
-    flushOutput();
+    await flushOutput();
   } catch (e) {
     console.log(e);
 
     // Flush any buffered output
-    flushOutput();
+    await flushOutput();
 
-    onOutput({
+    await onOutput({
       type: "error",
       message: formatRubyError(e, true),
     });
@@ -192,7 +194,7 @@ async function runFile(
 
   const updatedFiles = readAllFiles();
   for (const [filename, content] of Object.entries(updatedFiles)) {
-    onOutput({ type: "file", filename, content });
+    await onOutput({ type: "file", filename, content });
   }
 }
 
@@ -275,7 +277,7 @@ async function restoreState(commands: string[]): Promise<object> {
 
   for (const command of commands) {
     try {
-      rubyVM.eval(command);
+      await rubyVM.evalAsync(command);
     } catch (e) {
       // If restoration fails, we still continue with other commands
       console.error("Failed to restore command:", command, e);
@@ -289,7 +291,7 @@ async function restoreState(commands: string[]): Promise<object> {
   return {};
 }
 
-const api = {
+const api: WorkerAPI = {
   init,
   runCode,
   runFile,

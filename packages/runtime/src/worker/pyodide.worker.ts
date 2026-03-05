@@ -3,21 +3,22 @@
 
 import { expose } from "comlink";
 import type { PyodideInterface } from "pyodide";
-// import { loadPyodide } from "pyodide"; -> Reading from "node:child_process" is not handled by plugins
+import { loadPyodide } from "pyodide";
 import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
-import type { WorkerCapabilities } from "./runtime";
-import type { ReplOutput } from "../repl";
-import type { UpdatedFile } from "../runtime";
+import type { WorkerAPI, WorkerCapabilities } from "./runtime";
+import type { ReplOutput, UpdatedFile } from "../interface";
 
 import execfile_py from "./pyodide/execfile.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";
 
-const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`;
 const HOME = `/home/pyodide/`;
 
 let pyodide: PyodideInterface;
-let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
+let pendingOutputPromise: Promise<void>[] = [];
+let currentOutputCallback:
+  | ((output: ReplOutput | UpdatedFile) => Promise<void>)
+  | null = null;
 
 // Helper function to read all files from the Pyodide file system
 function readAllFiles(): Record<string, string> {
@@ -42,18 +43,33 @@ async function init(
   interruptBuffer: Uint8Array
 ): Promise<{ capabilities: WorkerCapabilities }> {
   if (!pyodide) {
-    self.importScripts(`${PYODIDE_CDN}pyodide.js`);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pyodide = await (self as any).loadPyodide({ indexURL: PYODIDE_CDN });
+    try {
+      pyodide = await loadPyodide({
+        indexURL: `${self.location.origin}/_next/static/pyodide/v${pyodideVersion}`,
+      });
+    } catch {
+      pyodide = await loadPyodide({
+        indexURL: `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`,
+      });
+    }
 
     pyodide.setStdout({
-      batched: (str: string) =>
-        currentOutputCallback?.({ type: "stdout", message: str }),
+      batched: (str: string) => {
+        if (currentOutputCallback) {
+          pendingOutputPromise.push(
+            currentOutputCallback({ type: "stdout", message: str })
+          );
+        }
+      },
     });
     pyodide.setStderr({
-      batched: (str: string) =>
-        currentOutputCallback?.({ type: "stderr", message: str }),
+      batched: (str: string) => {
+        if (currentOutputCallback) {
+          pendingOutputPromise.push(
+            currentOutputCallback({ type: "stderr", message: str })
+          );
+        }
+      },
     });
 
     pyodide.setInterruptBuffer(interruptBuffer);
@@ -63,22 +79,25 @@ async function init(
 
 async function runCode(
   code: string,
-  onOutput: (output: ReplOutput | UpdatedFile) => void
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
 ): Promise<void> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
   }
   currentOutputCallback = onOutput;
+  pendingOutputPromise = [];
   try {
     const result = await pyodide.runPythonAsync(code);
+    await Promise.all(pendingOutputPromise);
     if (result !== undefined) {
-      onOutput({
+      await onOutput({
         type: "return",
         message: String(result),
       });
     }
   } catch (e: unknown) {
     console.log(e);
+    await Promise.all(pendingOutputPromise);
     if (e instanceof Error) {
       // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
       if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
@@ -86,7 +105,7 @@ async function runCode(
         const execLineIndex = lines.findIndex((line) =>
           line.includes("<exec>")
         );
-        onOutput({
+        await onOutput({
           type: "error",
           message: lines
             .slice(0, 1)
@@ -95,13 +114,13 @@ async function runCode(
             .trim(),
         });
       } else {
-        onOutput({
+        await onOutput({
           type: "error",
           message: `予期せぬエラー: ${e.message.trim()}`,
         });
       }
     } else {
-      onOutput({
+      await onOutput({
         type: "error",
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
@@ -110,19 +129,20 @@ async function runCode(
 
   const updatedFiles = readAllFiles();
   for (const [filename, content] of Object.entries(updatedFiles)) {
-    onOutput({ type: "file", filename, content });
+    await onOutput({ type: "file", filename, content });
   }
 }
 
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => void
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
 ): Promise<void> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
   }
   currentOutputCallback = onOutput;
+  pendingOutputPromise = [];
   try {
     // Use Pyodide FS API to write files to the file system
     for (const filename of Object.keys(files)) {
@@ -133,8 +153,10 @@ async function runFile(
 
     const pyExecFile = pyodide.runPython(execfile_py) as PyCallable;
     pyExecFile(`${HOME}/${name}`);
+    await Promise.all(pendingOutputPromise);
   } catch (e: unknown) {
     console.log(e);
+    await Promise.all(pendingOutputPromise);
     if (e instanceof Error) {
       // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
       // <exec> 自身も隠す
@@ -143,7 +165,7 @@ async function runFile(
         const execLineIndex = lines.findLastIndex((line) =>
           line.includes("<exec>")
         );
-        onOutput({
+        await onOutput({
           type: "error",
           message: lines
             .slice(0, 1)
@@ -152,13 +174,13 @@ async function runFile(
             .trim(),
         });
       } else {
-        onOutput({
+        await onOutput({
           type: "error",
           message: `予期せぬエラー: ${e.message.trim()}`,
         });
       }
     } else {
-      onOutput({
+      await onOutput({
         type: "error",
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
@@ -167,7 +189,7 @@ async function runFile(
 
   const updatedFiles = readAllFiles();
   for (const [filename, content] of Object.entries(updatedFiles)) {
-    onOutput({ type: "file", filename, content });
+    await onOutput({ type: "file", filename, content });
   }
 }
 
@@ -197,7 +219,7 @@ async function restoreState(): Promise<object> {
   throw new Error("not implemented");
 }
 
-const api = {
+const api: WorkerAPI = {
   init,
   runCode,
   runFile,
