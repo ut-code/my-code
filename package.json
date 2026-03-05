@@ -7,14 +7,13 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run cf-typegen && npm run generateLanguages && npm run generateSections && npm run copyAllDTSFiles && npm run removeHinting && next dev",
-    "build": "npm run cf-typegen && npm run generateLanguages && npm run generateSections && npm run copyAllDTSFiles && npm run removeHinting && next build",
+    "dev": "npm run cf-typegen && npm run generateDocsMeta && npm run copyAllDTSFiles && npm run removeHinting && next dev",
+    "build": "npm run cf-typegen && npm run generateDocsMeta && npm run copyAllDTSFiles && npm run removeHinting && next build",
     "start": "next start",
     "lint": "npm run cf-typegen && next lint",
     "tsc": "npm run cf-typegen && tsc",
     "format": "prettier --write app/",
-    "generateLanguages": "tsx ./scripts/generateLanguagesList.ts",
-    "generateSections": "tsx ./scripts/generateSectionsList.ts",
+    "generateDocsMeta": "tsx ./scripts/generateDocsMeta.ts",
     "copyAllDTSFiles": "tsx ./scripts/copyAllDTSFiles.ts",
     "removeHinting": "tsx ./scripts/removeHinting.ts",
     "cf-preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview --port 3000",
