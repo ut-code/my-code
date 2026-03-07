@@ -7,26 +7,59 @@ import { notFound } from "next/navigation";
 import crypto from "node:crypto";
 
 export interface MarkdownSection {
-  file: string; // ファイル名
+  /**
+   * セクションのmdファイル名
+   */
+  file: string;
+  /**
+   * frontmatterに書くセクションid
+   * (データベース上の sectionId)
+   */
   id: string;
   level: number;
   title: string;
-  rawContent: string; // 見出しも含めたもとのmarkdownの内容
-  md5: string; // mdファイル全体のmd5
+  /**
+   * frontmatterを除く、見出しも含めたもとのmarkdownの内容
+   */
+  rawContent: string;
+  /**
+   * rawContentのmd5ハッシュのbase64エンコード
+   */
+  md5: string;
 }
 
-export interface PageEntry {
-  index: number;
-  slug: string;
-  name: string;
-  title: string;
-}
-
+/**
+ * 各言語のindex.ymlから読み込んだデータにid,index等を追加したデータ型
+ */
 export interface LanguageEntry {
+  /**
+   * public/docs/にある言語のディレクトリ名をidとして用いる
+   */
   id: string;
+  /**
+   * 言語の表示名
+   */
   name: string;
   description: string;
   pages: PageEntry[];
+}
+export interface PageEntry {
+  /**
+   * 章番号、0からはじまる連番
+   */
+  index: number;
+  /**
+   * 章のディレクトリ名。
+   */
+  slug: string;
+  /**
+   * 章の短いタイトル
+   */
+  name: string;
+  /**
+   * 章の長いタイトル
+   */
+  title: string;
 }
 
 interface IndexYml {
@@ -40,12 +73,24 @@ interface IndexYml {
 }
 
 export interface RevisionYmlEntry {
+  /**
+   * `langId/pageSlug`
+   */
   page: string;
   rev: SectionRevision[];
 }
 export interface SectionRevision {
-  md5: string; // mdファイル全体のmd5
-  git: string; // git上のコミットハッシュ
+  /**
+   * rawContentのmd5ハッシュ
+   */
+  md5: string;
+  /**
+   * git上のコミットid
+   */
+  git: string;
+  /**
+   * リポジトリのルートからの、セクションのmdファイルのパス
+   */
   path: string;
 }
 
