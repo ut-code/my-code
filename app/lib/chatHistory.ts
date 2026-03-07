@@ -3,8 +3,8 @@
 import { headers } from "next/headers";
 import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
-import { chat, message } from "@/schema/chat";
-import { and, asc, eq } from "drizzle-orm";
+import { chat, message, section } from "@/schema/chat";
+import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
 import { revalidateTag, unstable_cacheLife } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
@@ -54,6 +54,7 @@ export async function initContext(ctx?: Partial<Context>): Promise<Context> {
 }
 
 export async function addChat(
+  path: PagePath,
   sectionId: SectionId,
   messages: CreateChatMessage[],
   context?: Partial<Context>
@@ -81,17 +82,21 @@ export async function addChat(
     )
     .returning();
 
-  revalidateTag(cacheKeyForPage({}, userId));
+  revalidateTag(cacheKeyForPage(path, userId));
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
     console.log(
-      `deleting cache for chatHistory/getChat for user ${userId} and docs ${lang}/${page}`
+      `deleting cache for chatHistory/getChat for user ${userId} and docs ${path.lang}/${path.page}`
     );
-    await cache.delete(cacheKeyForPage({}, userId));
+    await cache.delete(cacheKeyForPage(path, userId));
   }
 
   return {
     ...newChat,
+    section: {
+      sectionId,
+      pagePath: `${path.lang}/${path.page}`,
+    },
     messages: chatMessages,
   };
 }
@@ -108,8 +113,17 @@ export async function getChat(
   }
 
   const chats = await drizzle.query.chat.findMany({
-    where: and(eq(chat.userId, userId), eq(chat.docsId, docsId)),
+    where: and(
+      eq(chat.userId, userId),
+      exists(
+        drizzle
+          .select()
+          .from(section)
+          .where(eq(section.pagePath, `${path.lang}/${path.page}`))
+      )
+    ),
     with: {
+      section: true,
       messages: {
         orderBy: [asc(message.createdAt)],
       },

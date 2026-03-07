@@ -170,7 +170,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
       targetSectionId = introSectionId(path);
     }
     const responseMessage = text.split(/-{3,}/)[1].trim();
-    const newChat = await addChat(targetSectionId, [
+    const newChat = await addChat(path, targetSectionId, [
       { role: "user", content: userQuestion },
       { role: "ai", content: responseMessage },
     ]);
