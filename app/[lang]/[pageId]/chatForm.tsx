@@ -11,14 +11,15 @@ import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useChatHistoryContext } from "./chatHistory";
 import { askAI } from "@/actions/chatActions";
+import { PagePath } from "@/lib/docs";
 
 interface ChatFormProps {
-  langName: string;
+  path: PagePath;
   sectionContent: DynamicMarkdownSection[];
   close: () => void;
 }
 
-export function ChatForm({ langName, sectionContent, close }: ChatFormProps) {
+export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +75,7 @@ export function ChatForm({ langName, sectionContent, close }: ChatFormProps) {
     // }
 
     const result = await askAI({
-      langName,
+      path,
       userQuestion,
       sectionContent,
       replOutputs,

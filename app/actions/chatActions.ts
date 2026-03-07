@@ -5,6 +5,7 @@ import { generateContent } from "./gemini";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "../terminal/repl";
 import { addChat, ChatWithMessages } from "@/lib/chatHistory";
+import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
 
 type ChatResult =
   | {
@@ -17,7 +18,7 @@ type ChatResult =
     };
 
 type ChatParams = {
-  langName: string;
+  path: PagePath;
   userQuestion: string;
   sectionContent: DynamicMarkdownSection[];
   replOutputs: Record<string, ReplCommand[]>;
@@ -36,13 +37,16 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   // }
 
   const {
-    langName,
+    path,
     userQuestion,
     sectionContent,
     replOutputs,
     files,
     execResults,
   } = params;
+
+  const pagesList = await getPagesList();
+  const langName = pagesList.find((lang) => lang.id === path.lang)?.name;
 
   const prompt: string[] = [];
 
@@ -138,7 +142,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   prompt.push(
     "  - ユーザーの質問がドキュメントのどのセクションとも直接的に関連しない場合は空白でも良いです。"
   );
-  prompt.push("- 2行目は水平線 --- を出力してください。")
+  prompt.push("- 2行目は水平線 --- を出力してください。");
   prompt.push(
     "- それ以降の行に、ドキュメントの内容に基づいて、ユーザーに伝える回答をMarkdown形式で記述してください。"
   );
@@ -150,7 +154,9 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     "  - 回答内でコードブロックを使用する際は ```言語名 としてください。" +
       "ドキュメント内では ```言語名-repl や ```言語名:ファイル名 、 ```言語名-exec:ファイル名 などが登場しますが、ユーザーへの回答ではこれらの記法は使用しないでください。"
   );
-  prompt.push("  - 水平線(---)はシステムが区切りとして認識するので、ユーザーへの回答中に水平線を使用することはできません。");
+  prompt.push(
+    "  - 水平線(---)はシステムが区切りとして認識するので、ユーザーへの回答中に水平線を使用することはできません。"
+  );
   console.log(prompt);
 
   try {
@@ -159,7 +165,10 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     if (!text) {
       throw new Error("AIからの応答が空でした");
     }
-    const targetSectionId = text.split(/-{3,}/)[0].trim();
+    let targetSectionId = text.split(/-{3,}/)[0].trim() as SectionId;
+    if (!targetSectionId) {
+      targetSectionId = introSectionId(path);
+    }
     const responseMessage = text.split(/-{3,}/)[1].trim();
     const newChat = await addChat(targetSectionId, [
       { role: "user", content: userQuestion },

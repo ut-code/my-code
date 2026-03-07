@@ -3,12 +3,17 @@ import { notFound } from "next/navigation";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
 import { getChatFromCache, initContext } from "@/lib/chatHistory";
-import { getMarkdownSections, getPagesList } from "@/lib/docs";
+import {
+  getMarkdownSections,
+  getPagesList,
+  LangId,
+  PageSlug,
+} from "@/lib/docs";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ lang: string; pageId: string }>;
+  params: Promise<{ lang: LangId; pageId: PageSlug }>;
 }): Promise<Metadata> {
   const { lang, pageId } = await params;
   const pagesList = await getPagesList();
@@ -28,7 +33,7 @@ export async function generateMetadata({
 export default async function Page({
   params,
 }: {
-  params: Promise<{ lang: string; pageId: string }>;
+  params: Promise<{ lang: LangId; pageId: PageSlug }>;
 }) {
   const { lang, pageId } = await params;
   const pagesList = await getPagesList();
@@ -36,27 +41,23 @@ export default async function Page({
   const pageEntry = langEntry?.pages.find((p) => p.slug === pageId);
   if (!langEntry || !pageEntry) notFound();
 
-  const docsId = `${lang}/${pageId}`;
+  // server componentなのでuseMemoいらない
+  const path = { lang: lang, page: pageId };
   const sections = await getMarkdownSections(lang, pageId);
 
-  // AI用のドキュメント全文（rawContentを結合）
-  const documentContent = sections.map((s) => s.rawContent).join("\n");
-
   const context = await initContext();
-  const initialChatHistories = await getChatFromCache(docsId, context);
+  const initialChatHistories = await getChatFromCache(path, context);
 
   return (
     <ChatHistoryProvider
       initialChatHistories={initialChatHistories}
-      docs_id={docsId}
+      path={path}
     >
       <PageContent
-        documentContent={documentContent}
         splitMdContent={sections}
+        langEntry={langEntry}
         pageEntry={pageEntry}
-        lang={lang}
-        pageId={pageId}
-        langName={langEntry.name}
+        path={path}
       />
     </ChatHistoryProvider>
   );

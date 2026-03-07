@@ -6,6 +6,24 @@ import { isCloudflare } from "./detectCloudflare";
 import { notFound } from "next/navigation";
 import crypto from "node:crypto";
 
+/*
+Branded Types
+文字列に「架空のプロパティ」を交差させることで、コンパイラに別の型として認識させます。
+実際には __brand というプロパティは実行時には存在しませんが、
+コンパイル時のみ「この文字列は Id 用にラベル付けされたものだ」と厳格にチェックしてくれます。
+
+ってGeminiが言ってた
+*/
+type Brand<K, T> = K & { readonly __brand: T };
+export type LangId = Brand<string, "LangId">;
+export type LangName = Brand<string, "LangName">;
+export type PageSlug = Brand<string, "PageSlug">;
+export interface PagePath {
+  lang: LangId;
+  page: PageSlug;
+}
+export type SectionId = Brand<string, "SectionId">;
+
 export interface MarkdownSection {
   /**
    * セクションのmdファイル名
@@ -15,7 +33,7 @@ export interface MarkdownSection {
    * frontmatterに書くセクションid
    * (データベース上の sectionId)
    */
-  id: string;
+  id: SectionId;
   level: number;
   title: string;
   /**
@@ -35,11 +53,11 @@ export interface LanguageEntry {
   /**
    * public/docs/にある言語のディレクトリ名をidとして用いる
    */
-  id: string;
+  id: LangId;
   /**
    * 言語の表示名
    */
-  name: string;
+  name: LangName;
   description: string;
   pages: PageEntry[];
 }
@@ -51,7 +69,7 @@ export interface PageEntry {
   /**
    * 章のディレクトリ名。
    */
-  slug: string;
+  slug: PageSlug;
   /**
    * 章の短いタイトル
    */
@@ -115,16 +133,16 @@ async function readPublicFile(path: string): Promise<string> {
   }
 }
 
-async function getLanguageIds(): Promise<string[]> {
+async function getLanguageIds(): Promise<LangId[]> {
   if (isCloudflare()) {
     const raw = await readPublicFile("docs/languages.json");
-    return JSON.parse(raw) as string[];
+    return JSON.parse(raw) as LangId[];
   } else {
     const docsDir = join(process.cwd(), "public", "docs");
     const entries = await readdir(docsDir, { withFileTypes: true });
     return entries
       .filter((e) => e.isDirectory())
-      .map((e) => e.name)
+      .map((e) => e.name as LangId)
       .sort();
   }
 }
@@ -137,10 +155,11 @@ export async function getPagesList(): Promise<LanguageEntry[]> {
       const data = yaml.load(raw) as IndexYml;
       return {
         id: langId,
-        name: data.name,
+        name: data.name as LangName,
         description: data.description,
         pages: data.pages.map((p, index) => ({
           ...p,
+          slug: p.slug as PageSlug,
           index,
         })),
       };
@@ -149,12 +168,12 @@ export async function getPagesList(): Promise<LanguageEntry[]> {
 }
 
 export async function getSectionsList(
-  lang: string,
-  pageId: string
+  lang: LangId,
+  page: PageSlug
 ): Promise<string[]> {
   if (isCloudflare()) {
     const sectionsJson = await readPublicFile(
-      `docs/${lang}/${pageId}/sections.json`
+      `docs/${lang}/${page}/sections.json`
     );
     return JSON.parse(sectionsJson) as string[];
   } else {
@@ -172,14 +191,14 @@ export async function getSectionsList(
       }
       return a.localeCompare(b);
     }
-    return (await readdir(join(process.cwd(), "public", "docs", lang, pageId)))
+    return (await readdir(join(process.cwd(), "public", "docs", lang, page)))
       .filter((f) => f.endsWith(".md"))
       .sort(naturalSortMdFiles);
   }
 }
 
 export async function getRevisions(
-  sectionId: string
+  sectionId: SectionId
 ): Promise<RevisionYmlEntry | undefined> {
   const revisionsYml = await readPublicFile(`docs/revisions.yml`);
   return (yaml.load(revisionsYml) as Record<string, RevisionYmlEntry>)[
@@ -191,19 +210,19 @@ export async function getRevisions(
  * public/docs/{lang}/{pageId}/ 以下のmdファイルを結合して MarkdownSection[] を返す。
  */
 export async function getMarkdownSections(
-  lang: string,
-  pageId: string
+  lang: LangId,
+  page: PageSlug
 ): Promise<MarkdownSection[]> {
-  const files = await getSectionsList(lang, pageId);
+  const files = await getSectionsList(lang, page);
 
   const sections: MarkdownSection[] = [];
   for (const file of files) {
-    const raw = await readPublicFile(`docs/${lang}/${pageId}/${file}`);
+    const raw = await readPublicFile(`docs/${lang}/${page}/${file}`);
     if (file === "-intro.md") {
       // イントロセクションはフロントマターなし・見出しなし
       sections.push({
         file,
-        id: `${lang}-${pageId}-intro`,
+        id: introSectionId({ lang, page }),
         level: 1,
         title: "",
         rawContent: raw,
@@ -214,6 +233,9 @@ export async function getMarkdownSections(
     }
   }
   return sections;
+}
+export function introSectionId(path: PagePath) {
+  return `${path.lang}-${path.page}-intro` as SectionId;
 }
 
 /**
@@ -229,27 +251,27 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
     throw new Error(`File ${file} has invalid frontmatter`);
   }
   const fm = yaml.load(content.slice(4, endIdx)) as {
-    id?: string;
-    title?: string;
-    level?: number;
+    id: SectionId;
+    title: string;
+    level: number;
   };
   // TODO: validation of frontmatter using zod
   // replコードブロックにはセクションidをターミナルidとして与える。
   const rawContent = content
     .slice(endIdx + 5)
-    .replace(/-repl\s*\n/, `-repl:${fm?.id ?? ""}\n`);
+    .replace(/-repl\s*\n/, `-repl:${fm.id ?? ""}\n`);
   return {
     file,
-    id: fm?.id ?? "",
-    title: fm?.title ?? "",
-    level: fm?.level ?? 2,
+    id: fm.id,
+    title: fm.title,
+    level: fm.level,
     rawContent,
     md5: crypto.createHash("md5").update(rawContent).digest("base64"),
   };
 }
 
 export async function getRevisionOfMarkdownSection(
-  sectionId: string,
+  sectionId: SectionId,
   md5: string
 ): Promise<MarkdownSection> {
   const revisions = await getRevisions(sectionId);

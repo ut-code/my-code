@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatWithMessages, getChat } from "@/lib/chatHistory";
+import { PagePath } from "@/lib/docs";
 import {
   createContext,
   ReactNode,
@@ -28,11 +29,11 @@ export function useChatHistoryContext() {
 
 export function ChatHistoryProvider({
   children,
-  docs_id,
+  path,
   initialChatHistories,
 }: {
   children: ReactNode;
-  docs_id: string;
+  path: PagePath;
   initialChatHistories: ChatWithMessages[];
 }) {
   const [chatHistories, setChatHistories] =
@@ -43,7 +44,7 @@ export function ChatHistoryProvider({
   }, [initialChatHistories]);
   // その後、クライアント側で最新のchatHistoriesを改めて取得して更新する
   const { data: fetchedChatHistories } = useSWR<ChatWithMessages[]>(
-    docs_id,
+    path,
     getChat,
     {
       // リクエストは古くても構わないので1回でいい
