@@ -8,6 +8,10 @@ import {
 import yaml from "js-yaml";
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import { getDrizzle } from "@/lib/drizzle";
+import { section as sectionTable } from "@/schema/chat";
+import { eq } from "drizzle-orm";
+import "dotenv/config";
 
 const docsDir = join(process.cwd(), "public", "docs");
 
@@ -65,6 +69,20 @@ for (const id in revisions) {
         `Please replace 'page: ${revisions[id].page}' in public/docs/revisions.yml with new page path manually.`
     );
   }
+}
+
+const drizzle = await getDrizzle();
+for (const id in revisions) {
+  await drizzle
+    .insert(sectionTable)
+    .values({
+      sectionId: id,
+      pagePath: revisions[id].page,
+    })
+    .onConflictDoUpdate({
+      target: sectionTable.sectionId,
+      set: { pagePath: revisions[id].page },
+    });
 }
 
 const revisionsYml = yaml.dump(revisions, {

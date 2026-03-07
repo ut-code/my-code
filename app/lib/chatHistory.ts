@@ -119,7 +119,10 @@ export async function getChat(
         drizzle
           .select()
           .from(section)
-          .where(eq(section.pagePath, `${path.lang}/${path.page}`))
+          .where(and(
+            eq(section.sectionId, chat.sectionId),
+            eq(section.pagePath, `${path.lang}/${path.page}`),
+          ))
       )
     ),
     with: {
@@ -140,6 +143,7 @@ export async function getChat(
       })
     );
   }
+  // @ts-expect-error なぜかchatsの型にsectionとmessagesが含まれていないことになっているが、正しくwithを指定しているし、console.logしてみるとちゃんと含まれている
   return chats;
 }
 export async function getChatFromCache(path: PagePath, context: Context) {
@@ -149,6 +153,7 @@ export async function getChatFromCache(path: PagePath, context: Context) {
   // cacheされる関数の中でheader()にはアクセスできない。
   // なので外でinitContext()を呼んだものを引数に渡す必要がある。
   // しかし、drizzleオブジェクトは外から渡せないのでgetChatの中で改めてinitContext()を呼んでdrizzleだけ再初期化している
+  // こんな意味不明な仕様になっているのはactionから呼ばれる関数とレンダリング時に呼ばれる関数を1ファイルでまとめて定義し共通化しようとしているせい。あとでなんとかする
   const { auth, userId } = context;
   if (!userId) {
     return [];

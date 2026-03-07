@@ -112,7 +112,13 @@ export function PageContent(props: PageContentProps) {
           <div>
             {/* 右側に表示するチャット履歴欄 */}
             {chatHistories
-              .filter((c) => c.sectionId === section.id)
+              .filter(
+                (c) =>
+                  c.sectionId === section.id ||
+                  // 対象のセクションが存在しないものは、introセクション(index=0)にフォールバックする
+                  (index === 0 &&
+                    dynamicMdContent.every((sec) => c.sectionId !== sec.id))
+              )
               .map(({ chatId, messages }) => (
                 <div
                   key={chatId}
