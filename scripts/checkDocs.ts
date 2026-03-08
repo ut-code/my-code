@@ -42,9 +42,12 @@ if (process.argv[2] === "--write") {
 
 const docsDir = join(process.cwd(), "public", "docs");
 
-const commit = execFileSync("git", ["rev-parse", "--short", "HEAD"], {
-  encoding: "utf8",
-}).trim();
+let commit = "";
+if (doWrite) {
+  commit = execFileSync("git", ["rev-parse", "--short", "HEAD"], {
+    encoding: "utf8",
+  }).trim();
+}
 
 const langEntries = await getPagesList();
 
