@@ -57,7 +57,7 @@ npm run lint
 ### データベースのスキーマ
 
 * データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `npx drizzle-kit generate` でmigrationファイルを作成し、 `npx drizzle-kit migrate` でデータベースに反映します。
-    * また、mainにマージする際に本番環境のデータベースにもmigrateをする必要があります
+    * 本番環境のデータベースのmigrateはmainにpushされた際にGitHub Actionで実行されます
 * スキーマのファイルを追加した場合は app/lib/drizzle.ts でimportを追加する必要があります(たぶん)
 * `npx prisma dev` で立ち上げたデータベースは `npx prisma dev ls` でデータベース名の確認・ `npx prisma dev rm default` で削除ができるらしい
 
