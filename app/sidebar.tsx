@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LanguageEntry } from "@/lib/docs";
+import { LangId, LanguageEntry, PagePath, PageSlug } from "@/lib/docs";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./themeToggle";
 import {
@@ -18,11 +18,10 @@ import { LanguageIcon } from "@/terminal/icons";
 import { RuntimeLang } from "@my-code/runtime/languages";
 
 export interface ISidebarMdContext {
-  loadedDocsId: { lang: string; pageId: string } | null;
+  loadedPath: PagePath | null;
   sidebarMdContent: DynamicMarkdownSection[];
   setSidebarMdContent: (
-    lang: string,
-    pageId: string,
+    path: PagePath,
     content:
       | DynamicMarkdownSection[]
       | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
@@ -49,19 +48,15 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   const [sidebarMdContent, setSidebarMdContent_] = useState<
     DynamicMarkdownSection[]
   >([]);
-  const [loadedDocsId, setLoadedDocsId] = useState<{
-    lang: string;
-    pageId: string;
-  } | null>(null);
+  const [loadedPath, setLoadedPath] = useState<PagePath | null>(null);
   const setSidebarMdContent = useCallback(
     (
-      lang: string,
-      pageId: string,
+      path: PagePath,
       content:
         | DynamicMarkdownSection[]
         | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
     ) => {
-      setLoadedDocsId({ lang, pageId });
+      setLoadedPath(path);
       setSidebarMdContent_(content);
     },
     []
@@ -69,7 +64,7 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   return (
     <SidebarMdContext.Provider
       value={{
-        loadedDocsId,
+        loadedPath,
         sidebarMdContent,
         setSidebarMdContent,
       }}
@@ -82,14 +77,14 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
 export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   const pathname = usePathname();
   const pathnameMatch = pathname.match(/^\/([\w-_]+)\/([\w-_]+).*?/);
-  const currentLang = pathnameMatch?.[1];
-  const currentPageId = pathnameMatch?.[2];
+  const currentLang = pathnameMatch?.[1] as LangId;
+  const currentPageId = pathnameMatch?.[2] as PageSlug;
   const sidebarContext = useSidebarMdContext();
   // sidebarMdContextの情報が古かったら使わない
   const sidebarMdContent =
-    sidebarContext.loadedDocsId &&
-    sidebarContext.loadedDocsId.lang === currentLang &&
-    sidebarContext.loadedDocsId.pageId === currentPageId
+    sidebarContext.loadedPath &&
+    sidebarContext.loadedPath.lang === currentLang &&
+    sidebarContext.loadedPath.page === currentPageId
       ? sidebarContext.sidebarMdContent
       : [];
 
