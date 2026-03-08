@@ -29,6 +29,7 @@ import { existsSync } from "node:fs";
 import { getDrizzle } from "@/lib/drizzle";
 import { section as sectionTable } from "@/schema/chat";
 import "dotenv/config";
+import { sql } from "drizzle-orm";
 
 let doWrite = false;
 let doCheckDiff = false;
@@ -114,16 +115,20 @@ for (const id in revisions) {
 
 if (doWrite) {
   const drizzle = await getDrizzle();
-  for (const id in revisions) {
+  const batchSize = 100;
+  const entries = Object.entries(revisions);
+  for (let i = 0; i < entries.length; i += batchSize) {
     await drizzle
       .insert(sectionTable)
-      .values({
-        sectionId: id,
-        pagePath: revisions[id].page,
-      })
+      .values(
+        entries.slice(i, i + batchSize).map(([id, data]) => ({
+          sectionId: id,
+          pagePath: data.page,
+        }))
+      )
       .onConflictDoUpdate({
         target: sectionTable.sectionId,
-        set: { pagePath: revisions[id].page },
+        set: { pagePath: sql`excluded."pagePath"` },
       });
   }
 
