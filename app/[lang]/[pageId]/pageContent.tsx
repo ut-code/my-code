@@ -7,6 +7,7 @@ import { useChatHistoryContext } from "./chatHistory";
 import { useSidebarMdContext } from "@/sidebar";
 import clsx from "clsx";
 import { MarkdownSection, PageEntry } from "@/lib/docs";
+import { PageTransition } from "./pageTransition";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
 export type DynamicMarkdownSection = MarkdownSection & {
@@ -21,6 +22,8 @@ interface PageContentProps {
   pageId: string;
   // TODO: チャット周りのid管理をsectionIdに移行し、docs_idパラメータを削除
   docs_id: string;
+  prevPage: PageEntry;
+  nextPage: PageEntry;
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
@@ -145,6 +148,11 @@ export function PageContent(props: PageContentProps) {
           </div>
         </Fragment>
       ))}
+      <PageTransition
+        lang={props.lang}
+        prevPage={props.prevPage}
+        nextPage={props.nextPage}
+      />
       {isFormVisible ? (
         // sidebarの幅が80であることからleft-84 (sidebar.tsx参照)
         // replがz-10を使用することからそれの上にするためz-20

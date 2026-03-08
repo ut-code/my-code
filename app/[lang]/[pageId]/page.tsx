@@ -33,8 +33,12 @@ export default async function Page({
   const { lang, pageId } = await params;
   const pagesList = await getPagesList();
   const langEntry = pagesList.find((l) => l.id === lang);
-  const pageEntry = langEntry?.pages.find((p) => p.slug === pageId);
+  const pageEntryIndex = langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
+  const pageEntry = langEntry?.pages[pageEntryIndex];
   if (!langEntry || !pageEntry) notFound();
+
+  const prevPage = langEntry.pages[pageEntryIndex - 1];
+  const nextPage = langEntry.pages[pageEntryIndex + 1];
 
   const docsId = `${lang}/${pageId}`;
   const sections = await getMarkdownSections(lang, pageId);
@@ -57,6 +61,8 @@ export default async function Page({
         docs_id={docsId}
         lang={lang}
         pageId={pageId}
+        prevPage={prevPage}
+        nextPage={nextPage}
       />
     </ChatHistoryProvider>
   );
