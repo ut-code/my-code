@@ -26,7 +26,7 @@ interface PageContentProps {
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
-  const { splitMdContent, langEntry, pageEntry, path } = props;
+  const { splitMdContent, pageEntry, path } = props;
 
   // SSR用のローカルstate
   const [dynamicMdContent, setDynamicMdContent] = useState<
@@ -94,7 +94,7 @@ export function PageContent(props: PageContentProps) {
       }}
     >
       <Heading level={1}>
-        第{props.pageEntry.index}章: {props.pageEntry.title}
+        第{pageEntry.index}章: {pageEntry.title}
       </Heading>
       <div />
       {dynamicMdContent.map((section, index) => (
