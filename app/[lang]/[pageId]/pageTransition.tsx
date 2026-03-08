@@ -14,7 +14,7 @@ export function PageTransition({ lang, prevPage, nextPage }: PageTransitionProps
         {prevPage && (
           <Link
             href={`/${lang}/${prevPage.slug}`}
-            className="btn btn-ghost border-base-content/20 flex flex-col items-start h-auto py-2 normal-case"
+            className="btn btn-ghost border-2 border-base-content/20 hover:border-yellow-400 flex flex-col items-end h-auto py-2 normal-case text-right"
           >
             <span className="text-xs text-base-content/60 font-normal">前のページ</span>
             <span className="text-sm md:text-base">&laquo; {prevPage.title}</span>
@@ -25,7 +25,7 @@ export function PageTransition({ lang, prevPage, nextPage }: PageTransitionProps
         {nextPage && (
           <Link
             href={`/${lang}/${nextPage.slug}`}
-            className="btn btn-ghost border-base-content/20 flex flex-col items-end h-auto py-2 normal-case text-right"
+            className="btn btn-ghost border-2 border-base-content/20 hover:border-yellow-400 flex flex-col items-end h-auto py-2 normal-case text-right"
           >
             <span className="text-xs text-base-content/60 font-normal">次のページ</span>
             <span className="text-sm md:text-base">{nextPage.title} &raquo;</span>
