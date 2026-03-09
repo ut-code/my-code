@@ -27,75 +27,60 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
 
   const { addChat } = useChatHistoryContext();
 
-  // const lang = getLanguageName(docs_id);
-
   const { files, replOutputs, execResults } = useEmbedContext();
 
-  // const documentContentInView = sectionContent
-  //   .filter((s) => s.inView)
-  //   .map((s) => s.rawContent)
-  //   .join("\n\n");
-  // const { data: exampleData, error: exampleError } = useSWR(
-  //   // 質問フォームを開いたときだけで良い
-  //   {
-  //     lang,
-  //     documentContent: documentContentInView,
-  //   } satisfies QuestionExampleParams,
-  //   getQuestionExample,
-  //   {
-  //     // リクエストは古くても構わないので1回でいい
-  //     revalidateIfStale: false,
-  //     revalidateOnFocus: false,
-  //     revalidateOnReconnect: false,
-  //   }
-  // );
-  // if (exampleError) {
-  //   console.error("Error getting question example:", exampleError);
-  // }
+  const exampleData = sectionContent
+    .filter((s) => s.inView)
+    .map((s) => s.question)
+    .filter((qe) => qe !== undefined)
+    .flat();
   // 質問フォームを開くたびにランダムに選び直し、
   // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
-  const [exampleChoice, setExampleChoice] = useState<number>(0); // 0〜1
+  const [exampleChoice, setExampleChoice] = useState<number | undefined>(
+    undefined
+  ); // 0〜1
   useEffect(() => {
-    if (exampleChoice === 0) {
+    if (exampleChoice === undefined) {
       setExampleChoice(Math.random());
     }
   }, [exampleChoice]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrorMessage(null); // Clear previous error message
-
-    const userQuestion = inputValue;
-    // if (!userQuestion && exampleData) {
-    //   // 質問が空欄なら、質問例を使用
-    //   userQuestion =
-    //     exampleData[Math.floor(exampleChoice * exampleData.length)];
-    //   setInputValue(userQuestion);
-    // }
-
-    const result = await askAI({
-      path,
-      userQuestion,
-      sectionContent,
-      replOutputs,
-      files,
-      execResults,
-    });
-
-    if (result.error !== null) {
-      setErrorMessage(result.error);
-      console.log(result.error);
-    } else {
-      addChat(result.chat);
-      document.getElementById(result.chat.sectionId)?.scrollIntoView({
-        behavior: "smooth",
-      });
-      setInputValue("");
-      close();
+    let userQuestion = inputValue;
+    if (!userQuestion && exampleData.length > 0 && exampleChoice) {
+      // 質問が空欄なら、質問例を使用
+      userQuestion =
+        exampleData[Math.floor(exampleChoice * exampleData.length)];
+      setInputValue(userQuestion);
     }
+    if (userQuestion) {
+      e.preventDefault();
+      setIsLoading(true);
+      setErrorMessage(null); // Clear previous error message
 
-    setIsLoading(false);
+      const result = await askAI({
+        path,
+        userQuestion,
+        sectionContent,
+        replOutputs,
+        files,
+        execResults,
+      });
+
+      if (result.error !== null) {
+        setErrorMessage(result.error);
+        console.log(result.error);
+      } else {
+        addChat(result.chat);
+        document.getElementById(result.chat.sectionId)?.scrollIntoView({
+          behavior: "smooth",
+        });
+        setInputValue("");
+        close();
+      }
+
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -110,10 +95,10 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
       <textarea
         className="textarea textarea-ghost textarea-md rounded-box"
         placeholder={
-          "質問を入力してください" /* +
-          (exampleData
+          "質問を入力してください" +
+          (exampleData.length > 0 && exampleChoice !== undefined
             ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
-            : "")*/
+            : "")
         }
         style={{
           width: "100%",
