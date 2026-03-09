@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
@@ -31,7 +31,7 @@ export function strWidth(str: string): number {
 /**
  * contentsがちょうど収まるターミナルの高さを計算する
  */
-export function getRows(contents: string, cols: number): number {
+export function calculateRows(contents: string, cols: number): number {
   return contents
     .split("\n")
     .reduce(
@@ -85,7 +85,7 @@ function computeTerminalTheme() {
 }
 
 interface TerminalProps {
-  getRows?: (cols: number) => number;
+  getRows?: (cols: number) => number | "fit";
   onReady?: () => void;
 }
 export function useTerminal(props: TerminalProps) {
@@ -94,23 +94,33 @@ export function useTerminal(props: TerminalProps) {
   const fitAddonRef = useRef<FitAddon | null>(null);
   const [termReady, setTermReady] = useState<boolean>(false);
   const theme = useChangeTheme();
-  const getRowsRef = useRef<(cols: number) => number>(undefined);
-  getRowsRef.current = props.getRows;
   const onReadyRef = useRef<() => void>(undefined);
   onReadyRef.current = props.onReady;
+  const { getRows } = props;
+  const resizeTerminal = useCallback(() => {
+    // fitAddon.fit();
+    const dims = fitAddonRef.current?.proposeDimensions();
+    if (dims && !isNaN(dims.cols)) {
+      let rows = getRows?.(dims.cols) ?? 0;
+      if (rows === "fit") {
+        rows = dims.rows;
+      }
+      terminalInstanceRef.current?.resize(dims.cols, Math.max(5, rows));
+    }
+  }, [getRows]);
+  useEffect(() => {
+    const observer = new ResizeObserver(resizeTerminal);
+    observer.observe(terminalRef.current);
+    return () => observer.disconnect();
+  }, [resizeTerminal]);
+  const resizeTerminalRef = useRef(resizeTerminal);
+  resizeTerminalRef.current = resizeTerminal;
 
   // ターミナルの初期化処理
+  // 初期化が完了した瞬間にその時点のresizeTerminalとonReadyを呼び出す必要があるので、refに入れている
   useEffect(() => {
     if (typeof window !== "undefined") {
       const abortController = new AbortController();
-      const resizeTerminal = () => {
-        // fitAddon.fit();
-        const dims = fitAddonRef.current?.proposeDimensions();
-        if (dims && !isNaN(dims.cols)) {
-          const rows = Math.max(5, getRowsRef.current?.(dims.cols) ?? 0);
-          terminalInstanceRef.current?.resize(dims.cols, rows);
-        }
-      }
       /*
       globals.cssでフォントを指定し読み込んでいるが、
       それが読み込まれる前にterminalを初期化してしまうとバグるので、
@@ -123,6 +133,7 @@ export function useTerminal(props: TerminalProps) {
       ]).then(([{ Terminal }, { FitAddon }]) => {
         if (!abortController.signal.aborted) {
           const term = new Terminal({
+            screenReaderMode: true,
             cursorBlink: true,
             convertEol: true,
             cursorStyle: "bar",
@@ -142,7 +153,7 @@ export function useTerminal(props: TerminalProps) {
           fitAddonRef.current = new FitAddon();
           term.loadAddon(fitAddonRef.current);
           // fitAddonRef.current.fit();
-          resizeTerminal();
+          resizeTerminalRef.current();
 
           term.open(terminalRef.current);
 
@@ -171,12 +182,8 @@ export function useTerminal(props: TerminalProps) {
         }
       });
 
-      const observer = new ResizeObserver(resizeTerminal);
-      observer.observe(terminalRef.current);
-
       return () => {
         abortController.abort("terminal component dismount");
-        observer.disconnect();
         if (fitAddonRef.current) {
           fitAddonRef.current.dispose();
           fitAddonRef.current = null;

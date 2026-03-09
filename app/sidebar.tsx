@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LanguageEntry } from "@/lib/docs";
+import { LangId, LanguageEntry, PagePath, PageSlug } from "@/lib/docs";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./themeToggle";
 import {
@@ -18,11 +18,10 @@ import { LanguageIcon } from "./terminal/icons";
 import { RuntimeLang } from "./terminal/runtime";
 
 export interface ISidebarMdContext {
-  loadedDocsId: { lang: string; pageId: string } | null;
+  loadedPath: PagePath | null;
   sidebarMdContent: DynamicMarkdownSection[];
   setSidebarMdContent: (
-    lang: string,
-    pageId: string,
+    path: PagePath,
     content:
       | DynamicMarkdownSection[]
       | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
@@ -49,19 +48,15 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   const [sidebarMdContent, setSidebarMdContent_] = useState<
     DynamicMarkdownSection[]
   >([]);
-  const [loadedDocsId, setLoadedDocsId] = useState<{
-    lang: string;
-    pageId: string;
-  } | null>(null);
+  const [loadedPath, setLoadedPath] = useState<PagePath | null>(null);
   const setSidebarMdContent = useCallback(
     (
-      lang: string,
-      pageId: string,
+      path: PagePath,
       content:
         | DynamicMarkdownSection[]
         | ((prev: DynamicMarkdownSection[]) => DynamicMarkdownSection[])
     ) => {
-      setLoadedDocsId({ lang, pageId });
+      setLoadedPath(path);
       setSidebarMdContent_(content);
     },
     []
@@ -69,7 +64,7 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   return (
     <SidebarMdContext.Provider
       value={{
-        loadedDocsId,
+        loadedPath,
         sidebarMdContent,
         setSidebarMdContent,
       }}
@@ -82,14 +77,14 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
 export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   const pathname = usePathname();
   const pathnameMatch = pathname.match(/^\/([\w-_]+)\/([\w-_]+).*?/);
-  const currentLang = pathnameMatch?.[1];
-  const currentPageId = pathnameMatch?.[2];
+  const currentLang = pathnameMatch?.[1] as LangId;
+  const currentPageId = pathnameMatch?.[2] as PageSlug;
   const sidebarContext = useSidebarMdContext();
   // sidebarMdContextの情報が古かったら使わない
   const sidebarMdContent =
-    sidebarContext.loadedDocsId &&
-    sidebarContext.loadedDocsId.lang === currentLang &&
-    sidebarContext.loadedDocsId.pageId === currentPageId
+    sidebarContext.loadedPath &&
+    sidebarContext.loadedPath.lang === currentLang &&
+    sidebarContext.loadedPath.page === currentPageId
       ? sidebarContext.sidebarMdContent
       : [];
 
@@ -118,7 +113,7 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   }, [currentLangIndex]);
 
   return (
-    <div className="bg-base-200 h-full w-80 overflow-y-auto">
+    <div className="bg-base-200 h-full w-80 flex flex-col">
       <h2 className="hidden lg:flex flex-row items-center p-4 gap-2">
         {/* サイドバーが常時表示されているlg以上の場合のみ */}
         <Link href="/" className="flex-1 flex items-center">
@@ -136,7 +131,7 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
         <label
           htmlFor="drawer-toggle"
           aria-label="open sidebar"
-          className="btn btn-ghost"
+          className="btn btn-ghost w-full justify-start"
         >
           <svg
             className="w-8 h-8"
@@ -156,7 +151,16 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
         </label>
       </span>
 
-      <ul className="menu w-full">
+      <ul
+        className="menu w-full h-max flex-nowrap grow-1 overflow-y-auto overflow-x-clip"
+        style={{
+          scrollbarGutter: "stable",
+          // DaisyUIはスクロールバーカラーを変更しているが、sidebarを開いた際にはさらに暗い色に変更してしまう
+          // ここではsidebarの状態によらずDaisyUIがデフォルトで設定しているスクロールバーカラーを復元
+          scrollbarColor:
+            "color-mix(in oklch, currentColor 35%, transparent) transparent",
+        }}
+      >
         {pagesList.map((group, i) => (
           <li key={group.id}>
             <details

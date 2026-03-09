@@ -6,8 +6,13 @@ import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
 import { useSidebarMdContext } from "@/sidebar";
 import clsx from "clsx";
-import { MarkdownSection, PageEntry } from "@/lib/docs";
 import { PageTransition } from "./pageTransition";
+import {
+  LanguageEntry,
+  MarkdownSection,
+  PageEntry,
+  PagePath,
+} from "@/lib/docs";
 
 // MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
 export type DynamicMarkdownSection = MarkdownSection & {
@@ -15,8 +20,8 @@ export type DynamicMarkdownSection = MarkdownSection & {
 };
 
 interface PageContentProps {
-  documentContent: string;
   splitMdContent: MarkdownSection[];
+  langEntry: LanguageEntry;
   pageEntry: PageEntry;
   lang: string;
   pageId: string;
@@ -27,12 +32,13 @@ interface PageContentProps {
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
+  const { splitMdContent, pageEntry, path } = props;
 
   // SSR用のローカルstate
   const [dynamicMdContent, setDynamicMdContent] = useState<
     DynamicMarkdownSection[]
   >(
-    props.splitMdContent.map((section) => ({
+    splitMdContent.map((section) => ({
       ...section,
       inView: false,
     }))
@@ -40,13 +46,13 @@ export function PageContent(props: PageContentProps) {
 
   useEffect(() => {
     // props.splitMdContentが変わったときにローカルstateとcontextの両方を更新
-    const newContent = props.splitMdContent.map((section) => ({
+    const newContent = splitMdContent.map((section) => ({
       ...section,
       inView: false,
     }));
     setDynamicMdContent(newContent);
-    setSidebarMdContent(props.lang, props.pageId, newContent);
-  }, [props.splitMdContent, props.lang, props.pageId, setSidebarMdContent]);
+    setSidebarMdContent(path, newContent);
+  }, [splitMdContent, path, setSidebarMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
@@ -73,14 +79,14 @@ export function PageContent(props: PageContentProps) {
 
       // ローカルstateとcontextの両方を更新
       setDynamicMdContent(updateContent);
-      setSidebarMdContent(props.lang, props.pageId, updateContent);
+      setSidebarMdContent(path, updateContent);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [setSidebarMdContent, props.lang, props.pageId]);
+  }, [setSidebarMdContent, path]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -94,7 +100,7 @@ export function PageContent(props: PageContentProps) {
       }}
     >
       <Heading level={1}>
-        第{props.pageEntry.index}章: {props.pageEntry.title}
+        第{pageEntry.index}章: {pageEntry.title}
       </Heading>
       <div />
       {dynamicMdContent.map((section, index) => (
@@ -107,17 +113,18 @@ export function PageContent(props: PageContentProps) {
             }}
           >
             {/* ドキュメントのコンテンツ */}
-            <StyledMarkdown
-              content={section.rawContent.replace(
-                /-repl\s*\n/,
-                `-repl:${section.id}`
-              )}
-            />
+            <StyledMarkdown content={section.rawContent} />
           </div>
           <div>
             {/* 右側に表示するチャット履歴欄 */}
             {chatHistories
-              .filter((c) => c.sectionId === section.id)
+              .filter(
+                (c) =>
+                  c.sectionId === section.id ||
+                  // 対象のセクションが存在しないものは、introセクション(index=0)にフォールバックする
+                  (index === 0 &&
+                    dynamicMdContent.every((sec) => c.sectionId !== sec.id))
+              )
               .map(({ chatId, messages }) => (
                 <div
                   key={chatId}
@@ -158,9 +165,8 @@ export function PageContent(props: PageContentProps) {
         // replがz-10を使用することからそれの上にするためz-20
         <div className="fixed bottom-4 right-4 left-4 lg:left-84 z-20">
           <ChatForm
-            documentContent={props.documentContent}
+            path={path}
             sectionContent={dynamicMdContent}
-            docs_id={props.docs_id}
             close={() => setIsFormVisible(false)}
           />
         </div>

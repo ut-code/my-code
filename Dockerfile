@@ -21,7 +21,8 @@ COPY --from=dependencies /app/node_modules ./node_modules
 # Copy application source code
 COPY . .
 
-ENV NODE_ENV=production
+# Stop if documentation has any change that is not reflected to revisions.yml and database.
+RUN npx tsx ./scripts/checkDocs.ts --check-diff
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry

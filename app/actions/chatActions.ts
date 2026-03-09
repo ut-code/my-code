@@ -5,6 +5,7 @@ import { generateContent } from "./gemini";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "../terminal/repl";
 import { addChat, ChatWithMessages } from "@/lib/chatHistory";
+import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
 
 type ChatResult =
   | {
@@ -17,9 +18,8 @@ type ChatResult =
     };
 
 type ChatParams = {
+  path: PagePath;
   userQuestion: string;
-  docsId: string;
-  documentContent: string;
   sectionContent: DynamicMarkdownSection[];
   replOutputs: Record<string, ReplCommand[]>;
   files: Record<string, string>;
@@ -37,18 +37,22 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   // }
 
   const {
+    path,
     userQuestion,
-    documentContent,
     sectionContent,
     replOutputs,
     files,
     execResults,
   } = params;
 
+  const pagesList = await getPagesList();
+  const langName = pagesList.find((lang) => lang.id === path.lang)?.name;
+
   const prompt: string[] = [];
 
+  prompt.push(`あなたは${langName}言語のチュートリアルの講師をしています。`);
   prompt.push(
-    `以下のPythonチュートリアルのドキュメントの内容を正確に理解し、ユーザーからの質問に対して、初心者にも分かりやすく、丁寧な解説を提供してください。`
+    `以下の${langName}チュートリアルのドキュメントの内容を正確に理解し、ユーザーからの質問に対して、初心者にも分かりやすく、丁寧な解説を提供してください。`
   );
   prompt.push(``);
   const sectionTitlesInView = sectionContent
@@ -64,8 +68,13 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   prompt.push(``);
   prompt.push(`# ドキュメント`);
   prompt.push(``);
-  prompt.push(documentContent);
+  for (const section of sectionContent) {
+    prompt.push(`[セクションid: ${section.id}]`);
+    prompt.push(section.rawContent.trim());
+    prompt.push(``);
+  }
   prompt.push(``);
+  // TODO: 各セクションのドキュメントの直下にそのセクション内のターミナルの情報を加えるべきなのでは?
   if (Object.keys(replOutputs).length > 0) {
     prompt.push(
       `# ターミナルのログ（ユーザーが入力したコマンドとその実行結果）`
@@ -75,7 +84,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
       "以下はドキュメント内で実行例を示した各コードブロックの内容に加えてユーザーが追加で実行したコマンドです。"
     );
     prompt.push(
-      "例えば ```python-repl:1 のコードブロックに対してユーザーが実行したログが ターミナル #1 です。"
+      "例えば ```python-repl:foo のコードブロックに対してユーザーが実行したログが ターミナル #foo です。"
     );
     prompt.push(``);
     for (const [replId, replCommands] of Object.entries(replOutputs)) {
@@ -125,34 +134,45 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     }
   }
 
-  prompt.push("# ユーザーからの質問");
-  prompt.push(userQuestion);
-  prompt.push(``);
-
   prompt.push("# 指示");
+  prompt.push("");
   prompt.push(
-    "- 回答はMarkdown形式で記述し、コードブロックを適切に使用してください。"
+    `- 1行目に、ユーザーの質問ともっとも関連性の高いドキュメント内のセクションのidを回答してください。idのみを出力してください。`
   );
-  prompt.push("- ドキュメントの内容に基づいて回答してください。");
   prompt.push(
-    "- ユーザーが入力したターミナルのコマンドやファイルの内容、実行結果を参考にして回答してください。"
+    "  - ユーザーの質問がドキュメントのどのセクションとも直接的に関連しない場合は空白でも良いです。"
   );
-  prompt.push("- ユーザーへの回答のみを出力してください。");
-  prompt.push("- 必要であれば、具体的なコード例を提示してください。");
+  prompt.push("- 2行目は水平線 --- を出力してください。");
+  prompt.push(
+    "- それ以降の行に、ドキュメントの内容に基づいて、ユーザーに伝える回答をMarkdown形式で記述してください。"
+  );
+  prompt.push(
+    "  - ユーザーが入力したターミナルのコマンドやファイルの内容、実行結果を参考にして回答してください。"
+  );
+  prompt.push("  - 必要であれば、具体的なコード例を提示してください。");
+  prompt.push(
+    "  - 回答内でコードブロックを使用する際は ```言語名 としてください。" +
+      "ドキュメント内では ```言語名-repl や ```言語名:ファイル名 、 ```言語名-exec:ファイル名 などが登場しますが、ユーザーへの回答ではこれらの記法は使用しないでください。"
+  );
+  prompt.push(
+    "  - 水平線(---)はシステムが区切りとして認識するので、ユーザーへの回答中に水平線を使用することはできません。"
+  );
   console.log(prompt);
 
   try {
-    const result = await generateContent(prompt.join("\n"));
+    const result = await generateContent(userQuestion, prompt.join("\n"));
     const text = result.text;
     if (!text) {
       throw new Error("AIからの応答が空でした");
     }
-    // TODO: どのセクションへの回答にするかをAIに決めさせる
-    const targetSectionId =
-      sectionContent.find((s) => s.inView)?.id || "";
-    const newChat = await addChat(params.docsId, targetSectionId, [
+    let targetSectionId = text.split(/-{3,}/)[0].trim() as SectionId;
+    if (!targetSectionId) {
+      targetSectionId = introSectionId(path);
+    }
+    const responseMessage = text.split(/-{3,}/)[1].trim();
+    const newChat = await addChat(path, targetSectionId, [
       { role: "user", content: userQuestion },
-      { role: "ai", content: text },
+      { role: "ai", content: responseMessage },
     ]);
     return {
       error: null,

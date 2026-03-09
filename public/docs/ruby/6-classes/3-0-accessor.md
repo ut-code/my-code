@@ -1,6 +1,6 @@
 ---
 id: ruby-classes-accessor
-title: '🔐 アクセサメソッド
+title: '🔐 アクセサメソッド'
 level: 2
 ---
 
