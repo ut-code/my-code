@@ -22,8 +22,8 @@ interface PageContentProps {
   pageId: string;
   // TODO: チャット周りのid管理をsectionIdに移行し、docs_idパラメータを削除
   docs_id: string;
-  prevPage: PageEntry;
-  nextPage: PageEntry;
+  prevPage?: PageEntry;
+  nextPage?: PageEntry;
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
