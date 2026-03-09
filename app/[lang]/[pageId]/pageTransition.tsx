@@ -14,10 +14,10 @@ export function PageTransition({ lang, prevPage, nextPage }: PageTransitionProps
         {prevPage && (
           <Link
             href={`/${lang}/${prevPage.slug}`}
-            className="group flex-1 btn btn-ghost border-2 border-base-content/20 hover:border-yellow-400 flex flex-col items-start h-auto py-2 normal-case text-left"
+            className="group flex-1 btn btn-ghost border-2 border-base-content/20 hover:border-primary flex flex-col items-start h-auto py-2 normal-case text-left"
           >
-            <span className="text-xs text-base-content/60 font-normal group-hover:text-yellow-400">前のページ</span>
-            <span className="text-sm md:text-base group-hover:text-yellow-400">&laquo; {prevPage.name}</span>
+            <span className="text-xs text-base-content/60 font-normal group-hover:text-primary">前のページ</span>
+            <span className="text-sm md:text-base group-hover:text-primary">&laquo; {prevPage.name}</span>
           </Link>
         )}
       </div>
@@ -25,10 +25,10 @@ export function PageTransition({ lang, prevPage, nextPage }: PageTransitionProps
         {nextPage && (
           <Link
             href={`/${lang}/${nextPage.slug}`}
-            className="group flex-1 btn btn-ghost border-2 border-base-content/20 hover:border-yellow-400 flex flex-col items-end h-auto py-2 normal-case text-right"
+            className="group flex-1 btn btn-ghost border-2 border-base-content/20 hover:border-primary flex flex-col items-end h-auto py-2 normal-case text-right"
           >
-            <span className="text-xs text-base-content/60 font-normal group-hover:text-yellow-400">次のページ</span>
-            <span className="text-sm md:text-base group-hover:text-yellow-400">{nextPage.name} &raquo;</span>
+            <span className="text-xs text-base-content/60 font-normal group-hover:text-primary">次のページ</span>
+            <span className="text-sm md:text-base group-hover:text-primary">{nextPage.name} &raquo;</span>
           </Link>
         )}
       </div>
