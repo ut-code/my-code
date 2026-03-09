@@ -29,6 +29,7 @@ interface PageContentProps {
   docs_id: string;
   prevPage?: PageEntry;
   nextPage?: PageEntry;
+  path: PagePath;
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
