@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { PageEntry } from "@/lib/docs";
+import { LangId, PageEntry } from "@/lib/docs";
 
 interface PageTransitionProps {
-  lang: string;
+  lang: LangId;
   prevPage?: PageEntry;
   nextPage?: PageEntry;
 }

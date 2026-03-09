@@ -45,7 +45,6 @@ export default async function Page({
   const prevPage = langEntry.pages[pageEntryIndex - 1];
   const nextPage = langEntry.pages[pageEntryIndex + 1];
 
-  const docsId = `${lang}/${pageId}`;
   // server componentなのでuseMemoいらない
   const path = { lang: lang, page: pageId };
   const sections = await getMarkdownSections(lang, pageId);
@@ -62,9 +61,6 @@ export default async function Page({
         splitMdContent={sections}
         langEntry={langEntry}
         pageEntry={pageEntry}
-        docs_id={docsId}
-        lang={lang}
-        pageId={pageId}
         prevPage={prevPage}
         nextPage={nextPage}
         path={path}

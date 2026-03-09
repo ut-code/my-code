@@ -23,10 +23,6 @@ interface PageContentProps {
   splitMdContent: MarkdownSection[];
   langEntry: LanguageEntry;
   pageEntry: PageEntry;
-  lang: string;
-  pageId: string;
-  // TODO: チャット周りのid管理をsectionIdに移行し、docs_idパラメータを削除
-  docs_id: string;
   prevPage?: PageEntry;
   nextPage?: PageEntry;
   path: PagePath;
@@ -157,7 +153,7 @@ export function PageContent(props: PageContentProps) {
         </Fragment>
       ))}
       <PageTransition
-        lang={props.lang}
+        lang={path.lang}
         prevPage={props.prevPage}
         nextPage={props.nextPage}
       />
