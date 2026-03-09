@@ -35,6 +35,9 @@ for (const lang of langEntries) {
       prompt.push(`1行ごとに1つずつ、`);
       prompt.push(`section-id: 質問文`);
       prompt.push(`の形式で出力してください。`);
+      prompt.push(
+        `質問文には強調やコードなどのmarkdownの書式は使用せず、テキストのみを出力してください。`
+      );
       prompt.push(``);
       prompt.push(`# ドキュメント`);
       prompt.push(``);
