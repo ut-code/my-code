@@ -1,7 +1,7 @@
 "use server";
 
 // import { z } from "zod";
-import { generateContent } from "./gemini";
+import { generateContent } from "@/lib/gemini";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
 import { addChat, ChatWithMessages } from "@/lib/chatHistory";

@@ -24,11 +24,7 @@ export interface PagePath {
 }
 export type SectionId = Brand<string, "SectionId">;
 
-export interface MarkdownSection {
-  /**
-   * セクションのmdファイル名
-   */
-  file: string;
+export interface SectionFrontMatter {
   /**
    * frontmatterに書くセクションid
    * (データベース上の sectionId)
@@ -36,6 +32,17 @@ export interface MarkdownSection {
   id: SectionId;
   level: number;
   title: string;
+  /**
+   * そのセクションに対する質問例
+   * scripts/questionExample.ts で生成する
+   */
+  question?: string[];
+}
+export interface MarkdownSection extends SectionFrontMatter {
+  /**
+   * セクションのmdファイル名
+   */
+  file: string;
   /**
    * frontmatterを除く、見出しも含めたもとのmarkdownの内容
    */
@@ -253,11 +260,7 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
   if (endIdx === -1) {
     throw new Error(`File ${file} has invalid frontmatter`);
   }
-  const fm = yaml.load(content.slice(4, endIdx)) as {
-    id: SectionId;
-    title: string;
-    level: number;
-  };
+  const fm = yaml.load(content.slice(4, endIdx)) as SectionFrontMatter;
   // TODO: validation of frontmatter using zod
   // replコードブロックにはセクションidをターミナルidとして与える。
   const rawContent = content
@@ -268,6 +271,7 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
     id: fm.id,
     title: fm.title,
     level: fm.level,
+    question: fm.question,
     rawContent,
     md5: crypto.createHash("md5").update(rawContent).digest("base64"),
   };
