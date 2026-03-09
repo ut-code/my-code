@@ -2,6 +2,11 @@
 id: cpp-pointers-memory-leak
 title: 恐怖の「メモリリーク」
 level: 3
+question:
+  - メモリリークが発生した場合、プログラムの実行中にそれを検知する方法はあるのか。
+  - '`std::vector`や`std::string`が内部で`new`と`delete`を自動的に行ってくれるとは、具体的にどのような仕組みなのか。'
+  - RAIIとは何か。なぜそれが生の`new/delete`よりも安全なのか。
+  - 生の`new/delete`を「最後の手段」とするのは、どのような状況を指すのか。
 ---
 
 ### 恐怖の「メモリリーク」
