@@ -112,18 +112,26 @@ export interface SectionRevision {
   path: string;
 }
 
+const publicFileCache = new Map<string, Promise<string>>();
 async function readPublicFile(path: string): Promise<string> {
   try {
     if (isCloudflare()) {
-      const cfAssets = getCloudflareContext().env.ASSETS;
-      const res = await cfAssets!.fetch(`https://assets.local/${path}`);
-      if (!res.ok) {
-        console.error(
-          `Failed to fetch ${path}: ${res.status} ${await res.text()}`
-        );
-        notFound();
+      if (publicFileCache.has(path)) {
+        return publicFileCache.get(path)!;
       }
-      return await res.text();
+      const p = (async () => {
+        const cfAssets = getCloudflareContext().env.ASSETS;
+        const res = await cfAssets!.fetch(`https://assets.local/${path}`);
+        if (!res.ok) {
+          console.error(
+            `Failed to fetch ${path}: ${res.status} ${await res.text()}`
+          );
+          notFound();
+        }
+        return await res.text();
+      })();
+      publicFileCache.set(path, p);
+      return p;
     } else {
       return await readFile(join(process.cwd(), "public", path), "utf-8");
     }
@@ -203,7 +211,9 @@ export async function getMarkdownSections(
       }
       return a.localeCompare(b);
     }
-    const files = (await readdir(join(process.cwd(), "public", "docs", lang, page)))
+    const files = (
+      await readdir(join(process.cwd(), "public", "docs", lang, page))
+    )
       .filter((f) => f.endsWith(".md"))
       .sort(naturalSortMdFiles);
 
