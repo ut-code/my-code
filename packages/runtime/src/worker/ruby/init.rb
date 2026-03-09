@@ -1,12 +1,12 @@
 $stdout = Object.new.tap do |obj|
   def obj.write(str)
     require "js"
-    JS.global[:stdout].write(str)
+    JS.global[:stdout].write(str).await
   end
 end
 $stderr = Object.new.tap do |obj|
   def obj.write(str)
     require "js"
-    JS.global[:stderr].write(str)
+    JS.global[:stderr].write(str).await
   end
 end

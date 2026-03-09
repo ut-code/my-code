@@ -11,8 +11,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { ReplOutput } from "../repl";
-import { RuntimeContext, RuntimeInfo, UpdatedFile } from "../runtime";
+import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
 
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],
@@ -166,10 +165,11 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
   );
   return {
     init,
-    ready: tsEnv !== null,
+    ready: tsEnv !== null && jsEval.ready,
     runFiles,
     getCommandlineStr,
     runtimeInfo,
+    mutex: jsEval.mutex,
   };
 }
 

@@ -50,3 +50,4 @@ next-env.d.ts
 
 /public/typescript/
 /app/m-plus-rounded-1c-nohint/
+node_modules

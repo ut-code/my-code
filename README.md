@@ -173,6 +173,8 @@ npm run checkDocs
 
 ## markdown仕様
 
+実行環境の説明は ./packages/runtime/README.md を参照
+
 ````
 ```言語名-repl
 >>> コマンド
@@ -181,10 +183,7 @@ npm run checkDocs
 ````
 
 でターミナルを埋め込む。
-* ターミナル表示部は app/terminal/terminal.tsx
-* コマンド入力処理は app/terminal/repl.tsx
-* 各言語の実行環境は app/terminal/言語名/ 内に書く。
-* 実行結果はSectionContextにも送られ、section.tsxからアクセスできる
+* 実行結果はEmbedContextにも送られ、チャットフォームが参照できる
 
 ````
 ```言語名:ファイル名
@@ -193,13 +192,12 @@ npm run checkDocs
 ````
 
 でテキストエディターを埋め込む。
-* app/terminal/editor.tsx
-* editor.tsx内で `import "ace-builds/src-min-noconflict/mode-言語名";` を追加すればその言語に対応した色付けがされる。
+* app/terminal/editor.tsx内で `import "ace-builds/src-min-noconflict/mode-言語名";` を追加し、packages/runtime/src/languages.tsにも追加すればその言語に対応した色付けがされる。
     * importできる言語の一覧は https://github.com/ajaxorg/ace-builds/tree/master/src-noconflict
 * 編集した内容は app/terminal/file.tsx のFileContextで管理される。
     * 編集中のコードはFileContextに即時送られる
     * FileContextが書き換えられたら即時すべてのエディターに反映される
-* 編集したファイルの一覧はSectionContextにも送られ、section.tsxからアクセスできる
+* 編集したファイルの一覧はEmbedContextにも送られ、チャットフォームが参照できる
 
 ````
 ```言語名-readonly:ファイル名
@@ -217,8 +215,7 @@ npm run checkDocs
 
 で実行ボタンを表示する
 * 実行ボタンを押した際にFileContextからファイルを読み、実行し、結果を表示する
-* app/terminal/exec.tsx に各言語ごとの実装を書く (それぞれ app/terminal/言語名/ 内に定義した関数を呼び出す)
-* 実行結果はSectionContextにも送られ、section.tsxからアクセスできる
+* 実行結果はEmbedContextにも送られ、チャットフォームが参照できる
 
 
 ## 技術スタック・ドキュメント・メモ

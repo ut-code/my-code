@@ -10,9 +10,14 @@ import {
   useState,
 } from "react";
 import { wrap, Remote, proxy } from "comlink";
-import { RuntimeContext, RuntimeLang, UpdatedFile } from "../runtime";
-import { ReplOutput, SyntaxStatus } from "../repl";
+import { RuntimeLang } from "../languages";
 import { Mutex, MutexInterface } from "async-mutex";
+import {
+  ReplOutput,
+  RuntimeContext,
+  SyntaxStatus,
+  UpdatedFile,
+} from "../interface";
 
 type WorkerLang = "python" | "ruby" | "javascript";
 export type WorkerCapabilities = {
@@ -20,18 +25,19 @@ export type WorkerCapabilities = {
 };
 
 // Define the worker API interface
+// comlinkを通すと関数は双方向とも必ずasyncになる。asyncでない関数を渡すとややこしいので、最初からすべてasyncで定義しておく
 export interface WorkerAPI {
   init(
     interruptBuffer: Uint8Array
   ): Promise<{ capabilities: WorkerCapabilities }>;
   runCode(
     code: string,
-    onOutput: (output: ReplOutput | UpdatedFile) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
   ): Promise<void>;
   runFile(
     name: string,
     files: Record<string, string>,
-    onOutput: (output: ReplOutput | UpdatedFile) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
   ): Promise<void>;
   checkSyntax(code: string): Promise<{ status: SyntaxStatus }>;
   restoreState(commands: string[]): Promise<object>;
@@ -71,13 +77,19 @@ export function WorkerProvider({
     lang satisfies RuntimeLang;
     switch (lang) {
       case "python":
-        worker = new Worker(new URL("./pyodide.worker.ts", import.meta.url));
+        worker = new Worker(new URL("./pyodide.worker.ts", import.meta.url), {
+          type: "module",
+        });
         break;
       case "ruby":
-        worker = new Worker(new URL("./ruby.worker.ts", import.meta.url));
+        worker = new Worker(new URL("./ruby.worker.ts", import.meta.url), {
+          type: "module",
+        });
         break;
       case "javascript":
-        worker = new Worker(new URL("./jsEval.worker.ts", import.meta.url));
+        worker = new Worker(new URL("./jsEval.worker.ts", import.meta.url), {
+          type: "module",
+        });
         break;
       default:
         lang satisfies never;
@@ -119,6 +131,11 @@ export function WorkerProvider({
       });
       return () => {
         void mutex.runExclusive(async () => {
+          // Reject all pending promises
+          const error = new Error("Worker terminated");
+          pendingPromises.current.forEach((reject) => reject(error));
+          pendingPromises.current.clear();
+
           workerRef.current?.terminate();
           workerRef.current = null;
           setReady(false);
@@ -167,7 +184,10 @@ export function WorkerProvider({
   }, [initializeWorker, mutex]);
 
   const runCommand = useCallback(
-    async (code: string, onOutput: (output: ReplOutput | UpdatedFile) => void): Promise<void> => {
+    async (
+      code: string,
+      onOutput: (output: ReplOutput | UpdatedFile) => void
+    ): Promise<void> => {
       if (!mutex.isLocked()) {
         throw new Error(`mutex of context must be locked for runCommand`);
       }
@@ -191,7 +211,7 @@ export function WorkerProvider({
         await trackPromise(
           workerApiRef.current.runCode(
             code,
-            proxy((item: ReplOutput | UpdatedFile) => {
+            proxy(async (item: ReplOutput | UpdatedFile) => {
               if (item.type !== "file") {
                 output.push(item);
               }
@@ -260,7 +280,7 @@ export function WorkerProvider({
           workerApiRef.current!.runFile(
             filenames[0],
             files,
-            proxy((item: ReplOutput | UpdatedFile) => {
+            proxy(async (item: ReplOutput | UpdatedFile) => {
               onOutput(item);
             })
           )

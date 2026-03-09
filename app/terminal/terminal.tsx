@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
@@ -85,10 +85,33 @@ function computeTerminalTheme() {
 }
 
 interface TerminalProps {
+  /**
+   * ターミナルの幅がcolsの場合の高さの最小値を指定します。
+   * 未指定または5未満の場合5になります。
+   * 内部でuseRefを使用しターミナル初期化完了の瞬間のgetRows関数インスタンスが呼び出されるので、一時オブジェクトでも大丈夫
+   */
   getRows?: (cols: number) => number | "fit";
+  /**
+   * ターミナルが初期化された際に呼び出されます。
+   * 内部でuseRefを使用しターミナル初期化完了の瞬間のonReady関数インスタンスが呼び出されるので、一時オブジェクトでも大丈夫
+   */
   onReady?: () => void;
 }
-export function useTerminal(props: TerminalProps) {
+interface TerminalContext {
+  /**
+   * ターミナルを描画するためのdiv要素にこのrefを渡してください。
+   */
+  terminalRef: RefObject<HTMLDivElement>;
+  /**
+   * xterm.jsのTerminalインスタンスへのref
+   */
+  terminalInstanceRef: RefObject<Terminal | null>;
+  /**
+   * ターミナルが初期化されたかどうかを示します。
+   */
+  termReady: boolean;
+}
+export function useTerminal(props: TerminalProps): TerminalContext {
   const terminalRef = useRef<HTMLDivElement>(null!);
   const terminalInstanceRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);

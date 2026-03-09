@@ -1,8 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { RuntimeContext, RuntimeInfo } from "../runtime";
-import { ReplCommand, ReplOutput } from "../repl";
+import { ReplCommand, ReplOutput, RuntimeContext, RuntimeInfo } from "../interface";
 import pyodideLock from "pyodide/pyodide-lock.json";
 
 export const PyodideContext = createContext<RuntimeContext>(null!);

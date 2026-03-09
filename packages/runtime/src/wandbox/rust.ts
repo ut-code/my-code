@@ -1,4 +1,4 @@
-import { ReplOutput } from "../repl";
+import { ReplOutput } from "../interface";
 import { compileAndRun, CompilerInfo, SelectedCompiler } from "./api";
 
 import prog_rs from "./rust/prog.rs?raw";

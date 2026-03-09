@@ -4,8 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
-import { langConstants } from "./runtime";
-import { MarkdownLang } from "@/[lang]/[pageId]/styledSyntaxHighlighter";
+import { LangConstants } from "@my-code/runtime/languages";
 import { MinMaxButton, Modal } from "./modal";
 
 // https://github.com/securingsincity/react-ace/issues/27 により普通のimportができない
@@ -33,63 +32,8 @@ const AceEditor = lazy(async () => {
   }
 });
 
-// mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値が対応する
-export type AceLang =
-  | "python"
-  | "ruby"
-  | "c_cpp"
-  | "rust"
-  | "javascript"
-  | "typescript"
-  | "json"
-  | "csv"
-  | "text";
-export function getAceLang(lang: MarkdownLang | undefined): AceLang {
-  // Markdownで指定される可能性のある言語名からAceLangを取得
-  switch (lang) {
-    case "python":
-    case "py":
-      return "python";
-    case "ruby":
-    case "rb":
-      return "ruby";
-    case "cpp":
-    case "c++":
-      return "c_cpp";
-    case "rust":
-    case "rs":
-      return "rust";
-    case "javascript":
-    case "js":
-      return "javascript";
-    case "typescript":
-    case "ts":
-      return "typescript";
-    case "json":
-      return "json";
-    case "csv":
-      return "csv";
-    case "sh":
-    case "bash":
-    case "powershell":
-    case "text":
-    case "txt":
-    case "html":
-    case "toml":
-    case "makefile":
-    case "cmake":
-    case undefined:
-      console.warn(`Ace editor mode not implemented for language: ${lang}`);
-      return "text";
-    default:
-      lang satisfies never;
-      console.error(`getAceLang() does not handle language ${lang}`);
-      return "text";
-  }
-}
-
 interface EditorProps {
-  language?: AceLang;
+  language: LangConstants;
   filename: string;
   initContent: string;
   readonly?: boolean;
@@ -129,6 +73,15 @@ export function EditorComponent(props: EditorProps) {
   );
 
   const [isModal, setIsModal] = useState(false);
+
+  if (
+    process.env.NODE_ENV === "development" &&
+    props.language.ace === undefined
+  ) {
+    throw new Error(
+      `language ${props.language.originalLang} does not have ace mode defined!`
+    );
+  }
 
   return (
     <Modal
@@ -186,9 +139,9 @@ export function EditorComponent(props: EditorProps) {
         >
           <AceEditor
             name={`ace-editor-${props.filename}`}
-            mode={props.language}
+            mode={props.language.ace ?? "text"}
             theme={theme}
-            tabSize={langConstants(props.language || "text").tabSize}
+            tabSize={props.language.tabSize ?? 4}
             width="100%"
             height={isModal ? "100%" : editorHeight * (fontSize + 1) + "px"}
             className="font-mono!" // Aceのデフォルトフォントを上書き

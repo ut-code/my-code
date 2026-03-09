@@ -2,18 +2,19 @@
 
 import { Heading } from "@/[lang]/[pageId]/markdown";
 import "mocha/mocha.css";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { useWandbox } from "./wandbox/runtime";
-import { RuntimeContext, RuntimeLang } from "./runtime";
-import { defineTests } from "./tests";
-import { usePyodide } from "./worker/pyodide";
-import { useRuby } from "./worker/ruby";
-import { useJSEval } from "./worker/jsEval";
+import { Fragment, useEffect, useState } from "react";
+import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
 import { ReplTerminal } from "./repl";
-import { EditorComponent, getAceLang } from "./editor";
+import { EditorComponent } from "./editor";
 import { ExecFile } from "./exec";
-import { useTypeScript } from "./typescript/runtime";
 import { useTerminal } from "./terminal";
+import {
+  RUNTIME_TIMEOUTS,
+  waitForRuntimeReady,
+} from "@my-code/runtime/tests/utils";
+import { replTests } from "@my-code/runtime/tests/repl";
+import { fileExecutionTests } from "@my-code/runtime/tests/fileExecution";
+import { useRuntimeAll } from "@my-code/runtime/context";
 
 import main_py from "./samples/main.py?raw";
 import main_rb from "./samples/main.rb?raw";
@@ -128,7 +129,7 @@ function RuntimeSample({
       {config.repl && (
         <ReplTerminal
           terminalId="1"
-          language={lang}
+          language={langConstants(lang)}
           initContent={config.replInitContent}
         />
       )}
@@ -136,18 +137,22 @@ function RuntimeSample({
         Object.entries(config.editor).map(([filename, initContent]) => (
           <EditorComponent
             key={filename}
-            language={getAceLang(lang)}
+            language={langConstants(lang)}
             filename={filename}
             initContent={initContent}
           />
         ))}
       {config.exec && (
-        <ExecFile filenames={config.exec} language={lang} content="" />
+        <ExecFile
+          filenames={config.exec}
+          language={langConstants(lang)}
+          content=""
+        />
       )}
       {config.readonlyFiles?.map((filename) => (
         <EditorComponent
           key={filename}
-          language={getAceLang(lang)}
+          language={langConstants(lang)}
           filename={filename}
           initContent=""
           readonly
@@ -196,21 +201,7 @@ function AnsiColorSample() {
 }
 
 function MochaTest() {
-  const pyodide = usePyodide();
-  const ruby = useRuby();
-  const jsEval = useJSEval();
-  const typescript = useTypeScript(jsEval);
-  const wandboxCpp = useWandbox("cpp");
-  const wandboxRust = useWandbox("rust");
-  const runtimeRef = useRef<Record<RuntimeLang, RuntimeContext>>(null!);
-  runtimeRef.current = {
-    python: pyodide,
-    ruby: ruby,
-    javascript: jsEval,
-    typescript: typescript,
-    cpp: wandboxCpp,
-    rust: wandboxRust,
-  };
+  const runtimeRef = useRuntimeAll();
 
   const [searchParams, setSearchParams] = useState<string>("");
   useEffect(() => {
@@ -229,7 +220,39 @@ function MochaTest() {
 
       for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
         runtimeRef.current[lang].init?.();
-        defineTests(lang, runtimeRef);
+
+        describe(`${lang} Runtime`, function () {
+          this.timeout(RUNTIME_TIMEOUTS[lang]);
+
+          beforeEach(async function () {
+            this.timeout(60000);
+            await waitForRuntimeReady(lang, runtimeRef);
+          });
+
+          describe("REPL", function () {
+            for (const [name, generator] of Object.entries(replTests)) {
+              const body = generator(lang);
+              if (body) {
+                it(name, async () => body(runtimeRef));
+              } else {
+                it.skip(name);
+              }
+            }
+          });
+
+          describe("File Execution", function () {
+            for (const [name, generator] of Object.entries(
+              fileExecutionTests
+            )) {
+              const body = generator(lang);
+              if (body) {
+                it(name, async () => body(runtimeRef));
+              } else {
+                it.skip(name);
+              }
+            }
+          });
+        });
       }
 
       const runner = mocha.run();

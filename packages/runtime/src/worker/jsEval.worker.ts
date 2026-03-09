@@ -1,9 +1,8 @@
 /// <reference lib="webworker" />
 
 import { expose } from "comlink";
-import type { ReplOutput } from "../repl";
-import type { WorkerCapabilities } from "./runtime";
-import type { UpdatedFile } from "../runtime";
+import type { ReplOutput, UpdatedFile } from "../interface";
+import type { WorkerAPI, WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
 import { replLikeEval, checkSyntax } from "@my-code/js-eval";
 
@@ -12,20 +11,42 @@ function format(...args: unknown[]): string {
   // https://nodejs.org/api/util.html#utilformatformat-args
   return args.map((a) => (typeof a === "string" ? a : inspect(a))).join(" ");
 }
-let currentOutputCallback: ((output: ReplOutput) => void) | null = null;
+let currentOutputCallback: ((output: ReplOutput) => Promise<void>) | null =
+  null;
+let pendingOutputPromise: Promise<void>[] = [];
 
 // Helper function to capture console output
 const originalConsole = self.console;
 self.console = {
   ...originalConsole,
-  log: (...args: unknown[]) =>
-    currentOutputCallback?.({ type: "stdout", message: format(...args) }),
-  error: (...args: unknown[]) =>
-    currentOutputCallback?.({ type: "stderr", message: format(...args) }),
-  warn: (...args: unknown[]) =>
-    currentOutputCallback?.({ type: "stderr", message: format(...args) }),
-  info: (...args: unknown[]) =>
-    currentOutputCallback?.({ type: "stdout", message: format(...args) }),
+  log: (...args: unknown[]) => {
+    if (currentOutputCallback) {
+      pendingOutputPromise.push(
+        currentOutputCallback({ type: "stdout", message: format(...args) })
+      );
+    }
+  },
+  error: (...args: unknown[]) => {
+    if (currentOutputCallback) {
+      pendingOutputPromise.push(
+        currentOutputCallback({ type: "stderr", message: format(...args) })
+      );
+    }
+  },
+  warn: (...args: unknown[]) => {
+    if (currentOutputCallback) {
+      pendingOutputPromise.push(
+        currentOutputCallback({ type: "stderr", message: format(...args) })
+      );
+    }
+  },
+  info: (...args: unknown[]) => {
+    if (currentOutputCallback) {
+      pendingOutputPromise.push(
+        currentOutputCallback({ type: "stdout", message: format(...args) })
+      );
+    }
+  },
 };
 
 async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
@@ -38,25 +59,28 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
 
 async function runCode(
   code: string,
-  onOutput: (output: ReplOutput | UpdatedFile) => void
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
 ): Promise<void> {
   currentOutputCallback = onOutput;
+  pendingOutputPromise = [];
   try {
     const result = await replLikeEval(code);
-    onOutput({
+    await Promise.all(pendingOutputPromise);
+    await onOutput({
       type: "return",
       message: inspect(result),
     });
   } catch (e) {
     originalConsole.log(e);
+    await Promise.all(pendingOutputPromise);
     // TODO: stack trace?
     if (e instanceof Error) {
-      onOutput({
+      await onOutput({
         type: "error",
         message: `${e.name}: ${e.message}`,
       });
     } else {
-      onOutput({
+      await onOutput({
         type: "error",
         message: `${String(e)}`,
       });
@@ -64,25 +88,28 @@ async function runCode(
   }
 }
 
-function runFile(
+async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => void
-): void {
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+): Promise<void> {
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
   currentOutputCallback = onOutput;
+  pendingOutputPromise = [];
   try {
     self.eval(files[name]);
+    await Promise.all(pendingOutputPromise);
   } catch (e) {
     originalConsole.log(e);
+    await Promise.all(pendingOutputPromise);
     // TODO: stack trace?
     if (e instanceof Error) {
-      onOutput({
+      await onOutput({
         type: "error",
         message: `${e.name}: ${e.message}`,
       });
     } else {
-      onOutput({
+      await onOutput({
         type: "error",
         message: `${String(e)}`,
       });
@@ -104,7 +131,7 @@ async function restoreState(commands: string[]): Promise<object> {
   return {};
 }
 
-const api = {
+const api: WorkerAPI = {
   init,
   runCode,
   runFile,

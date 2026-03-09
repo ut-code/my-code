@@ -10,9 +10,9 @@ import {
 import useSWR from "swr";
 import { compilerInfoFetcher, SelectedCompiler } from "./api";
 import { cppRunFiles, selectCppCompiler } from "./cpp";
-import { RuntimeContext, RuntimeInfo, RuntimeLang, UpdatedFile } from "../runtime";
-import { ReplOutput } from "../repl";
+import { RuntimeLang } from "../languages";
 import { rustRunFiles, selectRustCompiler } from "./rust";
+import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
 
 type WandboxLang = "cpp" | "rust";
 
