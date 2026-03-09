@@ -112,18 +112,26 @@ export interface SectionRevision {
   path: string;
 }
 
+const publicFileCache = new Map<string, Promise<string>>();
 async function readPublicFile(path: string): Promise<string> {
   try {
     if (isCloudflare()) {
-      const cfAssets = getCloudflareContext().env.ASSETS;
-      const res = await cfAssets!.fetch(`https://assets.local/${path}`);
-      if (!res.ok) {
-        console.error(
-          `Failed to fetch ${path}: ${res.status} ${await res.text()}`
-        );
-        notFound();
+      if (publicFileCache.has(path)) {
+        return publicFileCache.get(path)!;
       }
-      return await res.text();
+      const p = (async () => {
+        const cfAssets = getCloudflareContext().env.ASSETS;
+        const res = await cfAssets!.fetch(`https://assets.local/${path}`);
+        if (!res.ok) {
+          console.error(
+            `Failed to fetch ${path}: ${res.status} ${await res.text()}`
+          );
+          notFound();
+        }
+        return await res.text();
+      })();
+      publicFileCache.set(path, p);
+      return p;
     } else {
       return await readFile(join(process.cwd(), "public", path), "utf-8");
     }
@@ -167,36 +175,6 @@ export async function getPagesList(): Promise<LanguageEntry[]> {
   );
 }
 
-export async function getSectionsList(
-  lang: LangId,
-  page: PageSlug
-): Promise<string[]> {
-  if (isCloudflare()) {
-    const sectionsJson = await readPublicFile(
-      `docs/${lang}/${page}/sections.json`
-    );
-    return JSON.parse(sectionsJson) as string[];
-  } else {
-    function naturalSortMdFiles(a: string, b: string): number {
-      // -intro.md always comes first
-      if (a === "-intro.md") return -1;
-      if (b === "-intro.md") return 1;
-      // Sort numerically by leading N1-N2 prefix
-      const aMatch = a.match(/^(\d+)-(\d+)/);
-      const bMatch = b.match(/^(\d+)-(\d+)/);
-      if (aMatch && bMatch) {
-        const n1Diff = parseInt(aMatch[1]) - parseInt(bMatch[1]);
-        if (n1Diff !== 0) return n1Diff;
-        return parseInt(aMatch[2]) - parseInt(bMatch[2]);
-      }
-      return a.localeCompare(b);
-    }
-    return (await readdir(join(process.cwd(), "public", "docs", lang, page)))
-      .filter((f) => f.endsWith(".md"))
-      .sort(naturalSortMdFiles);
-  }
-}
-
 export async function getRevisions(
   sectionId: SectionId
 ): Promise<RevisionYmlEntry | undefined> {
@@ -213,26 +191,51 @@ export async function getMarkdownSections(
   lang: LangId,
   page: PageSlug
 ): Promise<MarkdownSection[]> {
-  const files = await getSectionsList(lang, page);
-
-  const sections: MarkdownSection[] = [];
-  for (const file of files) {
-    const raw = await readPublicFile(`docs/${lang}/${page}/${file}`);
-    if (file === "-intro.md") {
-      // イントロセクションはフロントマターなし・見出しなし
-      sections.push({
-        file,
-        id: introSectionId({ lang, page }),
-        level: 1,
-        title: "",
-        rawContent: raw,
-        md5: crypto.createHash("md5").update(raw).digest("base64"),
-      });
-    } else {
-      sections.push(parseFrontmatter(raw, file));
+  if (isCloudflare()) {
+    const sectionsJson = await readPublicFile(
+      `docs/${lang}/${page}/sections.json`
+    );
+    return JSON.parse(sectionsJson) as MarkdownSection[];
+  } else {
+    function naturalSortMdFiles(a: string, b: string): number {
+      // -intro.md always comes first
+      if (a === "-intro.md") return -1;
+      if (b === "-intro.md") return 1;
+      // Sort numerically by leading N1-N2 prefix
+      const aMatch = a.match(/^(\d+)-(\d+)/);
+      const bMatch = b.match(/^(\d+)-(\d+)/);
+      if (aMatch && bMatch) {
+        const n1Diff = parseInt(aMatch[1]) - parseInt(bMatch[1]);
+        if (n1Diff !== 0) return n1Diff;
+        return parseInt(aMatch[2]) - parseInt(bMatch[2]);
+      }
+      return a.localeCompare(b);
     }
+    const files = (
+      await readdir(join(process.cwd(), "public", "docs", lang, page))
+    )
+      .filter((f) => f.endsWith(".md"))
+      .sort(naturalSortMdFiles);
+
+    const sections: MarkdownSection[] = [];
+    for (const file of files) {
+      const raw = await readPublicFile(`docs/${lang}/${page}/${file}`);
+      if (file === "-intro.md") {
+        // イントロセクションはフロントマターなし・見出しなし
+        sections.push({
+          file,
+          id: introSectionId({ lang, page }),
+          level: 1,
+          title: "",
+          rawContent: raw,
+          md5: crypto.createHash("md5").update(raw).digest("base64"),
+        });
+      } else {
+        sections.push(parseFrontmatter(raw, file));
+      }
+    }
+    return sections;
   }
-  return sections;
 }
 export function introSectionId(path: PagePath) {
   return `${path.lang}-${path.page}-intro` as SectionId;
