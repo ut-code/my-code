@@ -6,6 +6,7 @@ import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
 import { useSidebarMdContext } from "@/sidebar";
 import clsx from "clsx";
+import { PageTransition } from "./pageTransition";
 import {
   LanguageEntry,
   MarkdownSection,
@@ -22,6 +23,8 @@ interface PageContentProps {
   splitMdContent: MarkdownSection[];
   langEntry: LanguageEntry;
   pageEntry: PageEntry;
+  prevPage?: PageEntry;
+  nextPage?: PageEntry;
   path: PagePath;
 }
 export function PageContent(props: PageContentProps) {
@@ -149,6 +152,11 @@ export function PageContent(props: PageContentProps) {
           </div>
         </Fragment>
       ))}
+      <PageTransition
+        lang={path.lang}
+        prevPage={props.prevPage}
+        nextPage={props.nextPage}
+      />
       {isFormVisible ? (
         // sidebarの幅が80であることからleft-84 (sidebar.tsx参照)
         // replがz-10を使用することからそれの上にするためz-20
