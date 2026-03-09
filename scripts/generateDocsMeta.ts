@@ -3,7 +3,7 @@
 
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { getPagesList, getSectionsList } from "@/lib/docs";
+import { getMarkdownSections, getPagesList } from "@/lib/docs";
 
 const docsDir = join(process.cwd(), "public", "docs");
 
@@ -17,15 +17,14 @@ console.log(
 
 for (const lang of langEntries) {
   for (const page of lang.pages) {
-    const files = await getSectionsList(lang.id, page.slug);
-    const filesJson = JSON.stringify(files);
+    const sections = await getMarkdownSections(lang.id, page.slug);
     await writeFile(
       join(docsDir, lang.id, page.slug, "sections.json"),
-      filesJson,
+      JSON.stringify(sections),
       "utf-8"
     );
     console.log(
-      `Generated ${lang.id}/${page.slug}/sections.json (${files.length} files)`
+      `Generated ${lang.id}/${page.slug}/sections.json (${sections.length} files)`
     );
   }
 }
