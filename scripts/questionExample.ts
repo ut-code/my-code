@@ -46,10 +46,31 @@ for (const lang of langEntries) {
       }
       console.log(prompt);
 
-      const result = await generateContent(prompt.join("\n"));
-      const text = result.text;
-      if (!text) {
-        throw new Error("AIからの応答が空でした");
+      let text: string | undefined;
+      while (true) {
+        if (requestCount >= geminiMaxRequest) {
+          console.log(
+            `Geminiへのリクエスト数が${geminiMaxRequest}に達したため、処理を終了します。`
+          );
+          process.exit(1);
+        }
+        requestCount++;
+
+        try {
+          const result = await generateContent(prompt.join("\n"));
+          text = result.text;
+          if (text) {
+            break;
+          } else {
+            console.error("AIからの応答が空でした");
+            await new Promise((resolve) => setTimeout(resolve, 30000));
+            continue;
+          }
+        } catch (e) {
+          console.error(`Geminiへのリクエスト中にエラーが発生しました: ${e}`);
+          await new Promise((resolve) => setTimeout(resolve, 30000));
+          continue;
+        }
       }
       console.log(text);
 
@@ -118,14 +139,6 @@ for (const lang of langEntries) {
           newRaw,
           "utf-8"
         );
-      }
-
-      requestCount++;
-      if (requestCount >= geminiMaxRequest) {
-        console.log(
-          `Geminiへのリクエスト数が${geminiMaxRequest}に達したため、処理を終了します。`
-        );
-        process.exit(1);
       }
     }
   }
