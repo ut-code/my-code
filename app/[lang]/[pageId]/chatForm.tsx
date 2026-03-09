@@ -11,20 +11,15 @@ import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useChatHistoryContext } from "./chatHistory";
 import { askAI } from "@/actions/chatActions";
+import { PagePath } from "@/lib/docs";
 
 interface ChatFormProps {
-  docs_id: string;
-  documentContent: string;
+  path: PagePath;
   sectionContent: DynamicMarkdownSection[];
   close: () => void;
 }
 
-export function ChatForm({
-  docs_id,
-  documentContent,
-  sectionContent,
-  close,
-}: ChatFormProps) {
+export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -80,9 +75,8 @@ export function ChatForm({
     // }
 
     const result = await askAI({
+      path,
       userQuestion,
-      docsId: docs_id,
-      documentContent,
       sectionContent,
       replOutputs,
       files,
@@ -94,7 +88,9 @@ export function ChatForm({
       console.log(result.error);
     } else {
       addChat(result.chat);
-      // TODO: chatIdが指す対象の回答にフォーカス
+      document.getElementById(result.chat.sectionId)?.scrollIntoView({
+        behavior: "smooth",
+      });
       setInputValue("");
       close();
     }

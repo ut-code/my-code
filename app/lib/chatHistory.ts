@@ -3,12 +3,13 @@
 import { headers } from "next/headers";
 import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
-import { chat, message } from "@/schema/chat";
-import { and, asc, eq } from "drizzle-orm";
+import { chat, message, section } from "@/schema/chat";
+import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
 import { revalidateTag, unstable_cacheLife } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
 import { unstable_cacheTag } from "next/cache";
+import { PagePath, SectionId } from "./docs";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -17,6 +18,9 @@ export interface CreateChatMessage {
 
 // cacheに使うキーで、実際のURLではない
 const CACHE_KEY_BASE = "https://my-code.utcode.net/chatHistory";
+function cacheKeyForPage(path: PagePath, userId: string) {
+  return `${CACHE_KEY_BASE}/getChat?path=${path.lang}/${path.page}&userId=${userId}`;
+}
 
 interface Context {
   drizzle: Awaited<ReturnType<typeof getDrizzle>>;
@@ -50,8 +54,8 @@ export async function initContext(ctx?: Partial<Context>): Promise<Context> {
 }
 
 export async function addChat(
-  docsId: string,
-  sectionId: string,
+  path: PagePath,
+  sectionId: SectionId,
   messages: CreateChatMessage[],
   context?: Partial<Context>
 ) {
@@ -63,7 +67,6 @@ export async function addChat(
     .insert(chat)
     .values({
       userId,
-      docsId,
       sectionId,
     })
     .returning();
@@ -79,19 +82,21 @@ export async function addChat(
     )
     .returning();
 
-  revalidateTag(`${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`);
+  revalidateTag(cacheKeyForPage(path, userId));
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
     console.log(
-      `deleting cache for chatHistory/getChat for user ${userId} and docs ${docsId}`
+      `deleting cache for chatHistory/getChat for user ${userId} and docs ${path.lang}/${path.page}`
     );
-    await cache.delete(
-      `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
-    );
+    await cache.delete(cacheKeyForPage(path, userId));
   }
 
   return {
     ...newChat,
+    section: {
+      sectionId,
+      pagePath: `${path.lang}/${path.page}`,
+    },
     messages: chatMessages,
   };
 }
@@ -99,7 +104,7 @@ export async function addChat(
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
 
 export async function getChat(
-  docsId: string,
+  path: PagePath,
   context?: Partial<Context>
 ): Promise<ChatWithMessages[]> {
   const { drizzle, userId } = await initContext(context);
@@ -108,8 +113,20 @@ export async function getChat(
   }
 
   const chats = await drizzle.query.chat.findMany({
-    where: and(eq(chat.userId, userId), eq(chat.docsId, docsId)),
+    where: and(
+      eq(chat.userId, userId),
+      exists(
+        drizzle
+          .select()
+          .from(section)
+          .where(and(
+            eq(section.sectionId, chat.sectionId),
+            eq(section.pagePath, `${path.lang}/${path.page}`),
+          ))
+      )
+    ),
     with: {
+      section: true,
       messages: {
         orderBy: [asc(message.createdAt)],
       },
@@ -120,35 +137,32 @@ export async function getChat(
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
     await cache.put(
-      `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`,
+      cacheKeyForPage(path, userId),
       new Response(JSON.stringify(chats), {
         headers: { "Cache-Control": "max-age=86400, s-maxage=86400" },
       })
     );
   }
+  // @ts-expect-error なぜかchatsの型にsectionとmessagesが含まれていないことになっているが、正しくwithを指定しているし、console.logしてみるとちゃんと含まれている
   return chats;
 }
-export async function getChatFromCache(docsId: string, context: Context) {
+export async function getChatFromCache(path: PagePath, context: Context) {
   "use cache";
   unstable_cacheLife("days");
 
   // cacheされる関数の中でheader()にはアクセスできない。
   // なので外でinitContext()を呼んだものを引数に渡す必要がある。
   // しかし、drizzleオブジェクトは外から渡せないのでgetChatの中で改めてinitContext()を呼んでdrizzleだけ再初期化している
+  // こんな意味不明な仕様になっているのはactionから呼ばれる関数とレンダリング時に呼ばれる関数を1ファイルでまとめて定義し共通化しようとしているせい。あとでなんとかする
   const { auth, userId } = context;
-  unstable_cacheTag(
-    `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
-  );
-
   if (!userId) {
     return [];
   }
+  unstable_cacheTag(cacheKeyForPage(path, userId));
 
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
-    const cachedResponse = await cache.match(
-      `${CACHE_KEY_BASE}/getChat?docsId=${docsId}&userId=${userId}`
-    );
+    const cachedResponse = await cache.match(cacheKeyForPage(path, userId));
     if (cachedResponse) {
       console.log("Cache hit for chatHistory/getChat");
       const data = (await cachedResponse.json()) as ChatWithMessages[];
@@ -157,7 +171,7 @@ export async function getChatFromCache(docsId: string, context: Context) {
       console.log("Cache miss for chatHistory/getChat");
     }
   }
-  return await getChat(docsId, { auth, userId });
+  return await getChat(path, { auth, userId });
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {
