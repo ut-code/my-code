@@ -2,6 +2,12 @@
 id: javascript-intro-about
 title: JavaScriptとは？
 level: 2
+question:
+  - JavaScriptが10日間で作られたというのはどういうことですか？
+  - ECMAScriptとは何ですか？JavaScriptとどう違うのですか？
+  - 「変数は型を持たない」とはどういう意味ですか？
+  - 動的型付けで実行時エラーのリスク管理が必要、とは具体的にどういうことですか？
+  - シングルスレッドなのに「高い並行性を実現」というのはどういうことですか？
 ---
 
 ## JavaScriptとは？

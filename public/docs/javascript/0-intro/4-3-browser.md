@@ -2,6 +2,11 @@
 id: javascript-intro-browser
 title: ブラウザでの実行 (参考)
 level: 3
+question:
+  - なぜブラウザでJavaScriptを動かすにはHTMLファイルが必要なのですか？
+  - alertとは何ですか？console.logとどう違うのですか？
+  - ブラウザの開発者ツールはどのように開くのですか？
+  - Consoleタブとは何ですか？
 ---
 
 ### ブラウザでの実行 (参考)

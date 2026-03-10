@@ -2,6 +2,10 @@
 id: cpp-raii-smartptr-practice1
 title: '練習問題1: unique_ptr と所有権の移動'
 level: 3
+question:
+  - Employeeクラスの定義方法を教えてください。
+  - promote_employee関数でunique_ptrを引数として受け取るには、どのように記述すればよいですか？
+  - std::moveはどこで、どのように使えば良いですか？
 ---
 
 ### 練習問題1: `unique_ptr` と所有権の移動

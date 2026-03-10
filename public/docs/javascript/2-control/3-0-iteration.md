@@ -2,6 +2,9 @@
 id: javascript-control-iteration
 title: 'イテレーション: for...of と for...in の違い'
 level: 2
+question:
+  - イテレーションとは具体的にどういう意味ですか？
+  - for...ofとfor...inは、なぜ両方存在するのですか？
 ---
 
 ## イテレーション: `for...of` と `for...in` の違い

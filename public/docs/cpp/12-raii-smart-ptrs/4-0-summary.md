@@ -2,6 +2,9 @@
 id: cpp-raii-smartptr-summary
 title: この章のまとめ
 level: 2
+question:
+  - スマートポインタ以外にRAIIを実装する例はありますか？
+  - newとdeleteを直接書かないようにするためには、常にスマートポインタを使えば良いのですか？
 ---
 
 ## この章のまとめ

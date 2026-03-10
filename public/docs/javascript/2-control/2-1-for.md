@@ -2,6 +2,8 @@
 id: javascript-control-for
 title: 古典的な for ループ
 level: 3
+question:
+  - forループの3つの式はそれぞれどのような役割ですか？
 ---
 
 ### 古典的な for ループ

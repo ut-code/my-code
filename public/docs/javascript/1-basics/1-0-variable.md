@@ -2,6 +2,12 @@
 id: javascript-basics-variable
 title: '変数宣言: let, const, var'
 level: 2
+question:
+  - letとconstは、具体的にどう使い分ければ良いですか？
+  - ブロックスコープとは、どの範囲まで変数を使えるということですか？
+  - varを使うべきではないとありますが、varを使うとどのような悪いことが起こるのですか？
+  - 巻き上げ（Hoisting）とは、具体的にどのような現象ですか？
+  - '`console.log("let output:", blockScoped);` がReferenceErrorになるのはなぜですか？'
 ---
 
 ## 変数宣言: let, const, var

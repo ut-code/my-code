@@ -1,7 +1,14 @@
 ---
 id: cpp-smartptr-uniqueptr
-title: 'std::unique_ptr'
+title: std::unique_ptr
 level: 3
+question:
+  - unique_ptrの「唯一の所有権」とは具体的にどういう意味ですか？
+  - unique_ptrがコピーできないのはなぜですか？
+  - std::moveは何のために使うのですか？所有権を移動させるとどうなりますか？
+  - std::make_uniqueを使うのが推奨されるのはなぜですか？new演算子を使うのと何が違いますか？
+  - unique_ptrのオブジェクトがnullptrになるのはどんな時ですか？
+  - 関数にunique_ptrを引数で渡すと、所有権は常に移動するのですか？
 ---
 
 ### `std::unique_ptr`

@@ -2,6 +2,8 @@
 id: javascript-control-loop
 title: 繰り返し (for, while)
 level: 2
+question:
+  - C/Java/C++の構文とほぼ同じとありますが、これらの言語を知らない場合、どのループを使えばいいですか？
 ---
 
 ## 繰り返し (for, while)
