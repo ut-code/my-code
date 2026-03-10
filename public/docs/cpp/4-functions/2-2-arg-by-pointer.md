@@ -2,6 +2,10 @@
 id: cpp-functions-arg-by-pointer
 title: 2. ポインタ渡し (Pass by Pointer)
 level: 3
+question:
+  - ポインタ渡しで「構文が汚れる」とは具体的にどのようなことですか？
+  - ポインタ渡しで`nullptr`チェックが必要な理由は何ですか？
+  - '`nullptr`を渡してしまった場合、どのような問題が起こりえますか？'
 ---
 
 ### 2\. ポインタ渡し (Pass by Pointer)

@@ -2,6 +2,10 @@
 id: cpp-project-build-include-guard-by-define
 title: 伝統的なインクルードガード
 level: 3
+question:
+  - '`#ifndef` の `ifndef` は何かの略ですか？'
+  - '`MATH_UTILS_H` のようなマクロ名は、自分で自由に決めても良いのですか？ 命名規則はありますか？'
+  - この `#ifndef` から `#endif` までの間に、ヘッダファイルの中身以外のものを書いても大丈夫ですか？
 ---
 
 ### 伝統的なインクルードガード

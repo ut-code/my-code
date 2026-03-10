@@ -2,6 +2,10 @@
 id: cpp-functions-arg-by-const-reference
 title: 4. const 参照渡し (Pass by const Reference)
 level: 3
+question:
+  - '`const`参照渡しがC++で最も頻繁に使われるパターンとされるのはなぜですか？'
+  - '`const`参照渡しで関数内で値を変更しようとするとコンパイルエラーになるのは、具体的にどのような仕組みですか？'
+  - '`int`や`double`のような基本型では値渡しで良いとのことですが、なぜ`const`参照渡しを使う必要がないのですか？'
 ---
 
 ### 4\. const 参照渡し (Pass by const Reference)

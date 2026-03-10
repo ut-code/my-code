@@ -2,6 +2,12 @@
 id: cpp-project-build-makefile
 title: Makefileによる自動化
 level: 3
+question:
+  - '`CXX` や `CXXFLAGS` は何のために定義されているのですか？'
+  - '`all: $(TARGET)` の `all` とは何ですか？ 必須の記述ですか？'
+  - '`%.o: %.cpp` の `%` は何を意味する記号ですか？'
+  - '`$<` や `$@` は特別な意味を持つ記号ですか？'
+  - '`clean` コマンドを実行するには、ターミナルで `make clean` と入力すればいいのですか？'
 ---
 
 ### Makefileによる自動化

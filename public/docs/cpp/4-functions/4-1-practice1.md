@@ -2,6 +2,9 @@
 id: cpp-functions-practice1
 title: '練習問題1: 値の入れ替え（Swap）'
 level: 2
+question:
+  - '`mySwap`関数を実装する上で、参照渡しを使うと何が便利ですか？'
+  - '`mySwap`関数の中で一時変数を使わずに値を入れ替える方法はありますか？'
 ---
 
 ### 練習問題1: 値の入れ替え（Swap）
