@@ -2,6 +2,14 @@
 id: cpp-stl-containers-vector
 title: 'std::vector: 最もよく使う可変長配列'
 level: 2
+question:
+  - 可変長配列とは何ですか？普通の配列とどう違うのでしょうか。
+  - O(1)やO(log n)といった表記は、処理の速さをどのように示しているのですか。
+  - push_back()やpop_back()で末尾への追加・削除が高速である理由は何ですか。
+  - std::vectorを使うときに、なぜ<vector>ヘッダをインクルードする必要があるのですか。
+  - 範囲for文 (range-based for loop) とは何ですか。一般的なfor文とどう違うのですか。
+  - コード例の`const std::string& name`の`const`や`&`はどういう意味ですか。
+  - '`names[1]`のようにインデックスでアクセスすると、なぜ高速なのですか。'
 ---
 
 ## `std::vector`: 最もよく使う可変長配列

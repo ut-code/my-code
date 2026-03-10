@@ -2,6 +2,9 @@
 id: cpp-stl-containers-summary
 title: この章のまとめ
 level: 2
+question:
+  - STLの3つの主要コンポーネントをもう一度簡単に説明してください。
+  - std::vectorとstd::mapのどちらを使うか迷ったとき、どのような基準で選べば良いですか。
 ---
 
 ## この章のまとめ

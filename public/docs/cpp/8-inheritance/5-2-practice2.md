@@ -2,6 +2,12 @@
 id: cpp-inheritance-practice2
 title: '問題2: 従業員の給与計算'
 level: 3
+question:
+  - '`Employee` クラスで `calculate_salary()` を純粋仮想関数にする意味は何ですか？'
+  - >-
+    `FullTimeEmployee` や `PartTimeEmployee` で `get_name()`
+    のような関数は必要ですか？どこで定義するのが良いですか？
+  - '`main` 関数の `full_time_emp.get_name()` の部分はどのように実装すればいいですか？'
 ---
 
 ### 問題2: 従業員の給与計算

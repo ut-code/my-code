@@ -1,7 +1,11 @@
 ---
 id: cpp-inheritance-practice1
-title: '練習問題1:乗り物の階層構造'
+title: 練習問題1:乗り物の階層構造
 level: 3
+question:
+  - '`Vehicle` クラスの `move()` 関数に `virtual` は必要ですか？なぜですか？'
+  - '`main` 関数で `Vehicle* vehicles[2];` とポインタの配列を作っていますが、普通のオブジェクトの配列ではだめなのですか？'
+  - '`Car` や `Motorcycle` に独自のメンバ変数を追加してもいいですか？'
 ---
 
 ### 練習問題1:乗り物の階層構造

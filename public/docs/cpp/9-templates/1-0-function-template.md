@@ -2,6 +2,12 @@
 id: cpp-templates-function-template
 title: '関数テンプレート: intでもdoubleでもstringでも動く関数を作る'
 level: 2
+question:
+  - 関数テンプレートのTは何でも指定できるのでしょうか
+  - max_valueという関数名ですが、max関数の問題解決と書かれているのはなぜですか
+  - string型で比較する場合、どのようなルールで大きい小さいが判断されるのですか
+  - intとdoubleなど、異なる型の引数を同時に渡した場合どうなりますか
+  - テンプレートを使わない場合と比べて、具体的にどのようなメリットがありますか
 ---
 
 ## 関数テンプレート: intでもdoubleでもstringでも動く関数を作る
