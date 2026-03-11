@@ -2,6 +2,10 @@
 id: python-file-io-csv-write
 title: CSVファイルへの書き込み
 level: 3
+question:
+  - '`newline=''''` を指定しない場合、「不要な空行」は具体的にどのように発生してしまうのですか？'
+  - '`writerow()` と `writerows()` は、それぞれどのような状況で使い分けるのが良いですか？'
+  - '`data_to_write` がリストのリストではなく、辞書のリストのような形式の場合でもCSVに書き込めますか？'
 ---
 
 ### CSVファイルへの書き込み

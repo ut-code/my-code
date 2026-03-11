@@ -2,6 +2,12 @@
 id: python-oop-class-instance
 title: classの定義とインスタンス化
 level: 2
+question:
+  - classとは具体的に何をするものですか。
+  - passは何のために使うのですか、書かないとどうなりますか。
+  - インスタンス化とはどういうことですか、なぜ必要なのでしょうか。
+  - my_dogをprintすると表示される<__main__.Dog object at 0x...>は何を意味しますか。
+  - クラス名は必ず大文字から始めるべきですか。
 ---
 
 ## `class`の定義とインスタンス化

@@ -2,6 +2,11 @@
 id: python-exceptions-else-finally
 title: elseとfinally節の役割
 level: 2
+question:
+  - '`else`節と`finally`節はそれぞれどんな時に使うのですか？'
+  - '`finally`節は、`try`ブロックの途中で`return`があった場合でも実行されますか？'
+  - ファイルを閉じたりする処理は、なぜ`finally`に書くのが良いのですか？
+  - '`else`と`finally`は必ず両方書かなければいけませんか？'
 ---
 
 ## `else`と`finally`節の役割

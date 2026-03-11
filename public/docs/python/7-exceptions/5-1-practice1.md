@@ -2,6 +2,11 @@
 id: python-exceptions-practice1
 title: '練習問題1: 安全なリスト要素の取得'
 level: 3
+question:
+  - この問題では、どの例外を捕捉する必要がありますか？
+  - '`IndexError`はどんな時に起こりますか？'
+  - '`TypeError`はどんな時に起こりますか？'
+  - '`print(safe_get(data, 1))`のように正常な場合でも`print`が必要なのはなぜですか？'
 ---
 
 ### 練習問題1: 安全なリスト要素の取得

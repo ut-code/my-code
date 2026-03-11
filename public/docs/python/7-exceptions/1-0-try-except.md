@@ -2,6 +2,11 @@
 id: python-exceptions-try-except
 title: try...exceptによる例外の捕捉
 level: 2
+question:
+  - '`try...except`は何のために使うのですか？'
+  - '`except ZeroDivisionError:`の`ZeroDivisionError`は何ですか？他の種類もありますか？'
+  - '`try`ブロックでエラーが起きなかった場合、`except`ブロックは実行されますか？'
+  - '`try...except`を使わないとプログラムはどうなりますか？'
 ---
 
 ## `try...except`による例外の捕捉

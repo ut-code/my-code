@@ -2,6 +2,11 @@
 id: python-exceptions-raise
 title: 独自例外の送出 (raise)
 level: 2
+question:
+  - '`raise`は何のために使うのですか？'
+  - '`raise`を使うとプログラムはどうなりますか？'
+  - 自分で例外を発生させる必要があるのはどんな時ですか？
+  - '`raise ValueError("メッセージ")`の`ValueError`の部分は、他のエラー名でもいいのですか？'
 ---
 
 ## 独自例外の送出 (`raise`)

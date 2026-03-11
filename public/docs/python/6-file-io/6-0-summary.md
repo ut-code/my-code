@@ -2,6 +2,8 @@
 id: python-file-io-summary
 title: この章のまとめ
 level: 2
+question:
+  - この章で学んだファイル操作以外に、初心者が次に学ぶべき重要なファイル操作の概念はありますか？
 ---
 
 ## この章のまとめ
