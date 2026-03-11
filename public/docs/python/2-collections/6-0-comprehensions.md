@@ -2,6 +2,9 @@
 id: python-collections-comprehensions
 title: 内包表記 (Comprehensions)による効率的な生成
 level: 2
+question:
+  - 内包表記は、forループと比べてどれくらい処理が速くなるのですか？
+  - 内包表記を使わない方が良いケースはありますか？
 ---
 
 ## 内包表記 (Comprehensions)による効率的な生成

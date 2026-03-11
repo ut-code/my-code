@@ -2,6 +2,9 @@
 id: python-control-functions-positional-var-arg
 title: '*args'
 level: 3
+question:
+  - '`*numbers`の`*`は何を意味していますか？'
+  - '`*args`で受け取った引数がタプルになるのはなぜですか？'
 ---
 
 ### `*args`

@@ -2,6 +2,10 @@
 id: python-control-functions-summary
 title: この章のまとめ
 level: 2
+question:
+  - 「Pythonic（パイソニック）」とは具体的にどういう意味ですか？
+  - 型アノテーションはコードの実行速度に影響しますか？
+  - この章で学んだ中で、一番気を付けるべき点は何ですか？
 ---
 
 ## この章のまとめ

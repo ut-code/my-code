@@ -2,6 +2,11 @@
 id: python-modules-datetime
 title: datetime
 level: 3
+question:
+  - '`datetime`モジュールは、他にどのような日付や時刻の操作ができますか？'
+  - '`datetime.datetime.now()`と`datetime.date.today()`はどのように違いますか？'
+  - '`strftime(''%Y-%m-%d %H:%M:%S'')`の`%Y`や`%m`は何を意味しますか？'
+  - 日時の最後の数字`123456`は何を表していますか？
 ---
 
 ### `datetime`

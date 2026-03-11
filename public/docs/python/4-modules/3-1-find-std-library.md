@@ -2,6 +2,11 @@
 id: python-modules-find-std-library
 title: 標準ライブラリの探索
 level: 3
+question:
+  - 標準ライブラリの公式ドキュメントは、英語が苦手でも読めますか？
+  - REPLとは何ですか？
+  - '`dir()`と`help()`はどんな時に使うと便利ですか？'
+  - '`dir(datetime)`の出力にある`__all__`や`__builtins__`のような特殊な名前は何ですか？'
 ---
 
 ### 標準ライブラリの探索

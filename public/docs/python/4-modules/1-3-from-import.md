@@ -2,6 +2,12 @@
 id: python-modules-from-import
 title: 'from...import: モジュールから特定の関数や変数だけを取り込む'
 level: 4
+question:
+  - '`from math import pi, sqrt`と`import math`はどのように違うのですか？'
+  - '`pi`や`sqrt`を直接参照できるメリットは何ですか？'
+  - '`from math import *`はなぜ避けるべきなのですか？'
+  - 「名前空間」とは具体的に何のことですか？
+  - 「意図しない名前の上書き」とはどういうことですか？
 ---
 
 #### `from...import`: モジュールから特定の関数や変数だけを取り込む
