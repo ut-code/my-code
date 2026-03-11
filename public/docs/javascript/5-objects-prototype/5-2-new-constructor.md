@@ -2,6 +2,11 @@
 id: javascript-prototype-new-constructor
 title: 2. コンストラクタ関数（new演算子）
 level: 3
+question:
+  - コンストラクタ関数とは何ですか？
+  - '`new` 演算子は何をしているのですか？'
+  - '`Func.prototype` と `user1.__proto__` は何が違うのですか？'
+  - '`User.prototype` にメソッドを定義するとメモリが節約されるのはなぜですか？'
 ---
 
 ### 2\. コンストラクタ関数（new演算子）

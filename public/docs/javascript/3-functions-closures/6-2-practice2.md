@@ -2,6 +2,10 @@
 id: javascript-functions-closures-practice2
 title: '問題2: クロージャによる掛け算生成器'
 level: 3
+question:
+  - '`createMultiplier` 関数の中に関数を書くのはなぜですか？'
+  - '`double` と `triple` がそれぞれ独立して動作するのはなぜですか？'
+  - クロージャを使って、この例以外にどんな便利なものが作れますか？
 ---
 
 ### 問題2: クロージャによる掛け算生成器

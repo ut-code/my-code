@@ -2,6 +2,8 @@
 id: javascript-prototype-object-create-basic
 title: Object.create() とコンストラクタ関数
 level: 2
+question:
+  - '`__proto__` を直接操作するのが推奨されないのはなぜですか？'
 ---
 
 ## Object.create() とコンストラクタ関数

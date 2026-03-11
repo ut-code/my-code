@@ -2,6 +2,10 @@
 id: javascript-objects-method-this-recall
 title: メソッドと this（復習）
 level: 2
+question:
+  - メソッドとは何ですか？普通の関数と何が違うのですか？
+  - '`this` はいつも「ドットの左側にあるオブジェクト」を指すのですか？'
+  - ES6からの短縮記法が推奨されるのはなぜですか？
 ---
 
 ## メソッドと this（復習）

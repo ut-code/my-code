@@ -2,6 +2,13 @@
 id: javascript-this-bind
 title: bind
 level: 3
+question:
+  - '`bind`が「新しい関数を返す」とは、元の関数は変更されないということですか？'
+  - イベントリスナーやコールバック関数としてメソッドを渡す際に、なぜ`bind`が重要になるのですか？
+  - >-
+    `brokenStart()`が`Cannot read property 'type' of
+    undefined`というエラーになるのは、`this.type`がなぜ読めないのですか？
+  - '`engine.start.bind(engine)`と書くとき、なぜ`engine`を2回書くのですか？'
 ---
 
 ### bind

@@ -2,6 +2,9 @@
 id: javascript-this-practice1
 title: '練習問題1: 失われたコンテキストの修復'
 level: 3
+question:
+  - '`simulateClick(user.greet)`としたときに`this`が失われるのは、本文中のどのルールに該当するのですか？'
+  - '`bind`を使って修正する具体的なコードの書き方をもう一度教えてほしいです。'
 ---
 
 ### 練習問題1: 失われたコンテキストの修復

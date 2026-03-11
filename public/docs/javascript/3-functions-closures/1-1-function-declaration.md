@@ -2,6 +2,10 @@
 id: javascript-function-declaration
 title: 1. 関数宣言 (Function Declaration)
 level: 3
+question:
+  - 関数宣言は定義する前の行から呼び出せるのはなぜですか？
+  - 関数宣言はどのような場合に使うのが良いですか？
+  - '`console.log(greet("Alice"));` の `greet` 関数は何を返していますか？'
 ---
 
 ### 1\. 関数宣言 (Function Declaration)

@@ -2,6 +2,10 @@
 id: javascript-objects-prototype-summary
 title: この章のまとめ
 level: 2
+question:
+  - プロトタイプベースの継承とクラスベースの継承の大きな違いは何ですか？
+  - '`[[Prototype]]` とは `__proto__` のことですか？'
+  - コンストラクタ関数と `new` 演算子を使うと「クラス」に近い振る舞いを模倣できる、とはどういう意味ですか？
 ---
 
 ## この章のまとめ
