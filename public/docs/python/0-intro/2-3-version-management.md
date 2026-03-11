@@ -2,6 +2,11 @@
 id: python-intro-version-management
 title: バージョン管理と環境管理ツール
 level: 3
+question:
+  - 複数のPythonバージョンが必要になるのはどのような時ですか？
+  - pyenvはどのように使えばよいのですか？
+  - データサイエンス以外でもCondaは使えますか？
+  - pyenvとCondaはどちらを使えば良いですか？
 ---
 
 ### バージョン管理と環境管理ツール

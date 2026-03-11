@@ -2,6 +2,10 @@
 id: javascript-promise-practice2
 title: '練習問題2: 擬似的なデータ取得フロー'
 level: 3
+question:
+  - '`fetchUser`と`fetchPosts`の関数は、それぞれ`new Promise`を使って実装するのでしょうか？'
+  - '`fetchUser`で取得したユーザーの名前を、どのように`fetchPosts`の引数として渡せばよいですか？'
+  - 「Promiseチェーンで繋ぎ」の部分のコードの書き方が具体的にイメージできません、ヒントをください。
 ---
 
 ### 練習問題2: 擬似的なデータ取得フロー

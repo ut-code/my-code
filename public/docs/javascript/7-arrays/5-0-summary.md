@@ -2,6 +2,9 @@
 id: javascript-arrays-summary
 title: この章のまとめ
 level: 2
+question:
+  - 「配列は動的で、push/popなどのメソッドで伸縮可能」とはどういう意味ですか？
+  - スプレッド構文や分割代入で「宣言的に記述できる」とはどういうことですか？
 ---
 
 ## この章のまとめ

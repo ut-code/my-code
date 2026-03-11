@@ -2,6 +2,12 @@
 id: javascript-async-await-async
 title: async 関数
 level: 3
+question:
+  - asyncキーワードは関数のどこに付ければいいですか？
+  - async関数が常にPromiseを返すのはなぜですか？
+  - Promise.resolve(値)とは具体的にどういう意味ですか？
+  - Promise { 'Hello, Async!' }のPromiseとは何ですか？
+  - getMessage().then(v => console.log(v))のvは何を表していますか？
 ---
 
 ### `async` 関数

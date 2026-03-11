@@ -2,6 +2,13 @@
 id: javascript-async-await-fetch-post
 title: JSONデータの送信 (POST)
 level: 3
+question:
+  - POSTリクエストでJSONデータを送信する方法は？
+  - 'method: ''POST''は何を意味しますか？'
+  - 'headers: { ''Content-Type'': ''application/json'' }はなぜ必要ですか？'
+  - JSON.stringify(postData)は何をするためのものですか？
+  - .then(res => res.json())はなぜここで使われているのですか？
+  - 'POSTリクエストのid: 101は何を表していますか？'
 ---
 
 ### JSONデータの送信 (POST)
