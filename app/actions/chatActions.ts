@@ -4,7 +4,7 @@
 import { generateContent } from "./gemini";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
-import { addChat, ChatWithMessages } from "@/lib/chatHistory";
+import { addChat, ChatWithMessages, CreateChatDiff } from "@/lib/chatHistory";
 import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
 
 type ChatResult =
@@ -198,18 +198,35 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
       targetSectionId = introSectionId(path);
     }
     const responseMessage = text.split(/-{3,}/)[1].trim();
-    const diffMatch = text
+    const diffRaw: CreateChatDiff[] = [];
+    for (const m of text
       .split(/-{3,}/)[2]
       .matchAll(
         /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g
+      )) {
+      const search = m[1];
+      const replace = m[2];
+      const targetSection = sectionContent.find((s) =>
+        s.rawContent.includes(search)
       );
-    const diff: { search: string; replace: string }[] = diffMatch
-      ? Array.from(diffMatch, (m) => ({ search: m[1], replace: m[2] }))
-      : [];
-    const newChat = await addChat(path, targetSectionId, [
-      { role: "user", content: userQuestion },
-      { role: "ai", content: responseMessage },
-    ]);
+      if (targetSection) {
+        diffRaw.push({
+          search,
+          replace,
+          sectionId: targetSection.id,
+          targetMD5: targetSection.md5,
+        });
+      }
+    }
+    const newChat = await addChat(
+      path,
+      targetSectionId,
+      [
+        { role: "user", content: userQuestion },
+        { role: "ai", content: responseMessage },
+      ],
+      diffRaw
+    );
     return {
       error: null,
       chat: newChat,

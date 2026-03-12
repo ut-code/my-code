@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
-import { chat, message, section } from "@/schema/chat";
+import { chat, diff, message, section } from "@/schema/chat";
 import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
 import { revalidateTag, unstable_cacheLife } from "next/cache";
@@ -14,6 +14,12 @@ import { PagePath, SectionId } from "./docs";
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
   content: string;
+}
+export interface CreateChatDiff {
+  search: string;
+  replace: string;
+  sectionId: SectionId;
+  targetMD5: string;
 }
 
 // cacheに使うキーで、実際のURLではない
@@ -57,6 +63,7 @@ export async function addChat(
   path: PagePath,
   sectionId: SectionId,
   messages: CreateChatMessage[],
+  diffRaw: CreateChatDiff[],
   context?: Partial<Context>
 ) {
   const { drizzle, userId } = await initContext(context);
@@ -82,6 +89,13 @@ export async function addChat(
     )
     .returning();
 
+  const chatDiffs = await drizzle.insert(diff).values(
+    diffRaw.map((d) => ({
+      chatId: newChat.chatId,
+      ...d,
+    }))
+  );
+
   revalidateTag(cacheKeyForPage(path, userId));
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
@@ -98,6 +112,7 @@ export async function addChat(
       pagePath: `${path.lang}/${path.page}`,
     },
     messages: chatMessages,
+    diff: chatDiffs,
   };
 }
 
@@ -119,10 +134,12 @@ export async function getChat(
         drizzle
           .select()
           .from(section)
-          .where(and(
-            eq(section.sectionId, chat.sectionId),
-            eq(section.pagePath, `${path.lang}/${path.page}`),
-          ))
+          .where(
+            and(
+              eq(section.sectionId, chat.sectionId),
+              eq(section.pagePath, `${path.lang}/${path.page}`)
+            )
+          )
       )
     ),
     with: {
@@ -130,6 +147,7 @@ export async function getChat(
       messages: {
         orderBy: [asc(message.createdAt)],
       },
+      diff: true,
     },
     orderBy: [asc(chat.createdAt)],
   });
