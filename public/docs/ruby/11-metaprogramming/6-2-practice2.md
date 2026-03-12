@@ -2,6 +2,12 @@
 id: ruby-metaprogramming-practice2
 title: '練習問題2: シンプルな設定オブジェクト'
 level: 3
+question:
+  - ハッシュのように動作するとは、具体的にどのような振る舞いをさせたいのですか。
+  - '`config.api_key = "12345"`のように値を設定する部分をmethod_missingでどのように実装しますか。'
+  - '`config.api_key`で値を取得する部分をmethod_missingでどのように実装しますか。'
+  - 設定されていないキーを呼び出した場合にnilを返すにはどうすれば良いですか。
+  - respond_to_missing?を`true`にするのはなぜですか。
 ---
 
 ### 練習問題2: シンプルな設定オブジェクト

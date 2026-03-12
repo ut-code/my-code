@@ -2,6 +2,10 @@
 id: rust-functions-control-loop-return
 title: loop と値の戻り
 level: 4
+question:
+  - breakの後に値を置くことでループから値を返す機能は、他の言語にはあまりないように感じます。どんな時に特に便利ですか？
+  - ループ内でbreak文が実行されなかった場合、loop式は何を返しますか？
+  - counter * 2の後にセミコロンがないのは、これも式として扱われるからですか？
 ---
 
 #### loop と値の戻り

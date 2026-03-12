@@ -2,6 +2,11 @@
 id: ruby-metaprogramming-rails-example
 title: Railsなどでの活用例
 level: 2
+question:
+  - RailsのActive Recordでfind_by_emailのようなメソッドがどのように動的に生成されるのか、もう少し詳しく教えてください。
+  - has_manyやbelongs_toがdefine_methodを使っているとは具体的にどういうことですか。
+  - Railsの「魔法」の多くを支えるとは、具体的にどんな「魔法」のことですか。
+  - メタプログラミングを使わない場合、Railsのようなフレームワークのコードはどのように変わりますか。
 ---
 
 ## Railsなどでの活用例

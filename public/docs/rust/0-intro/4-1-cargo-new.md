@@ -2,6 +2,10 @@
 id: rust-intro-cargo-new
 title: プロジェクトの作成 (cargo new)
 level: 3
+question:
+  - '`cargo new` コマンドは何をするものですか？'
+  - '`Cargo.toml` には何が記述されるのですか？'
+  - '`.gitignore` が自動生成されるのはなぜですか？'
 ---
 
 ### プロジェクトの作成 (`cargo new`)

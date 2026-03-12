@@ -2,6 +2,10 @@
 id: rust-basics-immutable
 title: 不変変数（Immutable）
 level: 3
+question:
+  - 不変変数に値を再代入できないのはなぜですか？
+  - E0384というコンパイルエラーはどのような状況で発生するのですか？
+  - first assignment to `x`というメッセージはどのコード行を指していますか？
 ---
 
 ### 不変変数（Immutable）

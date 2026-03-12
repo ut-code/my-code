@@ -2,6 +2,9 @@
 id: rust-functions-control-loops
 title: ループ構造
 level: 3
+question:
+  - loop, while, forの3種類のループは、それぞれどのような状況で使い分けるべきですか？
+  - 無限ループであるloopは、どのような場面で役立つのでしょうか？
 ---
 
 ### ループ構造

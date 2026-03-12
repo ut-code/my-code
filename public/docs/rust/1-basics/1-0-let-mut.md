@@ -2,6 +2,9 @@
 id: rust-basics-let-mut
 title: 変数と可変性（let vs let mut）
 level: 2
+question:
+  - letとlet mutの違いは何ですか？
+  - mutは何の略で、どのような意味があるのですか？
 ---
 
 ## 変数と可変性（let vs let mut）

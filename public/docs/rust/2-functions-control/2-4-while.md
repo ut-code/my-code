@@ -2,6 +2,8 @@
 id: rust-functions-control-while
 title: while
 level: 4
+question:
+  - whileループと、ifとbreakを組み合わせたloopループは、どのように使い分けるべきですか？
 ---
 
 #### while

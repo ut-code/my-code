@@ -2,6 +2,12 @@
 id: ruby-metaprogramming-method-missing
 title: 'method_missing: 存在しないメソッドへの応答'
 level: 2
+question:
+  - method_missingはなぜ特別なメソッドなのですか。
+  - NoMethodErrorが発生する前に呼び出されるとはどういうことですか。
+  - superを呼び出すのはどういう意味ですか、どのような時に使うべきですか。
+  - respond_to_missing?はなぜ必要なのですか、定義しないとどうなりますか。
+  - method_missingをオーバーライドすると、実際のアプリケーションでどのようなメリットがありますか。
 ---
 
 ## `method_missing`: 存在しないメソッドへの応答

@@ -2,6 +2,8 @@
 id: rust-functions-control-summary
 title: この章のまとめ
 level: 2
+question:
+  - この章で学んだ中で、特に初心者が注意すべきポイントは何ですか？
 ---
 
 ## この章のまとめ

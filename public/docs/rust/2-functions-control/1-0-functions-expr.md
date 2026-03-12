@@ -2,6 +2,10 @@
 id: rust-functions-control-functions-expr
 title: 関数と「式」指向
 level: 2
+question:
+  - fnキーワードは何かの略ですか？
+  - スネークケースを使うのはなぜですか？必ず使わないといけない決まりですか？
+  - 関数名にはどのような文字や記号が使えますか？
 ---
 
 ## 関数と「式」指向
