@@ -2,6 +2,15 @@
 id: ruby-modules-access-control
 title: アクセスコントロール (public, private, protected)
 level: 2
+question:
+  - '`public` メソッドはデフォルトなので特にキーワードを指定しないのですか。'
+  - '`private` メソッドは「レシーバを明示して呼び出すことができません」とありますが、具体的にどういうことですか。'
+  - '`self.` を付けずにクラス内部から呼び出すとは、どのようなコードになりますか。'
+  - '`protected` メソッドは、どのような状況で使うと便利ですか。'
+  - '`Wallet` クラスの `@balance` に `attr_reader` がないのはなぜですか。'
+  - '`withdraw` メソッドはなぜ `private` にする必要があるのですか。'
+  - '`deposit` メソッドが `protected` だと、`other_wallet.deposit(amount)` と呼び出せるのはなぜですか。'
+  - '`private` と `protected` の一番大きな違いは何ですか。'
 ---
 
 ## アクセスコントロール (`public`, `private`, `protected`)

@@ -1,7 +1,10 @@
 ---
 id: ruby-testing-assert_raises
-title: 'assert_raises(Exception) { ... }'
+title: assert_raises(Exception) { ... }
 level: 3
+question:
+  - '`assert_raises` は、指定した例外以外の例外が発生した場合はどうなりますか？'
+  - 例外が全く発生しなかった場合、テストは成功しますか、失敗しますか？
 ---
 
 ### `assert_raises(Exception) { ... }`

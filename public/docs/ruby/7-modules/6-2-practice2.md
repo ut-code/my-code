@@ -2,6 +2,13 @@
 id: ruby-modules-practice2
 title: '練習問題2: protected を使った比較'
 level: 3
+question:
+  - '`Score` クラスの `initialize` で `@value` を保持するにはどう書けば良いですか。'
+  - '`protected` メソッドである `value` をどのように定義すれば良いですか。'
+  - >-
+    `higher_than?` メソッドの内部で `self.value > other_score.value` と記述すると、`protected`
+    な `value` メソッドが呼び出せるのはなぜですか。
+  - '`protected` メソッドをインスタンスの外部から直接呼び出そうとするとエラーになることを、どのようにコードで示せば良いですか。'
 ---
 
 ### 練習問題2: protected を使った比較

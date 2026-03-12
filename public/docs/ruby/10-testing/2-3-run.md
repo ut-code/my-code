@@ -2,6 +2,10 @@
 id: ruby-testing-run
 title: 3. テストの実行
 level: 3
+question:
+  - テストを実行する際に、毎回ターミナルで `ruby test_calculator.rb` と入力するのですか？
+  - 実行結果の `.` は、テストが成功したことを意味するとのことですが、具体的に何が成功したことを示しているのですか？
+  - '`2 runs, 2 assertions` とありますが、runsとassertionsの違いは何ですか？'
 ---
 
 ### 3\. テストの実行

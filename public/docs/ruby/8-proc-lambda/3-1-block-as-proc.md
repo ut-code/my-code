@@ -2,6 +2,10 @@
 id: ruby-proc-lambda-block-as-proc
 title: 1. ブロックを Proc として受け取る
 level: 3
+question:
+  - メソッド定義の最後の引数に&をつけるとは、具体的にどの部分のことですか？
+  - block.call(item.upcase)のupcaseメソッドはどこから来たのですか？
+  - 普通にブロックを渡すのと、&blockでProcとして受け取るのとでは、何が違うのですか？
 ---
 
 ### 1\. ブロックを `Proc` として受け取る

@@ -2,6 +2,9 @@
 id: ruby-testing-assertion
 title: アサーション（assert_equal, assert 等）の書き方
 level: 2
+question:
+  - アサーションとは、どのような目的で使うものですか？
+  - Minitestには、ここに書かれている以外にもアサーションメソッドがありますか？
 ---
 
 ## アサーション（assert\_equal, assert 等）の書き方

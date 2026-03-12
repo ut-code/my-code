@@ -2,6 +2,16 @@
 id: ruby-stdlib-time-date
 title: 日付と時刻 (Time, Date)
 level: 2
+question:
+  - TimeとDateのどちらを使うべきか、どのように判断すればよいですか？
+  - Time.nowの出力にある+0900 (JST)は何を意味しますか？
+  - UNIXタイムスタンプとは何ですか？
+  - strftimeの%Y-%m-%dのような記号の意味はどこで確認できますか？
+  - require 'date'が必要なのはなぜですか？
+  - >-
+    Dateオブジェクトの出力が#<Date: 2025-11-04
+    ((2461014j,0s,0n),+0s,2299161j)>のようになるのはなぜですか？
+  - 日付の引き算でto_iを使うと日数になるのはなぜですか？
 ---
 
 ## 日付と時刻 (`Time`, `Date`)

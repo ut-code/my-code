@@ -2,6 +2,9 @@
 id: ruby-testing-practice2
 title: '練習問題2: TDDでUserクラスを実装'
 level: 3
+question:
+  - '`user.rb` と `test_user.rb` は必ず同じディレクトリに置く必要がありますか？'
+  - '`full_name` メソッド以外にも`User`クラスにメソッドを追加する場合、どのようにTDDサイクルを回せば良いですか？'
 ---
 
 ### 練習問題2: TDDでUserクラスを実装

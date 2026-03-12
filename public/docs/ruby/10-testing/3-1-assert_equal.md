@@ -2,6 +2,9 @@
 id: ruby-testing-assert_equal
 title: assert_equal(expected, actual)
 level: 3
+question:
+  - '`assert_equal` の引数の順序を間違えると、なぜメッセージが分かりにくくなるのですか？具体的な例で教えてください。'
+  - '`irb` で `assert_equal` を使うための設定は、実際のテストファイルでは書かなくても良いのですか？'
 ---
 
 ### `assert_equal(expected, actual)`
