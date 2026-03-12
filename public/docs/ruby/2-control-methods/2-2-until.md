@@ -2,6 +2,10 @@
 id: ruby-control-methods-until
 title: until
 level: 3
+question:
+  - untilとwhileはどちらを使うべきか、使い分けの基準はありますか？
+  - until文にelseのようなものはありますか？
+  - カウンターが0にならない場合の無限ループはどのように回避できますか？
 ---
 
 ### `until`

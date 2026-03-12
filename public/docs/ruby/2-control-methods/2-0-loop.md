@@ -2,6 +2,10 @@
 id: ruby-control-loop
 title: 繰り返し処理
 level: 2
+question:
+  - ここで言う「イテレータ」とは何ですか？
+  - whileやuntilよりもイテレータが主流なのはなぜですか？
+  - whileやuntilは、どのような状況で使うのが適切ですか？
 ---
 
 ## 繰り返し処理

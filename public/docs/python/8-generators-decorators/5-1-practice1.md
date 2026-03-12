@@ -2,6 +2,9 @@
 id: python-generators-decorators-practice1
 title: '練習問題1: カウントダウンジェネレータ'
 level: 3
+question:
+  - '`countdown` ジェネレータ関数で `yield` を使うタイミングと、ループの終了条件をどうすれば良いかわかりません'
+  - '`start` の値から1ずつ減らしていく処理はどのように書けば良いですか'
 ---
 
 ### 練習問題1: カウントダウンジェネレータ
