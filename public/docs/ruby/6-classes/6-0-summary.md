@@ -2,6 +2,9 @@
 id: ruby-classes-summary
 title: 📝 この章のまとめ
 level: 2
+question:
+  - コンストラクタとは何ですか？
+  - マクロとは何ですか？
 ---
 
 ## 📝 この章のまとめ

@@ -2,6 +2,9 @@
 id: ruby-classes-practice1
 title: '練習問題1: Book クラスの作成'
 level: 3
+question:
+  - 練習問題1でattr_readerを使うのと、手動でゲッターメソッドを定義するのとでは、どちらが良いですか？
+  - '@titleとtitleはそれぞれ何を表していますか？'
 ---
 
 ### 練習問題1: `Book` クラスの作成

@@ -2,6 +2,12 @@
 id: ruby-everything-object-integer
 title: Integer / Float (数値)
 level: 3
+question:
+  - Numericクラスとは何ですか？IntegerとFloatはそれに含まれるということですか？
+  - .even?や.odd?のようなメソッドは他にどんなものがありますか？
+  - .to_s、.to_f、.to_iはどのような時に使いますか？
+  - 10.5.roundが11になるのは、四捨五入の結果ですか？
+  - Floatで小数点以下の桁数を指定して丸める方法はありますか？
 ---
 
 ### Integer / Float (数値)
