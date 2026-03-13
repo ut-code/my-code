@@ -1,11 +1,19 @@
 "use server";
 
 // import { z } from "zod";
-import { generateContent } from "./gemini";
+import { generateContent as generateContentGemini } from "./gemini";
+import { generateContent as generateContentOpenRouter } from "./openrouter";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
 import { addChat, ChatWithMessages } from "@/lib/chatHistory";
 import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
+
+function generateContent(prompt: string, systemInstruction?: string) {
+  if (process.env.OPENROUTER_API_KEY && process.env.OPENROUTER_MODEL) {
+    return generateContentOpenRouter(prompt, systemInstruction);
+  }
+  return generateContentGemini(prompt, systemInstruction);
+}
 
 type ChatResult =
   | {
