@@ -13,11 +13,12 @@ import {
   PageEntry,
   PagePath,
 } from "@/lib/docs";
+import { ReplacedRange } from "@/markdown/multiHighlight";
 
 /**
  * MarkdownSectionに追加で、動的な情報を持たせる
  */
-export type DynamicMarkdownSection = MarkdownSection & {
+export interface DynamicMarkdownSection extends MarkdownSection {
   /**
    * ユーザーが今そのセクションを読んでいるかどうか
    */
@@ -26,7 +27,8 @@ export type DynamicMarkdownSection = MarkdownSection & {
    * チャットの会話を元にAIが書き換えた後の内容
    */
   replacedContent: string;
-};
+  replacedRange: ReplacedRange[];
+}
 
 interface PageContentProps {
   splitMdContent: MarkdownSection[];
@@ -43,21 +45,53 @@ export function PageContent(props: PageContentProps) {
   const { chatHistories } = useChatHistoryContext();
 
   const initDynamicMdContent = useCallback(() => {
-    const newContent = splitMdContent.map((section) => ({
-      ...section,
-      inView: false,
-      replacedContent: section.rawContent,
-    }));
+    const newContent: DynamicMarkdownSection[] = splitMdContent.map(
+      (section) => ({
+        ...section,
+        inView: false,
+        replacedContent: section.rawContent,
+        replacedRange: [],
+      })
+    );
     const chatDiffs = chatHistories.map((chat) => chat.diff).flat();
     chatDiffs.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     for (const diff of chatDiffs) {
       const targetSection = newContent.find((s) => s.id === diff.sectionId);
       if (targetSection) {
-        if (targetSection.replacedContent.includes(diff.search)) {
-          targetSection.replacedContent = targetSection.replacedContent.replace(
-            diff.search,
-            diff.replace
-          );
+        const startIndex = targetSection.replacedContent.indexOf(diff.search);
+        if (startIndex !== -1) {
+          const endIndex = startIndex + diff.search.length;
+          const replaceLen = diff.replace.length;
+          const diffLen = replaceLen - diff.search.length; // 文字列長の増減分
+
+          // 1. 文字列の置換
+          targetSection.replacedContent =
+            targetSection.replacedContent.slice(0, startIndex) +
+            diff.replace +
+            targetSection.replacedContent.slice(endIndex);
+
+          // 2. 既存のハイライト範囲のズレを補正（今回の置換箇所より後ろにあるものをシフト）
+          targetSection.replacedRange = targetSection.replacedRange.map((h) => {
+            if (h.start >= endIndex) {
+              // 完全に後ろにある場合は単純にシフト
+              return {
+                start: h.start + diffLen,
+                end: h.end + diffLen,
+                id: h.id,
+              };
+            }
+            if (h.end >= endIndex) {
+              return { start: h.start, end: h.end + diffLen, id: h.id };
+            }
+            return h;
+          });
+
+          // 3. 今回の置換箇所を新たなハイライト範囲として追加
+          targetSection.replacedRange.push({
+            start: startIndex,
+            end: startIndex + replaceLen,
+            id: diff.chatId,
+          });
         } else {
           // TODO: md5ハッシュを参照し過去バージョンのドキュメントへ適用を試みる
           console.error(
@@ -144,7 +178,10 @@ export function PageContent(props: PageContentProps) {
             }}
           >
             {/* ドキュメントのコンテンツ */}
-            <StyledMarkdown content={section.replacedContent} />
+            <StyledMarkdown
+              content={section.replacedContent}
+              replacedRange={section.replacedRange}
+            />
           </div>
           <div>
             {/* 右側に表示するチャット履歴欄 */}

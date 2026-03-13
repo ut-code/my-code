@@ -8,14 +8,24 @@ import { JSX, ReactNode } from "react";
 import { langConstants, MarkdownLang } from "@my-code/runtime/languages";
 import { ReplTerminal } from "@/terminal/repl";
 import { StyledSyntaxHighlighter } from "./styledSyntaxHighlighter";
+import clsx from "clsx";
+import { remarkMultiHighlight, ReplacedRange } from "@/markdown/multiHighlight";
 
-export function StyledMarkdown({ content }: { content: string }) {
+export function StyledMarkdown(props: {
+  content: string;
+  replacedRange?: ReplacedRange[];
+}) {
   return (
     <Markdown
-      remarkPlugins={[remarkGfm, removeComments, remarkCjkFriendly]}
+      remarkPlugins={[
+        remarkGfm,
+        removeComments,
+        remarkCjkFriendly,
+        [remarkMultiHighlight, props.replacedRange],
+      ]}
       components={components}
     >
-      {content}
+      {props.content}
     </Markdown>
   );
 }
@@ -49,6 +59,17 @@ const components: Components = {
   pre: ({ node, ...props }) => props.children,
   code: ({ node, className, ref, style, ...props }) => (
     <CodeComponent {...{ node, className, ref, style, ...props }} />
+  ),
+  ins: ({ node, className, ...props }) => (
+    <ins
+      className={clsx(
+        // classNameにチャットidが入っている。
+        // 選択しているチャットに対応するdiffのみ濃いハイライトにするなど (TODO)
+        className,
+        "underline decoration-dashed underline-offset-[0.2rem] decoration-secondary/50"
+      )}
+      {...props}
+    />
   ),
 };
 
@@ -151,9 +172,7 @@ function CodeComponent({
     );
   } else {
     // inline
-    return (
-      <InlineCode>{String(props.children || "").replace(/\n$/, "")}</InlineCode>
-    );
+    return <InlineCode>{props.children}</InlineCode>;
   }
 }
 
