@@ -1,7 +1,6 @@
 "use server";
 
 import { GoogleGenAI } from "@google/genai";
-import OpenAI from "openai";
 
 export async function generateContent(
   prompt: string,
@@ -11,23 +10,36 @@ export async function generateContent(
   const openRouterModel = process.env.OPENROUTER_MODEL;
 
   if (openRouterApiKey && openRouterModel) {
-    const client = new OpenAI({
-      apiKey: openRouterApiKey,
-      baseURL: "https://openrouter.ai/api/v1",
-    });
+    // Support semicolon-separated list of models for automatic fallback via
+    // OpenRouter's `models` array parameter.
+    const models = openRouterModel.split(";").map((m) => m.trim()).filter(Boolean);
 
-    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+    const messages: { role: string; content: string }[] = [];
     if (systemInstruction) {
       messages.push({ role: "system", content: systemInstruction });
     }
     messages.push({ role: "user", content: prompt });
 
-    const completion = await client.chat.completions.create({
-      model: openRouterModel,
-      messages,
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${openRouterApiKey}`,
+      },
+      body: JSON.stringify({ models, messages }),
     });
 
-    const text = completion.choices[0]?.message?.content;
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(
+        `OpenRouter APIエラー: ${response.status} ${response.statusText} - ${body}`
+      );
+    }
+
+    const data = (await response.json()) as {
+      choices?: { message?: { content?: string | null } }[];
+    };
+    const text = data.choices?.[0]?.message?.content;
     if (!text) {
       throw new Error("OpenRouterからの応答が空でした");
     }
