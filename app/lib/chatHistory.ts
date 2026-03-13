@@ -89,12 +89,15 @@ export async function addChat(
     )
     .returning();
 
-  const chatDiffs = await drizzle.insert(diff).values(
-    diffRaw.map((d) => ({
-      chatId: newChat.chatId,
-      ...d,
-    }))
-  );
+  const chatDiffs = await drizzle
+    .insert(diff)
+    .values(
+      diffRaw.map((d) => ({
+        chatId: newChat.chatId,
+        ...d,
+      }))
+    )
+    .returning();
 
   revalidateTag(cacheKeyForPage(path, userId));
   if (isCloudflare()) {

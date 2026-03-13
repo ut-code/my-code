@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ChatForm } from "./chatForm";
 import { Heading, StyledMarkdown } from "./markdown";
 import { useChatHistoryContext } from "./chatHistory";
@@ -14,9 +14,18 @@ import {
   PagePath,
 } from "@/lib/docs";
 
-// MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
+/**
+ * MarkdownSectionに追加で、動的な情報を持たせる
+ */
 export type DynamicMarkdownSection = MarkdownSection & {
+  /**
+   * ユーザーが今そのセクションを読んでいるかどうか
+   */
   inView: boolean;
+  /**
+   * チャットの会話を元にAIが書き換えた後の内容
+   */
+  replacedContent: string;
 };
 
 interface PageContentProps {
@@ -31,25 +40,52 @@ export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
   const { splitMdContent, pageEntry, path } = props;
 
-  // SSR用のローカルstate
-  const [dynamicMdContent, setDynamicMdContent] = useState<
-    DynamicMarkdownSection[]
-  >(
-    splitMdContent.map((section) => ({
-      ...section,
-      inView: false,
-    }))
-  );
+  const { chatHistories } = useChatHistoryContext();
 
-  useEffect(() => {
-    // props.splitMdContentが変わったときにローカルstateとcontextの両方を更新
+  const initDynamicMdContent = useCallback(() => {
     const newContent = splitMdContent.map((section) => ({
       ...section,
       inView: false,
+      replacedContent: section.rawContent,
     }));
+    const chatDiffs = chatHistories.map((chat) => chat.diff).flat();
+    chatDiffs.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    for (const diff of chatDiffs) {
+      const targetSection = newContent.find((s) => s.id === diff.sectionId);
+      if (targetSection) {
+        if (targetSection.replacedContent.includes(diff.search)) {
+          targetSection.replacedContent = targetSection.replacedContent.replace(
+            diff.search,
+            diff.replace
+          );
+        } else {
+          // TODO: md5ハッシュを参照し過去バージョンのドキュメントへ適用を試みる
+          console.error(
+            `Failed to apply diff: search string "${diff.search}" not found in section ${targetSection.id}`
+          );
+        }
+      } else {
+        console.error(
+          `Failed to apply diff: section with id "${diff.sectionId}" not found`
+        );
+      }
+    }
+
+    return newContent;
+  }, [splitMdContent, chatHistories]);
+
+  // SSR用のローカルstate
+  const [dynamicMdContent, setDynamicMdContent] = useState<
+    DynamicMarkdownSection[]
+  >(() => initDynamicMdContent());
+
+  useEffect(() => {
+    // props.splitMdContentが変わったとき, チャットのdiffが変わった時に
+    // ローカルstateとcontextの両方を更新
+    const newContent = initDynamicMdContent();
     setDynamicMdContent(newContent);
     setSidebarMdContent(path, newContent);
-  }, [splitMdContent, path, setSidebarMdContent]);
+  }, [initDynamicMdContent, path, setSidebarMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
@@ -87,8 +123,6 @@ export function PageContent(props: PageContentProps) {
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
-  const { chatHistories } = useChatHistoryContext();
-
   return (
     <div
       className="p-4 mx-auto max-w-full grid"
@@ -110,7 +144,7 @@ export function PageContent(props: PageContentProps) {
             }}
           >
             {/* ドキュメントのコンテンツ */}
-            <StyledMarkdown content={section.rawContent} />
+            <StyledMarkdown content={section.replacedContent} />
           </div>
           <div>
             {/* 右側に表示するチャット履歴欄 */}

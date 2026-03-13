@@ -77,7 +77,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   prompt.push(``);
   for (const section of sectionContent) {
     prompt.push(`[セクションid: ${section.id}]`);
-    prompt.push(section.rawContent.trim());
+    prompt.push(section.replacedContent.trim());
     prompt.push(``);
   }
   prompt.push(``);
