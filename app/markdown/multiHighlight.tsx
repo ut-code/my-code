@@ -1,6 +1,9 @@
 import { visit } from "unist-util-visit";
 import type { Plugin } from "unified";
 import type { Root, PhrasingContent } from "mdast";
+import { JSX } from "react";
+import { ExtraProps } from "react-markdown";
+import clsx from "clsx";
 
 export interface ReplacedRange {
   start: number;
@@ -90,3 +93,21 @@ export const remarkMultiHighlight: Plugin<[ReplacedRange[]], Root> = (
     });
   };
 };
+
+export function MultiHighlightTag({
+  node,
+  className,
+  ...props
+}: JSX.IntrinsicElements["ins"] & ExtraProps) {
+  return (
+    <ins
+      className={clsx(
+        // classNameにチャットidが入っている。
+        // 選択しているチャットに対応するdiffのみ濃いハイライトにするなど (TODO)
+        className,
+        "underline decoration-dashed underline-offset-[0.2rem] decoration-secondary/50"
+      )}
+      {...props}
+    />
+  );
+}

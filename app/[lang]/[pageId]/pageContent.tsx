@@ -2,7 +2,7 @@
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ChatForm } from "./chatForm";
-import { Heading, StyledMarkdown } from "./markdown";
+import { StyledMarkdown } from "@/markdown/markdown";
 import { useChatHistoryContext } from "./chatHistory";
 import { useSidebarMdContext } from "@/sidebar";
 import clsx from "clsx";
@@ -14,6 +14,7 @@ import {
   PagePath,
 } from "@/lib/docs";
 import { ReplacedRange } from "@/markdown/multiHighlight";
+import { Heading } from "@/markdown/heading";
 
 /**
  * MarkdownSectionに追加で、動的な情報を持たせる
