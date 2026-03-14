@@ -2,6 +2,10 @@
 id: rust-enums-pattern-practice2
 title: '練習問題 2: 簡易計算機'
 level: 3
+question:
+  - Operation enumのAdd(i32, i32) のように複数の同じ型をデータとして持つことはよくありますか？
+  - 割り算で0除算を防ぐためにNoneを返す処理は、どのような書き方になりますか？
+  - calculate関数の戻り値がOption<i32>になっているのはなぜですか？
 ---
 
 ### 練習問題 2: 簡易計算機

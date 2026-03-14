@@ -2,6 +2,10 @@
 id: rust-enums-pattern-exhaustive
 title: 網羅性チェック
 level: 3
+question:
+  - 'calculate_area関数の引数のshape: Shapeは、なぜ値渡しなのですか？'
+  - matchの各アームで、Circle(radius)のように中のデータを取り出すのはどういう仕組みですか？
+  - 網羅性チェックで一つでも漏れているとコンパイルエラーになるのは、具体的にどのような場合ですか？
 ---
 
 ### 網羅性チェック

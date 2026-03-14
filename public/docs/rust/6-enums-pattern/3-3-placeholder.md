@@ -2,6 +2,9 @@
 id: rust-enums-pattern-placeholder
 title: _ プレースホルダー
 level: 3
+question:
+  - _ プレースホルダーはどのような場合に使うと便利ですか？
+  - defaultキーワードの代わりに_を使うのはなぜですか？
 ---
 
 ### `_` プレースホルダー

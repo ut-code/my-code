@@ -2,6 +2,9 @@
 id: rust-structs-methods-tuple-unit-structs
 title: タプル構造体とユニット様構造体
 level: 2
+question:
+  - 名前付きフィールドを持たない構造体は、なぜ必要なのでしょうか？
+  - 通常の構造体と比べて、どのようなメリットがありますか？
 ---
 
 ## タプル構造体とユニット様構造体

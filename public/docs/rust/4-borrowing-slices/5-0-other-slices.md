@@ -2,6 +2,9 @@
 id: rust-borrowing-slices-other-slices
 title: 5.5 その他のスライス
 level: 2
+question:
+  - 配列スライスも可変にできますか？
+  - assert_eq! マクロはテスト以外の目的でも使えますか？
 ---
 
 ## 5.5 その他のスライス

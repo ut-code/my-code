@@ -1,7 +1,10 @@
 ---
 id: rust-enums-pattern-option-match
-title: 'Option<T> と match'
+title: Option<T> と match
 level: 3
+question:
+  - OptionのSome(i)からiを取り出すのは、matchのパターンマッチングでどのように行われているのですか？
+  - plus_one関数はOption<i32>を受け取ってOption<i32>を返していますが、これは一般的なパターンですか？
 ---
 
 ### Option\<T\> と match

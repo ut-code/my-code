@@ -2,6 +2,9 @@
 id: rust-borrowing-slices-str-slice
 title: 文字列スライス（&str）
 level: 3
+question:
+  - 文字列スライスのインデックス指定で、終了インデックスが含まれないのはなぜですか？
+  - 省略記法はどのような時に使うと便利ですか？
 ---
 
 ### 文字列スライス（`&str`）

@@ -2,6 +2,10 @@
 id: rust-enums-pattern-practice1
 title: '練習問題 1: コインの分類機'
 level: 3
+question:
+  - UsStateというEnumを定義するには、どのような書き方をすればいいですか？
+  - QuarterバリアントにUsStateをデータとして持たせる具体的なコードの書き方が分かりません。
+  - matchを使って複数のデータを同時に返すにはどうすればいいですか？
 ---
 
 ### 練習問題 1: コインの分類機

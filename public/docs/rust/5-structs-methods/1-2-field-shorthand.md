@@ -2,6 +2,10 @@
 id: rust-structs-methods-field-shorthand
 title: フィールド初期化省略記法
 level: 3
+question:
+  - フィールド初期化省略記法は、どのような場合に便利ですか？
+  - 'email: emailとemail、どちらの書き方でも同じ動作になりますか？'
+  - JavaScriptを知らない場合、どのようなイメージを持てばよいですか？
 ---
 
 ### フィールド初期化省略記法

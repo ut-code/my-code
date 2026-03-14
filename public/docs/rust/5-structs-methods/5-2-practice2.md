@@ -2,6 +2,9 @@
 id: rust-structs-methods-practice2
 title: '練習問題2: 座標計算'
 level: 3
+question:
+  - 平方根を計算する.sqrt()メソッドは、どのような値に対して使えますか？
+  - 2点間の距離の公式をRustのコードに変換する際の注意点はありますか？
 ---
 
 ### 練習問題2: 座標計算

@@ -2,6 +2,10 @@
 id: rust-borrowing-slices-practice2
 title: '問題 2: スライスの活用'
 level: 3
+question:
+  - as_bytes()メソッドは何を返しますか？
+  - for (i, &item) in bytes.iter().enumerate() の構文が初めてですが、これはどういう意味ですか？
+  - この方法はマルチバイト文字を含む文字列でも正しく動作しますか？
 ---
 
 ### 問題 2: スライスの活用

@@ -2,6 +2,9 @@
 id: rust-structs-methods-summary
 title: この章のまとめ
 level: 2
+question:
+  - Rustに継承がないと、オブジェクト指向的な設計はどのように行えばよいのですか？
+  - 列挙型とパターンマッチは、構造体とどのように関連するのですか？
 ---
 
 ## この章のまとめ

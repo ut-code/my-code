@@ -2,6 +2,12 @@
 id: rust-enums-pattern-enum-def
 title: Enumの定義と値の保持
 level: 2
+question:
+  - Enumとは何ですか？
+  - Enumの各バリアントにデータを持たせるとはどういう意味ですか？
+  - V4(u8, u8, u8, u8) の u8 はそれぞれ何を表していますか？
+  - StringはRustの標準ライブラリの型ですか？
+  - '#[derive(Debug)] は何のために必要ですか？'
 ---
 
 ## Enumの定義と値の保持

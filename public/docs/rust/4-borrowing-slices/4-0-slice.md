@@ -2,6 +2,9 @@
 id: rust-borrowing-slices-slice
 title: 5.4 スライス型（Slice）
 level: 2
+question:
+  - スライスは普通の参照と何が違うのですか？
+  - スライスも所有権を持たないのですか？
 ---
 
 ## 5.4 スライス型（Slice）
