@@ -2,6 +2,12 @@
 id: typescript-classes-ts-class
 title: 'TypeScriptのクラス: プロパティの型定義'
 level: 2
+question:
+  - プロパティの宣言を省略すると、具体的にどのようなエラーが出ますか？
+  - JavaScriptではプロパティを事前に宣言しなくても使えたのに、TypeScriptで宣言が必要なのはなぜですか？
+  - strictPropertyInitialization 設定とは何ですか？
+  - 'name!: string; の ! (非nullアサーション演算子) の意味は何ですか？'
+  - プロパティを宣言する場所は、必ずクラスの直下でなければなりませんか？
 ---
 
 ## TypeScriptのクラス: プロパティの型定義

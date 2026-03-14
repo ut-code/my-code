@@ -2,6 +2,10 @@
 id: typescript-combining-types-union
 title: Union型 (共用体型)
 level: 2
+question:
+  - Union型とは具体的にどういう時に使うのですか？
+  - id = true; がエラーになるのはなぜですか？
+  - Union型で定義した変数を操作する際の注意点について、もっと具体的な例で教えてください。
 ---
 
 ## Union型 (共用体型)

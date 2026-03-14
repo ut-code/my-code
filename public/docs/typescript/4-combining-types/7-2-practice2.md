@@ -2,6 +2,9 @@
 id: typescript-combining-types-practice2
 title: '練習問題2: 図形の面積計算'
 level: 3
+question:
+  - Circle型やSquare型にkindプロパティを追加する理由は何ですか？
+  - getArea関数内でswitch文を使うと、なぜ型が絞り込まれるのですか？
 ---
 
 ### 練習問題2: 図形の面積計算

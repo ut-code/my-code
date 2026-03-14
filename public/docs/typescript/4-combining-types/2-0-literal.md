@@ -2,6 +2,10 @@
 id: typescript-combining-types-literal
 title: Literal型 (リテラル型)
 level: 2
+question:
+  - '''red''のような特定の値だけを型として指定する「Literal型」は何が便利なのですか？'
+  - Literal型がEnumの代わりによく使われるとのことですが、Enumとは何ですか？
+  - typeキーワードは何のために使うのですか？
 ---
 
 ## Literal型 (リテラル型)

@@ -2,6 +2,11 @@
 id: typescript-generics-type-constraint
 title: '型制約 (extends): Generics型に制約を設ける'
 level: 2
+question:
+  - extendsキーワードは、クラスの継承とは異なる意味で使われているのですか？
+  - Lengthyインターフェースを定義することの具体的なメリットは何ですか？
+  - もし型制約がなかった場合、logLength関数でarg.lengthにアクセスすると何が起こりますか？
+  - logLength(100); がエラーになる理由を再度確認したいです。
 ---
 
 ## 型制約 (extends): Generics型に制約を設ける

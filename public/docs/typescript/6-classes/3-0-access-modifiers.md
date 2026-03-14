@@ -2,6 +2,11 @@
 id: typescript-classes-access-modifiers
 title: 'アクセス修飾子: public, private, protected'
 level: 2
+question:
+  - public、private、protected はそれぞれどのような時に使うべきですか？
+  - これらのアクセス修飾子を付けないと、デフォルトでは何になりますか？
+  - アクセス修飾子を使うことで、具体的にどのようなメリットがありますか？
+  - JavaScriptにはこれらの概念がないと思うのですが、TypeScript独自のものですか？
 ---
 
 ## アクセス修飾子: public, private, protected

@@ -2,6 +2,9 @@
 id: typescript-generics-practice1
 title: '練習問題 1: ペアを作成する関数'
 level: 3
+question:
+  - createPair関数で型引数をTとUの2つに分ける必要があるのはなぜですか？
+  - 戻り値の型が [T, U] となるのは、どのようなルールに基づいていますか？
 ---
 
 ### 練習問題 1: ペアを作成する関数

@@ -2,6 +2,9 @@
 id: typescript-function-types-optional-default
 title: オプショナル引数とデフォルト引数
 level: 2
+question:
+  - JavaScriptでは引数を省略するとundefinedになるのに、TypeScriptでは必須とみなされるのはなぜですか
+  - オプショナル引数とデフォルト引数は、どちらを優先して使うべきですか
 ---
 
 ## オプショナル引数とデフォルト引数

@@ -2,6 +2,11 @@
 id: typescript-generics-generics-class
 title: Genericsクラス
 level: 2
+question:
+  - クラスでジェネリクスを使うことで、具体的にどのような種類のデータ構造を効率的に実装できますか？
+  - 'private items: T[] = []; のT[]はどのような意味ですか？'
+  - pop() メソッドの戻り値の型 T | undefined は、なぜundefinedも含まれるのですか？
+  - numberStack.push("30"); がエラーになるのはなぜですか？
 ---
 
 ## Genericsクラス

@@ -2,6 +2,12 @@
 id: typescript-function-types-this-type
 title: this の型指定
 level: 3
+question:
+  - JavaScriptにおけるthisの挙動が複雑とは、具体的にどのような点ですか
+  - thisという名前の「偽の引数」とは何ですか、なぜ必要なのでしょうか
+  - このthis引数がコンパイル後のJavaScriptには出力されないとはどういう意味ですか
+  - アロー関数がthisを持たないとは、どういうことですか
+  - callメソッドがthisコンテキストを指定して実行するとは、具体的に何をしているのですか
 ---
 
 ### `this` の型指定

@@ -2,6 +2,10 @@
 id: typescript-combining-types-null-undefined
 title: null と undefined
 level: 2
+question:
+  - 'strictNullChecks: trueとはどういう設定ですか？ なぜ推奨されるのですか？'
+  - オプショナルなプロパティ（?）が 「型 | undefined」の糖衣構文に近い動きをする、とはどういう意味ですか？
+  - 変数にnullを代入した後、もう一度文字列などを代入できますか？
 ---
 
 ## null と undefined
