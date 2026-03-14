@@ -18,6 +18,8 @@ npx prisma dev
 ルートディレクトリに .env または .env.local という名前のファイルを作成し、以下の内容を記述
 ```dotenv
 API_KEY=GeminiAPIキー
+OPENROUTER_API_KEY=OpenRouterAPIキー
+OPENROUTER_MODEL=foo;bar
 BETTER_AUTH_URL=http://localhost:3000
 DATABASE_URL="postgres://... (prisma devの出力)"
 GOOGLE_CLIENT_ID=
@@ -26,7 +28,9 @@ GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 ```
 
-* `API_KEY` はGeminiのAPIキーを作成して設定します。未設定の場合チャットが使えません
+* チャット用にGeminiのAPIキーまたはOpenRouterのAPIキーのいずれかが必要です。未設定の場合チャットが使えません
+    * OpenRouterを使う場合は使用するモデルをセミコロン区切りで `OPENROUTER_MODEL` に設定してください (エラー時に2番目以降にフォールバックします)
+    * 両方設定されている場合はOpenRouterが使われます
 * `GITHUB_CLIENT_ID` `GITHUB_CLIENT_SECRET` はGitHub OAuthのクライアントIDとシークレットを設定します。未設定の場合「GitHubでログイン」が使えません。
 作り方については https://www.better-auth.com/docs/authentication/github を参照
 * `GOOGLE_CLIENT_ID` `GOOGLE_CLIENT_SECRET` はGoogle OAuthのクライアントIDとシークレットを設定します。未設定の場合「Googleでログイン」が使えません。

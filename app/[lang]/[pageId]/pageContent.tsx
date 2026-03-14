@@ -1,8 +1,8 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ChatForm } from "./chatForm";
-import { Heading, StyledMarkdown } from "./markdown";
+import { StyledMarkdown } from "@/markdown/markdown";
 import { useChatHistoryContext } from "./chatHistory";
 import { useSidebarMdContext } from "@/sidebar";
 import clsx from "clsx";
@@ -13,11 +13,23 @@ import {
   PageEntry,
   PagePath,
 } from "@/lib/docs";
+import { ReplacedRange } from "@/markdown/multiHighlight";
+import { Heading } from "@/markdown/heading";
 
-// MarkdownSectionに追加で、ユーザーが今そのセクションを読んでいるかどうか、などの動的な情報を持たせる
-export type DynamicMarkdownSection = MarkdownSection & {
+/**
+ * MarkdownSectionに追加で、動的な情報を持たせる
+ */
+export interface DynamicMarkdownSection extends MarkdownSection {
+  /**
+   * ユーザーが今そのセクションを読んでいるかどうか
+   */
   inView: boolean;
-};
+  /**
+   * チャットの会話を元にAIが書き換えた後の内容
+   */
+  replacedContent: string;
+  replacedRange: ReplacedRange[];
+}
 
 interface PageContentProps {
   splitMdContent: MarkdownSection[];
@@ -31,25 +43,84 @@ export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
   const { splitMdContent, pageEntry, path } = props;
 
+  const { chatHistories } = useChatHistoryContext();
+
+  const initDynamicMdContent = useCallback(() => {
+    const newContent: DynamicMarkdownSection[] = splitMdContent.map(
+      (section) => ({
+        ...section,
+        inView: false,
+        replacedContent: section.rawContent,
+        replacedRange: [],
+      })
+    );
+    const chatDiffs = chatHistories.map((chat) => chat.diff).flat();
+    chatDiffs.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    for (const diff of chatDiffs) {
+      const targetSection = newContent.find((s) => s.id === diff.sectionId);
+      if (targetSection) {
+        const startIndex = targetSection.replacedContent.indexOf(diff.search);
+        if (startIndex !== -1) {
+          const endIndex = startIndex + diff.search.length;
+          const replaceLen = diff.replace.length;
+          const diffLen = replaceLen - diff.search.length; // 文字列長の増減分
+
+          // 1. 文字列の置換
+          targetSection.replacedContent =
+            targetSection.replacedContent.slice(0, startIndex) +
+            diff.replace +
+            targetSection.replacedContent.slice(endIndex);
+
+          // 2. 既存のハイライト範囲のズレを補正（今回の置換箇所より後ろにあるものをシフト）
+          targetSection.replacedRange = targetSection.replacedRange.map((h) => {
+            if (h.start >= endIndex) {
+              // 完全に後ろにある場合は単純にシフト
+              return {
+                start: h.start + diffLen,
+                end: h.end + diffLen,
+                id: h.id,
+              };
+            }
+            if (h.end >= endIndex) {
+              return { start: h.start, end: h.end + diffLen, id: h.id };
+            }
+            return h;
+          });
+
+          // 3. 今回の置換箇所を新たなハイライト範囲として追加
+          targetSection.replacedRange.push({
+            start: startIndex,
+            end: startIndex + replaceLen,
+            id: diff.chatId,
+          });
+        } else {
+          // TODO: md5ハッシュを参照し過去バージョンのドキュメントへ適用を試みる
+          console.error(
+            `Failed to apply diff: search string "${diff.search}" not found in section ${targetSection.id}`
+          );
+        }
+      } else {
+        console.error(
+          `Failed to apply diff: section with id "${diff.sectionId}" not found`
+        );
+      }
+    }
+
+    return newContent;
+  }, [splitMdContent, chatHistories]);
+
   // SSR用のローカルstate
   const [dynamicMdContent, setDynamicMdContent] = useState<
     DynamicMarkdownSection[]
-  >(
-    splitMdContent.map((section) => ({
-      ...section,
-      inView: false,
-    }))
-  );
+  >(() => initDynamicMdContent());
 
   useEffect(() => {
-    // props.splitMdContentが変わったときにローカルstateとcontextの両方を更新
-    const newContent = splitMdContent.map((section) => ({
-      ...section,
-      inView: false,
-    }));
+    // props.splitMdContentが変わったとき, チャットのdiffが変わった時に
+    // ローカルstateとcontextの両方を更新
+    const newContent = initDynamicMdContent();
     setDynamicMdContent(newContent);
     setSidebarMdContent(path, newContent);
-  }, [splitMdContent, path, setSidebarMdContent]);
+  }, [initDynamicMdContent, path, setSidebarMdContent]);
 
   const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
   // sectionRefsの長さをsplitMdContentに合わせる
@@ -87,8 +158,6 @@ export function PageContent(props: PageContentProps) {
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
-  const { chatHistories } = useChatHistoryContext();
-
   return (
     <div
       className="p-4 mx-auto max-w-full grid"
@@ -110,7 +179,10 @@ export function PageContent(props: PageContentProps) {
             }}
           >
             {/* ドキュメントのコンテンツ */}
-            <StyledMarkdown content={section.rawContent} />
+            <StyledMarkdown
+              content={section.replacedContent}
+              replacedRange={section.replacedRange}
+            />
           </div>
           <div>
             {/* 右側に表示するチャット履歴欄 */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Heading } from "@/[lang]/[pageId]/markdown";
+import { Heading } from "@/markdown/heading";
 import "mocha/mocha.css";
 import { Fragment, useEffect, useState } from "react";
 import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
