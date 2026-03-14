@@ -21,21 +21,44 @@ export const message = pgTable("message", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 });
 
+export const diff = pgTable("diff", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  chatId: uuid("chatId").notNull(),
+  search: text("search").notNull(),
+  replace: text("replace").notNull(),
+  sectionId: text("sectionId").notNull(),
+  targetMD5: text("targetMD5").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+});
+
 export const chatRelations = relations(chat, ({ many, one }) => ({
   messages: many(message),
   section: one(section, {
     fields: [chat.sectionId],
     references: [section.sectionId],
   }),
+  diff: many(diff),
 }));
 
 export const sectionRelations = relations(chat, ({ many }) => ({
   chat: many(chat),
+  // diff: many(diff),
 }));
 
 export const messageRelations = relations(message, ({ one }) => ({
   chat: one(chat, {
     fields: [message.chatId],
+    references: [chat.chatId],
+  }),
+}));
+
+export const diffRelations = relations(diff, ({ one }) => ({
+  // section: one(section, {
+  //   fields: [diff.sectionId],
+  //   references: [section.sectionId],
+  // }),
+  chat: one(chat, {
+    fields: [diff.chatId],
     references: [chat.chatId],
   }),
 }));

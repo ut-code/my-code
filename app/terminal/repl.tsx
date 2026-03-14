@@ -16,12 +16,15 @@ import type { Terminal } from "@xterm/xterm";
 import { useEmbedContext } from "./embedContext";
 import { LangConstants } from "@my-code/runtime/languages";
 import clsx from "clsx";
-import { InlineCode } from "@/[lang]/[pageId]/markdown";
-import { emptyMutex, ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import { InlineCode } from "@/markdown/codeBlock";
+import {
+  emptyMutex,
+  ReplCommand,
+  ReplOutput,
+} from "@my-code/runtime/interface";
 import { useRuntime } from "@my-code/runtime/context";
 import { MinMaxButton, Modal } from "./modal";
 import { StopButtonContent } from "./exec";
-
 
 export function writeOutput(
   term: Terminal,

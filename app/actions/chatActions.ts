@@ -4,7 +4,7 @@
 import { generateContent } from "./gemini";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
-import { addChat, ChatWithMessages } from "@/lib/chatHistory";
+import { addChat, ChatWithMessages, CreateChatDiff } from "@/lib/chatHistory";
 import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
 
 type ChatResult =
@@ -66,11 +66,18 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     `質問に答える際には、ユーザーが閲覧しているセクションの内容を特に考慮してください。`
   );
   prompt.push(``);
+  prompt.push(
+    `質問への回答はユーザー向けのメッセージに加えて、ドキュメント自体を改訂するという形でも可能です。`
+  );
+  prompt.push(
+    `質問内容とドキュメントの内容の関連性が深く、比較的長めの解説をしたい場合、またはドキュメントへの補足がしたい場合は、そちらの形式での回答を検討してください。`
+  );
+  prompt.push(``);
   prompt.push(`# ドキュメント`);
   prompt.push(``);
   for (const section of sectionContent) {
     prompt.push(`[セクションid: ${section.id}]`);
-    prompt.push(section.rawContent.trim());
+    prompt.push(section.replacedContent.trim());
     prompt.push(``);
   }
   prompt.push(``);
@@ -157,6 +164,27 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   prompt.push(
     "  - 水平線(---)はシステムが区切りとして認識するので、ユーザーへの回答中に水平線を使用することはできません。"
   );
+  prompt.push(
+    "- ユーザーへのメッセージの最後の行の次には水平線 --- を出力してください。"
+  );
+  prompt.push(
+    "- それ以降の行に、ドキュメントの一部を改訂したい場合はその差分を"
+  );
+  prompt.push("<<<<<<< SEARCH");
+  prompt.push("修正したい元の文章の塊（一字一句違わずに）");
+  prompt.push("=======");
+  prompt.push("修正後の新しい文章の塊");
+  prompt.push(">>>>>>> REPLACE");
+  prompt.push("の形式で出力してください。");
+  prompt.push(
+    "  - 複数箇所改訂したい場合は上の形式の出力を複数回繰り返してください。"
+  );
+  prompt.push(
+    "  - ドキュメントにテキストを追加したい場合は追加したい箇所の前後のテキストを含めて出力してください。"
+  );
+  prompt.push(
+    "  - セクションid、セクション見出し、およびコードブロックの内側を編集することはできません。それ以外の文章のみを編集してください。"
+  );
   console.log(prompt);
 
   try {
@@ -170,10 +198,35 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
       targetSectionId = introSectionId(path);
     }
     const responseMessage = text.split(/\n-{3,}\n/)[1].trim();
-    const newChat = await addChat(path, targetSectionId, [
-      { role: "user", content: userQuestion },
-      { role: "ai", content: responseMessage },
-    ]);
+    const diffRaw: CreateChatDiff[] = [];
+    for (const m of text
+      .split(/\n-{3,}\n/)[2]
+      .matchAll(
+        /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g
+      )) {
+      const search = m[1];
+      const replace = m[2];
+      const targetSection = sectionContent.find((s) =>
+        s.rawContent.includes(search)
+      );
+      if (targetSection) {
+        diffRaw.push({
+          search,
+          replace,
+          sectionId: targetSection.id,
+          targetMD5: targetSection.md5,
+        });
+      }
+    }
+    const newChat = await addChat(
+      path,
+      targetSectionId,
+      [
+        { role: "user", content: userQuestion },
+        { role: "ai", content: responseMessage },
+      ],
+      diffRaw
+    );
     return {
       error: null,
       chat: newChat,
