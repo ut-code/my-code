@@ -193,17 +193,27 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     if (!text) {
       throw new Error("AIからの応答が空でした");
     }
-    let targetSectionId = text.split(/\n-{3,}\n/)[0].trim() as SectionId;
+    let targetSectionId = text
+      .split(/\n-{3,}\n/)
+      .at(0)
+      ?.trim() as SectionId | undefined;
     if (!targetSectionId) {
       targetSectionId = introSectionId(path);
     }
-    const responseMessage = text.split(/\n-{3,}\n/)[1].trim();
+    const responseMessage = text
+      .split(/\n-{3,}\n/)
+      .at(1)
+      ?.trim();
+    if (!responseMessage) {
+      throw new Error("AIからの応答が空でした");
+    }
     const diffRaw: CreateChatDiff[] = [];
     for (const m of text
-      .split(/\n-{3,}\n/)[2]
-      .matchAll(
+      .split(/\n-{3,}\n/)
+      .at(2)
+      ?.matchAll(
         /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g
-      )) {
+      ) ?? []) {
       const search = m[1];
       const replace = m[2];
       const targetSection = sectionContent.find((s) =>
