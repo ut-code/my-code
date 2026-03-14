@@ -2,6 +2,11 @@
 id: typescript-async-utilities-omit
 title: '4. Omit<T, K>: 特定のキーだけ除外する'
 level: 3
+question:
+  - Omit<T, K>がPickの逆というのは、具体的にどういう意味ですか？
+  - Product型のsecretCodeやinternalIdが「外部に出したくない情報」というのはどういうことですか？
+  - データベースのモデルから特定の情報を除外してクライアントに返す、という具体的な使用例をもっと詳しく知りたいです。
+  - Omitを使わない場合、どのように型定義をすれば良いのですか？
 ---
 
 ### 4\. Omit\<T, K\>: 特定のキーだけ除外する
