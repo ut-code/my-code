@@ -2,6 +2,10 @@
 id: rust-generics-traits-where-clause
 title: 複数のトレイト境界と where 句
 level: 3
+question:
+  - '`where` 句を使うことで、コードがどのように読みやすくなるのか、もう少し具体的な説明が欲しいです。'
+  - '`use std::fmt::Display;` が必要なのはなぜですか？'
+  - '`fmt(&self, f: &mut std::fmt::Formatter<''_>)` の `''_` は何を意味するのですか？'
 ---
 
 ### 複数のトレイト境界と `where` 句

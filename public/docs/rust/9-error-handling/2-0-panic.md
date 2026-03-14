@@ -1,7 +1,11 @@
 ---
 id: rust-error-handling-panic
-title: '回復不可能なエラー (panic!)'
+title: 回復不可能なエラー (panic!)
 level: 2
+question:
+  - '`panic!` を呼ぶとプログラムは具体的にどうなりますか？'
+  - '`panic!` を使うべきでない「通常の制御フロー」とは、どのようなケースを指しますか？'
+  - 他のプログラミング言語の例外（try-catch）と `panic!` はどう違いますか？
 ---
 
 ## 回復不可能なエラー (`panic!`)

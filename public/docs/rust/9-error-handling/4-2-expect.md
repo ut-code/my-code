@@ -2,6 +2,10 @@
 id: rust-error-handling-expect
 title: expect
 level: 3
+question:
+  - '`expect` を使う場合、エラーメッセージにはどのような情報を記述するのが良いですか？'
+  - '`unwrap` よりも `expect` が推奨されるのはなぜですか？'
+  - 「絶対に失敗しない」と確信がある場合でも `expect` を使うべきですか？
 ---
 
 ### `expect`

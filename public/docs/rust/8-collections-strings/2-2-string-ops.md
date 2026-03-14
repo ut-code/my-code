@@ -2,6 +2,11 @@
 id: rust-collections-strings-string-ops
 title: 文字列の操作
 level: 3
+question:
+  - push_strとpushメソッドはどのように使い分ければよいですか？
+  - s1 + &s2の演算で、なぜs1はムーブされて以降使えなくなるのですか？
+  - 'fn add(self, s: &str) -> Stringというシグネチャのselfとs: &strは何を指していますか？'
+  - format!マクロを使うと所有権を奪わないとのことですが、これはどのようなメリットがありますか？
 ---
 
 ### 文字列の操作

@@ -2,6 +2,9 @@
 id: rust-collections-strings-string-str
 title: String と &str の違い（復習）
 level: 3
+question:
+  - Stringと&strの「所有権」や「ヒープ上」「参照」という言葉の意味を、もっと簡単に教えてもらえますか？
+  - Stringと&strはそれぞれどのような時に使うのが適切ですか？
 ---
 
 ### `String` と `&str` の違い（復習）

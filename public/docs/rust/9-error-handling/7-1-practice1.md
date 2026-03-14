@@ -2,6 +2,9 @@
 id: rust-error-handling-practice1
 title: '練習問題 1: 安全な割り算'
 level: 3
+question:
+  - '`safe_div` 関数の定義で、エラー時に `Err(String::from("Division by zero"))` と書くのはなぜですか？'
+  - '`match` 文で `Ok` と `Err` を両方処理する必要があるのはなぜですか？'
 ---
 
 ### 練習問題 1: 安全な割り算
