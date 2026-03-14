@@ -2,6 +2,9 @@
 id: javascript-arrays-spread-destructure-basic
 title: スプレッド構文 (...) とデストラクチャリング（分割代入）
 level: 2
+question:
+  - モダンJavaScriptとは具体的にいつ頃のバージョンからを指すのですか？
+  - ReactやVueなどのフレームワークでスプレッド構文やデストラクチャリングが多用されるのはなぜですか？
 ---
 
 ## スプレッド構文 (...) とデストラクチャリング（分割代入）

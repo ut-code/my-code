@@ -2,6 +2,9 @@
 id: rust-borrowing-slices-mutable-ref
 title: 可変参照（Mutable Reference）
 level: 3
+question:
+  - 可変参照を使うには元の変数もmutにする必要があるのはなぜですか？
+  - 可変参照を渡すことで元の変数が変更されることをどうやって知ることができますか？
 ---
 
 ### 可変参照（Mutable Reference）

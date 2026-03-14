@@ -2,6 +2,11 @@
 id: javascript-promise-create
 title: Promiseの作成
 level: 3
+question:
+  - new Promiseの引数に渡す関数（Executor）のresolveとrejectは、それぞれどのような役割を持つ関数ですか？
+  - コード例の`const success = true;`という行は、常にtrueである必要があるのでしょうか？
+  - Promise { 'OK!' } と表示されている結果の「OK!」という値は、どのように取り出せばよいですか？
+  - rejectで渡している`new Error("Failed")`のエラーオブジェクトは、なぜ必要なのでしょうか？
 ---
 
 ### Promiseの作成

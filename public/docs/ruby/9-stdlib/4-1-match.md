@@ -2,6 +2,11 @@
 id: ruby-stdlib-match
 title: マッチの確認 (=~ と match)
 level: 3
+question:
+  - '=~演算子とString#matchメソッドの主な違いは何ですか？'
+  - MatchDataオブジェクトとは何ですか？
+  - キャプチャグループの()は何のために使うのですか？
+  - match_data[0], match_data[1], match_data[2]はそれぞれ何を示していますか？
 ---
 
 ### マッチの確認 (`=~` と `match`)

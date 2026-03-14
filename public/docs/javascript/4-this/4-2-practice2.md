@@ -2,6 +2,9 @@
 id: javascript-this-practice2
 title: '問題2: アロー関数の特性'
 level: 3
+question:
+  - '`calculator.multiply()`の中で、`map`のコールバック関数から`this.factor`が読めないのはなぜですか？'
+  - '`map`のコールバック関数でアロー関数を使うと、`this`がどのように解決されるのか具体的に知りたいです。'
 ---
 
 ### 問題2: アロー関数の特性

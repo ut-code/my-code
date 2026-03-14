@@ -2,6 +2,8 @@
 id: typescript-combining-types-summary
 title: この章のまとめ
 level: 2
+question:
+  - Union型とIntersection型の記号（|と&）を覚えるコツはありますか？
 ---
 
 ## この章のまとめ

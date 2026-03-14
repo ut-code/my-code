@@ -2,6 +2,10 @@
 id: typescript-async-utilities-practice1
 title: '練習問題1: 非同期データの取得'
 level: 3
+question:
+  - Postインターフェースの定義方法を忘れてしまいました。
+  - fetchPost関数の戻り値の型Promise<Post>をどのように書けばよいですか？
+  - async関数内でPromiseを使わずに、直接オブジェクトを返す場合はどうなりますか？
 ---
 
 ### 練習問題1: 非同期データの取得

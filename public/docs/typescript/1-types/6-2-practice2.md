@@ -2,6 +2,9 @@
 id: typescript-types-practice2
 title: '練習問題 2: unknown型の安全な利用'
 level: 3
+question:
+  - 練習問題2で、`input`が`string`型であることを確認しないと`input.length`が使えないのはなぜですか？
+  - 練習問題2の`printLength`関数に`null`や`undefined`を渡した場合、どのような結果になりますか？
 ---
 
 ### 練習問題 2: unknown型の安全な利用

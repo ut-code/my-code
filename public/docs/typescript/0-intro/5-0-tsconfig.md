@@ -2,6 +2,11 @@
 id: typescript-intro-tsconfig
 title: 'tsconfig.json: コンパイラの設定'
 level: 2
+question:
+  - '`tsconfig.json`は何のためのファイルですか？'
+  - '`npx tsc --init`を実行すると何が起きるのですか？'
+  - '`compilerOptions`の中の`target`, `module`, `strict`などの設定項目はそれぞれ何を設定しているのですか？'
+  - '`strict: true`がなぜ重要だとされているのですか？これを有効にしないとどうなりますか？'
 ---
 
 ## tsconfig.json: コンパイラの設定

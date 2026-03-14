@@ -2,6 +2,12 @@
 id: python-modules-import-math
 title: import文の基本
 level: 3
+question:
+  - '`import`文はどのような時に使うのですか？'
+  - 「標準ライブラリ」とは何ですか？
+  - '`math`モジュールには他にどのような関数がありますか？'
+  - なぜ`math.`と毎回書く必要があるのですか？
+  - '`print(math.pi)`の出力結果の`3.141592653589793`はどこまでが正確な値ですか？'
 ---
 
 ### `import`文の基本

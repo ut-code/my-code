@@ -2,6 +2,10 @@
 id: typescript-function-types-rest-params
 title: 残余引数 (Rest Parameters)
 level: 2
+question:
+  - 可変長引数とは、どのような場合に使用するのですか
+  - 残余引数でnumbersが必ず配列の型である必要があるのはなぜですか
+  - 残余引数を他の引数と組み合わせる際のルールはありますか
 ---
 
 ## 残余引数 (Rest Parameters)

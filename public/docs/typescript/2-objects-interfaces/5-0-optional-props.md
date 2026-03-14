@@ -2,6 +2,10 @@
 id: typescript-objects-interfaces-optional-props
 title: オプショナルなプロパティ (?)
 level: 2
+question:
+  - オプショナルなプロパティ`?`を付けたプロパティにアクセスした場合、値が存在しないときはどうなりますか。
+  - '`string | undefined`という型はどのような意味ですか。'
+  - オプショナルなプロパティは、宣言時に初期値を設定する必要はありますか。
 ---
 
 ## オプショナルなプロパティ (?)

@@ -2,6 +2,9 @@
 id: rust-borrowing-slices-str-literal
 title: 文字列リテラルはスライスである
 level: 3
+question:
+  - 文字列リテラルが&str型というのは、どういうことですか？
+  - Stringと&strはどのように使い分ければよいですか？
 ---
 
 ### 文字列リテラルはスライスである

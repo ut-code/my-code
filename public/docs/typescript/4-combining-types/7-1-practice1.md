@@ -2,6 +2,9 @@
 id: typescript-combining-types-practice1
 title: '練習問題1: 結果の型定義'
 level: 3
+question:
+  - この練習問題では、どの型ガードを使えば良いですか？
+  - type Result = ... の部分にはどのように型を定義すれば良いですか？
 ---
 
 ### 練習問題1: 結果の型定義

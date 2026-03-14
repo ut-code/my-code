@@ -2,6 +2,10 @@
 id: javascript-functions-default-arg
 title: デフォルト引数
 level: 3
+question:
+  - デフォルト引数はどのような場面で便利に使えますか？
+  - 引数が `undefined` の場合にもデフォルト値が使用されるのはなぜですか？
+  - デフォルト引数と通常の引数を混ぜて使うことはできますか？
 ---
 
 ### デフォルト引数

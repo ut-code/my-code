@@ -2,6 +2,10 @@
 id: ruby-stdlib-practice1
 title: '練習問題1: JSON設定ファイルの読み書き'
 level: 3
+question:
+  - 練習問題1のconfig.jsonファイルは、Rubyのスクリプトと同じディレクトリに置くべきですか？
+  - JSON.pretty_generateを使うと、具体的にどのような利点がありますか？
+  - 現在時刻を文字列としてHashに追加するには、どのメソッドを使えば良いですか？
 ---
 
 ### 練習問題1: JSON設定ファイルの読み書き

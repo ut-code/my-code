@@ -2,6 +2,11 @@
 id: python-file-io-json-module
 title: jsonモジュールを使ったJSONの操作
 level: 2
+question:
+  - JSONが「データ交換フォーマット」として広く使われているとは、具体的にどのような場面で役立つのでしょうか？
+  - Pythonのどんなオブジェクトが `json.dump()` や `json.load()` でJSONと相互変換できますか？
+  - '`json.dump()` の `indent=4` や `ensure_ascii=False` オプションは、どのような時に使うべきですか？'
+  - '`json.dump()` の他に、オブジェクトをJSON文字列に変換するような関数はありますか？'
 ---
 
 ## `json`モジュールを使ったJSONの操作

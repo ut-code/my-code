@@ -2,6 +2,9 @@
 id: typescript-types-array
 title: 配列 (Array)
 level: 3
+question:
+  - 配列の型定義で`型[]`と`Array<型>`の2通りの書き方がありますが、どちらを使うのが一般的ですか？
+  - '`number[]`として宣言した配列に、文字列型の要素を追加しようとするとどうなりますか？'
 ---
 
 ### 配列 (Array)

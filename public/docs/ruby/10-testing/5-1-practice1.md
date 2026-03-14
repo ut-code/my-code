@@ -2,6 +2,9 @@
 id: ruby-testing-practice1
 title: '練習問題1: Stringクラスのテスト'
 level: 3
+question:
+  - この練習問題でStringクラスをテストする際、`require_relative` は不要なのはなぜですか？
+  - 組み込みクラスの動作をテストすることに、どのような意味がありますか？
 ---
 
 ### 練習問題1: Stringクラスのテスト

@@ -2,6 +2,12 @@
 id: javascript-arrays-higher-order-func
 title: 高階関数によるイテレーション
 level: 2
+question:
+  - 「高階関数」とは何ですか？なぜ配列操作で高階関数を使うのが推奨されるのですか？
+  - forEach、map、filter、reduce のそれぞれ最も適切な使い分け方を教えてください。
+  - map や filter が「新しい配列を返す」ことのメリットは何ですか？
+  - reduce メソッドの (sum, item) => sum + item.price, 0 の 0 は何のためにあるのですか？
+  - メソッドチェーンを使うことで、コードはどのように良くなりますか？
 ---
 
 ## 高階関数によるイテレーション

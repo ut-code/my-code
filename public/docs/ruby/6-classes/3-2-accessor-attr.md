@@ -2,6 +2,13 @@
 id: ruby-classes-accessor-attr
 title: attr_* による自動定義
 level: 3
+question:
+  - attr_reader、attr_writer、attr_accessorは、それぞれどのような場面で使い分けるべきですか？
+  - シンボル（:nameなど）とは何ですか？なぜここで使うのですか？
+  - attr_*メソッドにインスタンス変数名を渡すときに、@をつけないのはなぜですか？
+  - self.priceと@priceは、いつどちらを使うべきですか？どう違うのですか？
+  - item.price = 3500がエラーになるのはなぜですか？
+  - puts item.stockがエラーになるのはなぜですか？
 ---
 
 ### `attr_*` による自動定義

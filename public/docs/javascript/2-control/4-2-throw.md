@@ -2,6 +2,9 @@
 id: javascript-control-throw
 title: throw について
 level: 3
+question:
+  - Errorオブジェクトを投げるのが一般的なのはなぜですか？文字列や数値を投げると何が問題なのですか？
+  - 自分で作成したカスタムエラーオブジェクトをthrowすることはできますか？
 ---
 
 ### `throw` について

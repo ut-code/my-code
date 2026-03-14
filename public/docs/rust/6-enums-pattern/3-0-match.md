@@ -2,6 +2,9 @@
 id: rust-enums-pattern-match
 title: match フロー制御演算子
 level: 2
+question:
+  - matchフロー制御演算子はC言語やJavaのswitch文とどう違うのですか？
+  - 網羅性チェックとは何ですか？
 ---
 
 ## match フロー制御演算子

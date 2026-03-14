@@ -2,6 +2,11 @@
 id: typescript-async-utilities-readonly
 title: '2. Readonly<T>: 全てを読み取り専用にする'
 level: 3
+question:
+  - Readonly<T>は、オブジェクトのプロパティを再代入できなくするということですか？
+  - frozenProduct.price = 200;がコンパイルエラーになるのは、なぜですか？
+  - Readonlyを使うメリットは何ですか？
+  - ReactのState管理で役立つとありますが、具体的にどのような場面で使いますか？
 ---
 
 ### 2\. Readonly\<T\>: 全てを読み取り専用にする

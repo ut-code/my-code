@@ -2,6 +2,12 @@
 id: javascript-control-if-truthy
 title: if文とTruthy / Falsy
 level: 2
+question:
+  - Falsyな値は理解できましたが、Truthyな値の具体的な例をもっと教えてください。
+  - 空の配列や空のオブジェクトがなぜTruthyなのですか？他のプログラミング言語と違って不思議に感じます。
+  - 文字列の"0"や"false"がTruthyになるのはなぜですか？これも直感と違います。
+  - BigIntとは何ですか？まだ知らない概念ですが、ここで登場しました。
+  - if文の条件式で変数そのものを評価するやり方はどのような時に便利ですか？
 ---
 
 ## `if`文とTruthy / Falsy

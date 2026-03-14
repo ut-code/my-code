@@ -2,6 +2,14 @@
 id: cpp-project-build-cmake
 title: CMakeによるモダンなビルド管理
 level: 3
+question:
+  - CMakeはMakefileよりも具体的にどのような点で優れていますか？
+  - '`cmake_minimum_required(VERSION 3.10)` のバージョンは、どのバージョンを指定すれば良いのですか？'
+  - >-
+    `set(CMAKE_CXX_STANDARD 17)`
+    でC++の標準バージョンを設定するとのことですが、古いバージョンや新しいバージョンも指定できますか？
+  - '`cmake ..` の `..` は何を意味しますか？'
+  - '`make` と `cmake --build .` は同じ結果になりますか？ どちらを使えばいいですか？'
 ---
 
 ### CMakeによるモダンなビルド管理

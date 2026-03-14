@@ -2,6 +2,9 @@
 id: ruby-testing-assert
 title: assert(test)
 level: 3
+question:
+  - '`assert(test)` の `test` が `true` と評価される値とは、具体的にどのようなものがありますか？'
+  - '`assert` と `assert_equal(true, test)` は同じ意味ですか？使い分ける基準はありますか？'
 ---
 
 ### `assert(test)`

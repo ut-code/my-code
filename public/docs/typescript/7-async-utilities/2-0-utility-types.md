@@ -2,6 +2,9 @@
 id: typescript-async-utilities-utility-types
 title: ユーティリティ型 (Utility Types)
 level: 2
+question:
+  - ユーティリティ型とは具体的にどのようなもので、なぜ便利なのですか？
+  - 「既存の型定義を変換して新しい型を生成する」という部分がイメージしにくいです。
 ---
 
 ## ユーティリティ型 (Utility Types)

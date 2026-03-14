@@ -2,6 +2,9 @@
 id: ruby-proc-lambda-amp-operator
 title: '& 演算子の役割'
 level: 2
+question:
+  - '&演算子は何と読むのですか？'
+  - ブロックとProcオブジェクトを相互に変換する機能は、具体的にどんな時に必要になりますか？
 ---
 
 ## `&` 演算子の役割

@@ -2,6 +2,9 @@
 id: javascript-classes-practice2
 title: '練習問題 2: 図形の継承'
 level: 3
+question:
+  - '`info()` メソッドをオーバーライドする具体的な手順がわかりません。'
+  - 親クラスの `info()` を呼び出すために `super.info()` をどのように使うのですか？
 ---
 
 ### 練習問題 2: 図形の継承

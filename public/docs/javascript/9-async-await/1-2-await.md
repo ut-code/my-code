@@ -2,6 +2,12 @@
 id: javascript-async-await-await
 title: await 式
 level: 3
+question:
+  - awaitはasync関数の中でしか使えないのですか？
+  - awaitが関数の実行を一時停止するとはどういうことですか？
+  - Settled（解決または拒否）とは具体的にどういう状態ですか？
+  - delay関数はPromiseを返すのですか？
+  - await delay(1000)の後にすぐにconsole.log("End")が実行されないのはなぜですか？
 ---
 
 ### `await` 式

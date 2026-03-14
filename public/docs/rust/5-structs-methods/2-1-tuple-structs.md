@@ -2,6 +2,10 @@
 id: rust-structs-methods-tuple-structs
 title: タプル構造体 (Tuple Structs)
 level: 3
+question:
+  - タプル構造体と通常のタプルは、何が違うのですか？
+  - ColorとPointのように、型として区別することの具体的なメリットは何ですか？
+  - タプル構造体のフィールドに名前を付けることはできないのですか？
 ---
 
 ### タプル構造体 (Tuple Structs)

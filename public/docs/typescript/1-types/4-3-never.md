@@ -2,6 +2,10 @@
 id: typescript-types-never
 title: 'never: 決して発生しない'
 level: 3
+question:
+  - '`never`型はどんな関数の戻り値として使われることが多いですか？'
+  - '`void`型と`never`型は何が違うんですか？'
+  - '`never`型を変数の型として宣言することはできますか？'
 ---
 
 ### never: 決して発生しない

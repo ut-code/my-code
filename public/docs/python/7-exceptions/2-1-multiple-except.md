@@ -2,6 +2,10 @@
 id: python-exceptions-multiple-except
 title: 1. except ブロックを複数記述する
 level: 3
+question:
+  - 複数の`except`ブロックを書く場合、エラーが発生したときにどの`except`が実行されるのですか？
+  - 想定していない種類のエラーが発生したらどうなりますか？
+  - '`calculate`関数のように、`int()`や`/`など複数の処理に対して`try...except`を書くのが一般的なのですか？'
 ---
 
 ### 1\. `except` ブロックを複数記述する

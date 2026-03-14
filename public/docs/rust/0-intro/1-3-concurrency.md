@@ -2,6 +2,10 @@
 id: rust-intro-concurrency
 title: 3. 安全な並行性（Fearless Concurrency）
 level: 3
+question:
+  - 並行処理のバグ（データ競合など）とは具体的に何ですか？
+  - Rustのコンパイラはどのようにデータ競合を検知するのですか？
+  - 「コンパイルが通れば、並行性のバグを含んでいる可能性は低い」というのは、他の言語でも同じですか？
 ---
 
 ### 3\. 安全な並行性（Fearless Concurrency）

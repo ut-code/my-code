@@ -2,6 +2,10 @@
 id: rust-lifetimes-func-lifetime
 title: 関数のライフタイム注釈
 level: 2
+question:
+  - '`longest` 関数のエラーメッセージ `missing lifetime specifier` は、何を意味しているのですか？'
+  - 「戻り値の参照がいつまで有効であれば安全なのか」という問題について、具体的なシナリオで説明してください。
+  - なぜコンパイラは `x` と `y` どちらを返すか実行時まで分からないのですか？
 ---
 
 ## 関数のライフタイム注釈

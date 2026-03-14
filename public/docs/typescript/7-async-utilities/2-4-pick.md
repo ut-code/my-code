@@ -2,6 +2,11 @@
 id: typescript-async-utilities-pick
 title: '3. Pick<T, K>: 特定のキーだけ抜き出す'
 level: 3
+question:
+  - Pick<T, K>のKに指定するid | name | priceの|は何ですか？
+  - ProductPreview型のitem変数にdescriptionを含めるとエラーになるのはなぜですか？
+  - 特定のキーだけを抜き出すメリットは何ですか？
+  - Pickを使わない場合、同じような型を作るにはどうすればいいですか？
 ---
 
 ### 3\. Pick\<T, K\>: 特定のキーだけ抜き出す

@@ -2,6 +2,10 @@
 id: cpp-project-build-split-example
 title: 分割の例
 level: 3
+question:
+  - '`#include <iostream>` と `#include "math_utils.h"` の違いは何ですか？'
+  - '`math_app.cpp` が `add` 関数の具体的な実装を知らないというのは、どういう意味ですか？'
+  - '`// この関数が他のファイルから参照されることを示す` のコメントは必須ですか？'
 ---
 
 ### 分割の例

@@ -2,6 +2,11 @@
 id: typescript-intro-compile-run
 title: コンパイルと実行
 level: 3
+question:
+  - '`npx tsc hello.ts`を実行すると何が起こるのですか？'
+  - '`hello.js`が生成されるとありますが、その中身はどのように変わるのですか？'
+  - 生成されたJavaScriptファイルをなぜNode.jsで実行するのですか？
+  - '`ts-exec:hello.ts`や`js-readonly:hello.js`とは何を表しているのですか？'
 ---
 
 ### コンパイルと実行

@@ -2,6 +2,11 @@
 id: cpp-intro-main
 title: int main() - main関数
 level: 3
+question:
+  - main関数がないプログラムは作れませんか？
+  - main関数は必ずint型を返さなければなりませんか？
+  - return 0;と書かないとどうなりますか？
+  - 引数を取るmain関数はどのような場合に使うのですか？
 ---
 
 ### `int main()` - main関数

@@ -2,6 +2,10 @@
 id: ruby-everything-object-practice1
 title: '練習問題1: 文字列の操作'
 level: 3
+question:
+  - 練習問題1のヒントにあるgsubとsub、sliceとインデックスアクセス[]はそれぞれどう使い分けますか？
+  - 複数のメソッドを組み合わせる順番は重要ですか？
+  - '" Welcome to the Ruby World! " から "RUBY" の部分だけを切り出すにはどうすればよいですか？'
 ---
 
 ### 練習問題1: 文字列の操作

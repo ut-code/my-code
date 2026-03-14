@@ -1,7 +1,11 @@
 ---
 id: ruby-collections-hash-rocket
-title: '1. 旧シンタックス (Rocket Syntax)'
+title: 1. 旧シンタックス (Rocket Syntax)
 level: 3
+question:
+  - キーに文字列以外のオブジェクトを使う例をもっと見たいです。
+  - どのような場合にロケットシンタックスを使うべきですか？
+  - キーが文字列とシンボルの場合で、アクセス方法に違いはありますか？
 ---
 
 ### 1\. 旧シンタックス (Rocket Syntax)

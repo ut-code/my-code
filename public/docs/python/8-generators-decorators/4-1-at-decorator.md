@@ -2,6 +2,10 @@
 id: python-generators-decorators-at-decorator
 title: '@ 構文'
 level: 3
+question:
+  - '`@` 構文を使うと、デコレータはどのように書けば良いですか'
+  - '`@my_decorator` と `say_goodbye = my_decorator(say_goodbye)` の違いは何ですか'
+  - 複数のデコレータを一つの関数に適用することはできますか
 ---
 
 ### `@` 構文

@@ -2,6 +2,10 @@
 id: python-exceptions-summary
 title: この章のまとめ
 level: 2
+question:
+  - 例外とエラーは同じものだと考えていいですか？
+  - '`try...except`を使う一番の目的は何ですか？'
+  - 堅牢なプログラムとは具体的にどんなプログラムのことですか？
 ---
 
 ## この章のまとめ

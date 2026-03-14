@@ -2,6 +2,11 @@
 id: javascript-control-for-of
 title: for...of ループ（反復可能オブジェクトの走査）
 level: 3
+question:
+  - Iterable（反復可能）なオブジェクトとは何ですか？どのようなものが含まれますか？
+  - >-
+    Object.keys()やObject.values()、Object.entries()を使うとありますが、これらはfor...ofとどのように組み合わせて使うのですか？
+  - 文字列もfor...ofでループできるのはなぜですか？
 ---
 
 ### `for...of` ループ（反復可能オブジェクトの走査）

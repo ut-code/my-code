@@ -2,6 +2,10 @@
 id: ruby-iterators-map
 title: map (collect)
 level: 3
+question:
+  - map と collect は全く同じ機能なら、どちらを使うべきですか？
+  - 元の配列が変更されない、とはどういうメリットがありますか？
+  - puts doubled.inspect の inspect メソッドは何のために使うのですか？
 ---
 
 ### `map` (`collect`)

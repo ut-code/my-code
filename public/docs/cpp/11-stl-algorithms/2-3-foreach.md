@@ -2,6 +2,10 @@
 id: cpp-stl-algorithms-foreach
 title: 'std::for_each: 各要素に処理を適用する'
 level: 3
+question:
+  - std::for_eachと通常のforループで要素を処理する場合、どちらを使うべきですか？
+  - print_functionのような関数は、どこに定義すれば良いのですか？
+  - std::for_eachを使ってコンテナの要素の値を変更することはできますか？
 ---
 
 ### `std::for_each`: 各要素に処理を適用する

@@ -2,6 +2,8 @@
 id: ruby-testing-refute
 title: refute(test)
 level: 3
+question:
+  - '`refute` と `assert_equal(false, test)` は同じ意味ですか？どちらを使えば良いですか？'
 ---
 
 ### `refute(test)`

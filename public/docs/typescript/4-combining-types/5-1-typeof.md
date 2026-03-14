@@ -2,6 +2,9 @@
 id: typescript-combining-types-typeof
 title: typeof 演算子
 level: 3
+question:
+  - typeof演算子はJavaScriptにもありますが、TypeScriptで使うと何が違うのですか？
+  - typeof演算子はプリミティブ型以外には使えないのでしょうか？
 ---
 
 ### typeof 演算子

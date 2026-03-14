@@ -2,6 +2,12 @@
 id: ruby-proc
 title: 'ブロックをオブジェクトとして扱う: Proc クラス'
 level: 2
+question:
+  - ブロックとは何ですか？
+  - Procクラスを使うと何が嬉しいのですか？
+  - Proc.newとprocは全く同じものとして使って良いのですか？
+  - Procオブジェクトの出力例にある「#<Proc:0x...>」は何を意味しますか？
+  - greeter.call("Alice")とするとHello, Alice!と表示された後、=> nilと出るのはなぜですか？
 ---
 
 ## ブロックをオブジェクトとして扱う: `Proc` クラス

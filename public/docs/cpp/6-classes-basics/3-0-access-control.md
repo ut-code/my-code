@@ -2,6 +2,12 @@
 id: cpp-classes-basics-access-control
 title: 'アクセス制御: public と private による情報の隠蔽'
 level: 2
+question:
+  - privateにしたメンバには、本当にそのクラスのメンバ関数からしかアクセスできないのですか？
+  - ゲッターとセッターは毎回書かないといけないのですか？書くのが面倒に感じます。
+  - setName関数の引数にあるconst std::string& newNameのconstと&は何を意味しているのですか？
+  - getName() constのconstは何のためにあるのですか？
+  - 情報の隠蔽をすることの具体的なメリットは、不正な値の防止以外に何かありますか？
 ---
 
 ## アクセス制御: public と private による情報の隠蔽

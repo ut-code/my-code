@@ -2,6 +2,9 @@
 id: python-control-functions-enumerate
 title: enumerate() 関数
 level: 3
+question:
+  - '`enumerate()`関数を使わないで、インデックスと値の両方を取得する方法はありますか？'
+  - '`for i, fruit in enumerate(fruits):` の `i` と `fruit` は順番を入れ替えることができますか？'
 ---
 
 ### `enumerate()` 関数

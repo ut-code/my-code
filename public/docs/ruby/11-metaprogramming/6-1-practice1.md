@@ -2,6 +2,11 @@
 id: ruby-metaprogramming-practice1
 title: '練習問題1: 動的アクセサ'
 level: 3
+question:
+  - ゲッターとセッターを動的に定義するとは、具体的にどのようなコードを書くのですか。
+  - attr_readerやattr_writerと、このmy_attr_accessorは何が違うのですか。
+  - インスタンス変数である`@name`や`@age`を動的に読み書きするにはどうすれば良いですか。
+  - '`extend DynamicAccessor`はなぜ必要なのですか。'
 ---
 
 ### 練習問題1: 動的アクセサ

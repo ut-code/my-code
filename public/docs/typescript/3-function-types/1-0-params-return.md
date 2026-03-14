@@ -2,6 +2,11 @@
 id: typescript-function-types-params-return
 title: 引数と戻り値の型
 level: 2
+question:
+  - TypeScriptで引数や戻り値に型を付けるのはなぜですか
+  - 戻り値の型を省略できる型推論とは具体的にどのような機能ですか
+  - 戻り値がない場合のvoid型は、どのような状況で使いますか
+  - add関数のエラー例で、なぜ文字列の"5"を渡すとエラーになるのですか
 ---
 
 ## 引数と戻り値の型

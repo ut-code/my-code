@@ -1,7 +1,14 @@
 ---
 id: javascript-this-arrow-func
-title: "アロー関数と this"
+title: アロー関数と this
 level: 2
+question:
+  - レキシカルスコープとは具体的に何ですか？
+  - アロー関数の`this`は、なぜ従来の関数と異なる挙動をするのですか？
+  - >-
+    `setTimeout`の例で、`startLegacy`がエラーになるのはなぜですか？`this.seconds`が`undefined`になる理由を詳しく知りたいです。
+  - アロー関数は`call`や`bind`を無視する、というのはどういうことですか？なぜ無視されるのですか？
+  - アロー関数が「動的なコンテキスト」が必要な場合には向かない、とは具体的にどういうことですか？
 ---
 
 ## アロー関数と `this`

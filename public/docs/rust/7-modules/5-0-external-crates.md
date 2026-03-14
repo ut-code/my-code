@@ -2,6 +2,10 @@
 id: rust-modules-external-crates
 title: 外部クレートの利用
 level: 2
+question:
+  - 外部クレートを使うと何ができますか？
+  - Cargoとは具体的にどのようなツールですか？
+  - crates.ioとは何ですか？
 ---
 
 ## 外部クレートの利用

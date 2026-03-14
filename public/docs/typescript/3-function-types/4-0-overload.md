@@ -2,6 +2,11 @@
 id: typescript-function-types-overload
 title: 関数のオーバーロード
 level: 2
+question:
+  - JavaScriptで「引数の型や数によって挙動が変わる関数」をTypeScriptで表現するのに、なぜオーバーロードが必要なのですか
+  - オーバーロードシグネチャと実装シグネチャの違いを具体的に教えてください
+  - 実装シグネチャは外部から直接見えないとは、どういうことですか
+  - 実装シグネチャの型がnumber | stringとなっているのに、呼び出し側ではnumberまたはstringに推論されるのはなぜですか
 ---
 
 ## 関数のオーバーロード

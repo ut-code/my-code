@@ -2,6 +2,9 @@
 id: typescript-combining-types-instanceof
 title: instanceof 演算子
 level: 3
+question:
+  - instanceof演算子もJavaScriptにありますが、TypeScriptで使う利点は何ですか？
+  - 第7章で詳しく扱われる「クラス」とは何ですか？
 ---
 
 ### instanceof 演算子

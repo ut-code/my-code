@@ -2,6 +2,10 @@
 id: rust-basics-scalar
 title: スカラー型（単一の値を表す）
 level: 3
+question:
+  - i32やu32のiやu、数字は何を表しているのですか？
+  - isizeとusizeはi32やu32とどう違うのですか？
+  - Rustのcharが4バイトでUnicodeスカラー値を扱うとはどういうことですか？
 ---
 
 ### スカラー型（単一の値を表す）

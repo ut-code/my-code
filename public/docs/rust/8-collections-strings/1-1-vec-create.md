@@ -2,6 +2,12 @@
 id: rust-collections-strings-vec-create
 title: ベクタの作成と更新
 level: 3
+question:
+  - Vec::new()とvec!マクロはどちらを使うのが一般的ですか？
+  - 型注釈Vec<i32>が「必要な場合がある」とは、どんな時ですか？
+  - ベクタを変更する際にmutが必要なのはなぜですか？
+  - popメソッドがOptionを返すのはなぜですか？Noneが返されるのはどんな時ですか？
+  - println!マクロの{:?}という記号は何ですか？
 ---
 
 ### ベクタの作成と更新

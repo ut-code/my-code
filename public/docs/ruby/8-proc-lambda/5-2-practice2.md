@@ -2,6 +2,10 @@
 id: ruby-proc-lambda-practice2
 title: '練習問題2: & を使ったメソッド'
 level: 3
+question:
+  - processorというProcオブジェクトはどのように作成すれば良いですか？
+  - apply_proc_to_arrayメソッドの定義方法をもう少し詳しく教えてください。
+  - Procオブジェクトを引数として受け取り、callで実行するとは、具体的にどのようなコードを書けば良いですか？
 ---
 
 ### 練習問題2: & を使ったメソッド

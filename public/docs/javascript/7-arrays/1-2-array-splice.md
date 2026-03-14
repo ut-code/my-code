@@ -2,6 +2,10 @@
 id: javascript-arrays-array-splice
 title: '破壊的な操作: splice'
 level: 3
+question:
+  - 「破壊的な操作」とは具体的にどのような意味ですか？
+  - splice(1, 2, 99, 100) のそれぞれの引数は何を表しているのですか？
+  - splice メソッドが [2, 3] という配列を返していますが、これは何を意味しますか？
 ---
 
 ### 破壊的な操作: `splice`

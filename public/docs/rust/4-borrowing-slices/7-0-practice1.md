@@ -2,6 +2,9 @@
 id: rust-borrowing-slices-practice1
 title: '練習問題 1: 参照渡しへの書き換え'
 level: 2
+question:
+  - この問題のRectangleはなぜCopyトレイトを実装しないのですか？
+  - 修正後、rect1が再利用できるようになるのはなぜですか？
 ---
 
 ## 練習問題 1: 参照渡しへの書き換え

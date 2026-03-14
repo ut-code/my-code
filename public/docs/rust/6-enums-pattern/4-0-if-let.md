@@ -2,6 +2,11 @@
 id: rust-enums-pattern-if-let
 title: if let 記法
 level: 2
+question:
+  - if let はなぜ「糖衣構文」と呼ばれるのですか？
+  - matchの網羅性チェックの恩恵が失われるとは、どういうことですか？
+  - if let と else を使う場合の注意点はありますか？
+  - if let と match はどのように使い分けるべきですか？
 ---
 
 ## if let 記法

@@ -2,6 +2,11 @@
 id: cpp-intro-setup
 title: おすすめのセットアップ
 level: 3
+question:
+  - Visual Studio Communityは無料ですか？
+  - macOSでxcode-select --installを実行すると何がインストールされますか？
+  - Linuxのインストールコマンドは何をしていますか？
+  - Visual Studio Codeの拡張機能とは、具体的にどのようなものをインストールすれば良いですか？
 ---
 
 ### おすすめのセットアップ

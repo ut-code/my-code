@@ -1,7 +1,13 @@
 ---
 id: cpp-data-containers-vector
-title: '可変長配列：std::vector'
+title: 可変長配列：std::vector
 level: 2
+question:
+  - std::vectorは「動的配列」とのことですが、具体的にどういう仕組みで要素の数を変えられるのですか？
+  - numbers[0]とnumbers.at(0)はどちらを使うべきですか？なぜ.at()の方が安全なのですか？
+  - .push_back()以外に、std::vectorの途中に要素を追加する方法はありますか？
+  - intやdouble以外の型、例えばstd::stringや自分で作ったクラスのオブジェクトも格納できますか？
+  - C++11以前の環境では初期化リストを使えないとのことですが、その場合はどうやって初期化すればいいですか？
 ---
 
 ## 可変長配列：`std::vector`

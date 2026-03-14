@@ -2,6 +2,11 @@
 id: python-basics-bool
 title: 真偽値（bool）
 level: 3
+question:
+  - '`True`と`False`の他に、真偽値として扱われるものはありますか？'
+  - '`True`や`False`は、具体的なコードのどのような部分で使われることが多いですか？'
+  - 小文字の`true`や`false`を使うとエラーになりますか？
+  - '`and`や`or`の他に、条件を組み合わせるための演算子はありますか？'
 ---
 
 ### 真偽値（bool）

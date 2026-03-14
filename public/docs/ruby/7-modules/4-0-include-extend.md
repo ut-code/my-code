@@ -2,6 +2,11 @@
 id: ruby-modules-include-extend
 title: include vs extend
 level: 2
+question:
+  - '`include` と `extend` は、それぞれどのような場合に使い分けるべきですか。'
+  - インスタンスメソッドとクラスメソッドの違いを改めて説明してください。
+  - '`IncludedClass.info` がエラーになるのはなぜですか。'
+  - '`obj2.info` がエラーになるのはなぜですか。'
 ---
 
 ## `include` vs `extend`

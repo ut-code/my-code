@@ -2,6 +2,12 @@
 id: javascript-classes-extends-super
 title: 継承 (extends と super)
 level: 2
+question:
+  - '`extends` キーワードを使うと何が便利になるのですか？'
+  - '`super` キーワードは具体的に何をするものですか？'
+  - 子クラスのコンストラクタで `this` を使う前に `super()` を呼び出す必要があるのはなぜですか？
+  - メソッドのオーバーライドとは何ですか？
+  - '`instanceof` は何を確認するために使うのですか？'
 ---
 
 ## 継承 (`extends` と `super`)

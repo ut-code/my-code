@@ -2,6 +2,15 @@
 id: cpp-classes-advanced-shallow-copy
 title: 何もしないとどうなる？ (浅いコピー)
 level: 3
+question:
+  - 「浅いコピー」とは、なぜポインタの指す先のデータではなく、ポインタの値だけをコピーするのですか？
+  - >-
+    ResourceHolderのデストラクタで、delete m_data; の前にstd::cout << "Resource " << *m_data
+    << " destroyed." としていますが、メモリ解放前のデータを見るのは安全ですか？
+  - 同じメモリを2回deleteするとクラッシュするのはなぜですか？
+  - >-
+    shallow_copy.cppの実行結果でResource 107521
+    destroyed.という数字が出力されていますが、これはどこから来た値ですか？
 ---
 
 ### 何もしないとどうなる？ (浅いコピー)

@@ -2,6 +2,11 @@
 id: python-modules-std-library
 title: 標準ライブラリ：Pythonに備わった強力なツール群
 level: 2
+question:
+  - 「バッテリー同梱 (Batteries Included)」とは、Python独自の考え方ですか？
+  - 標準ライブラリを使うメリットは何ですか？
+  - 「車輪の再発明を防ぐ」とはどういう意味ですか？
+  - 標準ライブラリ以外にも利用できるライブラリはありますか？
 ---
 
 ## 標準ライブラリ：Pythonに備わった強力なツール群

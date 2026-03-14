@@ -1,7 +1,11 @@
 ---
 id: rust-enums-pattern-option
-title: 'Option<T> 型（Null安全性の核心）'
+title: Option<T> 型（Null安全性の核心）
 level: 2
+question:
+  - Nullが存在しないとは、他の言語のnullやnilとは何が違うのですか？
+  - Option<T> の T は任意の型とありますが、これはどういう意味ですか？
+  - SomeとNoneは大文字で始まるので、Enumのバリアント名ですか？
 ---
 
 ## Option\<T\> 型（Null安全性の核心）

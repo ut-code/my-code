@@ -2,6 +2,9 @@
 id: cpp-functions-summary
 title: この章のまとめ
 level: 2
+question:
+  - 各引数の渡し方（値渡し、参照渡し、const参照渡し）の最も大きな違いは何ですか？
+  - なぜ`const`参照渡しが「C++の定石」と呼ばれるほど重要なのでしょうか？
 ---
 
 ## この章のまとめ

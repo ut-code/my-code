@@ -2,6 +2,10 @@
 id: rust-intro-hello-world
 title: Hello World (rustc を直接使う)
 level: 2
+question:
+  - '`rustc` を直接使うのはなぜ最初だけなのですか？'
+  - '`.rs` というファイルの拡張子は何を意味しますか？'
+  - バイナリファイルとは何ですか？
 ---
 
 ## Hello World (`rustc` を直接使う)

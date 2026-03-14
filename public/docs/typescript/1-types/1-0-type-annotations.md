@@ -2,6 +2,11 @@
 id: typescript-types-type-annotations
 title: 2.1 型注釈の構文 (Type Annotations)
 level: 2
+question:
+  - 型注釈とは何のために使う機能ですか？
+  - JavaScriptと比べて、型注釈を付けることのメリットは何ですか？
+  - 型注釈で指定した型と異なる値を代入しようとすると、具体的にどうなりますか？
+  - '`let`と`const`で型注釈の使い方は何か違いがありますか？'
 ---
 
 ## 2.1 型注釈の構文 (Type Annotations)

@@ -2,6 +2,10 @@
 id: cpp-raii-smartptr-practice2
 title: '問題2: shared_ptr と所有権の共有'
 level: 3
+question:
+  - Projectクラスの定義方法を教えてください。
+  - shared_ptrの参照カウントは、どのように取得するのですか？
+  - vectorをclear()すると、shared_ptrの参照カウントが減るのはなぜですか？
 ---
 
 ### 問題2: `shared_ptr` と所有権の共有

@@ -2,6 +2,16 @@
 id: typescript-async-utilities-basic-def
 title: 基本的な定義
 level: 3
+question:
+  - Promise<string>やPromise<number>とは何が違うのですか？
+  - Promise<void>はいつ使うのですか？
+  - asyncキーワードをつけると、なぜ自動的にPromiseでラップされるのですか？
+  - >-
+    fetchUser関数のPromise((resolve) => { setTimeout(() => {
+    resolve(...)の部分が具体的に何をしているのか理解できません。
+  - awaitを使うと、変数の型が自動的にPromiseが解けた状態になるのはなぜですか？
+  - main関数がasyncなのはなぜですか？
+  - コード例でPromiseを直接newしていますが、async関数を使う場合も常にnewするのでしょうか？
 ---
 
 ### 基本的な定義

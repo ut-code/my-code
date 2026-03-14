@@ -2,6 +2,10 @@
 id: rust-basics-mutable
 title: 可変変数（Mutable）
 level: 3
+question:
+  - mutを付けると変数の値が変更可能になるのはなぜですか？
+  - 常にmutを付けておくのは良くないことですか？
+  - なぜRustはデフォルトで不変変数なのですか？
 ---
 
 ### 可変変数（Mutable）

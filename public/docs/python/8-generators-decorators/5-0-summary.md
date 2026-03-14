@@ -2,6 +2,10 @@
 id: python-generators-decorators-summary
 title: この章のまとめ
 level: 2
+question:
+  - ジェネレータとデコレータは、実際の開発でどのような場面でよく利用されますか
+  - 「Pythonらしい（Pythonic）コード」とは具体的にどのようなコードのことですか
+  - この章で学んだ後、次に学ぶべきトピックは何ですか
 ---
 
 ## この章のまとめ

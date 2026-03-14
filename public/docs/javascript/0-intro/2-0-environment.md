@@ -2,6 +2,12 @@
 id: javascript-intro-environment
 title: '実行環境: ブラウザ vs Node.js'
 level: 2
+question:
+  - クライアントサイドとサーバーサイドの違いは何ですか？
+  - DOM (Document Object Model) とは何ですか？
+  - ブラウザのサンドボックスとは何ですか？
+  - Node.jsの「ChromeのV8 JavaScriptエンジンをブラウザの外に取り出した」とはどういうことですか？
+  - 「何ができるか（API）は環境に依存する」とは具体的にどういうことですか？
 ---
 
 ## 実行環境: ブラウザ vs Node.js

@@ -1,7 +1,11 @@
 ---
 id: javascript-arrow-function-basic
-title: 'アロー関数 (=>) の構文と特徴'
+title: アロー関数 (=>) の構文と特徴
 level: 2
+question:
+  - アロー関数は常に `function` キーワードの代わりとして使えるのですか？
+  - Javaのラムダ式やPythonのlambdaに似ているとありますが、具体的にどういう点が似ていますか？
+  - アロー関数を使うとどんな良いことがありますか？
 ---
 
 ## アロー関数 (`=>`) の構文と特徴

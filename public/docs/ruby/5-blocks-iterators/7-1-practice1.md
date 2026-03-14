@@ -2,6 +2,9 @@
 id: ruby-blocks-iterators-practice1
 title: 練習問題1
 level: 3
+question:
+  - 各要素を文字列に変換するには、どのようなメソッドを使えば良いですか？
+  - map のブロック引数には何を受け取れば良いですか？
 ---
 
 ### 練習問題1

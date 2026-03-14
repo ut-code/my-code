@@ -2,6 +2,9 @@
 id: typescript-types-any
 title: 'any: 危険な「何でもあり」'
 level: 3
+question:
+  - '`any`型を使うとTypeScriptを使うメリットが失われるというのはなぜですか？'
+  - '`any`型を使わなければいけないような状況はありますか？'
 ---
 
 ### any: 危険な「何でもあり」

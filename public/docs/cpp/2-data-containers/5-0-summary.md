@@ -2,6 +2,10 @@
 id: cpp-data-containers-summary
 title: この章のまとめ
 level: 2
+question:
+  - char*ではなくstd::stringを使うべき具体的な例をもっと教えてください。
+  - 「STL (Standard Template Library)」とは何ですか？このチュートリアルで学ぶ他のものもSTLの一部ですか？
+  - 「メモリ管理の苦労を飛ばして」とありますが、C++でメモリ管理を意識する必要があったのは具体的にどんな時ですか？
 ---
 
 ## この章のまとめ

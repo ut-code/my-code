@@ -2,6 +2,12 @@
 id: cpp-control-switch
 title: switch文とフォールスルー
 level: 3
+question:
+  - switch文の「フォールスルー」とは具体的にどういうことですか？意図的でない場合にどのような問題が起こりますか？
+  - '[[fallthrough]]; を使わない場合、コンパイラはどのような警告を出すのですか？'
+  - breakを書き忘れた場合、プログラムはどのように動作するのですか？
+  - switch文のcaseに書ける値の型に制限はありますか？
+  - defaultのcaseは必ず書くべきですか？
 ---
 
 ### `switch`文とフォールスルー

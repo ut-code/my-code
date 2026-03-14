@@ -2,6 +2,10 @@
 id: ruby-control-methods-practice1
 title: '練習問題1: 評価メソッドの作成'
 level: 3
+question:
+  - case文のwhen節で、範囲指定と特定の値を混ぜて書くことはできますか？
+  - raiseしたArgumentErrorがちゃんと機能するかどうか、どのようにテストすれば良いですか？
+  - 練習問題の解答例は提供されますか？
 ---
 
 ### 練習問題1: 評価メソッドの作成

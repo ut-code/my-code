@@ -2,6 +2,12 @@
 id: typescript-classes-js-class-review
 title: 'JSのクラス構文の復習: constructor, extends'
 level: 2
+question:
+  - 'name: string; のようにプロパティの型を宣言する意味は何ですか？'
+  - AnimalクラスのmoveメソッドでdistanceInMeters = 0としているのは、なぜですか？
+  - super()はなぜ呼び出す必要があるのですか？呼び出さないとどうなりますか？
+  - super.move(distanceInMeters); は、親クラスのmoveメソッドを呼び出しているのですか？
+  - TypeScriptでJavaScriptのクラスを書くと、具体的にどんなメリットがありますか？
 ---
 
 ## JSのクラス構文の復習: constructor, extends

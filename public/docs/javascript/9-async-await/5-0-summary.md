@@ -2,6 +2,11 @@
 id: javascript-async-await-summary
 title: この章のまとめ
 level: 2
+question:
+  - Async/Awaitを使う一番のメリットは何ですか？
+  - Fetch APIでresponse.okを確認する必要があるのはなぜですか？
+  - Fetch APIでresponse.json()が「2段構え」とはどういうことですか？
+  - 並列処理と直列処理の使い分けのポイントは何ですか？
 ---
 
 ## この章のまとめ

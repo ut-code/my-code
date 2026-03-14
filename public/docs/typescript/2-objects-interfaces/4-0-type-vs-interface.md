@@ -2,6 +2,11 @@
 id: typescript-objects-interfaces-type-vs-interface
 title: 'type vs interface: 使い分けの基本的なガイドライン'
 level: 2
+question:
+  - '`type`と`interface`を使い分ける際の具体的な判断基準を教えてください。'
+  - '`Declaration Merging`とはどのような機能ですか。'
+  - '`type`と`interface`の機能的な差が少ないというのはどういう意味ですか。'
+  - 一貫して`type`を使うチームが増えているのはなぜですか。
 ---
 
 ## type vs interface: 使い分けの基本的なガイドライン

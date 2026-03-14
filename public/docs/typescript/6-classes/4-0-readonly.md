@@ -2,6 +2,12 @@
 id: typescript-classes-readonly
 title: 'readonly修飾子: クラスプロパティへの適用'
 level: 2
+question:
+  - readonly を使うと、プロパティを定数のように扱えるということですか？
+  - readonly プロパティは、コンストラクタの外で変更しようとするとどうなりますか？
+  - readonly プロパティを宣言時に初期化しない場合は、必ずコンストラクタ内で初期化する必要がありますか？
+  - const と readonly は何が違いますか？
+  - readonly を使うメリットは何ですか？
 ---
 
 ## readonly修飾子: クラスプロパティへの適用

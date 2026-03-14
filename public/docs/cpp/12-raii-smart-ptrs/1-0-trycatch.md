@@ -2,6 +2,14 @@
 id: cpp-trycatch
 title: '例外処理: try, catch を使ったエラーハンドリング'
 level: 2
+question:
+  - 例外は具体的にどのような場面で使うべきですか？
+  - throwされた例外がcatchされない場合、プログラムはどうなりますか？
+  - std::runtime_error以外の例外の種類はありますか？
+  - e.what()は何を返しているのですか？
+  - tryブロックの中で複数の種類の例外が投げられた場合、どのように処理されますか？
+  - std::cerrとstd::coutの違いは何ですか？
+  - static_cast<double>(a) / b;という記述は何をしていますか？
 ---
 
 ## 例外処理: `try`, `catch` を使ったエラーハンドリング

@@ -2,6 +2,11 @@
 id: typescript-generics-practice2
 title: '練習問題 2: 制約付きジェネリクス'
 level: 3
+question:
+  - 'HasIdインターフェースのid: number | string; のようにユニオン型を使うのはなぜですか？'
+  - >-
+    showId({ name: "NoIdUser" });
+    がコンパイルエラーになるのは、具体的にHasIdインターフェースのどの制約に反しているからですか？
 ---
 
 ### 練習問題 2: 制約付きジェネリクス

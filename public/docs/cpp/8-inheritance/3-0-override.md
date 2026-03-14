@@ -2,6 +2,10 @@
 id: cpp-inheritance-override
 title: オーバーライド (override)
 level: 2
+question:
+  - '`override` を付けなくても、子クラスで親クラスと同じ名前の関数を定義すれば、それが呼ばれるのではないのですか？'
+  - '`override` を付けることで具体的にどのようなバグが防げるのですか？'
+  - '`final` というキーワードも見たことがあります。`override` と `final` はどう違うのですか？'
 ---
 
 ## オーバーライド (override)

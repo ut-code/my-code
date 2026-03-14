@@ -2,6 +2,9 @@
 id: typescript-function-types-optional
 title: オプショナル引数 (?)
 level: 3
+question:
+  - オプショナル引数で省略された場合の値がundefinedになるのは、どのようなメリットがありますか
+  - オプショナル引数を必須引数の後ろに配置する必要があるのはなぜですか
 ---
 
 ### オプショナル引数 (`?`)

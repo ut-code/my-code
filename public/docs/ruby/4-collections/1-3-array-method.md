@@ -2,6 +2,11 @@
 id: ruby-collections-array-method
 title: 便利なメソッド
 level: 3
+question:
+  - lengthとsizeは同じですか？
+  - sortメソッドは元の配列もソートしますか？
+  - include? メソッドは大文字と小文字を区別しますか？
+  - 他にどのような便利な配列メソッドがありますか？
 ---
 
 ### 便利なメソッド

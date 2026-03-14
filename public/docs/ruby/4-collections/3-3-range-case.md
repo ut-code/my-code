@@ -2,6 +2,10 @@
 id: ruby-collections-range-case
 title: 範囲の活用例
 level: 3
+question:
+  - case文のwhenで範囲を使うメリットは何ですか？
+  - assign_grade関数の例で、80点の場合に"B"になるのはなぜですか？
+  - 範囲が重なってしまった場合、どのwhenが優先されますか？
 ---
 
 ### 範囲の活用例

@@ -2,6 +2,10 @@
 id: typescript-types-type-inference
 title: 2.3 型推論 (Type Inference)
 level: 2
+question:
+  - 型推論とは具体的にどのような仕組みですか？
+  - いつ型注釈を省略して、いつ型注釈を書くべきですか？
+  - 型推論された変数に、推論された型と違う型の値を代入しようとするとどうなりますか？
 ---
 
 ## 2.3 型推論 (Type Inference)

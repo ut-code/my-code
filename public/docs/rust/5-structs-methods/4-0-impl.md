@@ -2,6 +2,9 @@
 id: rust-structs-methods-impl
 title: impl ブロック：メソッドと関連関数
 level: 2
+question:
+  - implブロックは、なぜstructの定義とは別に書く必要があるのですか？
+  - 他のプログラミング言語のクラスにおけるメソッド定義と、どのような違いがありますか？
 ---
 
 ## impl ブロック：メソッドと関連関数

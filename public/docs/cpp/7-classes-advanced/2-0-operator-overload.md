@@ -2,6 +2,13 @@
 id: cpp-classes-advanced-operator-overload
 title: 演算子のオーバーロード
 level: 2
+question:
+  - 演算子のオーバーロードを使うと、例えば + 演算子の意味を全く違うものに変えることもできるのですか？
+  - メンバ関数として演算子をオーバーロードするのと、非メンバ関数としてオーバーロードするのには、どのような基準で使い分ければ良いですか？
+  - >-
+    operator+ の定義で Vector2D operator+(const Vector2D& rhs) const とありますが、最後の
+    const は何のためにあるのですか？
+  - operator<< をメンバ関数として定義できないのはなぜですか？
 ---
 
 ## 演算子のオーバーロード

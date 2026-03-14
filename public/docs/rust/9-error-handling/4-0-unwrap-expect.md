@@ -2,6 +2,9 @@
 id: rust-error-handling-unwrap-expect
 title: unwrap と expect の使い所
 level: 2
+question:
+  - '`unwrap` や `expect` は、なぜ「失敗したらプログラムをクラッシュさせていい」という場合に使うのですか？'
+  - 安全なアプリケーションを作る上で、これらのメソッドは避けるべきですか？
 ---
 
 ## `unwrap` と `expect` の使い所

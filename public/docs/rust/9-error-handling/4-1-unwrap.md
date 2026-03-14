@@ -2,6 +2,9 @@
 id: rust-error-handling-unwrap
 title: unwrap
 level: 3
+question:
+  - '`unwrap` がパニックした場合、具体的にどのようなエラーメッセージが表示されますか？'
+  - '`unwrap` を使うことでどのようなリスクがありますか？'
 ---
 
 ### `unwrap`

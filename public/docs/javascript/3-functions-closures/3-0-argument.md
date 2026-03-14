@@ -2,6 +2,10 @@
 id: javascript-functions-argument
 title: 引数：デフォルト引数、Restパラメータ (...)
 level: 2
+question:
+  - 引数とは具体的に何のことですか？
+  - 関数の柔軟性を高めるための引数とは、どういう意味ですか？
+  - ここで紹介されている引数以外にも、JavaScriptには別の機能がありますか？
 ---
 
 ## 引数：デフォルト引数、Restパラメータ (...)
