@@ -2,6 +2,12 @@
 id: typescript-intro-about
 title: TypeScriptとは？
 level: 2
+question:
+  - TypeScriptとは具体的に何ができるようになる言語なのですか？
+  - JavaScriptのスーパーセットとはどういう意味ですか？
+  - 静的型付けと動的型付けの違いをもっと詳しく教えてください。
+  - なぜTypeScriptはコンパイルしないと実行できないのですか？
+  - '`tsc`とは何のことですか？'
 ---
 
 ## TypeScriptとは？

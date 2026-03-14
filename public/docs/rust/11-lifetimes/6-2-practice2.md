@@ -2,6 +2,10 @@
 id: rust-lifetimes-practice2
 title: '練習問題 2: 最初の単語を返す関数（ライフタイム付き）'
 level: 3
+question:
+  - '`longest` 関数と `first_word` 関数をどのように組み合わせて `first_word_of_longer` を作れば良いですか？'
+  - '`s.split_whitespace().next()` の結果のスライスのライフタイムは、どのように決まるのですか？'
+  - 練習問題2の関数で、もし戻り値にライフタイム注釈を付けなかったら、どのようなエラーになりますか？
 ---
 
 ### 練習問題 2: 最初の単語を返す関数（ライフタイム付き）

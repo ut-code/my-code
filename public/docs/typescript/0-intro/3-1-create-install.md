@@ -2,6 +2,12 @@
 id: typescript-intro-create-install
 title: プロジェクトの作成とTypeScriptのインストール
 level: 3
+question:
+  - '`mkdir`や`cd`コマンドを使ったことがありません。これは何をしているのですか？'
+  - '`npm init -y`は何のために必要なのですか？'
+  - '`npm install --save-dev typescript`の`--save-dev`は何を意味するのですか？'
+  - Node.jsがインストールされていない場合はどうすれば良いですか？
+  - '`npx`とは何ですか？`npm`とは違うのですか？'
 ---
 
 ### プロジェクトの作成とTypeScriptのインストール

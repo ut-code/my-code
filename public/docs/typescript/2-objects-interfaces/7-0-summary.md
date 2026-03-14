@@ -2,6 +2,9 @@
 id: typescript-objects-interfaces-summary
 title: この章のまとめ
 level: 2
+question:
+  - このまとめに書かれている各機能は、組み合わせて使用できますか。
+  - この章で学んだことを応用する具体的な例を教えてください。
 ---
 
 ## この章のまとめ

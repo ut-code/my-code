@@ -2,6 +2,9 @@
 id: typescript-intro-compile-config
 title: 設定ファイルを使ったコンパイル
 level: 3
+question:
+  - '`npx tsc`だけでコンパイルできるのはなぜですか？'
+  - '`npx tsc`と打った場合、どのTypeScriptファイルがコンパイルされるのですか？'
 ---
 
 ### 設定ファイルを使ったコンパイル

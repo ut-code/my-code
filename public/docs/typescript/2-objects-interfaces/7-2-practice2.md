@@ -2,6 +2,10 @@
 id: typescript-objects-interfaces-practice2
 title: '練習問題 2: ユーザー情報の統合'
 level: 3
+question:
+  - ネストされた型エイリアスを使用するメリットは何ですか。
+  - '`Contact`型を`Employee`型の中に直接定義することはできますか。'
+  - 練習問題の解答例を見たいです。
 ---
 
 ### 練習問題 2: ユーザー情報の統合

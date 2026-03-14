@@ -2,6 +2,11 @@
 id: typescript-objects-interfaces-type-alias
 title: '型エイリアス (type): 型に名前を付ける'
 level: 2
+question:
+  - 型エイリアスはオブジェクト以外の型にも使用できますか。
+  - '`PascalCase`とはどのような命名規則ですか。'
+  - 型エイリアスを定義する際に`=`を付けるのはなぜですか。
+  - '`type`キーワードは何かの略ですか。'
 ---
 
 ## 型エイリアス (type): 型に名前を付ける

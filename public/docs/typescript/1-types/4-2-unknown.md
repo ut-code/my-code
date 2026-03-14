@@ -2,6 +2,10 @@
 id: typescript-types-unknown
 title: 'unknown: 安全な「正体不明」'
 level: 3
+question:
+  - '`any`の代わりに`unknown`を使うべきだとありますが、両者の具体的な違いは何ですか？'
+  - 「型の絞り込み」とは具体的にどういうことですか？
+  - '`unknown`型の変数からプロパティにアクセスできないのはなぜですか？'
 ---
 
 ### unknown: 安全な「正体不明」

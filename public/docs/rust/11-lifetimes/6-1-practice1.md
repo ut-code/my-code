@@ -2,6 +2,10 @@
 id: rust-lifetimes-practice1
 title: '練習問題 1: 参照を持つ構造体とメソッド'
 level: 3
+question:
+  - '`Book` 構造体の定義で、どこに `''a` を記述すれば良いのですか？'
+  - '`Book` の `title` フィールドを `String` ではなく `&str` にするメリットは何ですか？'
+  - '`# [derive(Debug)]` は、なぜ必要なのでしょうか？'
 ---
 
 ### 練習問題 1: 参照を持つ構造体とメソッド
