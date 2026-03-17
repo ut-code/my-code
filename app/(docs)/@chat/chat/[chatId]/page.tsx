@@ -1,6 +1,7 @@
 import { getChatOne, initContext } from "@/lib/chatHistory";
 import { getMarkdownSections, getPagesList } from "@/lib/docs";
 import { ChatAreaContent } from "./chatArea";
+import { notFound } from "next/navigation";
 
 export default async function ChatPage({
   params,
@@ -11,6 +12,10 @@ export default async function ChatPage({
 
   const ctx = await initContext();
   const chatData = await getChatOne(chatId, ctx);
+
+  if (!chatData) {
+    notFound();
+  }
 
   const pagesList = await getPagesList();
   const targetLang = pagesList.find(

@@ -191,11 +191,7 @@ export async function getChatOne(chatId: string, context: Context) {
         orderBy: [asc(diff.createdAt)],
       },
     },
-  })) as typeof chat.$inferSelect & {
-    section: typeof section.$inferSelect;
-    messages: (typeof message.$inferSelect)[];
-    diff: (typeof diff.$inferSelect)[];
-  };
+  })) as ChatWithMessages | undefined;
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {

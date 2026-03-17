@@ -6,6 +6,7 @@ import { PagePath } from "@/lib/docs";
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -15,6 +16,7 @@ import useSWR from "swr";
 export interface IChatHistoryContext {
   chatHistories: ChatWithMessages[];
   addChat: (chat: ChatWithMessages) => void;
+  deleteChat: (chatId: string) => void;
   // updateChat: (sectionId: string, chatId: string, message: ChatMessage) => void;
 }
 const ChatHistoryContext = createContext<IChatHistoryContext | null>(null);
@@ -61,12 +63,15 @@ export function ChatHistoryProvider({
   }, [fetchedChatHistories]);
 
   // チャットを更新した際にはクライアントサイドでchatHistoryに反映する
-  const addChat = (chat: ChatWithMessages) => {
+  const addChat = useCallback((chat: ChatWithMessages) => {
     setChatHistories([...chatHistories, chat]);
-  };
+  }, []);
+  const deleteChat = useCallback((chatId: string) => {
+    setChatHistories(chatHistories.filter((chat) => chat.chatId !== chatId));
+  }, []);
 
   return (
-    <ChatHistoryContext.Provider value={{ chatHistories, addChat }}>
+    <ChatHistoryContext.Provider value={{ chatHistories, addChat, deleteChat }}>
       {children}
     </ChatHistoryContext.Provider>
   );

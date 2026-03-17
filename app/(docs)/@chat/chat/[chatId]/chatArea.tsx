@@ -1,7 +1,9 @@
 "use client";
 
+import { useChatHistoryContext } from "@/(docs)/@docs/[lang]/[pageId]/chatHistory";
 import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
-import { getChatOne } from "@/lib/chatHistory";
+import { deleteChatAction } from "@/actions/deleteChat";
+import { ChatWithMessages } from "@/lib/chatHistory";
 import { LanguageEntry, MarkdownSection, PageEntry } from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import { StyledMarkdown } from "@/markdown/markdown";
@@ -10,7 +12,7 @@ import Link from "next/link";
 
 interface Props {
   chatId: string;
-  chatData: Awaited<ReturnType<typeof getChatOne>>;
+  chatData: ChatWithMessages;
   targetLang: LanguageEntry | undefined;
   targetPage: PageEntry | undefined;
   targetSection: MarkdownSection | undefined;
@@ -25,6 +27,10 @@ export function ChatAreaContent(props: Props) {
   messagesAndDiffs.sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
+
+  // useChatHistoryContext must be used within a ChatHistoryProvider
+  // const { deleteChat } = useChatHistoryContext();
+
 
   return (
     <aside
@@ -89,7 +95,12 @@ export function ChatAreaContent(props: Props) {
         </div>
         <button
           className="btn btn-error btn-soft btn-sm"
-          onClick={() => alert("TODO: チャットの削除機能")}
+          onClick={async () => {
+            if (confirm("このチャットを削除してもよろしいですか?")) {
+              await deleteChatAction(chatId);
+              // deleteChat(chatId);
+            }
+          }}
         >
           {/*<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->*/}
           <svg
