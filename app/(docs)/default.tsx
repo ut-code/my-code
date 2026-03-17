@@ -1,1 +1,3 @@
-export default function EmptyPage() {}
+export default function EmptyPage() {
+  return null;
+}
