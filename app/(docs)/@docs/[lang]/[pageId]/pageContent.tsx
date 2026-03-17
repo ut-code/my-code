@@ -254,20 +254,19 @@ function ChatListForSection(props: {
           chatId === null ? "hidden lg:block" : "hidden",
           "mt-2 ml-4 max-w-60",
           "menu menu-sm",
-          "border border-base-content/10 rounded-sm shadow-sm bg-base-200"
+          "rounded-lg shadow-sm bg-base-200"
         )}
       >
         <li className="menu-title flex-row items-center gap-1">
           <ChatIcon />
           AIへの質問
+          <span className="badge badge-sm badge-soft badge-secondary">
+            {filteredChatHistories.length}
+          </span>
         </li>
         {filteredChatHistories.map(({ title, chatId }) => (
           <li key={chatId} className="">
-            <Link
-              className="link link-info"
-              href={`/chat/${chatId}`}
-              scroll={false}
-            >
+            <Link href={`/chat/${chatId}`} scroll={false}>
               {title}
             </Link>
           </li>
@@ -289,16 +288,12 @@ function ChatListForSection(props: {
           className={clsx(
             "menu menu-sm dropdown-content",
             "w-max max-w-[75vw]",
-            "border border-base-content/10 rounded-sm shadow-sm bg-base-200"
+            "rounded-lg shadow-sm bg-base-200/60 backdrop-blur-xs"
           )}
         >
           {filteredChatHistories.map(({ title, chatId }) => (
             <li key={chatId} className="">
-              <Link
-                className="link link-info"
-                href={`/chat/${chatId}`}
-                scroll={false}
-              >
+              <Link href={`/chat/${chatId}`} scroll={false}>
                 {title}
               </Link>
             </li>
