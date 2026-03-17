@@ -113,9 +113,9 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   }, [currentLangIndex]);
 
   return (
-    <div className="bg-base-200 h-full w-80 flex flex-col">
-      <h2 className="hidden lg:flex flex-row items-center p-4 gap-2">
-        {/* サイドバーが常時表示されているlg以上の場合のみ */}
+    <div className="bg-base-200 h-full w-sidebar flex flex-col">
+      <h2 className="hidden has-sidebar:flex flex-row items-center p-4 gap-2">
+        {/* サイドバーが常時表示されている場合のみ */}
         <Link href="/" className="flex-1 flex items-center">
           <img
             src="/icon.svg"
@@ -127,7 +127,7 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
         <ThemeToggle />
         <AccountMenu />
       </h2>
-      <span className="block lg:hidden p-4 pb-0">
+      <span className="block has-sidebar:hidden p-4 pb-0">
         <label
           htmlFor="drawer-toggle"
           aria-label="open sidebar"

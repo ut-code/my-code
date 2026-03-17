@@ -18,7 +18,11 @@ export function ChatAreaContainer(props: { chatId: string; children: ReactNode }
         // モバイルでは全画面表示する
         "fixed inset-0 pt-20 bg-base-100",
         // PCではスクロールで動かない右サイドバー
-        "lg:sticky lg:top-0 lg:pt-4 lg:w-1/3 lg:h-screen lg:shadow-md lg:bg-base-200 ",
+        "has-chat-1:sticky has-chat-1:top-16 has-sidebar:top-0 has-chat-1:pt-4",
+        "has-chat-1:basis-2/5 has-chat-1:max-w-chat-area has-chat-1:h-[calc(100vh-4rem)] has-sidebar:h-screen",
+        "has-chat-1:shadow-md has-chat-1:bg-base-200",
+        // navbar(z-40)よりは下、ChatListForSectionのdropdown(デフォルトでz-999だがz-30に変えている)よりも上
+        "z-35",
         "p-4",
         "flex flex-col",
         "overflow-y-auto"

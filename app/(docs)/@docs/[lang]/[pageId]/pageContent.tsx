@@ -169,14 +169,14 @@ export function PageContent(props: PageContentProps) {
           gridTemplateColumns: `1fr auto`,
         }}
       >
-        <Heading className="max-w-200" level={1}>
+        <Heading className="max-w-docs" level={1}>
           第{pageEntry.index}章: {pageEntry.title}
         </Heading>
         <div />
         {dynamicMdContent.map((section, index) => (
           <Fragment key={section.id}>
             <div
-              className="min-w-1/2 max-w-200 text-justify"
+              className="min-w-1/2 max-w-docs text-justify"
               id={section.id} // 目次からaタグで飛ぶために必要
               ref={(el) => {
                 sectionRefs.current[index] = el;
@@ -197,16 +197,17 @@ export function PageContent(props: PageContentProps) {
             </div>
           </Fragment>
         ))}
+        <PageTransition
+          lang={path.lang}
+          prevPage={props.prevPage}
+          nextPage={props.nextPage}
+        />
+        <div />
       </div>
-      <PageTransition
-        lang={path.lang}
-        prevPage={props.prevPage}
-        nextPage={props.nextPage}
-      />
       {isFormVisible ? (
-        // sidebarの幅が80であることからleft-84 (sidebar.tsx参照)
-        // replがz-10を使用することからそれの上にするためz-20
-        <div className="fixed bottom-4 right-4 left-4 lg:left-84 z-20">
+        // leftは sidebarの幅 + 4
+        // replがz-10, chatAreaがz-35を使用することからそれの上にするためz-40
+        <div className="fixed bottom-4 right-4 left-4 has-sidebar:left-[calc(var(--container-sidebar)+1rem)] z-40">
           <ChatForm
             path={path}
             sectionContent={dynamicMdContent}
@@ -248,11 +249,15 @@ function ChatListForSection(props: {
 
   return (
     <>
-      {/*PC表示かつチャットを表示していない → チャットリストを表示*/}
+      {/*xl以上の幅かつチャットを表示していない → チャットリストを表示
+      see also globals.css
+      */}
       <ul
         className={clsx(
-          chatId === null ? "hidden lg:block" : "hidden",
-          "mt-2 ml-4 max-w-60",
+          chatId === null
+            ? "hidden has-chat-1:block"
+            : "hidden has-chat-2:block",
+          "mt-2 ml-4 w-full max-w-chat-list",
           "menu menu-sm",
           "rounded-lg shadow-sm bg-base-200"
         )}
@@ -265,17 +270,23 @@ function ChatListForSection(props: {
           </span>
         </li>
         {filteredChatHistories.map(({ title, chatId }) => (
-          <li key={chatId} className="">
-            <Link href={`/chat/${chatId}`} scroll={false}>
+          <li key={chatId}>
+            <Link
+              className="text-wrap text-justify"
+              href={`/chat/${chatId}`}
+              scroll={false}
+            >
               {title}
             </Link>
           </li>
         ))}
       </ul>
-      {/*PCでない or PC表示でチャットを表示している → 小さい吹き出しを表示*/}
+      {/*xl未満 or xl以上でチャットを表示している → 小さいボタンを表示*/}
       <details
         className={clsx(
-          chatId === null ? "block lg:hidden" : "block",
+          chatId === null
+            ? "block has-chat-1:hidden"
+            : "block has-chat-2:block",
           "dropdown dropdown-end",
           "mt-2 ml-2"
         )}
@@ -288,12 +299,17 @@ function ChatListForSection(props: {
           className={clsx(
             "menu menu-sm dropdown-content",
             "w-max max-w-[75vw]",
+            "z-30",
             "rounded-lg shadow-sm bg-base-200/60 backdrop-blur-xs"
           )}
         >
           {filteredChatHistories.map(({ title, chatId }) => (
-            <li key={chatId} className="">
-              <Link href={`/chat/${chatId}`} scroll={false}>
+            <li key={chatId}>
+              <Link
+                className="text-wrap text-justify"
+                href={`/chat/${chatId}`}
+                scroll={false}
+              >
                 {title}
               </Link>
             </li>
