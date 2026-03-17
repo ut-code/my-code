@@ -12,10 +12,10 @@ import {
   useEffect,
   useState,
 } from "react";
-import { DynamicMarkdownSection } from "./[lang]/[pageId]/pageContent";
 import clsx from "clsx";
 import { LanguageIcon } from "@/terminal/icons";
 import { RuntimeLang } from "@my-code/runtime/languages";
+import { DynamicMarkdownSection } from "./(docs)/@docs/[lang]/[pageId]/pageContent";
 
 export interface ISidebarMdContext {
   loadedPath: PagePath | null;

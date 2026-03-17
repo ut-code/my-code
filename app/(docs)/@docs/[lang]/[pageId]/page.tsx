@@ -16,6 +16,7 @@ import {
 } from "@/lib/docs";
 import { unstable_cacheLife, unstable_cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
+import { DocsAutoRedirect } from "./autoRedirect";
 
 export async function generateMetadata({
   params,
@@ -61,15 +62,18 @@ export default async function Page({
   const chatHistories = await getChatFromCache(path, context.userId);
 
   return (
-    <PageContent
-      chatHistories={chatHistories}
-      splitMdContent={sections}
-      langEntry={langEntry}
-      pageEntry={pageEntry}
-      prevPage={prevPage}
-      nextPage={nextPage}
-      path={path}
-    />
+    <>
+      <PageContent
+        chatHistories={chatHistories}
+        splitMdContent={sections}
+        langEntry={langEntry}
+        pageEntry={pageEntry}
+        prevPage={prevPage}
+        nextPage={nextPage}
+        path={path}
+      />
+      <DocsAutoRedirect path={path} />
+    </>
   );
 }
 
