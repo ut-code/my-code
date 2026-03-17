@@ -41,7 +41,7 @@ export const chatRelations = relations(chat, ({ many, one }) => ({
   diff: many(diff),
 }));
 
-export const sectionRelations = relations(chat, ({ many }) => ({
+export const sectionRelations = relations(section, ({ many }) => ({
   chat: many(chat),
   // diff: many(diff),
 }));
