@@ -3,11 +3,11 @@
 import clsx from "clsx";
 import Link from "next/link";
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
+  error: unknown;
   reset: () => void;
 }) {
   return (
@@ -20,11 +20,11 @@ export default function Error({
           "max-w-full whitespace-pre-wrap"
         )}
       >
-        {error.message}
+        {error instanceof Error ? error.message : String(error)}
       </pre>
-      {error.digest && (
+      {"digest" in (error as { digest: string }) && (
         <p className="mt-2 text-sm text-base-content/50">
-          Digest: {error.digest}
+          Digest: {(error as { digest: string }).digest}
         </p>
       )}
       <div className="divider w-full self-auto!" />

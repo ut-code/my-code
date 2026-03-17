@@ -9,7 +9,7 @@ interface PageTransitionProps {
 
 export function PageTransition({ lang, prevPage, nextPage }: PageTransitionProps) {
   return (
-    <div className="flex justify-between gap-4 mt-12 pt-8 border-t border-base-content/10 min-w-1/2 max-w-200 col-span-2">
+    <div className="flex justify-between gap-4 mt-12 pt-8 border-t border-base-content/10 w-full max-w-docs">
       <div className="flex-1 flex">
         {prevPage && (
           <Link

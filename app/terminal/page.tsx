@@ -28,7 +28,7 @@ import sub_rs from "./samples/sub.rs?raw";
 
 export default function RuntimeTestPage() {
   return (
-    <div className="p-4 mx-auto w-full max-w-200">
+    <div className="p-4 mx-auto w-full max-w-docs">
       <Heading level={1}>Runtime Test Page</Heading>
 
       <Heading level={2}>REPLとコード実行のサンプル</Heading>
