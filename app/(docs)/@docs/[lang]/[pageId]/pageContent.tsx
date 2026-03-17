@@ -259,7 +259,11 @@ function ChatListForSection(props: {
         <li className="menu-title">チャット</li>
         {filteredChatHistories.map(({ chatId }) => (
           <li key={chatId} className="">
-            <Link className="link link-info" href={`/chat/${chatId}`}>
+            <Link
+              className="link link-info"
+              href={`/chat/${chatId}`}
+              scroll={false}
+            >
               {chatId}
             </Link>
           </li>
@@ -306,7 +310,11 @@ function ChatListForSection(props: {
         >
           {filteredChatHistories.map(({ chatId }) => (
             <li key={chatId} className="">
-              <Link className="link link-info" href={`/chat/${chatId}`}>
+              <Link
+                className="link link-info"
+                href={`/chat/${chatId}`}
+                scroll={false}
+              >
                 {chatId}
               </Link>
             </li>
