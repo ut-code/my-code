@@ -35,7 +35,10 @@ export default async function ChatPage({
   const targetPage = targetLang?.pages.find(
     (page) => page.slug === chatData.section.pagePath.split("/")[1]
   );
-  const sections = await getMarkdownSections(targetLang!.id, targetPage!.slug);
+  const sections =
+    targetLang && targetPage
+      ? await getMarkdownSections(targetLang.id, targetPage.slug)
+      : [];
   const targetSection = sections.find((sec) => sec.id === chatData.sectionId);
 
   return (
