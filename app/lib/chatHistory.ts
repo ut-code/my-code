@@ -215,7 +215,7 @@ export async function getChatOne(chatId: string, context: Context) {
     throw new Error("Not authenticated");
   }
 
-  return (await drizzle.query.chat.findFirst({
+  const chatData = (await drizzle.query.chat.findFirst({
     where: and(eq(chat.chatId, chatId), eq(chat.userId, userId)),
     with: {
       section: true,
@@ -227,6 +227,18 @@ export async function getChatOne(chatId: string, context: Context) {
       },
     },
   })) as ChatWithMessages | undefined;
+
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    await cache.put(
+      cacheKeyForChat(chatId),
+      new Response(JSON.stringify(chatData), {
+        headers: { "Cache-Control": "max-age=86400, s-maxage=86400" },
+      })
+    );
+  }
+
+  return chatData;
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {
