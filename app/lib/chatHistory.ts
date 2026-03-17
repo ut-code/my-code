@@ -141,6 +141,74 @@ export async function addChat(
 
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
 
+/**
+ * チャットレコードのみを作成する（メッセージ・差分は含まない）。
+ * ストリーミング時に、AIの回答が完全に届く前にチャットIDを確定させるために使用する。
+ */
+export async function createChatOnly(
+  path: PagePath,
+  sectionId: SectionId,
+  title: string,
+  context: Context
+) {
+  const { drizzle, userId } = context;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+  const [newChat] = await drizzle
+    .insert(chat)
+    .values({
+      userId,
+      sectionId,
+      title,
+    })
+    .returning();
+
+  return {
+    ...newChat,
+    section: {
+      sectionId,
+      pagePath: `${path.lang}/${path.page}`,
+    },
+  };
+}
+
+/**
+ * 既存のチャットにメッセージと差分を追加し、キャッシュを再検証する。
+ * ストリーミング完了後に使用する。
+ */
+export async function addMessagesAndDiffs(
+  chatId: string,
+  path: PagePath,
+  messages: CreateChatMessage[],
+  diffRaw: CreateChatDiff[],
+  context: Context
+) {
+  const { drizzle, userId } = context;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  await drizzle.insert(message).values(
+    messages.map((msg) => ({
+      chatId,
+      role: msg.role,
+      content: msg.content,
+    }))
+  );
+
+  if (diffRaw.length > 0) {
+    await drizzle.insert(diff).values(
+      diffRaw.map((d) => ({
+        chatId,
+        ...d,
+      }))
+    );
+  }
+
+  await revalidateChat(chatId, userId, path);
+}
+
 export async function deleteChat(chatId: string, context: Context) {
   const { drizzle, userId } = context;
   if (!userId) {

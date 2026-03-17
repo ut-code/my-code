@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
+import { useStreamingChat } from "@/(docs)/streamingChatContext";
 import { deleteChatAction } from "@/actions/deleteChat";
 import { ChatWithMessages } from "@/lib/chatHistory";
 import { LanguageEntry, MarkdownSection, PageEntry } from "@/lib/docs";
@@ -9,7 +10,7 @@ import { StyledMarkdown } from "@/markdown/markdown";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 export function ChatAreaContainer(props: { chatId: string; children: ReactNode }) {
   return (
@@ -75,6 +76,30 @@ export function ChatAreaContent(props: Props) {
   );
 
   const router = useRouter();
+  const streaming = useStreamingChat();
+  const isStreamingThis = streaming.streamingChatId === chatId;
+  const hasRefreshedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isStreamingThis || streaming.isStreaming) {
+      hasRefreshedRef.current = false;
+      return;
+    }
+    // ストリーミングが終了した
+    if (chatData.messages.length > 0) {
+      // DBにデータが揃った → ストリーミング状態を解除
+      streaming.clearStreaming();
+      hasRefreshedRef.current = false;
+    } else if (!hasRefreshedRef.current) {
+      // DBがまだ更新されていない → 再読み込みして最新データを取得
+      hasRefreshedRef.current = true;
+      router.refresh();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStreamingThis, streaming.isStreaming, chatData.messages.length, streaming.clearStreaming, router]);
+
+  // ストリーミング中または完了直後（DBリフレッシュ前）はストリーミングコンテンツを表示
+  const showStreaming = isStreamingThis;
 
   return (
     <>
@@ -161,46 +186,65 @@ export function ChatAreaContent(props: Props) {
         </button>
       </div>
       <div className="divider" />
-      {messagesAndDiffs.map((msg, index) =>
-        msg.type === "message" ? (
-          msg.role === "user" ? (
-            <div key={index} className="chat chat-end">
-              <div
-                className="chat-bubble p-0.5! bg-secondary/30"
-                style={{ maxWidth: "100%", wordBreak: "break-word" }}
-              >
+      {showStreaming ? (
+        <>
+          <div className="chat chat-end">
+            <div
+              className="chat-bubble p-0.5! bg-secondary/30"
+              style={{ maxWidth: "100%", wordBreak: "break-word" }}
+            >
+              <StyledMarkdown content={streaming.userQuestion} />
+            </div>
+          </div>
+          <div className="">
+            <StyledMarkdown content={streaming.streamingContent} />
+            {streaming.isStreaming && (
+              <span className="loading loading-dots loading-sm" />
+            )}
+          </div>
+        </>
+      ) : (
+        messagesAndDiffs.map((msg, index) =>
+          msg.type === "message" ? (
+            msg.role === "user" ? (
+              <div key={index} className="chat chat-end">
+                <div
+                  className="chat-bubble p-0.5! bg-secondary/30"
+                  style={{ maxWidth: "100%", wordBreak: "break-word" }}
+                >
+                  <StyledMarkdown content={msg.content} />
+                </div>
+              </div>
+            ) : msg.role === "ai" ? (
+              <div key={index} className="">
                 <StyledMarkdown content={msg.content} />
               </div>
-            </div>
-          ) : msg.role === "ai" ? (
-            <div key={index} className="">
-              <StyledMarkdown content={msg.content} />
-            </div>
+            ) : (
+              <div key={index} className="text-error">
+                {msg.content}
+              </div>
+            )
           ) : (
-            <div key={index} className="text-error">
-              {msg.content}
-            </div>
-          )
-        ) : (
-          <div
-            key={index}
-            className={clsx(
-              "bg-base-300 rounded-lg border border-2 border-secondary/50"
-            )}
-          >
-            {/* pb-0だとmargin collapsingが起きて変な隙間が空く */}
-            <del
+            <div
+              key={index}
               className={clsx(
-                "block p-2 pb-[1px] bg-error/10",
-                "line-through decoration-[color-mix(in_oklab,var(--color-error)_70%,currentColor)]"
+                "bg-base-300 rounded-lg border border-2 border-secondary/50"
               )}
             >
-              <StyledMarkdown content={msg.search} />
-            </del>
-            <ins className="block no-underline p-2 pt-[1px] bg-success/10">
-              <StyledMarkdown content={msg.replace} />
-            </ins>
-          </div>
+              {/* pb-0だとmargin collapsingが起きて変な隙間が空く */}
+              <del
+                className={clsx(
+                  "block p-2 pb-[1px] bg-error/10",
+                  "line-through decoration-[color-mix(in_oklab,var(--color-error)_70%,currentColor)]"
+                )}
+              >
+                <StyledMarkdown content={msg.search} />
+              </del>
+              <ins className="block no-underline p-2 pt-[1px] bg-success/10">
+                <StyledMarkdown content={msg.replace} />
+              </ins>
+            </div>
+          )
         )
       )}
     </>
