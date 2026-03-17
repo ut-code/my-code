@@ -2,10 +2,15 @@
 
 // import { z } from "zod";
 import { generateContent } from "./gemini";
-import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
-import { addChat, ChatWithMessages, CreateChatDiff } from "@/lib/chatHistory";
+import {
+  addChat,
+  ChatWithMessages,
+  CreateChatDiff,
+  initContext,
+} from "@/lib/chatHistory";
 import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
+import { DynamicMarkdownSection } from "@/(docs)/@docs/[lang]/[pageId]/pageContent";
 
 type ChatResult =
   | {
@@ -144,14 +149,22 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   prompt.push("# 指示");
   prompt.push("");
   prompt.push(
-    `- 1行目に、ユーザーの質問ともっとも関連性の高いドキュメント内のセクションのidを回答してください。idのみを出力してください。`
+    `- 1行目に、ユーザーの質問ともっとも関連性の高いドキュメント内のセクションのidを回答してください。`
   );
   prompt.push(
-    "  - ユーザーの質問がドキュメントのどのセクションとも直接的に関連しない場合は空白でも良いです。"
+    "  - idのみを出力してください。 セクションid: や括弧や引用符などは不要です。"
   );
-  prompt.push("- 2行目は水平線 --- を出力してください。");
   prompt.push(
-    "- それ以降の行に、ドキュメントの内容に基づいて、ユーザーに伝える回答をMarkdown形式で記述してください。"
+    "  - ユーザーの質問がドキュメントのどのセクションとも直接的に関連しない場合は null と出力してください。"
+  );
+  prompt.push(
+    "- 2行目に、この質問と回答を後から参照するためのわかりやすいタイトルをつけて記述してください。"
+  );
+  prompt.push(
+    "  - 太字やコードブロックなどのMarkdownの記法は使わずテキストのみで出力してください。"
+  );
+  prompt.push(
+    "- 3行目以降に、ドキュメントの内容に基づいて、ユーザーに伝える回答をMarkdown形式で記述してください。"
   );
   prompt.push(
     "  - ユーザーが入力したターミナルのコマンドやファイルの内容、実行結果を参考にして回答してください。"
@@ -164,12 +177,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   prompt.push(
     "  - 水平線(---)はシステムが区切りとして認識するので、ユーザーへの回答中に水平線を使用することはできません。"
   );
-  prompt.push(
-    "- ユーザーへのメッセージの最後の行の次には水平線 --- を出力してください。"
-  );
-  prompt.push(
-    "- それ以降の行に、ドキュメントの一部を改訂したい場合はその差分を"
-  );
+  prompt.push("- ドキュメントの一部を改訂したい場合はその差分を");
   prompt.push("<<<<<<< SEARCH");
   prompt.push("修正したい元の文章の塊（一字一句違わずに）");
   prompt.push("=======");
@@ -185,6 +193,10 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   prompt.push(
     "  - セクションid、セクション見出し、およびコードブロックの内側を編集することはできません。それ以外の文章のみを編集してください。"
   );
+  prompt.push(
+    "  - 改訂後のドキュメントと同じ内容はユーザーに伝える回答としては省略できます。(修正後のドキュメントを参照してください、など)"
+  );
+
   console.log(prompt);
 
   try {
@@ -193,49 +205,50 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     if (!text) {
       throw new Error("AIからの応答が空でした");
     }
-    let targetSectionId = text
-      .split(/\n-{3,}\n/)
-      .at(0)
-      ?.trim() as SectionId | undefined;
-    if (!targetSectionId) {
+    console.log(JSON.stringify(text));
+    const textMatch = text.match(/^([^\n]*?)\n+([^\n]*?)\n+([\s\S]*)$/);
+    let targetSectionId = textMatch?.at(1)?.trim() as SectionId | undefined;
+    if (
+      !targetSectionId ||
+      !sectionContent.some((s) => s.id === targetSectionId)
+    ) {
       targetSectionId = introSectionId(path);
     }
-    const responseMessage = text
-      .split(/\n-{3,}\n/)
-      .at(1)
-      ?.trim();
-    if (!responseMessage) {
-      throw new Error("AIからの応答が空でした");
+    const title = textMatch?.at(2)?.trim();
+    if (!title) {
+      throw new Error("AIからの応答にタイトルが含まれていませんでした");
     }
+    let responseMessage = textMatch?.at(3)?.trim();
+    if (!responseMessage) {
+      throw new Error("AIからの応答に本文が含まれていませんでした");
+    }
+    const diffRegex =
+      /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g;
     const diffRaw: CreateChatDiff[] = [];
-    for (const m of text
-      .split(/\n-{3,}\n/)
-      .at(2)
-      ?.matchAll(
-        /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g
-      ) ?? []) {
+    for (const m of responseMessage.matchAll(diffRegex) ?? []) {
       const search = m[1];
       const replace = m[2];
       const targetSection = sectionContent.find((s) =>
-        s.rawContent.includes(search)
+        s.replacedContent.includes(search)
       );
-      if (targetSection) {
-        diffRaw.push({
-          search,
-          replace,
-          sectionId: targetSection.id,
-          targetMD5: targetSection.md5,
-        });
-      }
+      diffRaw.push({
+        search,
+        replace,
+        sectionId: targetSection?.id ?? ("" as SectionId),
+        targetMD5: targetSection?.md5 ?? "",
+      });
     }
+    responseMessage = responseMessage.replace(diffRegex, "").trim();
     const newChat = await addChat(
       path,
       targetSectionId,
+      title,
       [
         { role: "user", content: userQuestion },
         { role: "ai", content: responseMessage },
       ],
-      diffRaw
+      diffRaw,
+      await initContext()
     );
     return {
       error: null,

@@ -1,3 +1,5 @@
+"use client";
+
 import { EditorComponent } from "@/terminal/editor";
 import { ExecFile } from "@/terminal/exec";
 import { ReplTerminal } from "@/terminal/repl";

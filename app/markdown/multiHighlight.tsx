@@ -4,6 +4,8 @@ import type { Root, PhrasingContent } from "mdast";
 import { JSX } from "react";
 import { ExtraProps } from "react-markdown";
 import clsx from "clsx";
+import { useChatId } from "@/(docs)/chatAreaState";
+import Link from "next/link";
 
 export interface ReplacedRange {
   start: number;
@@ -97,17 +99,28 @@ export const remarkMultiHighlight: Plugin<[ReplacedRange[]], Root> = (
 export function MultiHighlightTag({
   node,
   className,
+  children,
   ...props
 }: JSX.IntrinsicElements["ins"] & ExtraProps) {
+  const currentChatId = useChatId(); // 現在開いているチャットid
+  const thisChatIds = className ? className.split(" ") : [];
   return (
     <ins
       className={clsx(
         // classNameにチャットidが入っている。
         // 選択しているチャットに対応するdiffのみ濃いハイライトにするなど (TODO)
         className,
-        "underline decoration-dashed underline-offset-[0.2rem] decoration-secondary/50"
+        "underline decoration-dashed underline-offset-[0.2rem] decoration-secondary/50",
+        currentChatId && thisChatIds.includes(currentChatId)
+          ? "bg-secondary/10"
+          : "",
+        "cursor-pointer hover:decoration-solid hover:decoration-secondary/80"
       )}
       {...props}
-    />
+    >
+      <Link href={`/chat/${thisChatIds.at(-1)}`} scroll={false}>
+        {children}
+      </Link>
+    </ins>
   );
 }

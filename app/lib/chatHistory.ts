@@ -1,15 +1,12 @@
-"use server";
-
 import { headers } from "next/headers";
 import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
 import { chat, diff, message, section } from "@/schema/chat";
 import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
-import { revalidateTag, unstable_cacheLife } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
-import { unstable_cacheTag } from "next/cache";
-import { PagePath, SectionId } from "./docs";
+import { getPagesList, LangId, PagePath, PageSlug, SectionId } from "./docs";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -24,8 +21,29 @@ export interface CreateChatDiff {
 
 // cacheに使うキーで、実際のURLではない
 const CACHE_KEY_BASE = "https://my-code.utcode.net/chatHistory";
-function cacheKeyForPage(path: PagePath, userId: string) {
+export function cacheKeyForPage(path: PagePath, userId: string) {
   return `${CACHE_KEY_BASE}/getChat?path=${path.lang}/${path.page}&userId=${userId}`;
+}
+export function cacheKeyForChat(chatId: string) {
+  return `${CACHE_KEY_BASE}/getChatOne?chatId=${chatId}`;
+}
+
+async function revalidateChat(
+  chatId: string,
+  userId: string,
+  pagePath: string | PagePath
+) {
+  if (typeof pagePath === "string") {
+    const [lang, page] = pagePath.split("/") as [LangId, PageSlug];
+    pagePath = { lang, page };
+  }
+  revalidateTag(cacheKeyForChat(chatId));
+  revalidateTag(cacheKeyForPage(pagePath, userId));
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    await cache.delete(cacheKeyForChat(chatId));
+    await cache.delete(cacheKeyForPage(pagePath, userId));
+  }
 }
 
 interface Context {
@@ -34,6 +52,8 @@ interface Context {
   userId?: string;
 }
 /**
+ * drizzleとbetterAuthをまとめて初期化する関数
+ *
  * drizzleが初期化されてなければ初期化し、
  * authが初期化されてなければ初期化し、
  * userIdがなければセッションから取得してセットする。
@@ -62,11 +82,12 @@ export async function initContext(ctx?: Partial<Context>): Promise<Context> {
 export async function addChat(
   path: PagePath,
   sectionId: SectionId,
+  title: string,
   messages: CreateChatMessage[],
   diffRaw: CreateChatDiff[],
-  context?: Partial<Context>
+  context: Context
 ) {
-  const { drizzle, userId } = await initContext(context);
+  const { drizzle, userId } = context;
   if (!userId) {
     throw new Error("Not authenticated");
   }
@@ -75,6 +96,7 @@ export async function addChat(
     .values({
       userId,
       sectionId,
+      title,
     })
     .returning();
 
@@ -89,24 +111,22 @@ export async function addChat(
     )
     .returning();
 
-  const chatDiffs = await drizzle
-    .insert(diff)
-    .values(
-      diffRaw.map((d) => ({
-        chatId: newChat.chatId,
-        ...d,
-      }))
-    )
-    .returning();
-
-  revalidateTag(cacheKeyForPage(path, userId));
-  if (isCloudflare()) {
-    const cache = await caches.open("chatHistory");
-    console.log(
-      `deleting cache for chatHistory/getChat for user ${userId} and docs ${path.lang}/${path.page}`
-    );
-    await cache.delete(cacheKeyForPage(path, userId));
+  let chatDiffs;
+  if (diffRaw.length > 0) {
+    chatDiffs = await drizzle
+      .insert(diff)
+      .values(
+        diffRaw.map((d) => ({
+          chatId: newChat.chatId,
+          ...d,
+        }))
+      )
+      .returning();
+  } else {
+    chatDiffs = [] as never[];
   }
+
+  await revalidateChat(newChat.chatId, userId, path);
 
   return {
     ...newChat,
@@ -121,11 +141,32 @@ export async function addChat(
 
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
 
-export async function getChat(
+export async function deleteChat(chatId: string, context: Context) {
+  const { drizzle, userId } = context;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+  const deletedChat = await drizzle
+    .delete(chat)
+    .where(and(eq(chat.chatId, chatId), eq(chat.userId, userId)))
+    .returning();
+  if (deletedChat.length === 0) {
+    throw new Error("Chat not found or not authorized");
+  }
+  await drizzle.delete(message).where(eq(message.chatId, chatId));
+  await drizzle.delete(diff).where(eq(diff.chatId, chatId));
+
+  const targetSection = await drizzle.query.section.findFirst({
+    where: eq(section.sectionId, deletedChat[0].sectionId),
+  });
+  await revalidateChat(chatId, userId, targetSection?.pagePath ?? "");
+}
+
+export async function getAllChat(
   path: PagePath,
-  context?: Partial<Context>
+  context: Context
 ): Promise<ChatWithMessages[]> {
-  const { drizzle, userId } = await initContext(context);
+  const { drizzle, userId } = context;
   if (!userId) {
     return [];
   }
@@ -167,32 +208,37 @@ export async function getChat(
   // @ts-expect-error なぜかchatsの型にsectionとmessagesが含まれていないことになっているが、正しくwithを指定しているし、console.logしてみるとちゃんと含まれている
   return chats;
 }
-export async function getChatFromCache(path: PagePath, context: Context) {
-  "use cache";
-  unstable_cacheLife("days");
 
-  // cacheされる関数の中でheader()にはアクセスできない。
-  // なので外でinitContext()を呼んだものを引数に渡す必要がある。
-  // しかし、drizzleオブジェクトは外から渡せないのでgetChatの中で改めてinitContext()を呼んでdrizzleだけ再初期化している
-  // こんな意味不明な仕様になっているのはactionから呼ばれる関数とレンダリング時に呼ばれる関数を1ファイルでまとめて定義し共通化しようとしているせい。あとでなんとかする
-  const { auth, userId } = context;
+export async function getChatOne(chatId: string, context: Context) {
+  const { drizzle, userId } = context;
   if (!userId) {
-    return [];
+    throw new Error("Not authenticated");
   }
-  unstable_cacheTag(cacheKeyForPage(path, userId));
+
+  const chatData = (await drizzle.query.chat.findFirst({
+    where: and(eq(chat.chatId, chatId), eq(chat.userId, userId)),
+    with: {
+      section: true,
+      messages: {
+        orderBy: [asc(message.createdAt)],
+      },
+      diff: {
+        orderBy: [asc(diff.createdAt)],
+      },
+    },
+  })) as ChatWithMessages | undefined;
 
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
-    const cachedResponse = await cache.match(cacheKeyForPage(path, userId));
-    if (cachedResponse) {
-      console.log("Cache hit for chatHistory/getChat");
-      const data = (await cachedResponse.json()) as ChatWithMessages[];
-      return data;
-    } else {
-      console.log("Cache miss for chatHistory/getChat");
-    }
+    await cache.put(
+      cacheKeyForChat(chatId),
+      new Response(JSON.stringify(chatData), {
+        headers: { "Cache-Control": "max-age=86400, s-maxage=86400" },
+      })
+    );
   }
-  return await getChat(path, { auth, userId });
+
+  return chatData;
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {
@@ -201,4 +247,22 @@ export async function migrateChatUser(oldUserId: string, newUserId: string) {
     .update(chat)
     .set({ userId: newUserId })
     .where(eq(chat.userId, oldUserId));
+  const pagesList = await getPagesList();
+  for (const lang of pagesList) {
+    for (const page of lang.pages) {
+      revalidateTag(
+        cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
+      );
+    }
+  }
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    for (const lang of pagesList) {
+      for (const page of lang.pages) {
+        await cache.delete(
+          cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
+        );
+      }
+    }
+  }
 }
