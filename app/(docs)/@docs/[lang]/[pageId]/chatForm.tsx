@@ -12,6 +12,7 @@ import { useEmbedContext } from "@/terminal/embedContext";
 import { useChatHistoryContext } from "./chatHistory";
 import { askAI } from "@/actions/chatActions";
 import { PagePath } from "@/lib/docs";
+import { useRouter } from "next/navigation";
 
 interface ChatFormProps {
   path: PagePath;
@@ -30,6 +31,8 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   // const lang = getLanguageName(docs_id);
 
   const { files, replOutputs, execResults } = useEmbedContext();
+
+  const router = useRouter();
 
   // const documentContentInView = sectionContent
   //   .filter((s) => s.inView)
@@ -91,6 +94,7 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
       document.getElementById(result.chat.sectionId)?.scrollIntoView({
         behavior: "smooth",
       });
+      router.push(`/chat/${result.chat.chatId}`, { scroll: false });
       setInputValue("");
       close();
     }
