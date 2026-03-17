@@ -24,6 +24,27 @@ const CACHE_KEY_BASE = "https://my-code.utcode.net/chatHistory";
 export function cacheKeyForPage(path: PagePath, userId: string) {
   return `${CACHE_KEY_BASE}/getChat?path=${path.lang}/${path.page}&userId=${userId}`;
 }
+export function cacheKeyForChat(chatId: string) {
+  return `${CACHE_KEY_BASE}/getChatOne?chatId=${chatId}`;
+}
+
+async function revalidateChat(
+  chatId: string,
+  userId: string,
+  pagePath: string | PagePath
+) {
+  if (typeof pagePath === "string") {
+    const [lang, page] = pagePath.split("/") as [LangId, PageSlug];
+    pagePath = { lang, page };
+  }
+  revalidateTag(cacheKeyForChat(chatId));
+  revalidateTag(cacheKeyForPage(pagePath, userId));
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    await cache.delete(cacheKeyForChat(chatId));
+    await cache.delete(cacheKeyForPage(pagePath, userId));
+  }
+}
 
 interface Context {
   drizzle: Awaited<ReturnType<typeof getDrizzle>>;
@@ -105,14 +126,7 @@ export async function addChat(
     chatDiffs = [] as never[];
   }
 
-  revalidateTag(cacheKeyForPage(path, userId));
-  if (isCloudflare()) {
-    const cache = await caches.open("chatHistory");
-    console.log(
-      `deleting cache for chatHistory/getChat for user ${userId} and docs ${path.lang}/${path.page}`
-    );
-    await cache.delete(cacheKeyForPage(path, userId));
-  }
+  await revalidateChat(newChat.chatId, userId, path);
 
   return {
     ...newChat,
@@ -145,18 +159,7 @@ export async function deleteChat(chatId: string, context: Context) {
   const targetSection = await drizzle.query.section.findFirst({
     where: eq(section.sectionId, deletedChat[0].sectionId),
   });
-  const [lang, page] = (targetSection?.pagePath.split("/") ?? []) as [
-    LangId,
-    PageSlug,
-  ];
-  revalidateTag(cacheKeyForPage({ lang, page }, userId));
-  if (isCloudflare()) {
-    const cache = await caches.open("chatHistory");
-    console.log(
-      `deleting cache for chatHistory/getChat for user ${userId} and docs ${lang}/${page}`
-    );
-    await cache.delete(cacheKeyForPage({ lang, page }, userId));
-  }
+  await revalidateChat(chatId, userId, targetSection?.pagePath ?? "");
 }
 
 export async function getAllChat(

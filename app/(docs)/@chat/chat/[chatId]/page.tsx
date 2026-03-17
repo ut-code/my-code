@@ -1,6 +1,14 @@
-import { getChatOne, initContext } from "@/lib/chatHistory";
+import {
+  cacheKeyForChat,
+  cacheKeyForPage,
+  ChatWithMessages,
+  getChatOne,
+  initContext,
+} from "@/lib/chatHistory";
 import { getMarkdownSections, getPagesList } from "@/lib/docs";
 import { ChatAreaContainer, ChatAreaContent } from "./chatArea";
+import { unstable_cacheLife, unstable_cacheTag } from "next/cache";
+import { isCloudflare } from "@/lib/detectCloudflare";
 
 export default async function ChatPage({
   params,
@@ -9,8 +17,8 @@ export default async function ChatPage({
 }) {
   const { chatId } = await params;
 
-  const ctx = await initContext();
-  const chatData = await getChatOne(chatId, ctx);
+  const context = await initContext();
+  const chatData = await getChatOneFromCache(chatId, context.userId);
 
   if (!chatData) {
     // notFound(); だとページ全体が404になってしまう
@@ -42,4 +50,27 @@ export default async function ChatPage({
       />
     </ChatAreaContainer>
   );
+}
+
+async function getChatOneFromCache(chatId: string, userId?: string) {
+  "use cache";
+  unstable_cacheLife("days");
+  unstable_cacheTag(cacheKeyForChat(chatId));
+
+  if (!userId) {
+    return null;
+  }
+
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    const cachedResponse = await cache.match(cacheKeyForChat(chatId));
+    if (cachedResponse) {
+      const data = (await cachedResponse.json()) as ChatWithMessages;
+      return data;
+    }
+  }
+
+  const context = await initContext({ userId });
+  const chatData = await getChatOne(chatId, context);
+  return chatData;
 }
