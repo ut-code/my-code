@@ -12,7 +12,7 @@ question:
 
 まずは、ビルドシステムを使わずにコンパイラ `rustc` を直接叩いて、Rustプログラムの最小単位を見てみましょう。
 
-以下のコードを記述します。
+`hello.rs` というファイルを作成し、以下のコードを記述します。
 
 ```rust:hello.rs
 fn main() {
@@ -28,6 +28,9 @@ fn main() {
 2.  実行: `./hello` (Windowsなら `.\hello.exe`)
 
 <!-- end list -->
+
+このウェブサイト上の実行環境で動かす場合は、以下の実行ボタンをクリックしてください。
+実行すると、ターミナルに以下のように表示されるはずです。
 
 ```rust-exec:hello.rs
 Hello, world from rustc!

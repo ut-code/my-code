@@ -3,7 +3,6 @@ id: cpp-intro-run
 title: コンパイルと実行
 level: 3
 question:
-  - g++とclang++とclは、それぞれどのコンパイラを使うコマンドですか？
   - '-o mainや/Fe:main.exeは何のために必要ですか？'
   - コンパイルに失敗した場合、どのようなメッセージが表示されますか？
   - なぜPythonやJavaScriptはコンパイルが不要なのですか？

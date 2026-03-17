@@ -2,8 +2,7 @@
 id: cpp-project-build-summary
 title: この章のまとめ
 level: 2
-question:
-  - ヘッダファイルとソースファイルの分割、インクルードガード、ビルドシステムの3つの項目の中で、初心者がまず最初に意識すべきことは何ですか？
+question: []
 ---
 
 ## この章のまとめ

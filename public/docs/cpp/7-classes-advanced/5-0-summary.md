@@ -2,9 +2,7 @@
 id: cpp-classes-advanced-summary
 title: この章のまとめ
 level: 2
-question:
-  - この章で学んだ中で、最も重要で絶対に覚えておくべきことは何ですか？
-  - 各機能は、C++プログラミングのどのような場面で特に役立つことが多いですか？
+question: []
 ---
 
 ## この章のまとめ

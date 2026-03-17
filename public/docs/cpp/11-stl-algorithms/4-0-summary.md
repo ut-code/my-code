@@ -2,9 +2,7 @@
 id: cpp-stl-algorithms-summary
 title: この章のまとめ
 level: 2
-question:
-  - イテレータには様々な種類があるようですが、それらを全て覚える必要はありますか？
-  - この章で学んだことを実務でどのように活かせますか？
+question: []
 ---
 
 ## この章のまとめ
