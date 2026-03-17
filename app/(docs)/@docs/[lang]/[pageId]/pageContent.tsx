@@ -3,7 +3,6 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ChatForm } from "./chatForm";
 import { StyledMarkdown } from "@/markdown/markdown";
-import { useChatHistoryContext } from "./chatHistory";
 import { useSidebarMdContext } from "@/sidebar";
 import clsx from "clsx";
 import { PageTransition } from "./pageTransition";

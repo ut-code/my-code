@@ -77,7 +77,7 @@ export default async function Page({
   );
 }
 
-export async function getChatFromCache(path: PagePath, userId?: string) {
+async function getChatFromCache(path: PagePath, userId?: string) {
   // チャットの取得をキャッシュする。
   // use cacheの仕様で、drizzleオブジェクトとauthオブジェクトは引数に渡せない。
   // 一方、use cacheの関数内でheaders()にはアクセスできない。

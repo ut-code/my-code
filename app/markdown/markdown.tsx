@@ -54,7 +54,7 @@ const components: Components = {
       <table className="table w-max" {...props} />
     </div>
   ),
-  hr: ({ node, ...props }) => null,
+  hr: () => null,
   pre: ({ node, ...props }) => props.children,
   code: AutoCodeBlock,
   ins: MultiHighlightTag,
