@@ -6,6 +6,7 @@ export const chat = pgTable("chat", {
   userId: text("userId").notNull(),
   sectionId: text("sectionId").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
+  title: text("title").notNull().default("new chat"),
 });
 
 export const section = pgTable("section", {

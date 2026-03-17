@@ -156,6 +156,13 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
   );
   prompt.push("- 2行目は水平線 --- を出力してください。");
   prompt.push(
+    "- 次の行に、この質問と回答を後から参照するためのわかりやすいタイトルをつけて記述してください。"
+  );
+  prompt.push(
+    "- 太字やコードブロックなどのMarkdownの記法は使わずテキストのみで出力してください。"
+  );
+  prompt.push("- その次の行は水平線 --- を出力してください。");
+  prompt.push(
     "- それ以降の行に、ドキュメントの内容に基づいて、ユーザーに伝える回答をMarkdown形式で記述してください。"
   );
   prompt.push(
@@ -202,20 +209,27 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
       .split(/\n-{3,}\n/)
       .at(0)
       ?.trim() as SectionId | undefined;
-    if (!targetSectionId) {
+    if (
+      !targetSectionId ||
+      !sectionContent.some((s) => s.id === targetSectionId)
+    ) {
       targetSectionId = introSectionId(path);
+    }
+    const title = text.split(/\n-{3,}\n/).at(1);
+    if (!title) {
+      throw new Error("AIからの応答にタイトルが含まれていませんでした");
     }
     const responseMessage = text
       .split(/\n-{3,}\n/)
-      .at(1)
+      .at(2)
       ?.trim();
     if (!responseMessage) {
-      throw new Error("AIからの応答が空でした");
+      throw new Error("AIからの応答に本文が含まれていませんでした");
     }
     const diffRaw: CreateChatDiff[] = [];
     for (const m of text
       .split(/\n-{3,}\n/)
-      .at(2)
+      .at(3)
       ?.matchAll(
         /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g
       ) ?? []) {
@@ -236,6 +250,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     const newChat = await addChat(
       path,
       targetSectionId,
+      title,
       [
         { role: "user", content: userQuestion },
         { role: "ai", content: responseMessage },

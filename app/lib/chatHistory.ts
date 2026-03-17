@@ -61,6 +61,7 @@ export async function initContext(ctx?: Partial<Context>): Promise<Context> {
 export async function addChat(
   path: PagePath,
   sectionId: SectionId,
+  title: string,
   messages: CreateChatMessage[],
   diffRaw: CreateChatDiff[],
   context: Context
@@ -74,6 +75,7 @@ export async function addChat(
     .values({
       userId,
       sectionId,
+      title,
     })
     .returning();
 
@@ -88,15 +90,20 @@ export async function addChat(
     )
     .returning();
 
-  const chatDiffs = await drizzle
-    .insert(diff)
-    .values(
-      diffRaw.map((d) => ({
-        chatId: newChat.chatId,
-        ...d,
-      }))
-    )
-    .returning();
+  let chatDiffs;
+  if (diffRaw.length > 0) {
+    chatDiffs = await drizzle
+      .insert(diff)
+      .values(
+        diffRaw.map((d) => ({
+          chatId: newChat.chatId,
+          ...d,
+        }))
+      )
+      .returning();
+  } else {
+    chatDiffs = [] as never[];
+  }
 
   revalidateTag(cacheKeyForPage(path, userId));
   if (isCloudflare()) {

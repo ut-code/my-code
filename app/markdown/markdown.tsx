@@ -54,7 +54,7 @@ const components: Components = {
       <table className="table w-max" {...props} />
     </div>
   ),
-  hr: ({ node, ...props }) => <hr className="border-accent my-4" {...props} />,
+  hr: ({ node, ...props }) => null,
   pre: ({ node, ...props }) => props.children,
   code: AutoCodeBlock,
   ins: MultiHighlightTag,

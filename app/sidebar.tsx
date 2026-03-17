@@ -147,7 +147,7 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
               strokeLinejoin="round"
             />
           </svg>
-          <span className="text-lg">Close</span>
+          <span className="text-lg">閉じる</span>
         </label>
       </span>
 
