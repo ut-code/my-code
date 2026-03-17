@@ -1,12 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageContent } from "./pageContent";
-import { ChatHistoryProvider } from "./chatHistory";
 import {
   cacheKeyForPage,
   ChatWithMessages,
   getAllChat,
-  getChatFromCache,
   initContext,
 } from "@/lib/chatHistory";
 import {
@@ -60,22 +58,18 @@ export default async function Page({
   const sections = await getMarkdownSections(lang, pageId);
 
   const context = await initContext();
-  const initialChatHistories = await getChatFromCache(path, context.userId);
+  const chatHistories = await getChatFromCache(path, context.userId);
 
   return (
-    <ChatHistoryProvider
-      initialChatHistories={initialChatHistories}
+    <PageContent
+      chatHistories={chatHistories}
+      splitMdContent={sections}
+      langEntry={langEntry}
+      pageEntry={pageEntry}
+      prevPage={prevPage}
+      nextPage={nextPage}
       path={path}
-    >
-      <PageContent
-        splitMdContent={sections}
-        langEntry={langEntry}
-        pageEntry={pageEntry}
-        prevPage={prevPage}
-        nextPage={nextPage}
-        path={path}
-      />
-    </ChatHistoryProvider>
+    />
   );
 }
 

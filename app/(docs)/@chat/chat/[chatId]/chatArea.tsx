@@ -1,7 +1,5 @@
 "use client";
 
-import { useChatHistoryContext } from "@/(docs)/@docs/[lang]/[pageId]/chatHistory";
-import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
 import { deleteChatAction } from "@/actions/deleteChat";
 import { ChatWithMessages } from "@/lib/chatHistory";
 import { LanguageEntry, MarkdownSection, PageEntry } from "@/lib/docs";
@@ -9,6 +7,7 @@ import { Heading } from "@/markdown/heading";
 import { StyledMarkdown } from "@/markdown/markdown";
 import clsx from "clsx";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Props {
   chatId: string;
@@ -28,45 +27,10 @@ export function ChatAreaContent(props: Props) {
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 
-  // useChatHistoryContext must be used within a ChatHistoryProvider
-  // const { deleteChat } = useChatHistoryContext();
-
+  const router = useRouter();
 
   return (
-    <aside
-      className={clsx(
-        // モバイルでは全画面表示する
-        "fixed inset-0 pt-20 bg-base-100",
-        // PCではスクロールで動かない右サイドバー
-        "lg:sticky lg:top-0 lg:pt-4 lg:w-1/3 lg:h-screen lg:shadow-md lg:bg-base-200 ",
-        "p-4",
-        "flex flex-col",
-        "overflow-y-auto"
-      )}
-    >
-      <ChatAreaStateUpdater chatId={chatId} />
-      <div className="flex flex-row items-center">
-        <span className="flex-1 text-base font-bold opacity-40">
-          AIへの質問
-        </span>
-        <Link className="btn btn-ghost" href="/chat" scroll={false}>
-          <svg
-            className="w-8 h-8 -scale-x-100"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18 17L13 12L18 7M11 17L6 12L11 7"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="text-lg">閉じる</span>
-        </Link>
-      </div>
+    <>
       <Heading level={2} className="mt-2!">
         {chatData.title}
       </Heading>
@@ -98,7 +62,8 @@ export function ChatAreaContent(props: Props) {
           onClick={async () => {
             if (confirm("このチャットを削除してもよろしいですか?")) {
               await deleteChatAction(chatId);
-              // deleteChat(chatId);
+              router.push("/chat", { scroll: false });
+              router.refresh();
             }
           }}
         >
@@ -191,6 +156,6 @@ export function ChatAreaContent(props: Props) {
           </div>
         )
       )}
-    </aside>
+    </>
   );
 }

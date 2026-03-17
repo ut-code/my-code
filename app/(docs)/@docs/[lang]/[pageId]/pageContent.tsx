@@ -18,6 +18,7 @@ import { ReplacedRange } from "@/markdown/multiHighlight";
 import { Heading } from "@/markdown/heading";
 import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
+import { ChatWithMessages } from "@/lib/chatHistory";
 
 /**
  * MarkdownSectionに追加で、動的な情報を持たせる
@@ -41,12 +42,11 @@ interface PageContentProps {
   prevPage?: PageEntry;
   nextPage?: PageEntry;
   path: PagePath;
+  chatHistories: ChatWithMessages[];
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
-  const { splitMdContent, pageEntry, path } = props;
-
-  const { chatHistories } = useChatHistoryContext();
+  const { splitMdContent, pageEntry, path, chatHistories } = props;
 
   const initDynamicMdContent = useCallback(() => {
     const newContent: DynamicMarkdownSection[] = splitMdContent.map(
@@ -192,6 +192,7 @@ export function PageContent(props: PageContentProps) {
               <ChatListForSection
                 sectionId={section.id}
                 dynamicMdContent={dynamicMdContent}
+                chatHistories={chatHistories}
               />
             </div>
           </Fragment>
@@ -227,9 +228,9 @@ export function PageContent(props: PageContentProps) {
 function ChatListForSection(props: {
   dynamicMdContent: DynamicMarkdownSection[];
   sectionId: SectionId;
+  chatHistories: ChatWithMessages[];
 }) {
-  const { chatHistories } = useChatHistoryContext();
-  const { dynamicMdContent, sectionId } = props;
+  const { dynamicMdContent, sectionId, chatHistories } = props;
   const filteredChatHistories = chatHistories.filter(
     (c) =>
       c.sectionId === sectionId ||

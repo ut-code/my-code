@@ -6,7 +6,7 @@ import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
 import { revalidateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
-import { PagePath, SectionId } from "./docs";
+import { getPagesList, LangId, PagePath, PageSlug, SectionId } from "./docs";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -127,6 +127,38 @@ export async function addChat(
 
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
 
+export async function deleteChat(chatId: string, context: Context) {
+  const { drizzle, userId } = context;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+  const deletedChat = await drizzle
+    .delete(chat)
+    .where(and(eq(chat.chatId, chatId), eq(chat.userId, userId)))
+    .returning();
+  if (deletedChat.length === 0) {
+    throw new Error("Chat not found or not authorized");
+  }
+  await drizzle.delete(message).where(eq(message.chatId, chatId));
+  await drizzle.delete(diff).where(eq(diff.chatId, chatId));
+
+  const targetSection = await drizzle.query.section.findFirst({
+    where: eq(section.sectionId, deletedChat[0].sectionId),
+  });
+  const [lang, page] = (targetSection?.pagePath.split("/") ?? []) as [
+    LangId,
+    PageSlug,
+  ];
+  revalidateTag(cacheKeyForPage({ lang, page }, userId));
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    console.log(
+      `deleting cache for chatHistory/getChat for user ${userId} and docs ${lang}/${page}`
+    );
+    await cache.delete(cacheKeyForPage({ lang, page }, userId));
+  }
+}
+
 export async function getAllChat(
   path: PagePath,
   context: Context
@@ -200,4 +232,22 @@ export async function migrateChatUser(oldUserId: string, newUserId: string) {
     .update(chat)
     .set({ userId: newUserId })
     .where(eq(chat.userId, oldUserId));
+  const pagesList = await getPagesList();
+  for (const lang of pagesList) {
+    for (const page of lang.pages) {
+      revalidateTag(
+        cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
+      );
+    }
+  }
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    for (const lang of pagesList) {
+      for (const page of lang.pages) {
+        await cache.delete(
+          cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
+        );
+      }
+    }
+  }
 }

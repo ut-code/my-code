@@ -9,7 +9,6 @@ import { useState, FormEvent, useEffect } from "react";
 // import { getLanguageName } from "../pagesList";
 import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "@/terminal/embedContext";
-import { useChatHistoryContext } from "./chatHistory";
 import { askAI } from "@/actions/chatActions";
 import { PagePath } from "@/lib/docs";
 import { useRouter } from "next/navigation";
@@ -25,8 +24,6 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const { addChat } = useChatHistoryContext();
 
   // const lang = getLanguageName(docs_id);
 
@@ -90,11 +87,11 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
       setErrorMessage(result.error);
       console.log(result.error);
     } else {
-      addChat(result.chat);
       document.getElementById(result.chat.sectionId)?.scrollIntoView({
         behavior: "smooth",
       });
       router.push(`/chat/${result.chat.chatId}`, { scroll: false });
+      router.refresh();
       setInputValue("");
       close();
     }
