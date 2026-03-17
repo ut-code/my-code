@@ -2,13 +2,22 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageContent } from "./pageContent";
 import { ChatHistoryProvider } from "./chatHistory";
-import { getChatFromCache, initContext } from "@/lib/chatHistory";
+import {
+  cacheKeyForPage,
+  ChatWithMessages,
+  getAllChat,
+  getChatFromCache,
+  initContext,
+} from "@/lib/chatHistory";
 import {
   getMarkdownSections,
   getPagesList,
   LangId,
+  PagePath,
   PageSlug,
 } from "@/lib/docs";
+import { unstable_cacheLife, unstable_cacheTag } from "next/cache";
+import { isCloudflare } from "@/lib/detectCloudflare";
 
 export async function generateMetadata({
   params,
@@ -38,7 +47,8 @@ export default async function Page({
   const { lang, pageId } = await params;
   const pagesList = await getPagesList();
   const langEntry = pagesList.find((l) => l.id === lang);
-  const pageEntryIndex = langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
+  const pageEntryIndex =
+    langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
   const pageEntry = langEntry?.pages[pageEntryIndex];
   if (!langEntry || !pageEntry) notFound();
 
@@ -50,7 +60,7 @@ export default async function Page({
   const sections = await getMarkdownSections(lang, pageId);
 
   const context = await initContext();
-  const initialChatHistories = await getChatFromCache(path, context);
+  const initialChatHistories = await getChatFromCache(path, context.userId);
 
   return (
     <ChatHistoryProvider
@@ -67,4 +77,32 @@ export default async function Page({
       />
     </ChatHistoryProvider>
   );
+}
+
+export async function getChatFromCache(path: PagePath, userId?: string) {
+  // チャットの取得をキャッシュする。
+  // use cacheの仕様で、drizzleオブジェクトとauthオブジェクトは引数に渡せない。
+  // 一方、use cacheの関数内でheaders()にはアクセスできない。
+  // したがって、外でheaders()を使ってuserIdを取得した後、関数の中で再度drizzleを初期化しないといけない。
+  "use cache";
+  unstable_cacheLife("days");
+
+  if (!userId) {
+    return [];
+  }
+  unstable_cacheTag(cacheKeyForPage(path, userId));
+
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    const cachedResponse = await cache.match(cacheKeyForPage(path, userId));
+    if (cachedResponse) {
+      // console.log("Cache hit for chatHistory/getChat");
+      const data = (await cachedResponse.json()) as ChatWithMessages[];
+      return data;
+    } else {
+      // console.log("Cache miss for chatHistory/getChat");
+    }
+  }
+  const ctx = await initContext({ userId });
+  return await getAllChat(path, ctx);
 }

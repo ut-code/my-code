@@ -1,6 +1,7 @@
 "use client";
 
-import { ChatWithMessages, getChat } from "@/lib/chatHistory";
+import { getChatAllWithoutCache } from "@/actions/getChatAll";
+import { ChatWithMessages } from "@/lib/chatHistory";
 import { PagePath } from "@/lib/docs";
 import {
   createContext,
@@ -45,7 +46,7 @@ export function ChatHistoryProvider({
   // その後、クライアント側で最新のchatHistoriesを改めて取得して更新する
   const { data: fetchedChatHistories } = useSWR<ChatWithMessages[]>(
     path,
-    getChat,
+    getChatAllWithoutCache,
     {
       // リクエストは古くても構わないので1回でいい
       revalidateIfStale: false,

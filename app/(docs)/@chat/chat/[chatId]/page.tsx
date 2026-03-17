@@ -1,4 +1,5 @@
 import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
+import { getChatOne, initContext } from "@/lib/chatHistory";
 import { StyledMarkdown } from "@/markdown/markdown";
 import clsx from "clsx";
 import Link from "next/link";
@@ -10,11 +11,8 @@ export default async function ChatPage({
 }) {
   const { chatId } = await params;
 
-  // TODO: 実際のchatを取得
-  const messages = [
-    { role: "user", content: "a" },
-    { role: "ai", content: "b" },
-  ];
+  const ctx = await initContext();
+  const chatData = await getChatOne(chatId, ctx);
 
   return (
     <aside
@@ -31,7 +29,7 @@ export default async function ChatPage({
       <Link className="btn" href="/chat">
         閉じる
       </Link>
-      {messages.map((msg, index) => (
+      {chatData?.messages.map((msg, index) => (
         <div
           key={index}
           className={`chat ${msg.role === "user" ? "chat-end" : "chat-start"}`}

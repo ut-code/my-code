@@ -4,7 +4,12 @@
 import { generateContent } from "./gemini";
 import { DynamicMarkdownSection } from "../[lang]/[pageId]/pageContent";
 import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
-import { addChat, ChatWithMessages, CreateChatDiff } from "@/lib/chatHistory";
+import {
+  addChat,
+  ChatWithMessages,
+  CreateChatDiff,
+  initContext,
+} from "@/lib/chatHistory";
 import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
 
 type ChatResult =
@@ -235,7 +240,8 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
         { role: "user", content: userQuestion },
         { role: "ai", content: responseMessage },
       ],
-      diffRaw
+      diffRaw,
+      await initContext()
     );
     return {
       error: null,

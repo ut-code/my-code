@@ -1,14 +1,11 @@
-"use server";
-
 import { headers } from "next/headers";
 import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
 import { chat, diff, message, section } from "@/schema/chat";
 import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
-import { revalidateTag, unstable_cacheLife } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
-import { unstable_cacheTag } from "next/cache";
 import { PagePath, SectionId } from "./docs";
 
 export interface CreateChatMessage {
@@ -24,7 +21,7 @@ export interface CreateChatDiff {
 
 // cacheに使うキーで、実際のURLではない
 const CACHE_KEY_BASE = "https://my-code.utcode.net/chatHistory";
-function cacheKeyForPage(path: PagePath, userId: string) {
+export function cacheKeyForPage(path: PagePath, userId: string) {
   return `${CACHE_KEY_BASE}/getChat?path=${path.lang}/${path.page}&userId=${userId}`;
 }
 
@@ -34,6 +31,8 @@ interface Context {
   userId?: string;
 }
 /**
+ * drizzleとbetterAuthをまとめて初期化する関数
+ *
  * drizzleが初期化されてなければ初期化し、
  * authが初期化されてなければ初期化し、
  * userIdがなければセッションから取得してセットする。
@@ -64,9 +63,9 @@ export async function addChat(
   sectionId: SectionId,
   messages: CreateChatMessage[],
   diffRaw: CreateChatDiff[],
-  context?: Partial<Context>
+  context: Context
 ) {
-  const { drizzle, userId } = await initContext(context);
+  const { drizzle, userId } = context;
   if (!userId) {
     throw new Error("Not authenticated");
   }
@@ -121,11 +120,11 @@ export async function addChat(
 
 export type ChatWithMessages = Awaited<ReturnType<typeof addChat>>;
 
-export async function getChat(
+export async function getAllChat(
   path: PagePath,
-  context?: Partial<Context>
+  context: Context
 ): Promise<ChatWithMessages[]> {
-  const { drizzle, userId } = await initContext(context);
+  const { drizzle, userId } = context;
   if (!userId) {
     return [];
   }
@@ -167,32 +166,29 @@ export async function getChat(
   // @ts-expect-error なぜかchatsの型にsectionとmessagesが含まれていないことになっているが、正しくwithを指定しているし、console.logしてみるとちゃんと含まれている
   return chats;
 }
-export async function getChatFromCache(path: PagePath, context: Context) {
-  "use cache";
-  unstable_cacheLife("days");
 
-  // cacheされる関数の中でheader()にはアクセスできない。
-  // なので外でinitContext()を呼んだものを引数に渡す必要がある。
-  // しかし、drizzleオブジェクトは外から渡せないのでgetChatの中で改めてinitContext()を呼んでdrizzleだけ再初期化している
-  // こんな意味不明な仕様になっているのはactionから呼ばれる関数とレンダリング時に呼ばれる関数を1ファイルでまとめて定義し共通化しようとしているせい。あとでなんとかする
-  const { auth, userId } = context;
+export async function getChatOne(chatId: string, context: Context) {
+  const { drizzle, userId } = context;
   if (!userId) {
-    return [];
+    throw new Error("Not authenticated");
   }
-  unstable_cacheTag(cacheKeyForPage(path, userId));
 
-  if (isCloudflare()) {
-    const cache = await caches.open("chatHistory");
-    const cachedResponse = await cache.match(cacheKeyForPage(path, userId));
-    if (cachedResponse) {
-      console.log("Cache hit for chatHistory/getChat");
-      const data = (await cachedResponse.json()) as ChatWithMessages[];
-      return data;
-    } else {
-      console.log("Cache miss for chatHistory/getChat");
-    }
-  }
-  return await getChat(path, { auth, userId });
+  return (await drizzle.query.chat.findFirst({
+    where: and(eq(chat.chatId, chatId), eq(chat.userId, userId)),
+    with: {
+      section: true,
+      messages: {
+        orderBy: [asc(message.createdAt)],
+      },
+      diff: {
+        orderBy: [asc(diff.createdAt)],
+      },
+    },
+  })) as typeof chat.$inferSelect & {
+    section: typeof section.$inferSelect;
+    messages: (typeof message.$inferSelect)[];
+    diff: (typeof diff.$inferSelect)[];
+  };
 }
 
 export async function migrateChatUser(oldUserId: string, newUserId: string) {
