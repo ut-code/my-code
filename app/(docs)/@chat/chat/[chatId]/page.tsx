@@ -25,6 +25,13 @@ export default async function ChatPage({
   const sections = await getMarkdownSections(targetLang!.id, targetPage!.slug);
   const targetSection = sections.find((sec) => sec.id === chatData.sectionId);
 
+  const messagesAndDiffs = [
+    ...chatData.messages.map((msg) => ({ type: "message" as const, ...msg })),
+    ...chatData.diff.map((diff) => ({ type: "diff" as const, ...diff })),
+  ];
+  messagesAndDiffs.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
   return (
     <aside
       className={clsx(
@@ -61,23 +68,45 @@ export default async function ChatPage({
       <Link className="btn" href="/chat">
         閉じる
       </Link>
-      {chatData?.messages.map((msg, index) =>
-        msg.role === "user" ? (
-          <div key={index} className="chat chat-end">
-            <div
-              className="chat-bubble p-0.5! bg-secondary/30"
-              style={{ maxWidth: "100%", wordBreak: "break-word" }}
-            >
+      {messagesAndDiffs.map((msg, index) =>
+        msg.type === "message" ? (
+          msg.role === "user" ? (
+            <div key={index} className="chat chat-end">
+              <div
+                className="chat-bubble p-0.5! bg-secondary/30"
+                style={{ maxWidth: "100%", wordBreak: "break-word" }}
+              >
+                <StyledMarkdown content={msg.content} />
+              </div>
+            </div>
+          ) : msg.role === "ai" ? (
+            <div key={index} className="">
               <StyledMarkdown content={msg.content} />
             </div>
-          </div>
-        ) : msg.role === "ai" ? (
-          <div key={index} className="">
-            <StyledMarkdown content={msg.content} />
-          </div>
+          ) : (
+            <div key={index} className="text-error">
+              {msg.content}
+            </div>
+          )
         ) : (
-          <div key={index} className="text-error">
-            {msg.content}
+          <div
+            key={index}
+            className={clsx(
+              "bg-base-300 rounded-lg border border-2 border-secondary/50"
+            )}
+          >
+            {/* pb-0だとmargin collapsingが起きて変な隙間が空く */}
+            <del
+              className={clsx(
+                "block p-2 pb-[1px] bg-error/10",
+                "line-through decoration-[color-mix(in_oklab,var(--color-error)_70%,currentColor)]"
+              )}
+            >
+              <StyledMarkdown content={msg.search} />
+            </del>
+            <ins className="block no-underline p-2 pt-[1px] bg-success/10">
+              <StyledMarkdown content={msg.replace} />
+            </ins>
           </div>
         )
       )}
