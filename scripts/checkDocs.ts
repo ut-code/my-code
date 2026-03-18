@@ -50,6 +50,8 @@ if (doWrite) {
   }).trim();
 }
 
+let hasNewRevision = false;
+
 const langEntries = await getPagesList();
 
 const revisionsPrevYml = existsSync(join(docsDir, "revisions.yml"))
@@ -70,6 +72,7 @@ for (const lang of langEntries) {
           // ドキュメントが変更された場合
           console.warn(`${section.id} has new md5: ${section.md5}`);
           if (doWrite) {
+            hasNewRevision = true;
             revisions[section.id].rev.push({
               md5: section.md5,
               git: commit,
@@ -83,6 +86,7 @@ for (const lang of langEntries) {
         // ドキュメントが新規追加された場合
         console.warn(`${section.id} is new section`);
         if (doWrite) {
+          hasNewRevision = true;
           revisions[section.id] = {
             rev: [
               {
@@ -142,4 +146,23 @@ if (doWrite) {
       revisionsYml,
     "utf-8"
   );
+
+  if (hasNewRevision) {
+    const commitsYml = yaml.load(
+      await readFile(join(docsDir, "commits.yml"), "utf-8")
+    ) as Record<string, string>;
+    commitsYml[commit] = execFileSync(
+      "git",
+      ["show", "-s", "--format=%cI", commit],
+      {
+        encoding: "utf8",
+      }
+    ).trim();
+    await writeFile(
+      join(docsDir, "commits.yml"),
+      "# This file will be updated by CI. Do not edit manually.\n" +
+        yaml.dump(commitsYml, { sortKeys: true }),
+      "utf-8"
+    );
+  }
 }

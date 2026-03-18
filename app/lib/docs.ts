@@ -95,6 +95,9 @@ export interface RevisionYmlEntry {
    * `langId/pageSlug`
    */
   page: string;
+  /**
+   * revisionのリストは末尾が最新のはず。
+   */
   rev: SectionRevision[];
 }
 export interface SectionRevision {
@@ -182,6 +185,25 @@ export async function getRevisions(
   return (yaml.load(revisionsYml) as Record<string, RevisionYmlEntry>)[
     sectionId
   ];
+}
+
+const commitDateCache = new Map<string, Promise<Date>>();
+export async function getCommitDate(id: string): Promise<Date> {
+  if (commitDateCache.has(id)) {
+    return commitDateCache.get(id)!;
+  }
+  const p = (async () => {
+    const commitInfoYml = await readPublicFile(`docs/commits.yml`);
+    const commitInfo = yaml.load(commitInfoYml) as Record<string, string>;
+    const timestamp = commitInfo[id];
+    if (timestamp) {
+      return new Date(timestamp);
+    } else {
+      throw new Error(`Commit date for id=${id} not found`);
+    }
+  })();
+  commitDateCache.set(id, p);
+  return p;
 }
 
 /**
