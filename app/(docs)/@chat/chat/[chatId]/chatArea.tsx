@@ -10,7 +10,7 @@ import { StyledMarkdown } from "@/markdown/markdown";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode } from "react";
 
 export function ChatAreaContainer(props: {
   chatId: string;
