@@ -11,7 +11,8 @@ import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { PagePath } from "@/lib/docs";
 import { useRouter } from "next/navigation";
-import { useStreamingChat } from "@/(docs)/streamingChatContext";
+import { ChatStreamEvent } from "@/api/chat/route";
+import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
 
 interface ChatFormProps {
   path: PagePath;
@@ -30,7 +31,7 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   const { files, replOutputs, execResults } = useEmbedContext();
 
   const router = useRouter();
-  const streamingChat = useStreamingChat();
+  const streamingChatContext = useStreamingChatContext();
 
   // const documentContentInView = sectionContent
   //   .filter((s) => s.inView)
@@ -101,65 +102,60 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
     let navigated = false;
 
     // ストリームを非同期で読み続ける（ナビゲーション後もバックグラウンドで継続）
-    const readStream = async () => {
-      while (true) {
-        let result: ReadableStreamReadResult<Uint8Array>;
-        try {
-          result = await reader.read();
-        } catch (err) {
-          console.error("Stream connection interrupted:", err);
-          break;
-        }
-        const { done, value } = result;
-        if (done) break;
+    void (async () => {
+      try {
+        while (true) {
+          const result = await reader.read();
+          const { done, value } = result;
+          if (done) break;
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
 
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const event = JSON.parse(line) as
-              | { type: "chat"; chatId: string; sectionId: string }
-              | { type: "chunk"; text: string }
-              | { type: "done" }
-              | { type: "error"; message: string };
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const event = JSON.parse(line) as ChatStreamEvent;
 
-            if (event.type === "chat") {
-              streamingChat.startStreaming(event.chatId, userQuestion);
-              document.getElementById(event.sectionId)?.scrollIntoView({
-                behavior: "smooth",
-              });
-              router.push(`/chat/${event.chatId}`, { scroll: false });
-              navigated = true;
-              setIsLoading(false);
-              setInputValue("");
-              close();
-            } else if (event.type === "chunk") {
-              streamingChat.appendChunk(event.text);
-            } else if (event.type === "done") {
-              streamingChat.finishStreaming();
-            } else if (event.type === "error") {
-              if (!navigated) {
-                setErrorMessage(event.message);
+              if (event.type === "chat") {
+                streamingChatContext.startStreaming(event.chatId);
+                document.getElementById(event.sectionId)?.scrollIntoView({
+                  behavior: "smooth",
+                });
+                router.push(`/chat/${event.chatId}`, { scroll: false });
+                router.refresh();
+                navigated = true;
                 setIsLoading(false);
+                setInputValue("");
+                close();
+              } else if (event.type === "chunk") {
+                streamingChatContext.appendChunk(event.text);
+              } else if (event.type === "done") {
+                streamingChatContext.finishStreaming();
+                router.refresh();
+              } else if (event.type === "error") {
+                if (!navigated) {
+                  setErrorMessage(event.message);
+                  setIsLoading(false);
+                }
+                streamingChatContext.finishStreaming();
               }
-              streamingChat.finishStreaming();
+            } catch {
+              // ignore JSON parse errors
             }
-          } catch {
-            // ignore JSON parse errors
           }
         }
+      } catch (err) {
+        console.error("Stream reading failed:", err);
+        // ナビゲーション後のエラーはストリーミングを終了してローディングを止める
+        if (!navigated) {
+          setErrorMessage(String(err));
+          setIsLoading(false);
+        }
+        streamingChatContext.finishStreaming();
       }
-    };
-
-    // ストリーム読み込みはバックグラウンドで継続（awaitしない）
-    readStream().catch((err) => {
-      console.error("Stream reading failed:", err);
-      // ナビゲーション後のエラーはストリーミングを終了してローディングを止める
-      streamingChat.finishStreaming();
-    });
+    })();
   };
 
   return (

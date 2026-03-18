@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { generateContentStream } from "@/lib/ai";
 import {
+  addChat,
   addMessagesAndDiffs,
-  createChatOnly,
   CreateChatDiff,
   initContext,
 } from "@/lib/chatHistory";
@@ -19,7 +19,7 @@ type ChatParams = {
   execResults: Record<string, ReplOutput[]>;
 };
 
-type StreamEvent =
+export type ChatStreamEvent =
   | { type: "chat"; chatId: string; sectionId: string }
   | { type: "chunk"; text: string }
   | { type: "done" }
@@ -181,11 +181,13 @@ export async function POST(request: NextRequest) {
     "  - 改訂後のドキュメントと同じ内容はユーザーに伝える回答としては省略できます。(修正後のドキュメントを参照してください、など)"
   );
 
+  console.log(prompt);
+
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async start(controller) {
-      function send(event: StreamEvent) {
+      function send(event: ChatStreamEvent) {
         controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
       }
 
@@ -199,6 +201,8 @@ export async function POST(request: NextRequest) {
           userQuestion,
           prompt.join("\n")
         )) {
+          console.log("Received chunk:", [chunk]);
+        
           fullText += chunk;
 
           if (!headerParsed) {
@@ -226,10 +230,12 @@ export async function POST(request: NextRequest) {
               }
 
               // Create chat record in DB immediately
-              const newChat = await createChatOnly(
+              const newChat = await addChat(
                 path,
                 targetSectionId,
                 title,
+                [{ role: "user", content: userQuestion }],
+                [],
                 context
               );
               chatId = newChat.chatId;
@@ -289,7 +295,6 @@ export async function POST(request: NextRequest) {
           chatId,
           path,
           [
-            { role: "user", content: userQuestion },
             { role: "ai", content: cleanMessage },
           ],
           diffRaw,

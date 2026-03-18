@@ -1,69 +1,54 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 
-export interface StreamingChatState {
-  streamingChatId: string | null;
-  userQuestion: string;
-  streamingContent: string;
-  isStreaming: boolean;
-}
-
-interface StreamingChatActions {
-  startStreaming: (chatId: string, userQuestion: string) => void;
+interface StreamingChatContextData {
+  chatId: string | null;
+  content: string;
+  startStreaming: (chatId: string) => void;
   appendChunk: (chunk: string) => void;
   finishStreaming: () => void;
-  clearStreaming: () => void;
 }
 
-const StreamingChatContext = createContext<
-  StreamingChatState & StreamingChatActions
->(null!);
+const StreamingChatContext = createContext<StreamingChatContextData>(null!);
 
-export function useStreamingChat() {
+export function useStreamingChatContext() {
   return useContext(StreamingChatContext);
 }
 
 export function StreamingChatProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<StreamingChatState>({
-    streamingChatId: null,
-    userQuestion: "",
-    streamingContent: "",
-    isStreaming: false,
-  });
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [content, setContent] = useState("");
 
-  const startStreaming = (chatId: string, userQuestion: string) => {
-    setState({
-      streamingChatId: chatId,
-      userQuestion,
-      streamingContent: "",
-      isStreaming: true,
-    });
-  };
+  const startStreaming = useCallback((chatId: string) => {
+    setContent("");
+    setChatId(chatId);
+  }, []);
 
-  const appendChunk = (chunk: string) => {
-    setState((prev) => ({
-      ...prev,
-      streamingContent: prev.streamingContent + chunk,
-    }));
-  };
+  const appendChunk = useCallback((chunk: string) => {
+    setContent((prev) => prev + chunk);
+  }, []);
 
-  const finishStreaming = () => {
-    setState((prev) => ({ ...prev, isStreaming: false }));
-  };
-
-  const clearStreaming = () => {
-    setState({
-      streamingChatId: null,
-      userQuestion: "",
-      streamingContent: "",
-      isStreaming: false,
-    });
-  };
+  const finishStreaming = useCallback(() => {
+    setChatId(null);
+    setContent("");
+  }, []);
 
   return (
     <StreamingChatContext.Provider
-      value={{ ...state, startStreaming, appendChunk, finishStreaming, clearStreaming }}
+      value={{
+        chatId,
+        content,
+        startStreaming,
+        appendChunk,
+        finishStreaming,
+      }}
     >
       {children}
     </StreamingChatContext.Provider>
