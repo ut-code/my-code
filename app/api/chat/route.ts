@@ -6,18 +6,26 @@ import {
   CreateChatDiff,
   initContext,
 } from "@/lib/chatHistory";
-import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
-import { DynamicMarkdownSection } from "@/(docs)/@docs/[lang]/[pageId]/pageContent";
-import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import {
+  DynamicMarkdownSectionSchema,
+  getPagesList,
+  introSectionId,
+  PagePathSchema,
+  SectionId,
+} from "@/lib/docs";
+import { ReplCommandSchema, ReplOutputSchema } from "@my-code/runtime/interface";
+import { z } from "zod";
 
-type ChatParams = {
-  path: PagePath;
-  userQuestion: string;
-  sectionContent: DynamicMarkdownSection[];
-  replOutputs: Record<string, ReplCommand[]>;
-  files: Record<string, string>;
-  execResults: Record<string, ReplOutput[]>;
-};
+const ChatParamsSchema = z.object({
+  path: PagePathSchema,
+  userQuestion: z.string().min(1),
+  sectionContent: z.array(DynamicMarkdownSectionSchema),
+  replOutputs: z.record(z.string(), z.array(ReplCommandSchema)),
+  files: z.record(z.string(), z.string()),
+  execResults: z.record(z.string(), z.array(ReplOutputSchema)),
+});
+
+type ChatParams = z.output<typeof ChatParamsSchema>;
 
 export type ChatStreamEvent =
   | { type: "chat"; chatId: string; sectionId: string }
@@ -31,7 +39,14 @@ export async function POST(request: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const params = (await request.json()) as ChatParams;
+  const parseResult = ChatParamsSchema.safeParse(await request.json());
+  if (!parseResult.success) {
+    return new Response(
+      parseResult.error.issues.map((e) => e.message).join(", "),
+      { status: 400 }
+    );
+  }
+  const params: ChatParams = parseResult.data;
   const { path, userQuestion, sectionContent, replOutputs, files, execResults } =
     params;
 
