@@ -13,7 +13,10 @@ import {
   PagePathSchema,
   SectionId,
 } from "@/lib/docs";
-import { ReplCommandSchema, ReplOutputSchema } from "@my-code/runtime/interface";
+import {
+  ReplCommandSchema,
+  ReplOutputSchema,
+} from "@my-code/runtime/interface";
 import { z } from "zod";
 
 const ChatParamsSchema = z.object({
@@ -24,8 +27,6 @@ const ChatParamsSchema = z.object({
   files: z.record(z.string(), z.string()),
   execResults: z.record(z.string(), z.array(ReplOutputSchema)),
 });
-
-type ChatParams = z.output<typeof ChatParamsSchema>;
 
 export type ChatStreamEvent =
   | { type: "chat"; chatId: string; sectionId: string }
@@ -41,14 +42,16 @@ export async function POST(request: NextRequest) {
 
   const parseResult = ChatParamsSchema.safeParse(await request.json());
   if (!parseResult.success) {
-    return new Response(
-      parseResult.error.issues.map((e) => e.message).join(", "),
-      { status: 400 }
-    );
+    return new Response(JSON.stringify(parseResult.error), { status: 400 });
   }
-  const params: ChatParams = parseResult.data;
-  const { path, userQuestion, sectionContent, replOutputs, files, execResults } =
-    params;
+  const {
+    path,
+    userQuestion,
+    sectionContent,
+    replOutputs,
+    files,
+    execResults,
+  } = parseResult.data;
 
   const pagesList = await getPagesList();
   const langName = pagesList.find((lang) => lang.id === path.lang)?.name;
@@ -217,7 +220,7 @@ export async function POST(request: NextRequest) {
           prompt.join("\n")
         )) {
           console.log("Received chunk:", [chunk]);
-        
+
           fullText += chunk;
 
           if (!headerParsed) {
@@ -309,9 +312,7 @@ export async function POST(request: NextRequest) {
         await addMessagesAndDiffs(
           chatId,
           path,
-          [
-            { role: "ai", content: cleanMessage },
-          ],
+          [{ role: "ai", content: cleanMessage }],
           diffRaw,
           context
         );

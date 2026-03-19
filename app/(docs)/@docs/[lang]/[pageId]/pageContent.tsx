@@ -19,8 +19,6 @@ import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
 import { ChatWithMessages } from "@/lib/chatHistory";
 
-export type { DynamicMarkdownSection };
-
 interface PageContentProps {
   splitMdContent: MarkdownSection[];
   langEntry: LanguageEntry;

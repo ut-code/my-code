@@ -6,20 +6,16 @@ import { LangId, PageSlug } from "@/lib/docs";
 import { chat, section } from "@/schema/chat";
 import { and, eq } from "drizzle-orm";
 
-const chatIdSchema = z.string().uuid();
-
 export async function getRedirectFromChat(chatId: string): Promise<string> {
-  const parsed = chatIdSchema.safeParse(chatId);
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues.map((e) => e.message).join(", "));
-  }
+  chatId = z.uuid().parse(chatId);
+  
   const { drizzle, userId } = await initContext();
   if (!userId) {
     throw new Error("Not authenticated");
   }
 
   const chatData = (await drizzle.query.chat.findFirst({
-    where: and(eq(chat.chatId, parsed.data), eq(chat.userId, userId)),
+    where: and(eq(chat.chatId, chatId), eq(chat.userId, userId)),
     with: {
       section: true,
     },

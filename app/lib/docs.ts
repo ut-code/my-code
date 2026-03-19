@@ -25,7 +25,10 @@ export const PagePathSchema = z.object({
   lang: z.string().transform((s) => s as LangId),
   page: z.string().transform((s) => s as PageSlug),
 });
-export type PagePath = z.output<typeof PagePathSchema>;
+export interface PagePath {
+  lang: LangId;
+  page: PageSlug;
+}
 
 export const MarkdownSectionSchema = z.object({
   /**
@@ -68,7 +71,9 @@ export const DynamicMarkdownSectionSchema = MarkdownSectionSchema.extend({
   replacedContent: z.string(),
   replacedRange: z.array(ReplacedRangeSchema),
 });
-export type DynamicMarkdownSection = z.output<typeof DynamicMarkdownSectionSchema>;
+export type DynamicMarkdownSection = z.output<
+  typeof DynamicMarkdownSectionSchema
+>;
 
 /**
  * 各言語のindex.ymlから読み込んだデータにid,index等を追加したデータ型

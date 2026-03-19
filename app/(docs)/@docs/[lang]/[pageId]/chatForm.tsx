@@ -7,9 +7,8 @@ import { useState, FormEvent, useEffect } from "react";
 //   QuestionExampleParams,
 // } from "../actions/questionExample";
 // import { getLanguageName } from "../pagesList";
-import { DynamicMarkdownSection } from "./pageContent";
 import { useEmbedContext } from "@/terminal/embedContext";
-import { PagePath } from "@/lib/docs";
+import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { useRouter } from "next/navigation";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { useStreamingChatContext } from "@/(docs)/streamingChatContext";

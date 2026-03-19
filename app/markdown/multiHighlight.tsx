@@ -8,7 +8,6 @@ import { useChatId } from "@/(docs)/chatAreaState";
 import Link from "next/link";
 import type { ReplacedRange } from "@/lib/docs";
 
-export type { ReplacedRange };
 export const remarkMultiHighlight: Plugin<[ReplacedRange[]], Root> = (
   replacedRange?: ReplacedRange[]
 ) => {
