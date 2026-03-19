@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LangId, LanguageEntry, PagePath, PageSlug } from "@/lib/docs";
+import { DynamicMarkdownSection, LangId, LanguageEntry, PagePath, PageSlug } from "@/lib/docs";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./themeToggle";
 import {
@@ -15,7 +15,6 @@ import {
 import clsx from "clsx";
 import { LanguageIcon } from "@/terminal/icons";
 import { RuntimeLang } from "@my-code/runtime/languages";
-import { DynamicMarkdownSection } from "./(docs)/@docs/[lang]/[pageId]/pageContent";
 
 export interface ISidebarMdContext {
   loadedPath: PagePath | null;

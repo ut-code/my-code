@@ -6,12 +6,8 @@ import { ExtraProps } from "react-markdown";
 import clsx from "clsx";
 import { useChatId } from "@/(docs)/chatAreaState";
 import Link from "next/link";
+import type { ReplacedRange } from "@/lib/docs";
 
-export interface ReplacedRange {
-  start: number;
-  end: number;
-  id: string;
-}
 export const remarkMultiHighlight: Plugin<[ReplacedRange[]], Root> = (
   replacedRange?: ReplacedRange[]
 ) => {

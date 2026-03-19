@@ -1,11 +1,14 @@
 "use server";
 
+import { z } from "zod";
 import { initContext } from "@/lib/chatHistory";
 import { LangId, PageSlug } from "@/lib/docs";
 import { chat, section } from "@/schema/chat";
 import { and, eq } from "drizzle-orm";
 
 export async function getRedirectFromChat(chatId: string): Promise<string> {
+  chatId = z.uuid().parse(chatId);
+  
   const { drizzle, userId } = await initContext();
   if (!userId) {
     throw new Error("Not authenticated");

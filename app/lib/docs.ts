@@ -5,6 +5,7 @@ import yaml from "js-yaml";
 import { isCloudflare } from "./detectCloudflare";
 import { notFound } from "next/navigation";
 import crypto from "node:crypto";
+import { z } from "zod";
 
 /*
 Branded Types
@@ -18,40 +19,69 @@ type Brand<K, T> = K & { readonly __brand: T };
 export type LangId = Brand<string, "LangId">;
 export type LangName = Brand<string, "LangName">;
 export type PageSlug = Brand<string, "PageSlug">;
+export type SectionId = Brand<string, "SectionId">;
+
+export const PagePathSchema = z.object({
+  lang: z.string().transform((s) => s as LangId),
+  page: z.string().transform((s) => s as PageSlug),
+});
 export interface PagePath {
   lang: LangId;
   page: PageSlug;
 }
-export type SectionId = Brand<string, "SectionId">;
 
-export interface SectionFrontMatter {
+export const SectionFrontMatterSchema = z.object({
   /**
    * frontmatterに書くセクションid
    * (データベース上の sectionId)
    */
-  id: SectionId;
-  level: number;
-  title: string;
+  id: z.string().transform((s) => s as SectionId),
+  level: z.number(),
+  title: z.string(),
   /**
    * そのセクションに対する質問例
    * scripts/questionExample.ts で生成する
    */
-  question?: string[];
-}
-export interface MarkdownSection extends SectionFrontMatter {
+  question: z.array(z.string()).optional(),
+});
+export type SectionFrontMatter = z.output<typeof SectionFrontMatterSchema>;
+export const MarkdownSectionSchema = SectionFrontMatterSchema.extend({
   /**
    * セクションのmdファイル名
    */
-  file: string;
+  file: z.string(),
   /**
    * frontmatterを除く、見出しも含めたもとのmarkdownの内容
    */
-  rawContent: string;
+  rawContent: z.string(),
   /**
    * rawContentのmd5ハッシュのbase64エンコード
    */
-  md5: string;
-}
+  md5: z.string(),
+});
+export type MarkdownSection = z.output<typeof MarkdownSectionSchema>;
+
+export const ReplacedRangeSchema = z.object({
+  start: z.number(),
+  end: z.number(),
+  id: z.string(),
+});
+export type ReplacedRange = z.output<typeof ReplacedRangeSchema>;
+
+export const DynamicMarkdownSectionSchema = MarkdownSectionSchema.extend({
+  /**
+   * ユーザーが今そのセクションを読んでいるかどうか
+   */
+  inView: z.boolean(),
+  /**
+   * チャットの会話を元にAIが書き換えた後の内容
+   */
+  replacedContent: z.string(),
+  replacedRange: z.array(ReplacedRangeSchema),
+});
+export type DynamicMarkdownSection = z.output<
+  typeof DynamicMarkdownSectionSchema
+>;
 
 /**
  * 各言語のindex.ymlから読み込んだデータにid,index等を追加したデータ型
@@ -102,6 +132,9 @@ export interface RevisionYmlEntry {
    * `langId/pageSlug`
    */
   page: string;
+  /**
+   * revisionのリストは末尾が最新のはず。
+   */
   rev: SectionRevision[];
 }
 export interface SectionRevision {
@@ -189,6 +222,25 @@ export async function getRevisions(
   return (yaml.load(revisionsYml) as Record<string, RevisionYmlEntry>)[
     sectionId
   ];
+}
+
+const commitDateCache = new Map<string, Promise<Date>>();
+export async function getCommitDate(id: string): Promise<Date> {
+  if (commitDateCache.has(id)) {
+    return commitDateCache.get(id)!;
+  }
+  const p = (async () => {
+    const commitInfoYml = await readPublicFile(`docs/commits.yml`);
+    const commitInfo = yaml.load(commitInfoYml) as Record<string, string>;
+    const timestamp = commitInfo[id];
+    if (timestamp) {
+      return new Date(timestamp);
+    } else {
+      throw new Error(`Commit date for id=${id} not found`);
+    }
+  })();
+  commitDateCache.set(id, p);
+  return p;
 }
 
 /**

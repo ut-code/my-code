@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
+import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
 import { deleteChatAction } from "@/actions/deleteChat";
 import { ChatWithMessages } from "@/lib/chatHistory";
 import { LanguageEntry, MarkdownSection, PageEntry } from "@/lib/docs";
@@ -11,7 +12,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
-export function ChatAreaContainer(props: { chatId: string; children: ReactNode }) {
+export function ChatAreaContainer(props: {
+  chatId: string;
+  children: ReactNode;
+}) {
   return (
     <aside
       className={clsx(
@@ -75,6 +79,8 @@ export function ChatAreaContent(props: Props) {
   );
 
   const router = useRouter();
+  const streamingChatContext = useStreamingChatContext();
+  const isStreamingThis = streamingChatContext.chatId === chatId;
 
   return (
     <>
@@ -202,6 +208,12 @@ export function ChatAreaContent(props: Props) {
             </ins>
           </div>
         )
+      )}
+      {isStreamingThis && (
+        <div className="">
+          <StyledMarkdown content={streamingChatContext.content} />
+          <span className="loading loading-dots loading-sm" />
+        </div>
       )}
     </>
   );

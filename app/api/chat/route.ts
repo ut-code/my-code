@@ -1,46 +1,49 @@
-"use server";
-
-// import { z } from "zod";
-import { generateContent } from "@/lib/gemini";
-import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import { NextRequest } from "next/server";
+import { generateContentStream } from "@/lib/ai";
 import {
   addChat,
-  ChatWithMessages,
+  addMessagesAndDiffs,
   CreateChatDiff,
   initContext,
 } from "@/lib/chatHistory";
-import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
-import { DynamicMarkdownSection } from "@/(docs)/@docs/[lang]/[pageId]/pageContent";
+import {
+  DynamicMarkdownSectionSchema,
+  getPagesList,
+  introSectionId,
+  PagePathSchema,
+  SectionId,
+} from "@/lib/docs";
+import {
+  ReplCommandSchema,
+  ReplOutputSchema,
+} from "@my-code/runtime/interface";
+import { z } from "zod";
 
-type ChatResult =
-  | {
-      error: string;
-    }
-  | {
-      error: null;
-      // サーバー側でデータベースに新しく追加されたチャットデータ
-      chat: ChatWithMessages;
-    };
+const ChatParamsSchema = z.object({
+  path: PagePathSchema,
+  userQuestion: z.string().min(1),
+  sectionContent: z.array(DynamicMarkdownSectionSchema),
+  replOutputs: z.record(z.string(), z.array(ReplCommandSchema)),
+  files: z.record(z.string(), z.string()),
+  execResults: z.record(z.string(), z.array(ReplOutputSchema)),
+});
 
-type ChatParams = {
-  path: PagePath;
-  userQuestion: string;
-  sectionContent: DynamicMarkdownSection[];
-  replOutputs: Record<string, ReplCommand[]>;
-  files: Record<string, string>;
-  execResults: Record<string, ReplOutput[]>;
-};
+export type ChatStreamEvent =
+  | { type: "chat"; chatId: string; sectionId: string }
+  | { type: "chunk"; text: string }
+  | { type: "done" }
+  | { type: "error"; message: string };
 
-export async function askAI(params: ChatParams): Promise<ChatResult> {
-  // const parseResult = ChatSchema.safeParse(params);
+export async function POST(request: NextRequest) {
+  const context = await initContext();
+  if (!context.userId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
-  // if (!parseResult.success) {
-  //   return {
-  //     response: "",
-  //     error: parseResult.error.issues.map((e) => e.message).join(", "),
-  //   };
-  // }
-
+  const parseResult = ChatParamsSchema.safeParse(await request.json());
+  if (!parseResult.success) {
+    return new Response(JSON.stringify(parseResult.error), { status: 400 });
+  }
   const {
     path,
     userQuestion,
@@ -48,7 +51,7 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     replOutputs,
     files,
     execResults,
-  } = params;
+  } = parseResult.data;
 
   const pagesList = await getPagesList();
   const langName = pagesList.find((lang) => lang.id === path.lang)?.name;
@@ -86,7 +89,6 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
     prompt.push(``);
   }
   prompt.push(``);
-  // TODO: 各セクションのドキュメントの直下にそのセクション内のターミナルの情報を加えるべきなのでは?
   if (Object.keys(replOutputs).length > 0) {
     prompt.push(
       `# ターミナルのログ（ユーザーが入力したコマンドとその実行結果）`
@@ -199,65 +201,145 @@ export async function askAI(params: ChatParams): Promise<ChatResult> {
 
   console.log(prompt);
 
-  try {
-    const result = await generateContent(userQuestion, prompt.join("\n"));
-    const text = result.text;
-    if (!text) {
-      throw new Error("AIからの応答が空でした");
-    }
-    console.log(JSON.stringify(text));
-    const textMatch = text.match(/^([^\n]*?)\n+([^\n]*?)\n+([\s\S]*)$/);
-    let targetSectionId = textMatch?.at(1)?.trim() as SectionId | undefined;
-    if (
-      !targetSectionId ||
-      !sectionContent.some((s) => s.id === targetSectionId)
-    ) {
-      targetSectionId = introSectionId(path);
-    }
-    const title = textMatch?.at(2)?.trim();
-    if (!title) {
-      throw new Error("AIからの応答にタイトルが含まれていませんでした");
-    }
-    let responseMessage = textMatch?.at(3)?.trim();
-    if (!responseMessage) {
-      throw new Error("AIからの応答に本文が含まれていませんでした");
-    }
-    const diffRegex =
-      /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g;
-    const diffRaw: CreateChatDiff[] = [];
-    for (const m of responseMessage.matchAll(diffRegex) ?? []) {
-      const search = m[1];
-      const replace = m[2];
-      const targetSection = sectionContent.find((s) =>
-        s.replacedContent.includes(search)
-      );
-      diffRaw.push({
-        search,
-        replace,
-        sectionId: targetSection?.id ?? ("" as SectionId),
-        targetMD5: targetSection?.md5 ?? "",
-      });
-    }
-    responseMessage = responseMessage.replace(diffRegex, "").trim();
-    const newChat = await addChat(
-      path,
-      targetSectionId,
-      title,
-      [
-        { role: "user", content: userQuestion },
-        { role: "ai", content: responseMessage },
-      ],
-      diffRaw,
-      await initContext()
-    );
-    return {
-      error: null,
-      chat: newChat,
-    };
-  } catch (error: unknown) {
-    console.error("Error calling Generative AI:", error);
-    return {
-      error: String(error),
-    };
-  }
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      function send(event: ChatStreamEvent) {
+        controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
+      }
+
+      try {
+        let fullText = "";
+        let headerParsed = false;
+        let chatId: string | undefined;
+        let contentAfterHeader = "";
+
+        for await (const chunk of generateContentStream(
+          userQuestion,
+          prompt.join("\n")
+        )) {
+          console.log("Received chunk:", [chunk]);
+
+          fullText += chunk;
+
+          if (!headerParsed) {
+            // Wait until we have at least 2 lines (sectionId + title + start of body)
+            const headerMatch = fullText.match(/^([^\n]*?)\n+([^\n]*?)\n+/);
+            if (headerMatch) {
+              headerParsed = true;
+              let targetSectionId = headerMatch[1].trim() as SectionId;
+              const title = headerMatch[2].trim();
+
+              if (
+                !targetSectionId ||
+                !sectionContent.some((s) => s.id === targetSectionId)
+              ) {
+                targetSectionId = introSectionId(path);
+              }
+
+              if (!title) {
+                send({
+                  type: "error",
+                  message: "AIからの応答にタイトルが含まれていませんでした",
+                });
+                controller.close();
+                return;
+              }
+
+              // Create chat record in DB immediately
+              const newChat = await addChat(
+                path,
+                targetSectionId,
+                title,
+                [{ role: "user", content: userQuestion }],
+                [],
+                context
+              );
+              chatId = newChat.chatId;
+
+              // Notify client with chatId so navigation can happen
+              send({
+                type: "chat",
+                chatId,
+                sectionId: targetSectionId,
+              });
+
+              // Send any content that came after the header in this chunk
+              contentAfterHeader = fullText.slice(headerMatch[0].length);
+              if (contentAfterHeader) {
+                send({ type: "chunk", text: contentAfterHeader });
+              }
+            }
+          } else {
+            // Header already parsed - stream the chunk directly
+            contentAfterHeader += chunk;
+            send({ type: "chunk", text: chunk });
+          }
+        }
+
+        // AI response finished
+        if (!chatId) {
+          // Header was never parsed (e.g. very short response without 2 newlines)
+          send({
+            type: "error",
+            message: "AIからの応答の形式が正しくありませんでした",
+          });
+          controller.close();
+          return;
+        }
+
+        // Parse diffs from the full body content
+        const diffRegex =
+          /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g;
+        const diffRaw: CreateChatDiff[] = [];
+        for (const m of contentAfterHeader.matchAll(diffRegex)) {
+          const search = m[1];
+          const replace = m[2];
+          const targetSection = sectionContent.find((s) =>
+            s.replacedContent.includes(search)
+          );
+          diffRaw.push({
+            search,
+            replace,
+            sectionId: targetSection?.id ?? ("" as SectionId),
+            targetMD5: targetSection?.md5 ?? "",
+          });
+        }
+        const cleanMessage = contentAfterHeader.replace(diffRegex, "").trim();
+
+        // Save messages and diffs to DB
+        await addMessagesAndDiffs(
+          chatId,
+          path,
+          [{ role: "ai", content: cleanMessage }],
+          diffRaw,
+          context
+        );
+
+        send({ type: "done" });
+        controller.close();
+      } catch (error: unknown) {
+        console.error("Error in AI streaming:", error);
+        try {
+          controller.enqueue(
+            encoder.encode(
+              JSON.stringify({ type: "error", message: String(error) }) + "\n"
+            )
+          );
+        } catch {
+          // controller might already be closed
+        }
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Content-Type-Options": "nosniff",
+      "Cache-Control": "no-cache",
+    },
+  });
 }

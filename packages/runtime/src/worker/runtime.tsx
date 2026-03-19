@@ -129,6 +129,11 @@ export function WorkerProvider({
         await initializeWorker();
         setReady(true);
       });
+      if (isIOS()) {
+        alert(
+          "iPhone/iPadでは実行環境が正しく動作しない場合があります。PCで利用してください。"
+        );
+      }
       return () => {
         void mutex.runExclusive(async () => {
           // Reject all pending promises
@@ -304,5 +309,15 @@ export function WorkerProvider({
     >
       {children}
     </context.Provider>
+  );
+}
+
+function isIOS(): boolean {
+  // Source - https://stackoverflow.com/a/58065241
+  // Posted by kikiwora, modified by community. See post 'Timeline' for change history
+  // Retrieved 2026-03-19, License - CC BY-SA 4.0
+  return (
+    /iPad|iPhone|iPod/.test(navigator.platform) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
   );
 }
