@@ -20,42 +20,49 @@ export function ChatAreaContainer(props: {
     <aside
       className={clsx(
         // モバイルでは全画面表示する
-        "fixed inset-0 pt-20 bg-base-100",
+        "fixed inset-0 bg-base-100",
         // PCではスクロールで動かない右サイドバー
-        "has-chat-1:sticky has-chat-1:top-16 has-sidebar:top-0 has-chat-1:pt-4",
+        // 左にサイドバーがない=navvarがある とき、navbar分のスペースをあける(top-16, h-[100vh-4rem])
+        "has-chat-1:sticky has-chat-1:top-16 has-sidebar:top-0",
         "has-chat-1:basis-2/5 has-chat-1:max-w-chat-area has-chat-1:h-[calc(100vh-4rem)] has-sidebar:h-screen",
         "has-chat-1:shadow-md has-chat-1:bg-base-200",
         // navbar(z-40)よりは下、ChatListForSectionのdropdown(デフォルトでz-999だがz-30に変えている)よりも上
-        "z-35",
-        "p-4 pb-16",
-        "flex flex-col",
-        "overflow-y-auto"
+        "z-35"
       )}
     >
-      <ChatAreaStateUpdater chatId={props.chatId} />
-      <div className="flex flex-row items-center">
-        <span className="flex-1 text-base font-bold opacity-40">
-          AIへの質問
-        </span>
-        <Link className="btn btn-ghost" href="/chat" scroll={false}>
-          <svg
-            className="w-8 h-8 -scale-x-100"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18 17L13 12L18 7M11 17L6 12L11 7"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="text-lg">閉じる</span>
-        </Link>
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-base-200 to-base-200/0 z-1" />
+      <div
+        className={clsx(
+          "p-4 pb-16",
+          "pt-20 has-chat-1:pt-4",
+          "h-full flex flex-col overflow-y-auto"
+        )}
+      >
+        <ChatAreaStateUpdater chatId={props.chatId} />
+        <div className="flex flex-row items-center">
+          <span className="flex-1 text-base font-bold opacity-40">
+            AIへの質問
+          </span>
+          <Link className="btn btn-ghost" href="/chat" scroll={false}>
+            <svg
+              className="w-8 h-8 -scale-x-100"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 17L13 12L18 7M11 17L6 12L11 7"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-lg">閉じる</span>
+          </Link>
+        </div>
+        {props.children}
       </div>
-      {props.children}
     </aside>
   );
 }
