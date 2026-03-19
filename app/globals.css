@@ -154,4 +154,29 @@ mycdark:
     /* TailwindCSSでデフォルトで指定されていた絵文字フォントは一応残しておく */
       "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /*
+  デフォルトのbreakpoint:
+    --breakpoint-sm: 40rem;
+    --breakpoint-md: 48rem;
+    --breakpoint-lg: 64rem;
+    --breakpoint-xl: 80rem;
+    --breakpoint-2xl: 96rem;
+
+    docsは最低40remはないと読みづらい。
+    lg未満: docsのみ / chat-areaのみ
+    lg〜xl: docs + chat-list/chat-area
+    xl〜: sidebar + docs + chat-list/chat-area
+    2xl〜: sidebar + docs + chat-list + chat-area
+
+    navbarの表示はsidebarと連動
+  */
+  --breakpoint-has-sidebar: 80rem;
+  --breakpoint-has-chat-1: 64rem;
+  --breakpoint-has-chat-2: 96rem;
+
+  --container-docs: 60rem;
+  --container-sidebar: 20rem;
+  --container-chat-area: 30rem;
+  --container-chat-list: 15rem;
 }

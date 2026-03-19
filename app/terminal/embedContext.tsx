@@ -1,5 +1,6 @@
 "use client";
 
+import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
 import { usePathname } from "next/navigation";
 import {
   createContext,
@@ -9,7 +10,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { ReplCommand, ReplOutput } from "./repl";
 
 /*
 ファイルの内容や埋め込みターミナルのログを1箇所でまとめて管理し、書き込み・読み込みできるようにする

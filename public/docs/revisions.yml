@@ -1,0 +1,4639 @@
+# This file will be updated by CI. Do not edit manually, unless CI failed.
+cpp-0-intro-intro:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: /mArytsD75On3j08VnPJ6g==
+    path: public/docs/cpp/0-intro/-intro.md
+cpp-1-types-control-intro:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: 33WnLkEocC4/Y1oHMZlphA==
+    path: public/docs/cpp/1-types-control/-intro.md
+cpp-10-stl-containers-intro:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: iSiUqWYGAvkF/uTsBBa7LQ==
+    path: public/docs/cpp/10-stl-containers/-intro.md
+cpp-11-stl-algorithms-intro:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: dlk2x21iAxB1sOyB4CRGrg==
+    path: public/docs/cpp/11-stl-algorithms/-intro.md
+cpp-12-raii-smart-ptrs-intro:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: PtlvjZES3CxPpfMoUnINkw==
+    path: public/docs/cpp/12-raii-smart-ptrs/-intro.md
+cpp-2-data-containers-intro:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: 7VP0Gs/um5g1UFbiQ3FGQA==
+    path: public/docs/cpp/2-data-containers/-intro.md
+cpp-3-pointers-intro:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: gjKCDfBdAef+YeTAMlLpyA==
+    path: public/docs/cpp/3-pointers/-intro.md
+cpp-4-functions-intro:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: 5K9hmlfABKsgiXI9IXRi9A==
+    path: public/docs/cpp/4-functions/-intro.md
+cpp-5-project-build-intro:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: ogFvbus9/dCQPon8E+WlWQ==
+    path: public/docs/cpp/5-project-build/-intro.md
+cpp-6-classes-basics-intro:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: naF1pTjZ7Fj082oP705yvA==
+    path: public/docs/cpp/6-classes-basics/-intro.md
+cpp-7-classes-advanced-intro:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: lpDOKfu7UXl5ZCssQbVUug==
+    path: public/docs/cpp/7-classes-advanced/-intro.md
+cpp-8-inheritance-intro:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: J3X3wdk8+5jqSmvIuElorg==
+    path: public/docs/cpp/8-inheritance/-intro.md
+cpp-9-templates-intro:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: HBe/0t3EHwKq4pC3tcHsCQ==
+    path: public/docs/cpp/9-templates/-intro.md
+cpp-classes-advanced-copy:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: Y6EqxeY3lvBRRxLEVVFb3g==
+    path: public/docs/cpp/7-classes-advanced/1-0-copy.md
+cpp-classes-advanced-deep-copy:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: Nc9retbz7GeLXwYOqjKmrA==
+    path: public/docs/cpp/7-classes-advanced/1-2-deep-copy.md
+cpp-classes-advanced-operator-overload:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: kJR7AiMNzs43D2NOW43E2g==
+    path: public/docs/cpp/7-classes-advanced/2-0-operator-overload.md
+cpp-classes-advanced-practice1:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: Y6SMYzck+fXD6KGjF7D9YQ==
+    path: public/docs/cpp/7-classes-advanced/5-1-practice1.md
+cpp-classes-advanced-practice2:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: S7bBRA47Jeb8gej74QwPiw==
+    path: public/docs/cpp/7-classes-advanced/5-2-practice2.md
+cpp-classes-advanced-shallow-copy:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: Jk67jkfaCzD7TOyUKJQnCQ==
+    path: public/docs/cpp/7-classes-advanced/1-1-shallow-copy.md
+cpp-classes-advanced-static-member:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: XZ3TWzAPzhzGEn2nkFihRA==
+    path: public/docs/cpp/7-classes-advanced/3-0-static-member.md
+cpp-classes-advanced-summary:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: sapADdLTPBkDvHVgB5UBhg==
+    path: public/docs/cpp/7-classes-advanced/5-0-summary.md
+cpp-classes-advanced-this:
+  page: cpp/7-classes-advanced
+  rev:
+  - git: de11512
+    md5: hOLhcP6ZdLxTQbNYLX/eVQ==
+    path: public/docs/cpp/7-classes-advanced/4-0-this.md
+cpp-classes-basics-about:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: cWiP7j9kcb86c52J8iQItA==
+    path: public/docs/cpp/6-classes-basics/1-0-about.md
+cpp-classes-basics-access-control:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: TongeTIEdjLxZhBiXqkLNg==
+    path: public/docs/cpp/6-classes-basics/3-0-access-control.md
+cpp-classes-basics-constructor:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: VzG5Aj2x5Vh9vpcSoNPtSw==
+    path: public/docs/cpp/6-classes-basics/4-1-constructor.md
+cpp-classes-basics-constructor-destructor:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: l1uLYYGYuAGiZkBOkwcvZQ==
+    path: public/docs/cpp/6-classes-basics/4-0-constructor-destructor.md
+cpp-classes-basics-destructor:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: iPKqtcS2j8SgURxLmbp/7g==
+    path: public/docs/cpp/6-classes-basics/4-2-destructor.md
+cpp-classes-basics-instance:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: VY9C+s357ra9DZ/Lk94ZDg==
+    path: public/docs/cpp/6-classes-basics/2-0-instance.md
+cpp-classes-basics-practice1:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: EP+8pUfCi9IzqGHMfyDnxw==
+    path: public/docs/cpp/6-classes-basics/5-1-practice1.md
+cpp-classes-basics-practice2:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: 7D7/OuSW2WIIz/au4/SdEw==
+    path: public/docs/cpp/6-classes-basics/5-2-practice2.md
+cpp-classes-basics-summary:
+  page: cpp/6-classes-basics
+  rev:
+  - git: de11512
+    md5: 3x4TDdC1hJLZxaGGIC9m/w==
+    path: public/docs/cpp/6-classes-basics/5-0-summary.md
+cpp-control:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: uRVkilybDW2UPx20PZiDAQ==
+    path: public/docs/cpp/1-types-control/5-0-control.md
+cpp-control-if:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: 5YDq1CtynOQ6bMr+7JBoXQ==
+    path: public/docs/cpp/1-types-control/5-1-if.md
+cpp-control-loop:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: P8M0pMmo+3YE7cgLaaeXYw==
+    path: public/docs/cpp/1-types-control/5-3-loop.md
+cpp-control-switch:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: lvXMJN4o1apcUmFI1e8FFg==
+    path: public/docs/cpp/1-types-control/5-2-switch.md
+cpp-data-containers-array:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: hJgR712eVBqP8Vujzq1msg==
+    path: public/docs/cpp/2-data-containers/3-0-array.md
+cpp-data-containers-practice1:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: ThmiNqWLASNA8vXmY8sbWA==
+    path: public/docs/cpp/2-data-containers/5-1-practice1.md
+cpp-data-containers-practice2:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: 2ngqXilaEZSrvqb42/rA8w==
+    path: public/docs/cpp/2-data-containers/5-2-practice2.md
+cpp-data-containers-range-based-for:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: jnvV8S7NCWIZIN4KX3FkxA==
+    path: public/docs/cpp/2-data-containers/4-0-range-based-for.md
+cpp-data-containers-string:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: kGe8J0M5RTLcW9mn1+UWPA==
+    path: public/docs/cpp/2-data-containers/1-0-string.md
+cpp-data-containers-summary:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: YPlMNZuNFxcy+f/Mf01n4w==
+    path: public/docs/cpp/2-data-containers/5-0-summary.md
+cpp-data-containers-vector:
+  page: cpp/2-data-containers
+  rev:
+  - git: de11512
+    md5: iYiRGeihSmyXKX6Ta3qwlA==
+    path: public/docs/cpp/2-data-containers/2-0-vector.md
+cpp-functions-arg-by-const-reference:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: /W6my5hMuCbCKvuE0Wwy5Q==
+    path: public/docs/cpp/4-functions/2-4-arg-by-const-reference.md
+cpp-functions-arg-by-pointer:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: MefPbofzt9yUfS2xGIkT+Q==
+    path: public/docs/cpp/4-functions/2-2-arg-by-pointer.md
+cpp-functions-arg-by-reference:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: KKAd5JbkFBsVzyquXTLkHA==
+    path: public/docs/cpp/4-functions/2-3-arg-by-reference.md
+cpp-functions-arg-by-value:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: BRGZQ9zfkk3E9WbcKQdv9g==
+    path: public/docs/cpp/4-functions/2-1-arg-by-value.md
+cpp-functions-argument:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: BmDDeWMVIDhhr65iHPdH4Q==
+    path: public/docs/cpp/4-functions/2-0-argument.md
+cpp-functions-basic:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: dxtuCM/zoPcajDOdDCfjKA==
+    path: public/docs/cpp/4-functions/1-0-basic.md
+cpp-functions-default-arg:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: 1JclN7TMEptq/ifoFh/EnA==
+    path: public/docs/cpp/4-functions/3-2-default-arg.md
+cpp-functions-features:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: Qior/sq45FJ+Srbmf8Iu7g==
+    path: public/docs/cpp/4-functions/3-0-features.md
+cpp-functions-overload:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: N2AUHdJw3uGC/Lhbx9Dvjw==
+    path: public/docs/cpp/4-functions/3-1-overload.md
+cpp-functions-practice1:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: CVRlaLcCOxG7o16tZ41b4g==
+    path: public/docs/cpp/4-functions/4-1-practice1.md
+cpp-functions-practice2:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: tTyJjyjJQIU1Mqc3p8Je7g==
+    path: public/docs/cpp/4-functions/4-2-practice2.md
+cpp-functions-prototype-declaration:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: bL283qJ+LDQtG8YigKoLZg==
+    path: public/docs/cpp/4-functions/1-1-prototype-declaration.md
+cpp-functions-summary:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: VkMBFgXVMVE/Hq3IHKy65A==
+    path: public/docs/cpp/4-functions/4-0-summary.md
+cpp-functions-void:
+  page: cpp/4-functions
+  rev:
+  - git: de11512
+    md5: E0+8B6BXgjq48U9/CV5sCg==
+    path: public/docs/cpp/4-functions/1-2-void.md
+cpp-inheritance-abstract-class:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: 9+Ir9aU/224GzkePOT3fBA==
+    path: public/docs/cpp/8-inheritance/4-0-abstract-class.md
+cpp-inheritance-inheritance:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: GNdmRXqe6nDGiA9rGyFkgw==
+    path: public/docs/cpp/8-inheritance/1-0-inheritance.md
+cpp-inheritance-override:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: VbdtcSyYB6IQZMNbtu9s0A==
+    path: public/docs/cpp/8-inheritance/3-0-override.md
+cpp-inheritance-polymorphism:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: zC6j+NZP+LZhqPQSiRNVLA==
+    path: public/docs/cpp/8-inheritance/2-0-polymorphism.md
+cpp-inheritance-practice1:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: 9bq/R13GV5JUAd3jOk0jLQ==
+    path: public/docs/cpp/8-inheritance/5-1-practice1.md
+cpp-inheritance-practice2:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: wLlFXiD6eSjnzWYFHLww8A==
+    path: public/docs/cpp/8-inheritance/5-2-practice2.md
+cpp-inheritance-summary:
+  page: cpp/8-inheritance
+  rev:
+  - git: de11512
+    md5: g2BRaNHXn65ecI2Ql3GIuw==
+    path: public/docs/cpp/8-inheritance/5-0-summary.md
+cpp-intro-about:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: K74XuQplBdyT3OdgzdRdHg==
+    path: public/docs/cpp/0-intro/1-0-about.md
+cpp-intro-basic:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: ZCGsbnnuytfBQJNtLG8gEA==
+    path: public/docs/cpp/0-intro/4-0-basic.md
+cpp-intro-env-about:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: X4lM6uFOgFRMrRMdLykn5w==
+    path: public/docs/cpp/0-intro/2-0-env-about.md
+cpp-intro-feature:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: 75IQEvM0Rh8TMOF0Nc8EvA==
+    path: public/docs/cpp/0-intro/1-1-feature.md
+cpp-intro-helloworld:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: hquZu1hs1+84bzRANqf8xA==
+    path: public/docs/cpp/0-intro/3-0-helloworld.md
+cpp-intro-ide:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: fYqrMze0MD5/2BOLkyAmoQ==
+    path: public/docs/cpp/0-intro/2-1-ide.md
+cpp-intro-include:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: 5ddy2rjbsmG3Iut0HyJKzQ==
+    path: public/docs/cpp/0-intro/4-1-include.md
+cpp-intro-main:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: SlofveL0Qb9DozZi+jIigQ==
+    path: public/docs/cpp/0-intro/4-2-main.md
+cpp-intro-namespace:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: S/2Spv1KKrK1LimKSoc40g==
+    path: public/docs/cpp/0-intro/4-3-namespace.md
+cpp-intro-run:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: +HQ1FOp/o2lmzoLi3i4tSA==
+    path: public/docs/cpp/0-intro/3-1-run.md
+cpp-intro-setup:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: QVY3xomiqZCbPCHVy0hDjA==
+    path: public/docs/cpp/0-intro/2-2-setup.md
+cpp-intro-summary:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: RTHRkGHwpAqsMVn5znkNeg==
+    path: public/docs/cpp/0-intro/5-0-summary.md
+cpp-intro-usage:
+  page: cpp/0-intro
+  rev:
+  - git: de11512
+    md5: dUYNBclr84JDg5YIL+c7Og==
+    path: public/docs/cpp/0-intro/1-2-usage.md
+cpp-pointers-address-operator:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: LAEgPZDuL/VkpbHj+Gssxw==
+    path: public/docs/cpp/3-pointers/1-1-address-operator.md
+cpp-pointers-array:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: vigy9QmumhTx8mNVnMuI1g==
+    path: public/docs/cpp/3-pointers/2-0-array.md
+cpp-pointers-basic:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: i9wKd1mjyJ67/jMwolFH5A==
+    path: public/docs/cpp/3-pointers/1-0-basic.md
+cpp-pointers-heap:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: FtGhDliqXge46Za3zW45pQ==
+    path: public/docs/cpp/3-pointers/4-2-heap.md
+cpp-pointers-legacy-string:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: bcpSPEJ0+KPgoHx91QzaAQ==
+    path: public/docs/cpp/3-pointers/3-0-legacy-string.md
+cpp-pointers-memory-area:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: 7ywbG0FkY0MDxHsv0xReug==
+    path: public/docs/cpp/3-pointers/4-0-memory-area.md
+cpp-pointers-memory-leak:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: UpQyI7ftQsi++hlKhBHlYA==
+    path: public/docs/cpp/3-pointers/4-4-memory-leak.md
+cpp-pointers-nullptr:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: /DmogMulr/zFJkh/yi5hQQ==
+    path: public/docs/cpp/3-pointers/1-2-nullptr.md
+cpp-pointers-practice1:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: 1oBOsSZZL12jZz8nKynCXg==
+    path: public/docs/cpp/3-pointers/5-1-practice1.md
+cpp-pointers-practice2:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: 46m3y9YoYSDs7qLpWr1qYQ==
+    path: public/docs/cpp/3-pointers/5-2-practice2.md
+cpp-pointers-stack:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: /5PFPpLruQMDpdFHx8E9zA==
+    path: public/docs/cpp/3-pointers/4-1-stack.md
+cpp-pointers-summary:
+  page: cpp/3-pointers
+  rev:
+  - git: de11512
+    md5: DNUcGtBI3+/6qnwzmpuICQ==
+    path: public/docs/cpp/3-pointers/5-0-summary.md
+cpp-project-build-build:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: uocSzDxNVy3OB6697AnWAA==
+    path: public/docs/cpp/5-project-build/3-0-build.md
+cpp-project-build-cmake:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: 9zu9K6QvFNSBxUIRJoMz+g==
+    path: public/docs/cpp/5-project-build/3-3-cmake.md
+cpp-project-build-gcc-manual:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: eIBvdnjUOXvqhaD3IB0UQw==
+    path: public/docs/cpp/5-project-build/3-1-gcc-manual.md
+cpp-project-build-header-and-source:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: uY4PtYrokAdVOQnbu14qKw==
+    path: public/docs/cpp/5-project-build/1-0-header-and-source.md
+cpp-project-build-include-guard:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: k7AL5Gtnx2XyeFojGd9Itw==
+    path: public/docs/cpp/5-project-build/2-0-include-guard.md
+cpp-project-build-include-guard-by-define:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: 6LOvb0I66mZDc63QAZhKFw==
+    path: public/docs/cpp/5-project-build/2-1-include-guard-by-define.md
+cpp-project-build-makefile:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: hFOwCGXghzXKLAVGInQRlA==
+    path: public/docs/cpp/5-project-build/3-2-makefile.md
+cpp-project-build-practice1:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: AdFcDE+wcpBWLs87H9c5yw==
+    path: public/docs/cpp/5-project-build/4-1-practice1.md
+cpp-project-build-pragma-once:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: XIr3ito1Grxoa0WMKuxVKQ==
+    path: public/docs/cpp/5-project-build/2-2-pragma-once.md
+cpp-project-build-split-example:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: vqTlU9Z58LcEPJBzTb/SuA==
+    path: public/docs/cpp/5-project-build/1-2-split-example.md
+cpp-project-build-summary:
+  page: cpp/5-project-build
+  rev:
+  - git: de11512
+    md5: kSe9bv2FSf0VlpB2kJyfkQ==
+    path: public/docs/cpp/5-project-build/4-0-summary.md
+cpp-raii:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: XlxqwDgHPYRDhTZoT/RM0w==
+    path: public/docs/cpp/12-raii-smart-ptrs/2-0-raii.md
+cpp-raii-smartptr-practice1:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: SlxBqSMT9RI8pUyZq/gXqg==
+    path: public/docs/cpp/12-raii-smart-ptrs/4-1-practice1.md
+cpp-raii-smartptr-practice2:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: GHMiQ2/zsSEvWJmgtP9bbw==
+    path: public/docs/cpp/12-raii-smart-ptrs/4-2-practice2.md
+cpp-raii-smartptr-summary:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: Cgr7YPsUiEbrN4Lo6HXn3g==
+    path: public/docs/cpp/12-raii-smart-ptrs/4-0-summary.md
+cpp-smartptr:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: 7qBqkt86MgoUQCZhrjD7Lg==
+    path: public/docs/cpp/12-raii-smart-ptrs/3-0-smartptr.md
+cpp-smartptr-sharedptr:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: QSoz3fXH1wztujWGW8ul5w==
+    path: public/docs/cpp/12-raii-smart-ptrs/3-2-sharedptr.md
+cpp-smartptr-uniqueptr:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: f185jUMRGx0He58p3x5tjg==
+    path: public/docs/cpp/12-raii-smart-ptrs/3-1-uniqueptr.md
+cpp-stl-algorithms-about:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: 7HEkLXfDbCAUEHVyMIJDKg==
+    path: public/docs/cpp/11-stl-algorithms/1-0-about.md
+cpp-stl-algorithms-algo:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: kbPCt/IE1MUN5M+mtl+HoA==
+    path: public/docs/cpp/11-stl-algorithms/2-0-algo.md
+cpp-stl-algorithms-find:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: yCr1NxsrnDTROdTsYzxGCw==
+    path: public/docs/cpp/11-stl-algorithms/2-2-find.md
+cpp-stl-algorithms-foreach:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: 5exwY1mfdhy5NeITc08YCw==
+    path: public/docs/cpp/11-stl-algorithms/2-3-foreach.md
+cpp-stl-algorithms-lambda:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: Jny24K546GqocZvRi2+5rA==
+    path: public/docs/cpp/11-stl-algorithms/3-0-lambda.md
+cpp-stl-algorithms-practice1:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: tUejXo+mnumi6cruzVKbUQ==
+    path: public/docs/cpp/11-stl-algorithms/4-1-practice1.md
+cpp-stl-algorithms-practice2:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: cFn5YUDT0DzlOvHE19MqRg==
+    path: public/docs/cpp/11-stl-algorithms/4-2-practice2.md
+cpp-stl-algorithms-sort:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: JX4UUmbXiSBSieKy68QIoA==
+    path: public/docs/cpp/11-stl-algorithms/2-1-sort.md
+cpp-stl-algorithms-summary:
+  page: cpp/11-stl-algorithms
+  rev:
+  - git: de11512
+    md5: CrDhZqHqlhMLHxTdd9nPvw==
+    path: public/docs/cpp/11-stl-algorithms/4-0-summary.md
+cpp-stl-containers-about:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: 1vtGQJTG2g+MnGlw5m6rMg==
+    path: public/docs/cpp/10-stl-containers/1-0-about.md
+cpp-stl-containers-map:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: 0AIc7DFI6pEo6Zb0CH28Ng==
+    path: public/docs/cpp/10-stl-containers/3-0-map.md
+cpp-stl-containers-other:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: Hie8BeXD8WuJHNMjErH4sQ==
+    path: public/docs/cpp/10-stl-containers/4-0-other.md
+cpp-stl-containers-practice1:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: YOPZqmY8SbRTHZXDiK8AhQ==
+    path: public/docs/cpp/10-stl-containers/5-1-practice1.md
+cpp-stl-containers-practice2:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: 3DQL1bqHteYbprQPcgaspg==
+    path: public/docs/cpp/10-stl-containers/5-2-practice2.md
+cpp-stl-containers-summary:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: EAqr89J/VVbANzt7c6NwsA==
+    path: public/docs/cpp/10-stl-containers/5-0-summary.md
+cpp-stl-containers-vector:
+  page: cpp/10-stl-containers
+  rev:
+  - git: de11512
+    md5: ZH/jLUlGSNsT14fvwhlL/A==
+    path: public/docs/cpp/10-stl-containers/2-0-vector.md
+cpp-templates-class-template:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: /GrTbWA+lMM5zhwLe/5qvg==
+    path: public/docs/cpp/9-templates/2-0-class-template.md
+cpp-templates-class-template-detail:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: qfSyLoY+P35Fd5TjJYJDww==
+    path: public/docs/cpp/9-templates/2-1-class-template-detail.md
+cpp-templates-function-template:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: vfZNnhBGasUvLdd42MCHnA==
+    path: public/docs/cpp/9-templates/1-0-function-template.md
+cpp-templates-function-template-detail:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: WvV/BJkm0+kqvbEEcxQtoA==
+    path: public/docs/cpp/9-templates/1-1-function-template-detail.md
+cpp-templates-practice1:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: FF3dFdw0CeZI+rHBWBur+A==
+    path: public/docs/cpp/9-templates/3-1-practice1.md
+cpp-templates-practice2:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: n9SDp1LUPbbZWWB62tJSDg==
+    path: public/docs/cpp/9-templates/3-2-practice2.md
+cpp-templates-summary:
+  page: cpp/9-templates
+  rev:
+  - git: de11512
+    md5: QCfLNSP+OYCow0+fH9bIiA==
+    path: public/docs/cpp/9-templates/3-0-summary.md
+cpp-trycatch:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: cEkPGVDQNv+CBLKMdm7DFw==
+    path: public/docs/cpp/12-raii-smart-ptrs/1-0-trycatch.md
+cpp-trycatch-leak:
+  page: cpp/12-raii-smart-ptrs
+  rev:
+  - git: de11512
+    md5: uGTuHU2tYRlVWMT028/XfA==
+    path: public/docs/cpp/12-raii-smart-ptrs/1-1-leak.md
+cpp-types-auto:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: ZttEhQWDRYX1cIc+Tzoqmg==
+    path: public/docs/cpp/1-types-control/3-2-auto.md
+cpp-types-basic:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: 8cF4whLMW9pkKE1ivQXuIw==
+    path: public/docs/cpp/1-types-control/1-0-basic-types.md
+cpp-types-console:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: OKJDrasWwNuELkhyR29Mcw==
+    path: public/docs/cpp/1-types-control/4-0-console.md
+cpp-types-const:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: UKb1gR2sSspc4QhHeu+qxQ==
+    path: public/docs/cpp/1-types-control/3-1-const.md
+cpp-types-control-practice1:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: 48Me3QKvfmuOCPiLddW6Og==
+    path: public/docs/cpp/1-types-control/6-1-practice1.md
+cpp-types-control-practice2:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: 9LDGwa5QpUokKbn0Ri3YEw==
+    path: public/docs/cpp/1-types-control/6-2-practice2.md
+cpp-types-control-summary:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: x6A3D7QrAaDT80lU3EpVdA==
+    path: public/docs/cpp/1-types-control/6-0-summary.md
+cpp-types-modifier:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: E7zaD6n91O4z/Ll4o8oJpw==
+    path: public/docs/cpp/1-types-control/3-0-modifier.md
+cpp-types-uniform-init:
+  page: cpp/1-types-control
+  rev:
+  - git: de11512
+    md5: d0SQM7obR9if+uMhtKS7GA==
+    path: public/docs/cpp/1-types-control/2-0-uniform-init.md
+javascript-0-intro-intro:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: da0nweS4EGWkXpss1qBhjA==
+    path: public/docs/javascript/0-intro/-intro.md
+javascript-1-basics-intro:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: HeZhGZ5jNhJj8zMbgPYm3Q==
+    path: public/docs/javascript/1-basics/-intro.md
+javascript-2-control-intro:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: zTbAjh/S2LRqbhZ/9SJvlw==
+    path: public/docs/javascript/2-control/-intro.md
+javascript-3-functions-closures-intro:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: sqjMu+jMs1d16NTydJzSrA==
+    path: public/docs/javascript/3-functions-closures/-intro.md
+javascript-4-this-intro:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: SKVTx/hmc5ihGcqQEN3njQ==
+    path: public/docs/javascript/4-this/-intro.md
+javascript-5-objects-prototype-intro:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: FkVTo2OKrdTLmwKQufSQZQ==
+    path: public/docs/javascript/5-objects-prototype/-intro.md
+javascript-6-classes-intro:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: /4Yy83AK5jb0gAnaquqotA==
+    path: public/docs/javascript/6-classes/-intro.md
+javascript-7-arrays-intro:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: 28KiOxSPHWsMsC9QIp+SRw==
+    path: public/docs/javascript/7-arrays/-intro.md
+javascript-8-promise-intro:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: XZw58m5MVs/XWp5XlOcP4Q==
+    path: public/docs/javascript/8-promise/-intro.md
+javascript-9-async-await-intro:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: 9iRQwdDQfHP5b4Dj+rRAwA==
+    path: public/docs/javascript/9-async-await/-intro.md
+javascript-arrays-array-splice:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: cvTGT3wjd0B2zefdHliLfg==
+    path: public/docs/javascript/7-arrays/1-2-array-splice.md
+javascript-arrays-basic:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: gnq49k1VdILKGmzpgz++BA==
+    path: public/docs/javascript/7-arrays/1-0-array-literal.md
+javascript-arrays-destructuring:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: 5O16Tk6TOij1bqtuccvH2A==
+    path: public/docs/javascript/7-arrays/2-2-destructuring.md
+javascript-arrays-higher-order-func:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: B69z7m9xq/meH3FjpVHiCw==
+    path: public/docs/javascript/7-arrays/3-0-higher-order-func.md
+javascript-arrays-other-method:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: EjD5e5SaRe1EhgGzfRGp4Q==
+    path: public/docs/javascript/7-arrays/4-0-other-method.md
+javascript-arrays-practice1:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: Rolc4udF63JRv88I+hWgqQ==
+    path: public/docs/javascript/7-arrays/5-1-practice1.md
+javascript-arrays-practice2:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: NJVe/pQdvWRs4qlEpkDKJw==
+    path: public/docs/javascript/7-arrays/5-2-practice2.md
+javascript-arrays-spread:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: Z14loExLOOPZXuRkcOrqQQ==
+    path: public/docs/javascript/7-arrays/2-1-spread.md
+javascript-arrays-spread-destructure-basic:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: waf/tDT3cR14wtx7MJVT/w==
+    path: public/docs/javascript/7-arrays/2-0-spread-destructure-basic.md
+javascript-arrays-summary:
+  page: javascript/7-arrays
+  rev:
+  - git: de11512
+    md5: P/U3wdlMlRSlCTatyepKfQ==
+    path: public/docs/javascript/7-arrays/5-0-summary.md
+javascript-arrow-function-basic:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: yU9RfSlBIENC1nVMCeYrGQ==
+    path: public/docs/javascript/3-functions-closures/2-0-arrow-function.md
+javascript-arrow-function-simple:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: RbGLX9+qLCJqF6VpJaRNGQ==
+    path: public/docs/javascript/3-functions-closures/2-2-arrow-function-simple.md
+javascript-async-await-async:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: 5541CA57khp8q83yPzhH1Q==
+    path: public/docs/javascript/9-async-await/1-1-async.md
+javascript-async-await-async-await:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: Sb9Zq797FjCskYEk1qTTtQ==
+    path: public/docs/javascript/9-async-await/1-0-async-await.md
+javascript-async-await-await:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: IftZWyjjsgwkDvBZluIgLg==
+    path: public/docs/javascript/9-async-await/1-2-await.md
+javascript-async-await-fetch:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: UtQ98ng0bJljYn71tfm6sQ==
+    path: public/docs/javascript/9-async-await/3-0-fetch.md
+javascript-async-await-fetch-post:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: qzT3X3iiyWoC6jjV41HF7w==
+    path: public/docs/javascript/9-async-await/3-1-fetch-post.md
+javascript-async-await-practice1:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: btu9sSN61l5cxXoTF/uukA==
+    path: public/docs/javascript/9-async-await/6-1-practice1.md
+javascript-async-await-practice2:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: k+niXE3HshgDsvHwVX/dSQ==
+    path: public/docs/javascript/9-async-await/6-2-practice2.md
+javascript-async-await-promise-all:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: R+BbKO9lj4FfyWMbAo9xOQ==
+    path: public/docs/javascript/9-async-await/4-2-promise-all.md
+javascript-async-await-promise-all-race:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: h5qRY8cglN4QfEiRJf2h0w==
+    path: public/docs/javascript/9-async-await/4-0-promise-all-race.md
+javascript-async-await-promise-race:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: pPPRJb11xMmqRod6XFelmA==
+    path: public/docs/javascript/9-async-await/4-3-promise-race.md
+javascript-async-await-sequential:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: nORrxT5tPTfRgRuPGt1A3A==
+    path: public/docs/javascript/9-async-await/4-1-sequential.md
+javascript-async-await-summary:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: /COU6qIczx+5QkWBj0h+mg==
+    path: public/docs/javascript/9-async-await/5-0-summary.md
+javascript-async-await-try-catch:
+  page: javascript/9-async-await
+  rev:
+  - git: de11512
+    md5: Axm5hnH5bVg8LpowI3SGzg==
+    path: public/docs/javascript/9-async-await/2-0-try-catch.md
+javascript-basics-add-operator:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: inADy6aFoJo8LKDaF2bSDw==
+    path: public/docs/javascript/1-basics/5-1-add-operator.md
+javascript-basics-const-object:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: Jox0tjgJzo8tqQmbZ26+Ow==
+    path: public/docs/javascript/1-basics/3-1-const-object.md
+javascript-basics-equality:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: 0e1h9nw3j4C+A0lOtRYJ6g==
+    path: public/docs/javascript/1-basics/4-0-equality.md
+javascript-basics-null-undefined:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: fUGtRtxxivllEUJMn650TA==
+    path: public/docs/javascript/1-basics/2-1-null-undefined.md
+javascript-basics-object:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: QTvcGBIekxGQxGzkLpMp+g==
+    path: public/docs/javascript/1-basics/3-0-object.md
+javascript-basics-practice1:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: 4nozDGIDQxFkGp1kCK0eZw==
+    path: public/docs/javascript/1-basics/6-1-practice1.md
+javascript-basics-practice2:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: gEfkw961MpE2oFHlqxsQ/A==
+    path: public/docs/javascript/1-basics/6-2-practice2.md
+javascript-basics-primitive-type:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: FLuXTw4SsQDYxc9TUC6NfQ==
+    path: public/docs/javascript/1-basics/2-0-primitive-type.md
+javascript-basics-summary:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: ds8jtl04oyeLmllT+a6jrg==
+    path: public/docs/javascript/1-basics/6-0-summary.md
+javascript-basics-variable:
+  page: javascript/1-basics
+  rev:
+  - git: de11512
+    md5: vcPZDpC9Qv5C94EI4QdMFQ==
+    path: public/docs/javascript/1-basics/1-0-variable.md
+javascript-classes-class-expr:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: SpjUckJBEVTEwM4Mo/GSTA==
+    path: public/docs/javascript/6-classes/1-1-class-expr.md
+javascript-classes-constructor:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: RACi1d/6zCxIcsAKdOKyyA==
+    path: public/docs/javascript/6-classes/1-0-class-constructor.md
+javascript-classes-extends-super:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: iZRBx4CVcOD4skCoj/KF4w==
+    path: public/docs/javascript/6-classes/3-0-extends-super.md
+javascript-classes-method:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: sCkxUyZBr0yCmul+HfMBzw==
+    path: public/docs/javascript/6-classes/2-0-method.md
+javascript-classes-practice1:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: dSZtX+zl86CnSwpm+KYNVQ==
+    path: public/docs/javascript/6-classes/5-1-practice1.md
+javascript-classes-practice2:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: X06tpb2SZJc7OK2khrhDyQ==
+    path: public/docs/javascript/6-classes/5-2-practice2.md
+javascript-classes-private:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: 1/XgK/Sh276WK2cDOAGUKg==
+    path: public/docs/javascript/6-classes/4-2-private.md
+javascript-classes-static:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: 2Lm5SmhNWVc32ssUcOBBUQ==
+    path: public/docs/javascript/6-classes/4-1-static.md
+javascript-classes-static-private:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: tzANe44CiuEEWosFcVSfIQ==
+    path: public/docs/javascript/6-classes/4-0-static-private.md
+javascript-classes-summary:
+  page: javascript/6-classes
+  rev:
+  - git: de11512
+    md5: RzPdx/URyukrCWxgXp45sg==
+    path: public/docs/javascript/6-classes/5-0-summary.md
+javascript-closures:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: 1a7qmYUHn8zyg7lQ0yaDqQ==
+    path: public/docs/javascript/3-functions-closures/5-0-closure.md
+javascript-control-for:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: Z+LWq1cJINlfNhYSRX/T0w==
+    path: public/docs/javascript/2-control/2-1-for.md
+javascript-control-for-in:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: t6UnnXn5O4Xl2num0n+v4A==
+    path: public/docs/javascript/2-control/3-1-for-in.md
+javascript-control-for-of:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: 9ntb0KldbK1ekf9ffnJNow==
+    path: public/docs/javascript/2-control/3-2-for-of.md
+javascript-control-if-truthy:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: Z8fy/hZBg1HzvHPezj/0zA==
+    path: public/docs/javascript/2-control/1-1-if-truthy.md
+javascript-control-iteration:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: Uh5n2848ZBlPels95x2l3A==
+    path: public/docs/javascript/2-control/3-0-iteration.md
+javascript-control-loop:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: bl7uFAPQBZPMrvVONw11Gg==
+    path: public/docs/javascript/2-control/2-0-loop.md
+javascript-control-practice1:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: tFX4zes3NZ9O2dRFKfQmUQ==
+    path: public/docs/javascript/2-control/5-1-practice1.md
+javascript-control-practice2:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: sf9ylVH5q7vybSgooCxFyA==
+    path: public/docs/javascript/2-control/5-2-practice2.md
+javascript-control-summary:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: zF8a3TzBGsdepJVdGWCa4A==
+    path: public/docs/javascript/2-control/5-0-summary.md
+javascript-control-switch:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: yiLhDTM/kxn3fc48aI9ZGg==
+    path: public/docs/javascript/2-control/1-2-switch.md
+javascript-control-throw:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: DXdsJG0esgzWpBs9waKt3g==
+    path: public/docs/javascript/2-control/4-2-throw.md
+javascript-control-try-catch:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: wAFR2s7E9cBPTU1kO0nBzA==
+    path: public/docs/javascript/2-control/4-0-try-catch.md
+javascript-control-while:
+  page: javascript/2-control
+  rev:
+  - git: de11512
+    md5: VBELiYebbzC5dwk8qE8Dzw==
+    path: public/docs/javascript/2-control/2-2-while.md
+javascript-function-declaration:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: Q6b1jgArahh5qx9OQL1CDg==
+    path: public/docs/javascript/3-functions-closures/1-1-function-declaration.md
+javascript-function-expression:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: iFAsUkmPIEPPGD/iN/KBUw==
+    path: public/docs/javascript/3-functions-closures/1-2-function-expression.md
+javascript-functions-argument:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: NKCYgFahmbl4uRlukfQK9g==
+    path: public/docs/javascript/3-functions-closures/3-0-argument.md
+javascript-functions-basic:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: UMKw23D4/MXTQq4x+I9Iuw==
+    path: public/docs/javascript/3-functions-closures/1-0-function.md
+javascript-functions-closures-practice1:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: laUifsrum3Pr/zoVXJ8Sig==
+    path: public/docs/javascript/3-functions-closures/6-1-practice1.md
+javascript-functions-closures-practice2:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: jw9iRmXqsb6WAHCe4jl36g==
+    path: public/docs/javascript/3-functions-closures/6-2-practice2.md
+javascript-functions-closures-summary:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: 0jcVL02r2yNZCvAjM+rKKQ==
+    path: public/docs/javascript/3-functions-closures/6-0-summary.md
+javascript-functions-default-arg:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: f6aruD8L7TSETHpa6qoKyQ==
+    path: public/docs/javascript/3-functions-closures/3-1-default-arg.md
+javascript-functions-rest-arg:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: uIbXOOGZ+GDU3L3CyzcXmA==
+    path: public/docs/javascript/3-functions-closures/3-2-rest-arg.md
+javascript-functions-scope-chain:
+  page: javascript/3-functions-closures
+  rev:
+  - git: de11512
+    md5: kDljBYm3c2gh4cNoaSd4pA==
+    path: public/docs/javascript/3-functions-closures/4-0-scope-chain.md
+javascript-intro-about:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: kBulgM3eOjczsYrT3/YJpg==
+    path: public/docs/javascript/0-intro/1-0-about.md
+javascript-intro-browser:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: Esh7ZLeZgIWuVfyy2FNjSg==
+    path: public/docs/javascript/0-intro/4-3-browser.md
+javascript-intro-comparison:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: k3ZA1ruy0mL6Xdm0IOijsw==
+    path: public/docs/javascript/0-intro/3-0-comparison.md
+javascript-intro-environment:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: flaj4igef+wKB/YWfu2sdw==
+    path: public/docs/javascript/0-intro/2-0-environment.md
+javascript-intro-helloworld:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: yny2RZruZRk6uxbITmAByg==
+    path: public/docs/javascript/0-intro/4-0-helloworld.md
+javascript-intro-repl:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: 3me5E/ruA2eWHJt9qSb+3A==
+    path: public/docs/javascript/0-intro/4-1-repl.md
+javascript-intro-run-source:
+  page: javascript/0-intro
+  rev:
+  - git: de11512
+    md5: Y5WUaR+sA616ooJhXLs5Sg==
+    path: public/docs/javascript/0-intro/4-2-run-source.md
+javascript-objects-literal:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: fmjBAsboSdGnpDle97MnAw==
+    path: public/docs/javascript/5-objects-prototype/1-0-obj-literal.md
+javascript-objects-method-this-recall:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: Q/RdQp4F3coYoWyzYEbrQQ==
+    path: public/docs/javascript/5-objects-prototype/2-0-method-this-recall.md
+javascript-objects-properties:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: 02eRNBOvlYRJFB+nAuGK1w==
+    path: public/docs/javascript/5-objects-prototype/1-1-properties.md
+javascript-objects-prototype-practice1:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: DJEN9oKFyBH336VGNPQ68Q==
+    path: public/docs/javascript/5-objects-prototype/6-1-practice1.md
+javascript-objects-prototype-practice2:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: 3vFKnW24nm62wV7nA7BJTA==
+    path: public/docs/javascript/5-objects-prototype/6-2-practice2.md
+javascript-objects-prototype-summary:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: U7/lFPzZmE74cXv7OGmneQ==
+    path: public/docs/javascript/5-objects-prototype/6-0-summary.md
+javascript-promise-basic:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: IrFpZ8oCx7b8mU6syrIxgg==
+    path: public/docs/javascript/8-promise/4-0-promise-basic.md
+javascript-promise-callback-hell:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: J2OyTbV20eKgXoGcBmy0NA==
+    path: public/docs/javascript/8-promise/3-0-callback-hell.md
+javascript-promise-create:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: LmIwH4p7GotWkXM3jzBDAA==
+    path: public/docs/javascript/8-promise/5-1-promise-create.md
+javascript-promise-event-callback:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: XthWX2OotKXRmCgbjUEqaw==
+    path: public/docs/javascript/8-promise/2-0-event-callback.md
+javascript-promise-method:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: ubg3Azi1cYY1X8RqVQyLnQ==
+    path: public/docs/javascript/8-promise/5-2-promise-method.md
+javascript-promise-practice1:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: LIInb7CG9Tnujmzn5Tz+NA==
+    path: public/docs/javascript/8-promise/7-1-practice1.md
+javascript-promise-practice2:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: BIMbEfyWXrCGuZuyXZu+HA==
+    path: public/docs/javascript/8-promise/7-2-practice2.md
+javascript-promise-summary:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: RdNmxCFvC9z666KYT/Hq1g==
+    path: public/docs/javascript/8-promise/6-0-summary.md
+javascript-promise-sync-vs-async:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: JAGBJsh9eCaFUxsrsgifGA==
+    path: public/docs/javascript/8-promise/1-0-sync-vs-async.md
+javascript-promise-usage:
+  page: javascript/8-promise
+  rev:
+  - git: de11512
+    md5: ZaIPqHUKKdgybu/ml4rR8w==
+    path: public/docs/javascript/8-promise/5-0-promise-usage.md
+javascript-prototype-basic:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: LitGhhdL0wp2fsR6Zw21aA==
+    path: public/docs/javascript/5-objects-prototype/3-0-prototype-basic.md
+javascript-prototype-chain:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: ilFfF9GbXnhGXWLEzygLEA==
+    path: public/docs/javascript/5-objects-prototype/4-0-prototype-chain.md
+javascript-prototype-getprototypeof:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: RWWO8cj59TfixW9cOSf3bA==
+    path: public/docs/javascript/5-objects-prototype/3-1-getprototypeof.md
+javascript-prototype-new-constructor:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: h58kbRe0RCByGuaVOsxe/g==
+    path: public/docs/javascript/5-objects-prototype/5-2-new-constructor.md
+javascript-prototype-object-create:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: rC7qoaoYHiQKELIDD74pUA==
+    path: public/docs/javascript/5-objects-prototype/5-1-object-create.md
+javascript-prototype-object-create-basic:
+  page: javascript/5-objects-prototype
+  rev:
+  - git: de11512
+    md5: udAwbtwsNCZgpWgppDXFpA==
+    path: public/docs/javascript/5-objects-prototype/5-0-object-create-basic.md
+javascript-this-arrow-func:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: z3aaG7dEUHWdomnoTKVzNA==
+    path: public/docs/javascript/4-this/3-0-arrow-func.md
+javascript-this-basic:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: xaDNSX/IyFO+kvUdAakrQw==
+    path: public/docs/javascript/4-this/1-0-this-basic.md
+javascript-this-bind:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: 2w/upowzfulEDzBuqNzIIQ==
+    path: public/docs/javascript/4-this/2-2-bind.md
+javascript-this-bind-basic:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: PvWitEWFP5kuAMq8l8Svig==
+    path: public/docs/javascript/4-this/2-0-bind-basic.md
+javascript-this-call-apply:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: pl61k5ibvxbgrSxqjFaPng==
+    path: public/docs/javascript/4-this/2-1-call-apply.md
+javascript-this-practice1:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: bLJW/qetW0Ho6FFOtup24w==
+    path: public/docs/javascript/4-this/4-1-practice1.md
+javascript-this-practice2:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: YoR3oNzH5HoPQgmMd8o/eA==
+    path: public/docs/javascript/4-this/4-2-practice2.md
+javascript-this-summary:
+  page: javascript/4-this
+  rev:
+  - git: de11512
+    md5: oPa4IlbsGM6Fq711rjirDA==
+    path: public/docs/javascript/4-this/4-0-summary.md
+python-0-intro-intro:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: uarvEvHI+2jp1WUkq2Vdeg==
+    path: public/docs/python/0-intro/-intro.md
+python-1-basics-intro:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: vZXbsjvXR+kHSkopsKTd/g==
+    path: public/docs/python/1-basics/-intro.md
+python-2-collections-intro:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: Fl4EdEdjKgwjFdFPukLsnw==
+    path: public/docs/python/2-collections/-intro.md
+python-3-control-functions-intro:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: 0LZoveWlVyBLcJKc7PEOuQ==
+    path: public/docs/python/3-control-functions/-intro.md
+python-4-modules-intro:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: d4KubZHE7xwSCfzqL2VNOA==
+    path: public/docs/python/4-modules/-intro.md
+python-5-oop-intro:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: QYiWIS/bLD3pM6rMYjm5JA==
+    path: public/docs/python/5-oop/-intro.md
+python-6-file-io-intro:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: gkZlyR8aANRoYnusLiL+gA==
+    path: public/docs/python/6-file-io/-intro.md
+python-7-exceptions-intro:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: JZZ2/G89FDMz9c4+EHkw8g==
+    path: public/docs/python/7-exceptions/-intro.md
+python-8-generators-decorators-intro:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: vdI4mmJeZjcyj/vvU3A9Yg==
+    path: public/docs/python/8-generators-decorators/-intro.md
+python-basics-bool:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: 83YCzzhuY+yQ06eEw9KcBg==
+    path: public/docs/python/1-basics/2-4-bool.md
+python-basics-f-string:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: KK7N6Cb0P/48Nc8/kcgXGw==
+    path: public/docs/python/1-basics/2-3-f-string.md
+python-basics-int:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: OJKlj+xix39PQ35eqVGCLw==
+    path: public/docs/python/1-basics/2-1-int.md
+python-basics-practice1:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: VymqddpAhYE9iqpehZJDEw==
+    path: public/docs/python/1-basics/4-1-practice1.md
+python-basics-practice2:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: 6JaxKLNCQfAEnlKDEkyezw==
+    path: public/docs/python/1-basics/4-2-practice2.md
+python-basics-str:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: EyblpE8/fhMxuOfq1j1x9g==
+    path: public/docs/python/1-basics/2-2-str.md
+python-basics-summary:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: O8qeaJmyEFxEeSEEtUC3SA==
+    path: public/docs/python/1-basics/4-0-summary.md
+python-basics-type-hints:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: ps7M6cuPx5j+5/qw5Q2tlg==
+    path: public/docs/python/1-basics/3-0-type-hints.md
+python-basics-types:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: QWenqeJ81MTSFvgnTPY4IQ==
+    path: public/docs/python/1-basics/2-0-types.md
+python-basics-variable:
+  page: python/1-basics
+  rev:
+  - git: de11512
+    md5: HpAAXtbc+Ygnk/IxMdWEVw==
+    path: public/docs/python/1-basics/1-0-variable.md
+python-collections-comprehensions:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: eYIaZFlzrimqpWEsS+3Zjg==
+    path: public/docs/python/2-collections/6-0-comprehensions.md
+python-collections-dict-comprehension:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: d/G5b1icX+bOoi+7X40Yuw==
+    path: public/docs/python/2-collections/6-2-dict-comprehension.md
+python-collections-dictionary:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: Uz4psRVv8b4Qg4wvlJ2ciw==
+    path: public/docs/python/2-collections/3-0-dictionary.md
+python-collections-list:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: SH47/2f8zuj1IY+3mG2tRA==
+    path: public/docs/python/2-collections/1-0-list.md
+python-collections-list-comprehension:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: PXk7MyYY/C+uUfY6MH5AYQ==
+    path: public/docs/python/2-collections/6-1-list-comprehension.md
+python-collections-practice1:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: fXp5RZ0G4GlvltQDCwymxQ==
+    path: public/docs/python/2-collections/7-1-practice1.md
+python-collections-practice2:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: JkA2M1RYEauiTCWgwy4YWg==
+    path: public/docs/python/2-collections/7-2-practice2.md
+python-collections-set:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: fFbsvQKN/71fT8QI95KW8w==
+    path: public/docs/python/2-collections/4-0-set.md
+python-collections-set-comprehension:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: eIAs7EUwhg4ECBcEB0r+qg==
+    path: public/docs/python/2-collections/6-3-set-comprehension.md
+python-collections-slicing:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: WQhXTp8IoSUDdm2OOaDuog==
+    path: public/docs/python/2-collections/5-0-slicing.md
+python-collections-summary:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: hIAFNOffuZEwka+yEEbqCA==
+    path: public/docs/python/2-collections/7-0-summary.md
+python-collections-tuple:
+  page: python/2-collections
+  rev:
+  - git: de11512
+    md5: JxSs5SiKbgJXf9e9rViobQ==
+    path: public/docs/python/2-collections/2-0-tuple.md
+python-control-functions-arguments:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: 0Hff1k0embxjIn7H7yTT8g==
+    path: public/docs/python/3-control-functions/5-0-arguments.md
+python-control-functions-def:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: v0NbdURDQH4e2y9jt/m3yw==
+    path: public/docs/python/3-control-functions/4-0-def.md
+python-control-functions-enumerate:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: W/lAMkBQL6kv3ByKG5BWWQ==
+    path: public/docs/python/3-control-functions/2-2-enumerate.md
+python-control-functions-for:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: vqNHAU4OXxN00MPcYR38ZQ==
+    path: public/docs/python/3-control-functions/2-0-for.md
+python-control-functions-if:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: p7eFld+Z8SiA5I3MYQwP9A==
+    path: public/docs/python/3-control-functions/1-0-if.md
+python-control-functions-keyword-var-arg:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: iKgQi8zHYcBMUyiAn5QOtA==
+    path: public/docs/python/3-control-functions/6-2-keyword-var-arg.md
+python-control-functions-lambda:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: zzqHNR+aou3kYdy4PGUCtA==
+    path: public/docs/python/3-control-functions/7-0-lambda.md
+python-control-functions-positional-var-arg:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: PTmT5d7WmK9bZY2eUct1IQ==
+    path: public/docs/python/3-control-functions/6-1-positional-var-arg.md
+python-control-functions-practice1:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: ocJErycjIFRyTNdm6EGguQ==
+    path: public/docs/python/3-control-functions/8-1-practice1.md
+python-control-functions-practice2:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: DuhvtX+hKkkui1GwwQ3jUQ==
+    path: public/docs/python/3-control-functions/8-2-practice2.md
+python-control-functions-range:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: G04MW06FmXeAh/YnRXjTmQ==
+    path: public/docs/python/3-control-functions/2-1-range.md
+python-control-functions-summary:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: CC/O5pE917t94HzW3uAoUw==
+    path: public/docs/python/3-control-functions/8-0-summary.md
+python-control-functions-var-arg:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: oXoxSf5rRnPTxUkjbqcVxA==
+    path: public/docs/python/3-control-functions/6-0-var-arg.md
+python-control-functions-while:
+  page: python/3-control-functions
+  rev:
+  - git: de11512
+    md5: uKWGGSTQU7iJHr266xgHIA==
+    path: public/docs/python/3-control-functions/3-0-while.md
+python-exceptions-else-finally:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: lyv3tJQw8qVYGxXAoxtCvQ==
+    path: public/docs/python/7-exceptions/4-0-else-finally.md
+python-exceptions-multiple-error:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: TzL7wfqPO2me90lcaa5vjQ==
+    path: public/docs/python/7-exceptions/2-0-multiple-error.md
+python-exceptions-multiple-except:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: KfGuhbdJXoI8lcQREDo8qA==
+    path: public/docs/python/7-exceptions/2-1-multiple-except.md
+python-exceptions-practice1:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: 6YYpAD9TT/2DDfKN+BJh2g==
+    path: public/docs/python/7-exceptions/5-1-practice1.md
+python-exceptions-practice2:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: naOLugZLb9w5jMj0N0tBYQ==
+    path: public/docs/python/7-exceptions/5-2-practice2.md
+python-exceptions-raise:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: A8r+rkYDHTGrbWZvCDHKsg==
+    path: public/docs/python/7-exceptions/3-0-raise.md
+python-exceptions-summary:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: IAu9MzwtxG3CIm2hMlbbng==
+    path: public/docs/python/7-exceptions/5-0-summary.md
+python-exceptions-try-except:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: PdPzxGbLjfrCcajXIRM5/Q==
+    path: public/docs/python/7-exceptions/1-0-try-except.md
+python-exceptions-tuple-except:
+  page: python/7-exceptions
+  rev:
+  - git: de11512
+    md5: bT6I5SngPHgKCNvhkRu7qA==
+    path: public/docs/python/7-exceptions/2-2-tuple-except.md
+python-file-io-csv-module:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: f1+ai0K6OXWIwBtqBfhG2Q==
+    path: public/docs/python/6-file-io/5-0-csv-module.md
+python-file-io-csv-read:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: wxXN1dYtBMTFJOt7SspZTA==
+    path: public/docs/python/6-file-io/5-2-csv-read.md
+python-file-io-csv-write:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: BJBb6lG5GWyDrZ6aIKWuHw==
+    path: public/docs/python/6-file-io/5-1-csv-write.md
+python-file-io-json-module:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: Gb9kLJ/Ifi74su9l4asLFA==
+    path: public/docs/python/6-file-io/4-0-json-module.md
+python-file-io-open:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: THX6fcFuNFOnqf2TKxUQ1w==
+    path: public/docs/python/6-file-io/1-0-open.md
+python-file-io-practice1:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: ftT2T59ST/pmQsg4Peej0g==
+    path: public/docs/python/6-file-io/6-1-practice1.md
+python-file-io-practice2:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: gxqp0ozDHI69Ihsoeyu5dQ==
+    path: public/docs/python/6-file-io/6-2-practice2.md
+python-file-io-read:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: JvqUIhSw9ZPl6oyvaQ91Iw==
+    path: public/docs/python/6-file-io/2-2-read.md
+python-file-io-summary:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: W5UOtlm5W7f6yfeoSzvQbA==
+    path: public/docs/python/6-file-io/6-0-summary.md
+python-file-io-textfile:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: WYQ+4Kt61JbeW36fLqZK5w==
+    path: public/docs/python/6-file-io/2-0-textfile.md
+python-file-io-with:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: 0IyLG0rwLQt1qLohsOT+dQ==
+    path: public/docs/python/6-file-io/3-0-with.md
+python-file-io-write:
+  page: python/6-file-io
+  rev:
+  - git: de11512
+    md5: hfXSHdIOxlSsLoL8WIVDQg==
+    path: public/docs/python/6-file-io/2-1-write.md
+python-generators-decorators-at-decorator:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: COjMej60LFghMWPfdfmEhw==
+    path: public/docs/python/8-generators-decorators/4-1-at-decorator.md
+python-generators-decorators-decorator:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: YVgaDbeTJuf1y9AMXhT9cw==
+    path: public/docs/python/8-generators-decorators/4-0-decorator.md
+python-generators-decorators-generator-expr:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: 3CRZN6k1giimpZP/ZVznxA==
+    path: public/docs/python/8-generators-decorators/3-0-generator-expr.md
+python-generators-decorators-generator-yield:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: EygAcArGK5dsdNsrSxjZxA==
+    path: public/docs/python/8-generators-decorators/2-0-generator-yield.md
+python-generators-decorators-iterator:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: NN13VtdcZVBLqcwPWt1hGQ==
+    path: public/docs/python/8-generators-decorators/1-0-iterator.md
+python-generators-decorators-practice1:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: cRSdDHTuW7xwbDQLorJTVw==
+    path: public/docs/python/8-generators-decorators/5-1-practice1.md
+python-generators-decorators-practice2:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: l9QYb2y3E7OgsGyr2sZObQ==
+    path: public/docs/python/8-generators-decorators/5-2-practice2.md
+python-generators-decorators-summary:
+  page: python/8-generators-decorators
+  rev:
+  - git: de11512
+    md5: hhjkBm0qOtoDKm1NnuxgQw==
+    path: public/docs/python/8-generators-decorators/5-0-summary.md
+python-intro-install:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: cs7Vmt1PmHiIXnPdaPNi6Q==
+    path: public/docs/python/0-intro/2-0-install.md
+python-intro-main-snippet:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: JyYDnLmf4rekOZWwttkxwQ==
+    path: public/docs/python/0-intro/4-1-main-snippet.md
+python-intro-pip-venv:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: 0g2mLjtmt7EEfOQXgfDrgQ==
+    path: public/docs/python/0-intro/5-0-pip-venv.md
+python-intro-readability:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: 76tf5G8NcV/fjGHzAZSc/w==
+    path: public/docs/python/0-intro/1-0-readability.md
+python-intro-repl:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: rStCCDAmdptBhjRudqaQrQ==
+    path: public/docs/python/0-intro/3-0-repl.md
+python-intro-repl-usage:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: +dA3QfKb2szFo/LQOQ0r7A==
+    path: public/docs/python/0-intro/3-3-repl-usage.md
+python-intro-script-run:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: 96cTehcM+U6LAlMQ/hz8AA==
+    path: public/docs/python/0-intro/4-0-script-run.md
+python-intro-version-management:
+  page: python/0-intro
+  rev:
+  - git: de11512
+    md5: gFk0LM1kU7sJGGK0BvWo0w==
+    path: public/docs/python/0-intro/2-3-version-management.md
+python-modules-basic:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: QZqPm3sCYKnc5YKcs0rTmA==
+    path: public/docs/python/4-modules/1-0-basic.md
+python-modules-custom-module:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: DMUEQYz7M35/8ZUJevdf+g==
+    path: public/docs/python/4-modules/1-4-custom-module.md
+python-modules-datetime:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: PJPsi0eEuGd23pKfdG6+vA==
+    path: public/docs/python/4-modules/3-4-datetime.md
+python-modules-find-std-library:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: O8yl0c0WT25nSbjr5SAUEg==
+    path: public/docs/python/4-modules/3-1-find-std-library.md
+python-modules-from-import:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: 3Ua0ZVp+j2JH3pjIOdmi7w==
+    path: public/docs/python/4-modules/1-3-from-import.md
+python-modules-import-as:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: jvkKdfbNydUfI3k/zvyr5A==
+    path: public/docs/python/4-modules/1-2-import-as.md
+python-modules-import-math:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: NH5zIKkPXnF0uN9lDMwGUg==
+    path: public/docs/python/4-modules/1-1-import-math.md
+python-modules-init-py:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: S1WPD9M0G4khRY0+3lD7wg==
+    path: public/docs/python/4-modules/2-1-init-py.md
+python-modules-json:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: x7M+hfMS9v/euXT5q+wQJQ==
+    path: public/docs/python/4-modules/3-5-json.md
+python-modules-os:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: Egz0JmAbqR9L1uNmGYGtxQ==
+    path: public/docs/python/4-modules/3-2-os.md
+python-modules-package:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: Mw/ZSAaoOD4W7GnvUEdbJw==
+    path: public/docs/python/4-modules/2-0-package.md
+python-modules-practice1:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: ZF2lw9EbHMZDS3+4FgDh4Q==
+    path: public/docs/python/4-modules/4-1-practice1.md
+python-modules-practice2:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: FNi2mbHTO40UcoiyUMoraQ==
+    path: public/docs/python/4-modules/4-2-practice2.md
+python-modules-std-library:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: g2DYqdurWSlZ6YOIh1M7fA==
+    path: public/docs/python/4-modules/3-0-std-library.md
+python-modules-summary:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: pLqEL+wICaSAta7xEeiPKw==
+    path: public/docs/python/4-modules/4-0-summary.md
+python-modules-sys:
+  page: python/4-modules
+  rev:
+  - git: de11512
+    md5: 3YOGLlS5fvr58JRVLEF0gg==
+    path: public/docs/python/4-modules/3-3-sys.md
+python-oop-class-instance:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: dMavGyHwlz76MhazWyQIIw==
+    path: public/docs/python/5-oop/1-0-class-instance.md
+python-oop-class-type-annotation:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: TOCA9S1RE2UpSKFNn0fFbg==
+    path: public/docs/python/5-oop/4-1-class-type-annotation.md
+python-oop-class-vars:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: dRkAxXrj+9x8vxfZCuwRnw==
+    path: public/docs/python/5-oop/3-0-class-vars.md
+python-oop-constructor:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: cNtgU/77Kc/mi7WPGPiZ/Q==
+    path: public/docs/python/5-oop/2-0-constructor.md
+python-oop-inheritance:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: P0ujuLSSv7CEdQ27ormwAA==
+    path: public/docs/python/5-oop/5-0-inheritance.md
+python-oop-method:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: qf4fNFYYp4Vlr2HKx3naHw==
+    path: public/docs/python/5-oop/4-0-method.md
+python-oop-practice1:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: GgmKWmDK4H5wyafhPTX0PA==
+    path: public/docs/python/5-oop/8-1-practice1.md
+python-oop-practice2:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: y9sO9J8kzkkN9OMPvqae1Q==
+    path: public/docs/python/5-oop/8-2-practice2.md
+python-oop-str-repr:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: LFYDKpLa2AoOQlskXDr1nQ==
+    path: public/docs/python/5-oop/6-0-str-repr.md
+python-oop-summary:
+  page: python/5-oop
+  rev:
+  - git: de11512
+    md5: K6I/4LGyAOQP01LbndQQrA==
+    path: public/docs/python/5-oop/8-0-summary.md
+ruby-0-intro-intro:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: dls9Z7RFXLnKuyC+oOs9Dg==
+    path: public/docs/ruby/0-intro/-intro.md
+ruby-1-basics-intro:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: 4Fgy86bkujTamMzG7oIbfQ==
+    path: public/docs/ruby/1-basics/-intro.md
+ruby-10-testing-intro:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: T/Jghe8SAkAHdJnH33qbmA==
+    path: public/docs/ruby/10-testing/-intro.md
+ruby-11-metaprogramming-intro:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: H5Fi86tnMiz4IJdJow0KPw==
+    path: public/docs/ruby/11-metaprogramming/-intro.md
+ruby-2-control-methods-intro:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: NcZIuMWf82bIOH+VQH/QJw==
+    path: public/docs/ruby/2-control-methods/-intro.md
+ruby-3-everything-object-intro:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: jLLl6v0GTyQ7YGaH7luZ2A==
+    path: public/docs/ruby/3-everything-object/-intro.md
+ruby-4-collections-intro:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: hCYxan/RZqCRKx9uMyR6fQ==
+    path: public/docs/ruby/4-collections/-intro.md
+ruby-5-blocks-iterators-intro:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: REUL2jixyqoTsmzrUiPq/g==
+    path: public/docs/ruby/5-blocks-iterators/-intro.md
+ruby-6-classes-intro:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: Wwv0jbcNLK/ABoX041XH4w==
+    path: public/docs/ruby/6-classes/-intro.md
+ruby-7-modules-intro:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: AoNwFjNC06F1woyzGW/4Ww==
+    path: public/docs/ruby/7-modules/-intro.md
+ruby-8-proc-lambda-intro:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: kTXXy7tQWn8KvVhkOkiVJg==
+    path: public/docs/ruby/8-proc-lambda/-intro.md
+ruby-9-stdlib-intro:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: 4z9FCCuN5vJ6MZWiWJOdDg==
+    path: public/docs/ruby/9-stdlib/-intro.md
+ruby-basics-method-call:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: DMtSY8st27f9Ci52yFTxUQ==
+    path: public/docs/ruby/1-basics/5-0-method-call.md
+ruby-basics-nil-false:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: 0EC2mHYCOA6Kn1Epoi5qyg==
+    path: public/docs/ruby/1-basics/3-0-nil-false.md
+ruby-basics-practice1:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: MDpi0j8NZTQDZKsxTCxjFQ==
+    path: public/docs/ruby/1-basics/7-1-practice1.md
+ruby-basics-string-interpolation:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: 0pHBIftmrf+LM8yQY7WQOw==
+    path: public/docs/ruby/1-basics/6-0-string-interpolation.md
+ruby-basics-summary:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: CZCOCVANYOMsRT5vV/Sghg==
+    path: public/docs/ruby/1-basics/7-0-summary.md
+ruby-basics-symbol:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: PcQYUAMM3FwkyFqxT+zZZQ==
+    path: public/docs/ruby/1-basics/4-0-symbol.md
+ruby-basics-types:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: yGUSKxEcpuznqERjgIy9WQ==
+    path: public/docs/ruby/1-basics/2-0-types.md
+ruby-basics-variable:
+  page: ruby/1-basics
+  rev:
+  - git: de11512
+    md5: lVeMdYivKQs15yqCpKtHjg==
+    path: public/docs/ruby/1-basics/1-0-variable.md
+ruby-blocks:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: roue7R1i10ktd/KkLciLjw==
+    path: public/docs/ruby/5-blocks-iterators/1-0-block.md
+ruby-blocks-arg:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: yCt7QRKedWDfTw6d2m5H1w==
+    path: public/docs/ruby/5-blocks-iterators/1-1-block-arg.md
+ruby-blocks-iterators-enumerable:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: vn9jJ66uj0B9prkE/fAvkw==
+    path: public/docs/ruby/5-blocks-iterators/3-0-enumerable.md
+ruby-blocks-iterators-for:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: GxLTpA/y4AGbSLpKxObbfQ==
+    path: public/docs/ruby/5-blocks-iterators/4-0-for.md
+ruby-blocks-iterators-practice1:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: 2s6E5XGxgvTNErC2bBr99A==
+    path: public/docs/ruby/5-blocks-iterators/7-1-practice1.md
+ruby-blocks-iterators-practice2:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: UIPoHDnTfnvaWb8d1HYchA==
+    path: public/docs/ruby/5-blocks-iterators/7-2-practice2.md
+ruby-blocks-iterators-summary:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: w+3PnqQg+s20RDcbL6GBbA==
+    path: public/docs/ruby/5-blocks-iterators/7-0-summary.md
+ruby-blocks-iterators-yield:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: iLUgyIysqp6dOVD3/W7hUA==
+    path: public/docs/ruby/5-blocks-iterators/6-0-yield.md
+ruby-blocks-return:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: Li/HEc9wH4t2jz+t0Syvjw==
+    path: public/docs/ruby/5-blocks-iterators/1-2-block-return.md
+ruby-classes-accessor:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: ddrqiCRO6AELFZdvsIkpZg==
+    path: public/docs/ruby/6-classes/3-0-accessor.md
+ruby-classes-accessor-attr:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: i3AKZ+7e5ME02qgqFvdbmg==
+    path: public/docs/ruby/6-classes/3-2-accessor-attr.md
+ruby-classes-accessor-manual:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: exEpnknnQpF1HyNpAPglKQ==
+    path: public/docs/ruby/6-classes/3-1-accessor-manual.md
+ruby-classes-class-var-method:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: +bygQ7SCz1En15vkfXBYuw==
+    path: public/docs/ruby/6-classes/4-0-class-var-method.md
+ruby-classes-inheritance:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: UrGYVOOiNlDN/4VanBoTtQ==
+    path: public/docs/ruby/6-classes/5-0-inheritance.md
+ruby-classes-initialize:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: ow/KuYRo9O40Aabwgty7UQ==
+    path: public/docs/ruby/6-classes/1-0-initialize.md
+ruby-classes-instance-var-method:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: McRQzdyH0WZYBytGSH4hfQ==
+    path: public/docs/ruby/6-classes/2-0-instance-var-method.md
+ruby-classes-practice1:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: 2y09gG0Ct+FOggeWELgcbA==
+    path: public/docs/ruby/6-classes/6-1-practice1.md
+ruby-classes-practice2:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: NYcF2vaGqRw9EucYFHtWjg==
+    path: public/docs/ruby/6-classes/6-2-practice2.md
+ruby-classes-summary:
+  page: ruby/6-classes
+  rev:
+  - git: de11512
+    md5: Vv3dENAkWH3TTV73OvmUmA==
+    path: public/docs/ruby/6-classes/6-0-summary.md
+ruby-collections-array:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: r+o/ihSbIwuzdwIjb9WFfQ==
+    path: public/docs/ruby/4-collections/1-0-array.md
+ruby-collections-array-method:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: APMSVBLxhAs3Mm+vjx2nJw==
+    path: public/docs/ruby/4-collections/1-3-array-method.md
+ruby-collections-array-push-pop:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: StRrE6Sk1nemVQvVRYlj0w==
+    path: public/docs/ruby/4-collections/1-2-array-push-pop.md
+ruby-collections-hash:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: Q+uyYYu28/eaOs77DUzmqg==
+    path: public/docs/ruby/4-collections/2-0-hash.md
+ruby-collections-hash-json-like:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: J1SJ+2k5IWbqQouo5OViZw==
+    path: public/docs/ruby/4-collections/2-2-hash-json-like.md
+ruby-collections-hash-rocket:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: Cp0qopoYO/dTG4dphwXJ5Q==
+    path: public/docs/ruby/4-collections/2-1-hash-rocket.md
+ruby-collections-practice1:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: loKWfGJN8pUlN1b+GD41Pw==
+    path: public/docs/ruby/4-collections/4-1-practice1.md
+ruby-collections-practice2:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: 3ODZsz4mak32Wa9kmBlZwA==
+    path: public/docs/ruby/4-collections/4-2-practice2.md
+ruby-collections-range:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: Wm8Y4j3q+1zTYFFAx0Pr8w==
+    path: public/docs/ruby/4-collections/3-0-range.md
+ruby-collections-range-2:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: KngaWHPG9i6Rmp+lymhdVg==
+    path: public/docs/ruby/4-collections/3-1-range-2.md
+ruby-collections-range-3:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: 0Fp4DH5IHhD4mgE6i1OFKg==
+    path: public/docs/ruby/4-collections/3-2-range-3.md
+ruby-collections-range-case:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: GIfnVp/2w74E5SMvsHB8tA==
+    path: public/docs/ruby/4-collections/3-3-range-case.md
+ruby-collections-summary:
+  page: ruby/4-collections
+  rev:
+  - git: de11512
+    md5: UCguktgWpqmnaDITPdZU5Q==
+    path: public/docs/ruby/4-collections/4-0-summary.md
+ruby-control-case:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: rigEZ3wM/1f7iGm0zv8A7g==
+    path: public/docs/ruby/2-control-methods/1-3-case.md
+ruby-control-conditional:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: 9ZBIKJ+QRWSZb44n9SwD5A==
+    path: public/docs/ruby/2-control-methods/1-0-conditional.md
+ruby-control-if:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: q0ya83IWHVkaAJuTIg3UFQ==
+    path: public/docs/ruby/2-control-methods/1-1-if.md
+ruby-control-loop:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: /jx0zuv4oC9bvxy2MMKklw==
+    path: public/docs/ruby/2-control-methods/2-0-loop.md
+ruby-control-methods-practice1:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: pkB90VSV67IDZQ4xt4zxAw==
+    path: public/docs/ruby/2-control-methods/6-1-practice1.md
+ruby-control-methods-practice2:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: jzYEAC4Kga+nH30JSWjqJA==
+    path: public/docs/ruby/2-control-methods/6-2-practice2.md
+ruby-control-methods-summary:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: 5LMb10n9i1/azgj34ku6CQ==
+    path: public/docs/ruby/2-control-methods/6-0-summary.md
+ruby-control-methods-until:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: /do9QQx2IWjDK0Qs9B7z7g==
+    path: public/docs/ruby/2-control-methods/2-2-until.md
+ruby-control-unless:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: uG1+t19zVPXcN8Az78jgyg==
+    path: public/docs/ruby/2-control-methods/1-2-unless.md
+ruby-control-while:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: ZC1EoleBncNZLJx/MzVi3g==
+    path: public/docs/ruby/2-control-methods/2-1-while.md
+ruby-everything-object-basic-method:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: yYE8+RQSaWvz3qk7BimicQ==
+    path: public/docs/ruby/3-everything-object/4-0-basic-method.md
+ruby-everything-object-integer:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: b3Z099FewLEMLPvxjOrscw==
+    path: public/docs/ruby/3-everything-object/4-2-integer.md
+ruby-everything-object-literal:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: FReCcsuVejJ+GO/oXgPi1g==
+    path: public/docs/ruby/3-everything-object/1-0-literal.md
+ruby-everything-object-message-passing:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: 5Dt+kPla63WToySNSpHo0w==
+    path: public/docs/ruby/3-everything-object/3-0-message-passing.md
+ruby-everything-object-nil:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: fIrn6aqHBLjdEfA0XztcrA==
+    path: public/docs/ruby/3-everything-object/2-0-nil.md
+ruby-everything-object-practice1:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: j7BcKMnlDgKdRSgeQs7mBw==
+    path: public/docs/ruby/3-everything-object/5-1-practice1.md
+ruby-everything-object-practice2:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: CZtVA3dvWuGexauHK6Uvkg==
+    path: public/docs/ruby/3-everything-object/5-2-practice2.md
+ruby-everything-object-string:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: xiheTa7JiZHRhTxAwJ8A3w==
+    path: public/docs/ruby/3-everything-object/4-1-string.md
+ruby-everything-object-summary:
+  page: ruby/3-everything-object
+  rev:
+  - git: de11512
+    md5: AFEPqsffixVtbr6dFFvKdQ==
+    path: public/docs/ruby/3-everything-object/5-0-summary.md
+ruby-exception:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: AEMESLcbsmVEqEceqxQ+YA==
+    path: public/docs/ruby/2-control-methods/5-0-exception.md
+ruby-exception-raise:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: AcVaw6hnz7ZISF6+kQVyWA==
+    path: public/docs/ruby/2-control-methods/5-2-raise.md
+ruby-intro-comparison:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: i4bQ+ZCGBGR0EMOMMnnquA==
+    path: public/docs/ruby/0-intro/2-0-comparison.md
+ruby-intro-helloworld:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: kN6axXpdz9wLaIUNturN9Q==
+    path: public/docs/ruby/0-intro/5-0-helloworld.md
+ruby-intro-irb:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: 5p292bLjlaAcdORFEebpwg==
+    path: public/docs/ruby/0-intro/4-0-irb.md
+ruby-intro-irb-helloworld:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: rH0dBZDihTB+selhsY1tHw==
+    path: public/docs/ruby/0-intro/5-1-irb-helloworld.md
+ruby-intro-philosophy:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: fYQYSDbgjv2KWubrBI1rhw==
+    path: public/docs/ruby/0-intro/1-0-philosophy.md
+ruby-intro-rbenv:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: 5WG9Yz+5eB6l/Q2/M8Nk+Q==
+    path: public/docs/ruby/0-intro/3-0-rbenv.md
+ruby-intro-run:
+  page: ruby/0-intro
+  rev:
+  - git: de11512
+    md5: aQnSPSE55t6cMLyg06KEPw==
+    path: public/docs/ruby/0-intro/5-2-run.md
+ruby-iterators:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: mCzizX8782MWrI3i/oa41g==
+    path: public/docs/ruby/5-blocks-iterators/2-0-iterator.md
+ruby-iterators-each:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: rNQ6LtZxuJH55pHZMgZOfQ==
+    path: public/docs/ruby/5-blocks-iterators/2-1-each.md
+ruby-iterators-find:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: F1H8rWR4gAxQEA9Mi0SI5Q==
+    path: public/docs/ruby/5-blocks-iterators/2-4-find.md
+ruby-iterators-map:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: yPwRLxL/wLNITItiA5C8PQ==
+    path: public/docs/ruby/5-blocks-iterators/2-2-map.md
+ruby-iterators-select:
+  page: ruby/5-blocks-iterators
+  rev:
+  - git: de11512
+    md5: /aUIbd7L48ojs/xElV02VQ==
+    path: public/docs/ruby/5-blocks-iterators/2-3-select.md
+ruby-metaprogramming-define-method:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: oN2IEuuPrSv3DQgp9EvyEQ==
+    path: public/docs/ruby/11-metaprogramming/3-0-define-method.md
+ruby-metaprogramming-dynamic:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: K46WmNHh6H238mYBzp8Liw==
+    path: public/docs/ruby/11-metaprogramming/1-0-dynamic.md
+ruby-metaprogramming-method-missing:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: gXf+bWCBnCgU7tl3AbJHrA==
+    path: public/docs/ruby/11-metaprogramming/4-0-method-missing.md
+ruby-metaprogramming-practice1:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: FysXs8EGoVmyaw4FS+bS5Q==
+    path: public/docs/ruby/11-metaprogramming/6-1-practice1.md
+ruby-metaprogramming-practice2:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: 3DF6hyWKtbHsKFNyuTt40w==
+    path: public/docs/ruby/11-metaprogramming/6-2-practice2.md
+ruby-metaprogramming-rails-example:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: BDyfxJbnSH6z94To5NeOBQ==
+    path: public/docs/ruby/11-metaprogramming/5-0-rails-example.md
+ruby-metaprogramming-send:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: 1e7dA3ScOlg8xS8qYJ1+dA==
+    path: public/docs/ruby/11-metaprogramming/2-0-send.md
+ruby-metaprogramming-summary:
+  page: ruby/11-metaprogramming
+  rev:
+  - git: de11512
+    md5: iD+xb/8ifqsptBQ8yRxW4Q==
+    path: public/docs/ruby/11-metaprogramming/6-0-summary.md
+ruby-methods-def:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: lQd7a4TmKIvDfb10446nqg==
+    path: public/docs/ruby/2-control-methods/3-0-def.md
+ruby-methods-default-arg:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: /qnE0IJtLAdPFJdWN6ovNw==
+    path: public/docs/ruby/2-control-methods/4-1-default-arg.md
+ruby-methods-keyword-arg:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: 7Dte6u/GiQumgMz+VYgK1A==
+    path: public/docs/ruby/2-control-methods/4-2-keyword-arg.md
+ruby-methods-splat-arg:
+  page: ruby/2-control-methods
+  rev:
+  - git: de11512
+    md5: WWhwfU3q6DwycWHGr8XMvw==
+    path: public/docs/ruby/2-control-methods/4-3-splat-arg.md
+ruby-modules-access-control:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: ZiDm1nUL+IIRs42IinSLhg==
+    path: public/docs/ruby/7-modules/5-0-access-control.md
+ruby-modules-basic:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: lJMbY6O3u+15UW5B9dSecg==
+    path: public/docs/ruby/7-modules/1-0-basic.md
+ruby-modules-include:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: 37ExuDvPtU9zpJHwZ/m5Ig==
+    path: public/docs/ruby/7-modules/3-0-include.md
+ruby-modules-include-extend:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: ORzRE2dpau+0cl0dqtR+qw==
+    path: public/docs/ruby/7-modules/4-0-include-extend.md
+ruby-modules-namespace:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: UhCSzXdVSAOeBhMkcgiaeA==
+    path: public/docs/ruby/7-modules/2-0-namespace.md
+ruby-modules-practice1:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: V5NjQEm9D9l1XmH0/96RDA==
+    path: public/docs/ruby/7-modules/6-1-practice1.md
+ruby-modules-practice2:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: G3GxgOjTzNB78cAKCFmPuw==
+    path: public/docs/ruby/7-modules/6-2-practice2.md
+ruby-modules-summary:
+  page: ruby/7-modules
+  rev:
+  - git: de11512
+    md5: FdGgV33fNsfBY2ttiPF8BQ==
+    path: public/docs/ruby/7-modules/6-0-summary.md
+ruby-proc:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: RA83Jk96BNvs6j0mFdORAQ==
+    path: public/docs/ruby/8-proc-lambda/1-0-proc.md
+ruby-proc-lambda-amp-operator:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: 8yU/VqL6wq22lm1iOWrLdQ==
+    path: public/docs/ruby/8-proc-lambda/3-0-amp-operator.md
+ruby-proc-lambda-args:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: 3Nf6U/o0Syc1z85MQbEKkQ==
+    path: public/docs/ruby/8-proc-lambda/2-2-args.md
+ruby-proc-lambda-block-as-proc:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: zYUgI17WTvM+0cLCHKIzDw==
+    path: public/docs/ruby/8-proc-lambda/3-1-block-as-proc.md
+ruby-proc-lambda-closure:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: amyIGRApj/oTbI+JkidlgQ==
+    path: public/docs/ruby/8-proc-lambda/4-0-closure.md
+ruby-proc-lambda-practice1:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: gmtYT7Mhcq6cwdtZW6bOPg==
+    path: public/docs/ruby/8-proc-lambda/5-1-practice1.md
+ruby-proc-lambda-practice2:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: iqt8OaW2OgBk65BtLMX1tw==
+    path: public/docs/ruby/8-proc-lambda/5-2-practice2.md
+ruby-proc-lambda-proc-as-block:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: VP9lRaIaUP5KIuADlCTMgw==
+    path: public/docs/ruby/8-proc-lambda/3-2-proc-as-block.md
+ruby-proc-lambda-return:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: 1T5DpfJDCV9DWn2Wam5dwg==
+    path: public/docs/ruby/8-proc-lambda/2-1-lambda-return.md
+ruby-proc-lambda-summary:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: jrXx3nNMIy8doESrhWjZ2A==
+    path: public/docs/ruby/8-proc-lambda/5-0-summary.md
+ruby-proc-new-lambda:
+  page: ruby/8-proc-lambda
+  rev:
+  - git: de11512
+    md5: y8m1ElCnXifww5Ze4TWaHw==
+    path: public/docs/ruby/8-proc-lambda/2-0-proc-new-lambda.md
+ruby-stdlib-dir-pathname:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: v3vg3fjsK8X0yq/4cShFIw==
+    path: public/docs/ruby/9-stdlib/1-2-dir-pathname.md
+ruby-stdlib-file-read-write:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: ONf4n4bF4/M0ZzFA8TOvmQ==
+    path: public/docs/ruby/9-stdlib/1-1-file-read-write.md
+ruby-stdlib-filesystem:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: 5ynYX3y0cbdrKkIYdkHilQ==
+    path: public/docs/ruby/9-stdlib/1-0-filesystem.md
+ruby-stdlib-json:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: hs5hJXtUQ2DInXypGl1oVA==
+    path: public/docs/ruby/9-stdlib/3-0-json.md
+ruby-stdlib-match:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: D4RxSR5DkpzX60RRO5hE4A==
+    path: public/docs/ruby/9-stdlib/4-1-match.md
+ruby-stdlib-practice1:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: QbyL+dvmMuQk0t9UFx2fkA==
+    path: public/docs/ruby/9-stdlib/5-1-practice1.md
+ruby-stdlib-practice2:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: 9B/iD0hiGHSKh2cyQoxGgg==
+    path: public/docs/ruby/9-stdlib/5-2-practice2.md
+ruby-stdlib-regexp:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: mNsrOEvOdUq6yWRJP6CpsA==
+    path: public/docs/ruby/9-stdlib/4-0-regexp.md
+ruby-stdlib-scan-gsub:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: BgrQ8Qx5fJkrmFOQm1xvhA==
+    path: public/docs/ruby/9-stdlib/4-2-scan-gsub.md
+ruby-stdlib-summary:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: 6aCTts1BizY8lPL5uXLbvg==
+    path: public/docs/ruby/9-stdlib/5-0-summary.md
+ruby-stdlib-time-date:
+  page: ruby/9-stdlib
+  rev:
+  - git: de11512
+    md5: 9dAr7wE/S570ZgoVfverJw==
+    path: public/docs/ruby/9-stdlib/2-0-time-date.md
+ruby-testing-assert:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: 4XHcHMX9r+xwUnLU9uxASg==
+    path: public/docs/ruby/10-testing/3-2-assert.md
+ruby-testing-assert_equal:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: qliqUqLjuG5auXK7qowWLA==
+    path: public/docs/ruby/10-testing/3-1-assert_equal.md
+ruby-testing-assert_nil:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: PFGG6ZVgvCQ4pOmlmp1ItA==
+    path: public/docs/ruby/10-testing/3-4-assert_nil.md
+ruby-testing-assert_raises:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: NtJ78RGa3RqMk6y9RpWQFQ==
+    path: public/docs/ruby/10-testing/3-5-assert_raises.md
+ruby-testing-assertion:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: HGmd6C34iINx91HvE0mzbg==
+    path: public/docs/ruby/10-testing/3-0-assertion.md
+ruby-testing-minites:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: TifccdaDPIBSci9HYBT7/Q==
+    path: public/docs/ruby/10-testing/1-0-minitest.md
+ruby-testing-practice1:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: AuqWy2pG1G1upvKIxmQMVQ==
+    path: public/docs/ruby/10-testing/5-1-practice1.md
+ruby-testing-practice2:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: grEeDmcA9kmfLDMbx7WD4w==
+    path: public/docs/ruby/10-testing/5-2-practice2.md
+ruby-testing-refute:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: Ro+bmDj2pf40g0yRcu4D7g==
+    path: public/docs/ruby/10-testing/3-3-refute.md
+ruby-testing-run:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: 5WL/nQtjAViwBqPuXUYYqw==
+    path: public/docs/ruby/10-testing/2-3-run.md
+ruby-testing-summary:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: QNAwlQoVXqCzKJZLsG1q3Q==
+    path: public/docs/ruby/10-testing/5-0-summary.md
+ruby-testing-tdd:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: w/6LXg0mPyQPW33rV9Bdkg==
+    path: public/docs/ruby/10-testing/4-0-tdd.md
+ruby-testing-tdd-green:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: NEPi5FBBNYseKF+N6t+QtA==
+    path: public/docs/ruby/10-testing/4-2-tdd-green.md
+ruby-testing-tdd-red:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: MyiAlXJTvBRwa5dv+1mD/A==
+    path: public/docs/ruby/10-testing/4-1-tdd-red.md
+ruby-testing-tdd-refactor:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: usHh7HvnLS4SmxiCATG1sQ==
+    path: public/docs/ruby/10-testing/4-3-tdd-refactor.md
+ruby-testing-test-basic:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: HsKesHDKbdBdcH+rZvLlzA==
+    path: public/docs/ruby/10-testing/2-0-test-basic.md
+ruby-testing-test-class:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: ezJYVEk0vFdMNQNDflMexA==
+    path: public/docs/ruby/10-testing/2-1-test-class.md
+ruby-testing-test-file:
+  page: ruby/10-testing
+  rev:
+  - git: de11512
+    md5: UkL0XGfk3kjJgr1//hp2Aw==
+    path: public/docs/ruby/10-testing/2-2-test-file.md
+rust-0-intro-intro:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: 5MGPcKVGoGgGb36zZ9gNhw==
+    path: public/docs/rust/0-intro/-intro.md
+rust-1-basics-intro:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: M6r2esgRsSyMjLa3n/E/pA==
+    path: public/docs/rust/1-basics/-intro.md
+rust-10-generics-traits-intro:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: ROccZfFC5lqkys0CrV8+jw==
+    path: public/docs/rust/10-generics-traits/-intro.md
+rust-11-lifetimes-intro:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: htzgK6gNGRezcuZICyuqEw==
+    path: public/docs/rust/11-lifetimes/-intro.md
+rust-2-functions-control-intro:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: W4INt4GOLsdg8a0CLcNZBQ==
+    path: public/docs/rust/2-functions-control/-intro.md
+rust-3-ownership-intro:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: zu4LCc5gq9Vlbw/bgOwOKA==
+    path: public/docs/rust/3-ownership/-intro.md
+rust-4-borrowing-slices-intro:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: VbQy774auAhKINkf25LJdQ==
+    path: public/docs/rust/4-borrowing-slices/-intro.md
+rust-5-structs-methods-intro:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: t61wa/lRK2kDxo3QZ54l4w==
+    path: public/docs/rust/5-structs-methods/-intro.md
+rust-6-enums-pattern-intro:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: gUfe4j9albzYXek+FBxvsg==
+    path: public/docs/rust/6-enums-pattern/-intro.md
+rust-7-modules-intro:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: W0zXVptBcX8hNY4FyRfyxQ==
+    path: public/docs/rust/7-modules/-intro.md
+rust-8-collections-strings-intro:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: qg+XuIpuw67rFb/2Ss7hjg==
+    path: public/docs/rust/8-collections-strings/-intro.md
+rust-9-error-handling-intro:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: zx0Os8UEsO/mDQ6kWBXcEw==
+    path: public/docs/rust/9-error-handling/-intro.md
+rust-basics-compound:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: WCKFsasf5AnJP3cWHUZ08Q==
+    path: public/docs/rust/1-basics/3-2-compound.md
+rust-basics-data-types:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: RHuKzaYFFUa0KHcAWqaz+A==
+    path: public/docs/rust/1-basics/3-0-data-types.md
+rust-basics-immutable:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: DlhLKtstrCwSxB41v/hcBA==
+    path: public/docs/rust/1-basics/1-1-immutable.md
+rust-basics-let-mut:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: FeaAxpYAUgXW47aaJd4iEg==
+    path: public/docs/rust/1-basics/1-0-let-mut.md
+rust-basics-mutable:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: 3V6tKqyP9GWm1JZsyWrTKA==
+    path: public/docs/rust/1-basics/1-2-mutable.md
+rust-basics-practice1:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: A8X3qAQiFcebxOQKaxAOjg==
+    path: public/docs/rust/1-basics/4-1-practice1.md
+rust-basics-practice2:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: SYCesvekYMYzrZEUAOZDNg==
+    path: public/docs/rust/1-basics/4-2-practice2.md
+rust-basics-scalar:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: dU9UxKBUD2Z6lfms1bUcqw==
+    path: public/docs/rust/1-basics/3-1-scalar.md
+rust-basics-shadowing:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: men16jgxqPVsUsyQeG9PtQ==
+    path: public/docs/rust/1-basics/2-0-shadowing.md
+rust-basics-summary:
+  page: rust/1-basics
+  rev:
+  - git: de11512
+    md5: AdTEfZYIpySHr5SKz4XiWg==
+    path: public/docs/rust/1-basics/4-0-summary.md
+rust-borrowing-slices-borrow-rules:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: Vvnkl8DcURGfRn9LXgwzYA==
+    path: public/docs/rust/4-borrowing-slices/2-0-borrow-rules.md
+rust-borrowing-slices-dangling-ptr:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: ixwCSG7YHy6np7MR+yi0Lw==
+    path: public/docs/rust/4-borrowing-slices/3-0-dangling-ptr.md
+rust-borrowing-slices-immutable-ref:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: TA0NCV4X8kNavvvZwwvUcg==
+    path: public/docs/rust/4-borrowing-slices/1-1-immutable-ref.md
+rust-borrowing-slices-mutable-ref:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: jEwZ3Uqxsc/FJrJCeQEekQ==
+    path: public/docs/rust/4-borrowing-slices/1-2-mutable-ref.md
+rust-borrowing-slices-no-mixed-refs:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: 8PjBr5p8nVkeRcQByWeLzw==
+    path: public/docs/rust/4-borrowing-slices/2-2-no-mixed-refs.md
+rust-borrowing-slices-other-slices:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: +oVjpl94Jfue1oXzqbaZQQ==
+    path: public/docs/rust/4-borrowing-slices/5-0-other-slices.md
+rust-borrowing-slices-practice1:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: PdBVfB+cg4T2b3qNXn7o7Q==
+    path: public/docs/rust/4-borrowing-slices/7-0-practice1.md
+rust-borrowing-slices-practice2:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: Fsm4qOPyU1dHTGG4vIg9Mg==
+    path: public/docs/rust/4-borrowing-slices/7-1-practice2.md
+rust-borrowing-slices-ref-borrow:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: tVxJFneE+kH+YYeBcFKuAA==
+    path: public/docs/rust/4-borrowing-slices/1-0-ref-borrow.md
+rust-borrowing-slices-single-mut-ref:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: IAw7imieK+ADYX0gH+4DGQ==
+    path: public/docs/rust/4-borrowing-slices/2-1-single-mut-ref.md
+rust-borrowing-slices-slice:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: PMFY0cARBD/FBsyU7PCp+g==
+    path: public/docs/rust/4-borrowing-slices/4-0-slice.md
+rust-borrowing-slices-str-literal:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: ts/R9KbqXK+rcHpZ4kXL2w==
+    path: public/docs/rust/4-borrowing-slices/4-2-str-literal.md
+rust-borrowing-slices-str-param:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: kR/klJIrHBlYx9f1rJcpCQ==
+    path: public/docs/rust/4-borrowing-slices/4-3-str-param.md
+rust-borrowing-slices-str-slice:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: AJcGfsz0yQ2oj7mEzoo4ow==
+    path: public/docs/rust/4-borrowing-slices/4-1-str-slice.md
+rust-borrowing-slices-summary:
+  page: rust/4-borrowing-slices
+  rev:
+  - git: de11512
+    md5: 38h6KiQUpcX2zDIwJJ6naA==
+    path: public/docs/rust/4-borrowing-slices/6-0-summary.md
+rust-collections-strings-entry-api:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: On33EtaZgRUqO/cblzuRPg==
+    path: public/docs/rust/8-collections-strings/3-3-entry-api.md
+rust-collections-strings-hashmap:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: C8jzy2YcMsKn6wYqPnFNoA==
+    path: public/docs/rust/8-collections-strings/3-0-hashmap.md
+rust-collections-strings-hashmap-basic:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: qE7jkEGBxlSvdehYX0BP2w==
+    path: public/docs/rust/8-collections-strings/3-1-hashmap-basic.md
+rust-collections-strings-no-indexing:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: cC9XOyDeQV6P52xt+McXmw==
+    path: public/docs/rust/8-collections-strings/2-3-no-indexing.md
+rust-collections-strings-ownership:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: 6KA9gZ44ddLGicqt2E+wgQ==
+    path: public/docs/rust/8-collections-strings/3-2-ownership.md
+rust-collections-strings-practice1:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: 6K1CoRA2LsOvtLnJ2lh1qw==
+    path: public/docs/rust/8-collections-strings/4-1-practice1.md
+rust-collections-strings-practice2:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: fPR09A9/AhgSpRz1Ev/9OQ==
+    path: public/docs/rust/8-collections-strings/4-2-practice2.md
+rust-collections-strings-string-ops:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: 36rF0K7auMMS5GKumSkAJQ==
+    path: public/docs/rust/8-collections-strings/2-2-string-ops.md
+rust-collections-strings-string-str:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: mqduOH88h3gCS2icGmzPyA==
+    path: public/docs/rust/8-collections-strings/2-1-string-str.md
+rust-collections-strings-string-utf8:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: yxpdQdylRoiK4qQ9a8Hvww==
+    path: public/docs/rust/8-collections-strings/2-0-string-utf8.md
+rust-collections-strings-summary:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: 38eNyH7YvjGVkh98EJdKsw==
+    path: public/docs/rust/8-collections-strings/4-0-summary.md
+rust-collections-strings-vec:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: qJypdWa12BiXzRe1FpvkOA==
+    path: public/docs/rust/8-collections-strings/1-0-vec.md
+rust-collections-strings-vec-access:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: QeZU4/ZDUSt4OrCivSlnQQ==
+    path: public/docs/rust/8-collections-strings/1-2-vec-access.md
+rust-collections-strings-vec-create:
+  page: rust/8-collections-strings
+  rev:
+  - git: de11512
+    md5: VJQ2OA8AvNAeV9xPwYi82g==
+    path: public/docs/rust/8-collections-strings/1-1-vec-create.md
+rust-enums-pattern-enum-data:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: vAEZZ8eXnCxcgEy4T+YLCA==
+    path: public/docs/rust/6-enums-pattern/1-2-enum-data.md
+rust-enums-pattern-enum-def:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: diZJv6n4sw2y1f5xC2bZPg==
+    path: public/docs/rust/6-enums-pattern/1-0-enum-def.md
+rust-enums-pattern-enum-vs-struct:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: 3T7+BAZtkRiagzplMHanbQ==
+    path: public/docs/rust/6-enums-pattern/1-1-enum-vs-struct.md
+rust-enums-pattern-exhaustive:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: CzyHvHHb5lGwN5xpBDZMDg==
+    path: public/docs/rust/6-enums-pattern/3-1-exhaustive.md
+rust-enums-pattern-if-let:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: Kp7z34ed53bOU5qveEVpfg==
+    path: public/docs/rust/6-enums-pattern/4-0-if-let.md
+rust-enums-pattern-match:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: owv9xRYqQeD1GyP2SBsPog==
+    path: public/docs/rust/6-enums-pattern/3-0-match.md
+rust-enums-pattern-option:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: izzTDgHeXi/E0Ue+bZ+H1Q==
+    path: public/docs/rust/6-enums-pattern/2-0-option.md
+rust-enums-pattern-option-match:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: vSzcXRe76qgwjpPITgFR+A==
+    path: public/docs/rust/6-enums-pattern/3-2-option-match.md
+rust-enums-pattern-placeholder:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: 7PfzggNGXoHqlTxO1Aq9KA==
+    path: public/docs/rust/6-enums-pattern/3-3-placeholder.md
+rust-enums-pattern-practice1:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: l8ckfpGzmB+vWO7Fk2Y1yw==
+    path: public/docs/rust/6-enums-pattern/5-1-practice1.md
+rust-enums-pattern-practice2:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: Ayjh02B0GOcd6v5vL4eJUQ==
+    path: public/docs/rust/6-enums-pattern/5-2-practice2.md
+rust-enums-pattern-summary:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: dHLF8jn+zzFLF6QviZgH/w==
+    path: public/docs/rust/6-enums-pattern/5-0-summary.md
+rust-enums-pattern-why-safe:
+  page: rust/6-enums-pattern
+  rev:
+  - git: de11512
+    md5: mZk7ODZofQvddeM/jZwhEg==
+    path: public/docs/rust/6-enums-pattern/2-1-why-safe.md
+rust-error-handling-custom-error:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: 9R+2K050L76+r7dT1SxjoA==
+    path: public/docs/rust/9-error-handling/6-0-custom-error.md
+rust-error-handling-error-types:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: rhxZ6kvcPbvuROpJduo4VQ==
+    path: public/docs/rust/9-error-handling/1-0-error-types.md
+rust-error-handling-expect:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: yyzTEa6nj35QuYX7sYyNKw==
+    path: public/docs/rust/9-error-handling/4-2-expect.md
+rust-error-handling-panic:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: ckCUNH3ARk4cTqUjRZzcTA==
+    path: public/docs/rust/9-error-handling/2-0-panic.md
+rust-error-handling-practice1:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: GETlcL0BMLoSNQ8EbOodVg==
+    path: public/docs/rust/9-error-handling/7-1-practice1.md
+rust-error-handling-practice2:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: sj1i9aFNdSGmj+q2emDuOg==
+    path: public/docs/rust/9-error-handling/7-2-practice2.md
+rust-error-handling-propagation:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: jjrNv/TMq5vy+q2gsDxV3A==
+    path: public/docs/rust/9-error-handling/5-0-propagation.md
+rust-error-handling-result:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: XzOognJZ+FUfLCKMJf6zQA==
+    path: public/docs/rust/9-error-handling/3-0-result.md
+rust-error-handling-result-basic:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: TLxgbdB7v1tEla1LvrudeQ==
+    path: public/docs/rust/9-error-handling/3-1-result-basic.md
+rust-error-handling-summary:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: JHMZ6xo9202FPex/ZhDCPw==
+    path: public/docs/rust/9-error-handling/7-0-summary.md
+rust-error-handling-unwrap:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: kMerfeWQ+lXuLkF8+r8sgg==
+    path: public/docs/rust/9-error-handling/4-1-unwrap.md
+rust-error-handling-unwrap-expect:
+  page: rust/9-error-handling
+  rev:
+  - git: de11512
+    md5: WjHJjWAQ5jXbdAWCZzXTHw==
+    path: public/docs/rust/9-error-handling/4-0-unwrap-expect.md
+rust-functions-control-control-flow:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: IZcTBLJf+lL8iA+3LOlw6A==
+    path: public/docs/rust/2-functions-control/2-0-control-flow.md
+rust-functions-control-for:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: 0QlH6EsRQHcTCtpkHXO/sw==
+    path: public/docs/rust/2-functions-control/2-5-for.md
+rust-functions-control-functions-expr:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: E0O/DYfe13O/4EwPQwddZg==
+    path: public/docs/rust/2-functions-control/1-0-functions-expr.md
+rust-functions-control-if:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: fL1t+2RN1222WoP1GTHpkQ==
+    path: public/docs/rust/2-functions-control/2-1-if.md
+rust-functions-control-loop-return:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: /UhA3++x3Gx2mc70TUryYg==
+    path: public/docs/rust/2-functions-control/2-3-loop-return.md
+rust-functions-control-loops:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: pGO/N0bgEYjq8xAQV7Wb0g==
+    path: public/docs/rust/2-functions-control/2-2-loops.md
+rust-functions-control-params-return:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: FT4qeqtZUpci6vi9buuqng==
+    path: public/docs/rust/2-functions-control/1-1-params-return.md
+rust-functions-control-practice1:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: ISC4SPVSMq3raIkxlu+D/Q==
+    path: public/docs/rust/2-functions-control/4-0-practice1.md
+rust-functions-control-practice2:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: S3fvDqD/x/YFbjGMLd+0ag==
+    path: public/docs/rust/2-functions-control/4-1-practice2.md
+rust-functions-control-stmt-expr:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: gXbtdton0q8uG3PKbwRVeQ==
+    path: public/docs/rust/2-functions-control/1-2-stmt-expr.md
+rust-functions-control-summary:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: yyiM+fPFTAEUi8Rn9Xxn8Q==
+    path: public/docs/rust/2-functions-control/3-0-summary.md
+rust-functions-control-while:
+  page: rust/2-functions-control
+  rev:
+  - git: de11512
+    md5: G6+NP8C+LUDkGOVF5yqqcA==
+    path: public/docs/rust/2-functions-control/2-4-while.md
+rust-generics-traits-basic-syntax:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: nIYI1Ub33AzzKjnJYYPYlg==
+    path: public/docs/rust/10-generics-traits/4-1-basic-syntax.md
+rust-generics-traits-generic-func:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: M6qsJrcJqF8h//1ALsLpjw==
+    path: public/docs/rust/10-generics-traits/2-1-generic-func.md
+rust-generics-traits-generic-struct:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: mKDJgdyGqWDyZoMmfAWQPA==
+    path: public/docs/rust/10-generics-traits/2-2-generic-struct.md
+rust-generics-traits-generics:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: qNOWAnFF7XKRxtc62N8MVA==
+    path: public/docs/rust/10-generics-traits/2-0-generics.md
+rust-generics-traits-practice1:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: XZ+S4dablXfbByxLX9VMlA==
+    path: public/docs/rust/10-generics-traits/6-1-practice1.md
+rust-generics-traits-practice2:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: LWM8bSWJv+1XggEQhaS1Yg==
+    path: public/docs/rust/10-generics-traits/6-2-practice2.md
+rust-generics-traits-rust-approach:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: /GH+50lzFshkSHChmp0nrg==
+    path: public/docs/rust/10-generics-traits/1-0-rust-approach.md
+rust-generics-traits-std-traits:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: IEApsUwNpAnX9B4wF0bqXg==
+    path: public/docs/rust/10-generics-traits/5-0-std-traits.md
+rust-generics-traits-summary:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: RdWfp4epel9iLj9ToSAtng==
+    path: public/docs/rust/10-generics-traits/6-0-summary.md
+rust-generics-traits-trait-bounds:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: 6wp4AbRgwSVYIK58AquKeg==
+    path: public/docs/rust/10-generics-traits/4-0-trait-bounds.md
+rust-generics-traits-trait-def:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: FkX3ZhsuzUN+Qoq2E2+G6w==
+    path: public/docs/rust/10-generics-traits/3-1-trait-def.md
+rust-generics-traits-trait-impl:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: RCKAeESC/6yNabF2fguvsw==
+    path: public/docs/rust/10-generics-traits/3-2-trait-impl.md
+rust-generics-traits-traits:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: pha+B+/12i4eBkDt/7nCYA==
+    path: public/docs/rust/10-generics-traits/3-0-traits.md
+rust-generics-traits-where-clause:
+  page: rust/10-generics-traits
+  rev:
+  - git: de11512
+    md5: a8GDVKQR3g0w+ZtmeJYUpw==
+    path: public/docs/rust/10-generics-traits/4-2-where-clause.md
+rust-intro-cargo:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: /baMdpSXM/5o/js8hVUvTA==
+    path: public/docs/rust/0-intro/4-0-cargo.md
+rust-intro-cargo-commands:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: 9d27KGL6u52eGRlwF2JVkQ==
+    path: public/docs/rust/0-intro/4-2-cargo-commands.md
+rust-intro-cargo-new:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: yhGzoAC0gSlftZONzkf5JQ==
+    path: public/docs/rust/0-intro/4-1-cargo-new.md
+rust-intro-clippy:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: nik6iQKC5fQuI7BF4uy0gQ==
+    path: public/docs/rust/0-intro/5-2-clippy.md
+rust-intro-concurrency:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: HCCkkNKKZDvw8kErh0v4sw==
+    path: public/docs/rust/0-intro/1-3-concurrency.md
+rust-intro-features:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: aD8GQeEVT8Iam6tSpRkXRg==
+    path: public/docs/rust/0-intro/1-0-features.md
+rust-intro-fmt-lint:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: 7He9VfxO1n8Q87vEVCB1JQ==
+    path: public/docs/rust/0-intro/5-0-fmt-lint.md
+rust-intro-hello-world:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: BNml+Ro7y0BmL+gI15Cx6Q==
+    path: public/docs/rust/0-intro/3-0-hello-world.md
+rust-intro-memory-safety:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: KzLTdvl/E+SqaiqTN37UMw==
+    path: public/docs/rust/0-intro/1-1-memory-safety.md
+rust-intro-points:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: emGBz5lhuM8nF0p6Ghl/dA==
+    path: public/docs/rust/0-intro/3-1-points.md
+rust-intro-rustfmt:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: 5ioKNK65reau39XmqVC1Bw==
+    path: public/docs/rust/0-intro/5-1-rustfmt.md
+rust-intro-rustup:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: 7jUnYo6K4fa3Zl7bu5IAfw==
+    path: public/docs/rust/0-intro/2-1-rustup.md
+rust-intro-setup:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: l9fqhi84bOoRi+olhLm2dA==
+    path: public/docs/rust/0-intro/2-0-setup.md
+rust-intro-zero-cost:
+  page: rust/0-intro
+  rev:
+  - git: de11512
+    md5: lov7kcbVhX3cqdy3YpsFAA==
+    path: public/docs/rust/0-intro/1-2-zero-cost.md
+rust-lifetimes-dangling-ref:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: a5EnlUPfr+dtiPjiPwDKzA==
+    path: public/docs/rust/11-lifetimes/1-1-dangling-ref.md
+rust-lifetimes-elision:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: 4tgFZrpWZHgSqWYx8FlVQw==
+    path: public/docs/rust/11-lifetimes/3-0-elision.md
+rust-lifetimes-func-lifetime:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: IPrX3K4c5JRicZDpXMnGWQ==
+    path: public/docs/rust/11-lifetimes/2-0-func-lifetime.md
+rust-lifetimes-lifetime-syntax:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: yeGaHWm7PB9jJE4u+7IvUg==
+    path: public/docs/rust/11-lifetimes/2-1-lifetime-syntax.md
+rust-lifetimes-practice1:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: SKC2494GytNPzVYWfZJQoQ==
+    path: public/docs/rust/11-lifetimes/6-1-practice1.md
+rust-lifetimes-practice2:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: ZN5YlW3QvN8IDTU8fkH5/g==
+    path: public/docs/rust/11-lifetimes/6-2-practice2.md
+rust-lifetimes-static-lifetime:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: BT7pc5lYe2Zh5ygq1hIVRg==
+    path: public/docs/rust/11-lifetimes/5-0-static-lifetime.md
+rust-lifetimes-struct-lifetime:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: KAY64ccHVyHUNirzPXC8SA==
+    path: public/docs/rust/11-lifetimes/4-0-struct-lifetime.md
+rust-lifetimes-summary:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: /BbBXclxzBLHs0A2H0LCsA==
+    path: public/docs/rust/11-lifetimes/6-0-summary.md
+rust-lifetimes-what-is-lifetime:
+  page: rust/11-lifetimes
+  rev:
+  - git: de11512
+    md5: bdRLUyBdkCl7p1VRTraRTQ==
+    path: public/docs/rust/11-lifetimes/1-0-what-is-lifetime.md
+rust-modules-abs-rel-paths:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: CEnwr1U94xFrsdSEcf4rKQ==
+    path: public/docs/rust/7-modules/3-1-abs-rel-paths.md
+rust-modules-cargotoml:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: +t4XsRz7zr9KfJ5B0HIFmw==
+    path: public/docs/rust/7-modules/5-1-cargotoml.md
+rust-modules-external-crates:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: pCk3+NXDoHYGzVxyGvJjRg==
+    path: public/docs/rust/7-modules/5-0-external-crates.md
+rust-modules-file-split:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: W7k/V/jxuPAuSS9xJhmyPg==
+    path: public/docs/rust/7-modules/4-0-file-split.md
+rust-modules-mod-def:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: uU7vHjSSG3HCslyT8X2oPA==
+    path: public/docs/rust/7-modules/1-1-mod-def.md
+rust-modules-pkg-crate-module:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: ZsLLPfra9ohgEy1U6OFGAw==
+    path: public/docs/rust/7-modules/1-0-pkg-crate-module.md
+rust-modules-practice1:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: Knl5CCrLBScZlSKogp19vQ==
+    path: public/docs/rust/7-modules/6-1-practice1.md
+rust-modules-practice2:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: EfUWg3jETO/LCqK8vOy1qw==
+    path: public/docs/rust/7-modules/6-2-practice2.md
+rust-modules-struct-visibility:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: jtu6qYd8dxj7wm0XDF7sKw==
+    path: public/docs/rust/7-modules/2-1-struct-visibility.md
+rust-modules-summary:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: RhhobN/SU641q31n251Rmw==
+    path: public/docs/rust/7-modules/6-0-summary.md
+rust-modules-usage:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: TXwzY79hxuByfPIfCoqKlQ==
+    path: public/docs/rust/7-modules/5-2-usage.md
+rust-modules-use-paths:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: 54HyFslI6bH2vU8RXZeNwA==
+    path: public/docs/rust/7-modules/3-0-use-paths.md
+rust-modules-visibility:
+  page: rust/7-modules
+  rev:
+  - git: de11512
+    md5: JH8nZ2YeRe9CfAt2/bkQnw==
+    path: public/docs/rust/7-modules/2-0-visibility.md
+rust-ownership-clone:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: jgiph8a6udF2kgpg8cW26A==
+    path: public/docs/rust/3-ownership/3-3-clone.md
+rust-ownership-copy:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: 1KHOQIfw66cQGZZhAMpmtA==
+    path: public/docs/rust/3-ownership/3-1-copy.md
+rust-ownership-heap:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: 1BiHK6yuGRvU4iLCAzmu0Q==
+    path: public/docs/rust/3-ownership/1-2-heap.md
+rust-ownership-move:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: qo4uB2aakSKrX4/CE2wdnw==
+    path: public/docs/rust/3-ownership/3-2-move.md
+rust-ownership-move-copy:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: 2d8WhenuqUPsSWLcijbWFQ==
+    path: public/docs/rust/3-ownership/3-0-move-copy.md
+rust-ownership-ownership-func:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: jltfrqUz9fLDWlsCtOPwCw==
+    path: public/docs/rust/3-ownership/4-0-ownership-func.md
+rust-ownership-ownership-rules:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: /Eweda6PgRNFtsC1Xlc4YQ==
+    path: public/docs/rust/3-ownership/2-0-ownership-rules.md
+rust-ownership-practice1:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: acjubUkf9eEIeo8ceosf/Q==
+    path: public/docs/rust/3-ownership/5-1-practice1.md
+rust-ownership-practice2:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: IAD2tP6dlD9tyDFe8DqQFA==
+    path: public/docs/rust/3-ownership/5-2-practice2.md
+rust-ownership-return-ownership:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: JjE9UdDxHupQsyze6/XPNA==
+    path: public/docs/rust/3-ownership/4-1-return-ownership.md
+rust-ownership-scope:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: w5TbbqgQTVBKSZvaEhTafQ==
+    path: public/docs/rust/3-ownership/2-1-scope.md
+rust-ownership-stack:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: LisrwLI6Toxu0KVVyGaWSg==
+    path: public/docs/rust/3-ownership/1-1-stack.md
+rust-ownership-stack-heap:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: 94bGe2ognoBbcOiLegLnyg==
+    path: public/docs/rust/3-ownership/1-0-stack-heap.md
+rust-ownership-summary:
+  page: rust/3-ownership
+  rev:
+  - git: de11512
+    md5: vpOG8Wg7wTgLa4ICyZ4uJw==
+    path: public/docs/rust/3-ownership/5-0-summary.md
+rust-structs-methods-assoc-funcs:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: FKUlqwe4z8gJygRhboE71g==
+    path: public/docs/rust/5-structs-methods/4-2-assoc-funcs.md
+rust-structs-methods-basic-def:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: 1lvK5PJCucQkAhjUcADgxQ==
+    path: public/docs/rust/5-structs-methods/1-1-basic-def.md
+rust-structs-methods-field-shorthand:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: zTYI+wiY6tjECvoh8j39JQ==
+    path: public/docs/rust/5-structs-methods/1-2-field-shorthand.md
+rust-structs-methods-impl:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: MUa48R9CKRMuEksalY5TAg==
+    path: public/docs/rust/5-structs-methods/4-0-impl.md
+rust-structs-methods-methods:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: l10WxAbkfUKaOd1+jmgzTA==
+    path: public/docs/rust/5-structs-methods/4-1-methods.md
+rust-structs-methods-ownership-structs:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: DcCNDFuAb96cOFxGKgFaYQ==
+    path: public/docs/rust/5-structs-methods/3-0-ownership-structs.md
+rust-structs-methods-practice1:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: 3W4RVYfONsC4Uk5WrX8vvg==
+    path: public/docs/rust/5-structs-methods/5-1-practice1.md
+rust-structs-methods-practice2:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: on2jTigUdGCHPu3qpJam5g==
+    path: public/docs/rust/5-structs-methods/5-2-practice2.md
+rust-structs-methods-struct-def:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: u/XfUZq0Fcng+QjIAlrShQ==
+    path: public/docs/rust/5-structs-methods/1-0-struct-def.md
+rust-structs-methods-struct-update:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: yRQWpMZqhceXUgYlYY9KSg==
+    path: public/docs/rust/5-structs-methods/1-3-struct-update.md
+rust-structs-methods-summary:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: 8j955rBzVapfcejW5TukQA==
+    path: public/docs/rust/5-structs-methods/5-0-summary.md
+rust-structs-methods-tuple-structs:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: CqmYviOum9J73KL0bbDUsw==
+    path: public/docs/rust/5-structs-methods/2-1-tuple-structs.md
+rust-structs-methods-tuple-unit-structs:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: QmEv278z1evz1QbkIGgptA==
+    path: public/docs/rust/5-structs-methods/2-0-tuple-unit-structs.md
+rust-structs-methods-unit-structs:
+  page: rust/5-structs-methods
+  rev:
+  - git: de11512
+    md5: PpJqqhiAPupqtmNVeffGDA==
+    path: public/docs/rust/5-structs-methods/2-2-unit-structs.md
+typescript-0-intro-intro:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: S97TGFYa5b58gaUpAgvH4g==
+    path: public/docs/typescript/0-intro/-intro.md
+typescript-1-types-intro:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: HLMc5aC7aZ1zXS3nveUhPw==
+    path: public/docs/typescript/1-types/-intro.md
+typescript-2-objects-interfaces-intro:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: FqoOuw38P1wZ7GO4xr2crg==
+    path: public/docs/typescript/2-objects-interfaces/-intro.md
+typescript-3-function-types-intro:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: 4ly6HNXpzmOReBdHX4+fTQ==
+    path: public/docs/typescript/3-function-types/-intro.md
+typescript-4-combining-types-intro:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: 7+7sKkT/ElbUO2K49bxwYA==
+    path: public/docs/typescript/4-combining-types/-intro.md
+typescript-5-generics-intro:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: 0kkpMYsWyNfIgwMrkfZ4QQ==
+    path: public/docs/typescript/5-generics/-intro.md
+typescript-6-classes-intro:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: hOmIPkp27AhBGCCVEX1w8A==
+    path: public/docs/typescript/6-classes/-intro.md
+typescript-7-async-utilities-intro:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: BsWe/DlLFZUt8ZBQ1UTe/A==
+    path: public/docs/typescript/7-async-utilities/-intro.md
+typescript-async-utilities-advanced-types:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: Q11bxjV/ib894TFctn2/Vw==
+    path: public/docs/typescript/7-async-utilities/3-0-advanced-types.md
+typescript-async-utilities-async-types:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: 10WflSmoyDgKd6XZSUWSzQ==
+    path: public/docs/typescript/7-async-utilities/1-0-async-types.md
+typescript-async-utilities-base-types:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: FUwIvGPYavI2NKc37Hq4sA==
+    path: public/docs/typescript/7-async-utilities/2-1-base-types.md
+typescript-async-utilities-basic-def:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: FcER0EkIjVDYBj2SlCinZQ==
+    path: public/docs/typescript/7-async-utilities/1-1-basic-def.md
+typescript-async-utilities-conditional-types:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: i6q2siSly1I8mgqAaI7G6A==
+    path: public/docs/typescript/7-async-utilities/3-2-conditional-types.md
+typescript-async-utilities-error-handling:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: XgXluxSyhpufhRFk76GVqA==
+    path: public/docs/typescript/7-async-utilities/1-2-error-handling.md
+typescript-async-utilities-mapped-types:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: l3BwjTFCI7H/SHqPnYEI2w==
+    path: public/docs/typescript/7-async-utilities/3-1-mapped-types.md
+typescript-async-utilities-omit:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: +pvX7UHkZPxbvH6aFxiQ/Q==
+    path: public/docs/typescript/7-async-utilities/2-5-omit.md
+typescript-async-utilities-partial:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: CVEFcXFD01/6DSn5kfZg3A==
+    path: public/docs/typescript/7-async-utilities/2-2-partial.md
+typescript-async-utilities-pick:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: knU564yY9QcEX01vRW1j1Q==
+    path: public/docs/typescript/7-async-utilities/2-4-pick.md
+typescript-async-utilities-practice1:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: f0VrLNL0uRmUXW00CJRoaw==
+    path: public/docs/typescript/7-async-utilities/4-1-practice1.md
+typescript-async-utilities-practice2:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: lmm8ihY5nuAmBA2P9PiKmg==
+    path: public/docs/typescript/7-async-utilities/4-2-practice2.md
+typescript-async-utilities-readonly:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: 0L6mqXzkSBRsvo0o98SljA==
+    path: public/docs/typescript/7-async-utilities/2-3-readonly.md
+typescript-async-utilities-summary:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: 6FjnlzuyTiKnRTulluOmUw==
+    path: public/docs/typescript/7-async-utilities/4-0-summary.md
+typescript-async-utilities-utility-types:
+  page: typescript/7-async-utilities
+  rev:
+  - git: de11512
+    md5: +91ZaKq8pZ79MANnStJgbA==
+    path: public/docs/typescript/7-async-utilities/2-0-utility-types.md
+typescript-classes-abstract:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: UPCwfypg7Ww/tIxmJ22mMQ==
+    path: public/docs/typescript/6-classes/6-0-abstract.md
+typescript-classes-access-modifiers:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: BDUpb74ncr5ScNj1sZE8vQ==
+    path: public/docs/typescript/6-classes/3-0-access-modifiers.md
+typescript-classes-implements:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: eNCwKcj+HEvRM3Tptg7j2g==
+    path: public/docs/typescript/6-classes/5-0-implements.md
+typescript-classes-js-class-review:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: ZlF2Gr/nwqtjKyHg7sa6rw==
+    path: public/docs/typescript/6-classes/1-0-js-class-review.md
+typescript-classes-param-props:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: PSIa0ZJoZP6HGALCgJBdQQ==
+    path: public/docs/typescript/6-classes/3-1-param-props.md
+typescript-classes-practice1:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: rBoMl935WhFo1XZ0cYyBdQ==
+    path: public/docs/typescript/6-classes/7-1-practice1.md
+typescript-classes-practice2:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: fGiwLJysExYHdjNvynerEA==
+    path: public/docs/typescript/6-classes/7-2-practice2.md
+typescript-classes-readonly:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: 7TFYw8uKvWusMAMxcPRxoA==
+    path: public/docs/typescript/6-classes/4-0-readonly.md
+typescript-classes-summary:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: szGAbcSvGY72RAcYtDkRig==
+    path: public/docs/typescript/6-classes/7-0-summary.md
+typescript-classes-ts-class:
+  page: typescript/6-classes
+  rev:
+  - git: de11512
+    md5: FVPaSTFENfNz91LqmrUI2g==
+    path: public/docs/typescript/6-classes/2-0-ts-class.md
+typescript-combining-types-in:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: VnP5hOGyHfVjf5+jTVbLeg==
+    path: public/docs/typescript/4-combining-types/5-2-in.md
+typescript-combining-types-instanceof:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: /29sJal1NwhnXXr9WE2IKg==
+    path: public/docs/typescript/4-combining-types/5-3-instanceof.md
+typescript-combining-types-intersection:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: ssDyDD2MdeUp8UvTMzw10w==
+    path: public/docs/typescript/4-combining-types/3-0-intersection.md
+typescript-combining-types-literal:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: gDQd8B4306kuyVg7R4oPRQ==
+    path: public/docs/typescript/4-combining-types/2-0-literal.md
+typescript-combining-types-null-undefined:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: DUMI24FViCLyd8lzaK42Zw==
+    path: public/docs/typescript/4-combining-types/4-0-null-undefined.md
+typescript-combining-types-practice1:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: qfaPBUtGglBoXu9mgSyjPw==
+    path: public/docs/typescript/4-combining-types/7-1-practice1.md
+typescript-combining-types-practice2:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: Ob8bqEc3T0Y1Z+pjHKRbwA==
+    path: public/docs/typescript/4-combining-types/7-2-practice2.md
+typescript-combining-types-summary:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: WtIeE+tmNfM+C7Njz9RoEQ==
+    path: public/docs/typescript/4-combining-types/7-0-summary.md
+typescript-combining-types-type-assertions:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: ruFjAWCiO48RDS4YSsT8tg==
+    path: public/docs/typescript/4-combining-types/6-0-type-assertions.md
+typescript-combining-types-type-guards:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: rO/u5CqZ0zEEFK7uhG34dA==
+    path: public/docs/typescript/4-combining-types/5-0-type-guards.md
+typescript-combining-types-typeof:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: r4A5iD3KUZR6X+grN6R7EA==
+    path: public/docs/typescript/4-combining-types/5-1-typeof.md
+typescript-combining-types-union:
+  page: typescript/4-combining-types
+  rev:
+  - git: de11512
+    md5: j/pHVCmjdCVyRA2yyM3yeg==
+    path: public/docs/typescript/4-combining-types/1-0-union.md
+typescript-function-types-arrow-this:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: E1l7xTvZSS1s32sZYUJuVg==
+    path: public/docs/typescript/3-function-types/3-0-arrow-this.md
+typescript-function-types-arrow-type:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: OBp0EYSHG0jjNjV+Yl9hkA==
+    path: public/docs/typescript/3-function-types/3-1-arrow-type.md
+typescript-function-types-default:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: Uw8eWP4/3DdDSvBNezHm6A==
+    path: public/docs/typescript/3-function-types/2-2-default.md
+typescript-function-types-optional:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: 67YfLt4pw/4NoR17vJ6stA==
+    path: public/docs/typescript/3-function-types/2-1-optional.md
+typescript-function-types-optional-default:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: fDUgXuU8himIpgsZJH6+LQ==
+    path: public/docs/typescript/3-function-types/2-0-optional-default.md
+typescript-function-types-overload:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: Aqc0iBQKb51jDhr6rLQmpg==
+    path: public/docs/typescript/3-function-types/4-0-overload.md
+typescript-function-types-params-return:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: qr7pBZD0A/aOBUc55NLGOw==
+    path: public/docs/typescript/3-function-types/1-0-params-return.md
+typescript-function-types-practice1:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: R2oKqlds05v2Ikwsczkh4g==
+    path: public/docs/typescript/3-function-types/7-1-practice1.md
+typescript-function-types-practice2:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: TD7A+d0GMXsZwMWvvrrOxw==
+    path: public/docs/typescript/3-function-types/7-2-practice2.md
+typescript-function-types-rest-params:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: UrR3ACHcA04S37gin7lLgw==
+    path: public/docs/typescript/3-function-types/5-0-rest-params.md
+typescript-function-types-summary:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: 0AlJMwJcSfKaIxJDknVs+g==
+    path: public/docs/typescript/3-function-types/7-0-summary.md
+typescript-function-types-this-type:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: khxwvB1oSI36/IUQec4Nxw==
+    path: public/docs/typescript/3-function-types/3-2-this-type.md
+typescript-function-types-type-alias:
+  page: typescript/3-function-types
+  rev:
+  - git: de11512
+    md5: IbRqLJy1G2BLfFVxzM1xIw==
+    path: public/docs/typescript/3-function-types/6-0-type-alias.md
+typescript-generics-generics-class:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: h4lle7W13UkYIlFQZawTUQ==
+    path: public/docs/typescript/5-generics/4-0-generics-class.md
+typescript-generics-generics-func:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: h51EQWf0O2n+scBbKU6R+A==
+    path: public/docs/typescript/5-generics/2-0-generics-func.md
+typescript-generics-generics-interface:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: H67/LTVqR9LJnbrRy91YtA==
+    path: public/docs/typescript/5-generics/3-0-generics-interface.md
+typescript-generics-generics-intro:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: EXdc11IjcIVACQE8ZvejIQ==
+    path: public/docs/typescript/5-generics/1-0-generics-intro.md
+typescript-generics-practice1:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: +Jp7jFAGEdpgvUF2HZ9y4Q==
+    path: public/docs/typescript/5-generics/6-1-practice1.md
+typescript-generics-practice2:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: Iy+V/fL2luoJ58NRLKfy0w==
+    path: public/docs/typescript/5-generics/6-2-practice2.md
+typescript-generics-summary:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: f4Q04VYXU0rkdBr22mPaqA==
+    path: public/docs/typescript/5-generics/6-0-summary.md
+typescript-generics-type-constraint:
+  page: typescript/5-generics
+  rev:
+  - git: de11512
+    md5: HFrKbE6dwcTSqOod8Uvt/A==
+    path: public/docs/typescript/5-generics/5-0-type-constraint.md
+typescript-intro-about:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: ofxqcIHUHe3fFdwByhi0lA==
+    path: public/docs/typescript/0-intro/1-0-about.md
+typescript-intro-code:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: 6/wU0mTt/02MQa7Ed8OTrQ==
+    path: public/docs/typescript/0-intro/4-1-code.md
+typescript-intro-compile-config:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: 5UTHQDj3aqAx+t4pwRlnjQ==
+    path: public/docs/typescript/0-intro/5-1-compile-config.md
+typescript-intro-compile-run:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: Z69vxSJneix640DJSsVaVQ==
+    path: public/docs/typescript/0-intro/4-2-compile-run.md
+typescript-intro-create-install:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: JMLpdLlxQB8H8dXl6BUbGw==
+    path: public/docs/typescript/0-intro/3-1-create-install.md
+typescript-intro-first-ts:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: GPFETs2ZM5tlTqPrg0AuSw==
+    path: public/docs/typescript/0-intro/4-0-first-ts.md
+typescript-intro-setup:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: nqmEWB2TEtupMIB2JrvpMw==
+    path: public/docs/typescript/0-intro/3-0-setup.md
+typescript-intro-tsconfig:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: 3PIWgUlGThS/SrevvoR4Tw==
+    path: public/docs/typescript/0-intro/5-0-tsconfig.md
+typescript-intro-why:
+  page: typescript/0-intro
+  rev:
+  - git: de11512
+    md5: ifFwgIZ2mHayJkIh+gTclg==
+    path: public/docs/typescript/0-intro/2-0-why.md
+typescript-objects-interfaces-interface:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: uOAeuATwtf4NUJ3AF9n1rg==
+    path: public/docs/typescript/2-objects-interfaces/3-0-interface.md
+typescript-objects-interfaces-object-types:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: CoQ3Uas8Ko3RdaN8IRh/lA==
+    path: public/docs/typescript/2-objects-interfaces/1-0-object-types.md
+typescript-objects-interfaces-optional-props:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: wRUFjYN+O+0u26IxfhlbeA==
+    path: public/docs/typescript/2-objects-interfaces/5-0-optional-props.md
+typescript-objects-interfaces-practice1:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: moadosFGUaolNl6sFmYXlQ==
+    path: public/docs/typescript/2-objects-interfaces/7-1-practice1.md
+typescript-objects-interfaces-practice2:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: wbgVifBPP0ZSuuaBA67ZrA==
+    path: public/docs/typescript/2-objects-interfaces/7-2-practice2.md
+typescript-objects-interfaces-readonly:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: dkV4Wvp46yfSqDRYD7AYbw==
+    path: public/docs/typescript/2-objects-interfaces/6-0-readonly.md
+typescript-objects-interfaces-summary:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: 6ij7GT3T2z9Crkb66gErDA==
+    path: public/docs/typescript/2-objects-interfaces/7-0-summary.md
+typescript-objects-interfaces-type-alias:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: OJW3Fv1QaECPsJ+UzfS+ZA==
+    path: public/docs/typescript/2-objects-interfaces/2-0-type-alias.md
+typescript-objects-interfaces-type-vs-interface:
+  page: typescript/2-objects-interfaces
+  rev:
+  - git: de11512
+    md5: A8IrPIcDxOVNcx10ZR6dhw==
+    path: public/docs/typescript/2-objects-interfaces/4-0-type-vs-interface.md
+typescript-types-any:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: uKVGYZ+m2mWb9/CVhqiVSw==
+    path: public/docs/typescript/1-types/4-1-any.md
+typescript-types-array:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: Jb3KXU8xjx7oVaFNflZ/dA==
+    path: public/docs/typescript/1-types/5-1-array.md
+typescript-types-array-tuple:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: fqyfq/EvIfDh7PMRhzi/Aw==
+    path: public/docs/typescript/1-types/5-0-array-tuple.md
+typescript-types-never:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: GiibNu1nSi27XVSHiTFlsg==
+    path: public/docs/typescript/1-types/4-3-never.md
+typescript-types-practice1:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: fA9xtNSsoDIPT8gPR4bb0g==
+    path: public/docs/typescript/1-types/6-1-practice1.md
+typescript-types-practice2:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: iWkHRM7ik/6bSpJGmul2gw==
+    path: public/docs/typescript/1-types/6-2-practice2.md
+typescript-types-primitive-types:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: pCXUiESxlgZTtG+MGI5bCA==
+    path: public/docs/typescript/1-types/2-0-primitive-types.md
+typescript-types-special-types:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: jng4NMAvCX37m83fCdlMFg==
+    path: public/docs/typescript/1-types/4-0-special-types.md
+typescript-types-summary:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: x+m3wgIpjmbR4TFGpHBrWw==
+    path: public/docs/typescript/1-types/6-0-summary.md
+typescript-types-tuple:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: 8uaBHcGGwchyFEaUwgzIUw==
+    path: public/docs/typescript/1-types/5-2-tuple.md
+typescript-types-type-annotations:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: t8tuJPYX60yRsKhbfO/LSQ==
+    path: public/docs/typescript/1-types/1-0-type-annotations.md
+typescript-types-type-inference:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: Ec/Mbq91sZAUVOknzfNe8w==
+    path: public/docs/typescript/1-types/3-0-type-inference.md
+typescript-types-unknown:
+  page: typescript/1-types
+  rev:
+  - git: de11512
+    md5: LbhnYdM7JM7v6YOcUwANeA==
+    path: public/docs/typescript/1-types/4-2-unknown.md

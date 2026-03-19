@@ -33,7 +33,7 @@ jobs:
     - run: npm ci
     - run: npm run tsc
 
-  test-js-eval:
+  check-docs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -45,4 +45,4 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    - run: npm test --workspace=packages/jsEval
+    - run: npm run checkDocs

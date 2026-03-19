@@ -8,10 +8,10 @@ import "./globals.css";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
 import { ReactNode } from "react";
-import { EmbedContextProvider } from "./terminal/embedContext";
+import { EmbedContextProvider } from "@/terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./sidebar";
-import { RuntimeProvider } from "./terminal/runtime";
+import { RuntimeProvider } from "@my-code/runtime/context";
 import { getPagesList } from "@/lib/docs";
 
 export const metadata: Metadata = {
@@ -27,11 +27,11 @@ export default async function RootLayout({
   const pagesList = await getPagesList();
   return (
     <html lang="ja">
-      <body className="w-screen min-h-screen bg-transparent! text-inherit! m-0!">
+      <body className="w-full min-h-screen bg-transparent! text-inherit! m-0!">
         {/* mocha.css がbodyに背景色などを設定してしまうので、それを上書きしている */}
         <AutoAnonymousLogin />
         <SidebarMdProvider>
-          <div className="drawer lg:drawer-open min-h-screen">
+          <div className="drawer has-sidebar:drawer-open min-h-screen">
             <input
               id="drawer-toggle"
               type="checkbox"

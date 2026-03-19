@@ -1,0 +1,54 @@
+import clsx from "clsx";
+import { ReactNode } from "react";
+
+export function Heading({
+  level,
+  children,
+  className,
+}: {
+  level: number;
+  children: ReactNode;
+  className?: string;
+}) {
+  switch (level) {
+    case 0:
+      return null;
+    case 1:
+      return (
+        <h1 className={clsx(className, "text-2xl font-bold my-4")}>
+          {children}
+        </h1>
+      );
+    case 2:
+      return (
+        <h2 className={clsx(className, "text-xl font-bold mt-4 mb-3 ")}>
+          {children}
+        </h2>
+      );
+    case 3:
+      return (
+        <h3 className={clsx(className, "text-lg font-bold mt-4 mb-2")}>
+          {children}
+        </h3>
+      );
+    case 4:
+      return (
+        <h4 className={clsx(className, "text-base font-bold mt-3 mb-2")}>
+          {children}
+        </h4>
+      );
+    case 5:
+      // TODO: これ以下は4との差がない (全体的に大きくする必要がある？)
+      return (
+        <h5 className={clsx(className, "text-base font-bold mt-3 mb-2")}>
+          {children}
+        </h5>
+      );
+    case 6:
+      return (
+        <h6 className={clsx(className, "text-base font-bold mt-3 mb-2")}>
+          {children}
+        </h6>
+      );
+  }
+}

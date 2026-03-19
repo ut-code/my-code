@@ -32,9 +32,9 @@ export function Navbar({ pagesList }: { pagesList: LanguageEntry[] }) {
   return (
     <>
       {/* fixedのヘッダーの分だけスクロールするコンテンツを下に移動するためのdiv */}
-      <div className="h-16 lg:hidden" />
+      <div className="h-16 has-sidebar:hidden" />
 
-      <div className="h-16 navbar bg-base-300/60 w-full fixed lg:hidden flex gap-4 z-40 shadow-md backdrop-blur-xs">
+      <div className="h-16 navbar bg-base-300/60 w-full fixed has-sidebar:hidden flex gap-4 z-40 shadow-md backdrop-blur-xs">
         <div className="flex-none">
           {/* サイドバーを開閉するボタン */}
           <label
@@ -57,7 +57,6 @@ export function Navbar({ pagesList }: { pagesList: LanguageEntry[] }) {
             </svg>
           </label>
         </div>
-        {/* サイドバーが表示されていない場合のみ */}
         <Link href="/" className="flex items-center">
           <img
             src="/icon.svg"

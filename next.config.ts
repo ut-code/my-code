@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import { PyodidePlugin } from "@pyodide/webpack-plugin";
+import { version as pyodideVersion } from "pyodide/package.json";
 
 initOpenNextCloudflareForDev();
 
@@ -44,13 +46,14 @@ const nextConfig: NextConfig = {
     ];
   },
   webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        child_process: false,
-        "node:child_process": false,
-        ...config.resolve.fallback,
-      };
-    }
+    config.plugins.push(
+      new PyodidePlugin({
+        // public/ 以下に書き出すと404
+        // ../public/ 以下に書き出すと Uncaught SyntaxError: Invalid or unexpected token (at layout.js:1073:29) エラーになる
+        // _next/static/ 以下ならとりあえずうごく
+        outDirectory: `static/pyodide/v${pyodideVersion}`,
+      })
+    );
     // import hoge from "./file?raw" でfileの中身を文字列としてインポート
     for (const rule of config.module.rules) {
       if (rule.resourceQuery instanceof RegExp) {

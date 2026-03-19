@@ -22,6 +22,27 @@
       "when": 1764931132581,
       "tag": "0002_sad_mindworm",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1772895009610,
+      "tag": "0003_thin_ben_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1773327252896,
+      "tag": "0004_busy_orphan",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773727108826,
+      "tag": "0005_giant_kylun",
+      "breakpoints": true
     }
   ]
 }

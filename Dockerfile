@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 COPY packages/jsEval/package.json ./packages/jsEval/
+COPY packages/runtime/package.json ./packages/runtime/
 
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
@@ -21,7 +22,8 @@ COPY --from=dependencies /app/node_modules ./node_modules
 # Copy application source code
 COPY . .
 
-ENV NODE_ENV=production
+# Stop if documentation has any change that is not reflected to revisions.yml and database.
+RUN npx tsx ./scripts/checkDocs.ts --check-diff
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
