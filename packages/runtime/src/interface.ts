@@ -1,4 +1,5 @@
 import { MutexInterface } from "async-mutex";
+import { z } from "zod";
 
 /**
  * 各言語の実行環境のインタフェース
@@ -148,28 +149,33 @@ export interface RuntimeInfo {
   version?: string;
 }
 
-export type ReplOutputType =
-  | "stdout"
-  | "stderr"
-  | "error"
-  | "return"
-  | "trace"
-  | "system";
-export interface ReplOutput {
-  type: ReplOutputType; // 出力の種類
-  message: string; // 出力メッセージ
-}
-export interface UpdatedFile {
-  type: "file";
-  filename: string;
-  content: string;
-}
+export const ReplOutputTypeSchema = z.enum([
+  "stdout",
+  "stderr",
+  "error",
+  "return",
+  "trace",
+  "system",
+]);
+export type ReplOutputType = z.output<typeof ReplOutputTypeSchema>;
+export const ReplOutputSchema = z.object({
+  type: ReplOutputTypeSchema, // 出力の種類
+  message: z.string(), // 出力メッセージ
+});
+export type ReplOutput = z.output<typeof ReplOutputSchema>;
+export const UpdatedFileSchema = z.object({
+  type: z.literal("file"),
+  filename: z.string(),
+  content: z.string(),
+});
+export type UpdatedFile = z.output<typeof UpdatedFileSchema>;
 
-export interface ReplCommand {
-  command: string;
-  output: ReplOutput[];
-  commandId?: string; // Optional for backward compatibility
-}
+export const ReplCommandSchema = z.object({
+  command: z.string(),
+  output: z.array(ReplOutputSchema),
+  commandId: z.string().optional(), // Optional for backward compatibility
+});
+export type ReplCommand = z.output<typeof ReplCommandSchema>;
 export type SyntaxStatus = "complete" | "incomplete" | "invalid"; // 構文チェックの結果
 
 export const emptyMutex: MutexInterface = {

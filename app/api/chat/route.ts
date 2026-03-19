@@ -6,18 +6,27 @@ import {
   CreateChatDiff,
   initContext,
 } from "@/lib/chatHistory";
-import { getPagesList, introSectionId, PagePath, SectionId } from "@/lib/docs";
-import { DynamicMarkdownSection } from "@/(docs)/@docs/[lang]/[pageId]/pageContent";
-import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import {
+  DynamicMarkdownSectionSchema,
+  getPagesList,
+  introSectionId,
+  PagePathSchema,
+  SectionId,
+} from "@/lib/docs";
+import {
+  ReplCommandSchema,
+  ReplOutputSchema,
+} from "@my-code/runtime/interface";
+import { z } from "zod";
 
-type ChatParams = {
-  path: PagePath;
-  userQuestion: string;
-  sectionContent: DynamicMarkdownSection[];
-  replOutputs: Record<string, ReplCommand[]>;
-  files: Record<string, string>;
-  execResults: Record<string, ReplOutput[]>;
-};
+const ChatParamsSchema = z.object({
+  path: PagePathSchema,
+  userQuestion: z.string().min(1),
+  sectionContent: z.array(DynamicMarkdownSectionSchema),
+  replOutputs: z.record(z.string(), z.array(ReplCommandSchema)),
+  files: z.record(z.string(), z.string()),
+  execResults: z.record(z.string(), z.array(ReplOutputSchema)),
+});
 
 export type ChatStreamEvent =
   | { type: "chat"; chatId: string; sectionId: string }
@@ -31,9 +40,18 @@ export async function POST(request: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const params = (await request.json()) as ChatParams;
-  const { path, userQuestion, sectionContent, replOutputs, files, execResults } =
-    params;
+  const parseResult = ChatParamsSchema.safeParse(await request.json());
+  if (!parseResult.success) {
+    return new Response(JSON.stringify(parseResult.error), { status: 400 });
+  }
+  const {
+    path,
+    userQuestion,
+    sectionContent,
+    replOutputs,
+    files,
+    execResults,
+  } = parseResult.data;
 
   const pagesList = await getPagesList();
   const langName = pagesList.find((lang) => lang.id === path.lang)?.name;
@@ -202,7 +220,7 @@ export async function POST(request: NextRequest) {
           prompt.join("\n")
         )) {
           console.log("Received chunk:", [chunk]);
-        
+
           fullText += chunk;
 
           if (!headerParsed) {
@@ -294,9 +312,7 @@ export async function POST(request: NextRequest) {
         await addMessagesAndDiffs(
           chatId,
           path,
-          [
-            { role: "ai", content: cleanMessage },
-          ],
+          [{ role: "ai", content: cleanMessage }],
           diffRaw,
           context
         );

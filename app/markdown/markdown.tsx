@@ -5,10 +5,10 @@ import remarkCjkFriendly from "remark-cjk-friendly";
 import {
   MultiHighlightTag,
   remarkMultiHighlight,
-  ReplacedRange,
 } from "./multiHighlight";
 import { Heading } from "./heading";
 import { AutoCodeBlock } from "./codeBlock";
+import { ReplacedRange } from "@/lib/docs";
 
 export function StyledMarkdown(props: {
   content: string;
