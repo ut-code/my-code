@@ -27,7 +27,7 @@ export function ChatAreaContainer(props: {
         "has-chat-1:shadow-md has-chat-1:bg-base-200",
         // navbar(z-40)よりは下、ChatListForSectionのdropdown(デフォルトでz-999だがz-30に変えている)よりも上
         "z-35",
-        "p-4",
+        "p-4 pb-16",
         "flex flex-col",
         "overflow-y-auto"
       )}

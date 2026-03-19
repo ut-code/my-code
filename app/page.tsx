@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const pagesList = await getPagesList();
   return (
-    <div className="w-full p-4">
+    <div className="w-full p-4 pb-16 md:pb-20 lg:pb-24">
       <div className="max-w-docs mx-auto">
         <div
           className={clsx(
