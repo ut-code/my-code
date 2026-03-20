@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useRef, useCallback } from "react";
 // import useSWR from "swr";
 // import {
 //   getQuestionExample,
@@ -9,9 +9,10 @@ import { useState, FormEvent, useEffect } from "react";
 // import { getLanguageName } from "../pagesList";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
+import { revalidateChatAction } from "@/actions/revalidateChat";
 
 interface ChatFormProps {
   path: PagePath;
@@ -31,6 +32,37 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
 
   const router = useRouter();
   const streamingChatContext = useStreamingChatContext();
+
+  const pathname = usePathname();
+  const pendingRouterPushTarget = useRef<null | string>(null);
+  const pendingRouterPushResolver = useRef<null | (() => void)>(null);
+  // router.pushの完了を待つ関数。pathnameの変化でページ遷移の完了を検知し、解決する。
+  const asyncRouterPush = useCallback(
+    (url: string, options?: { scroll?: boolean }) => {
+      if (pendingRouterPushTarget.current) {
+        console.error(
+          "Already navigating to",
+          pendingRouterPushTarget.current,
+          "can't navigate to",
+          url
+        );
+        return;
+      }
+      pendingRouterPushTarget.current = url;
+      return new Promise<void>((resolve) => {
+        pendingRouterPushResolver.current = resolve;
+        router.push(url, options);
+      });
+    },
+    [router]
+  );
+  useEffect(() => {
+    if (pendingRouterPushTarget.current === pathname) {
+      pendingRouterPushResolver.current?.();
+      pendingRouterPushTarget.current = null;
+      pendingRouterPushResolver.current = null;
+    }
+  }, [pathname]);
 
   // const documentContentInView = sectionContent
   //   .filter((s) => s.inView)
@@ -98,6 +130,7 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
+    let chatId: string | null = null;
     let navigated = false;
 
     // ストリームを非同期で読み続ける（ナビゲーション後もバックグラウンドで継続）
@@ -118,11 +151,16 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
               const event = JSON.parse(line) as ChatStreamEvent;
 
               if (event.type === "chat") {
+                // revalidateChatは/api/chatの中では呼ばず、別のServerActionとして呼び出す
+                await revalidateChatAction(event.chatId, path);
+                chatId = event.chatId;
                 streamingChatContext.startStreaming(event.chatId);
                 document.getElementById(event.sectionId)?.scrollIntoView({
                   behavior: "smooth",
                 });
-                router.push(`/chat/${event.chatId}`, { scroll: false });
+                await asyncRouterPush(`/chat/${event.chatId}`, {
+                  scroll: false,
+                });
                 router.refresh();
                 navigated = true;
                 setIsLoading(false);
@@ -131,6 +169,9 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
               } else if (event.type === "chunk") {
                 streamingChatContext.appendChunk(event.text);
               } else if (event.type === "done") {
+                if (chatId) {
+                  await revalidateChatAction(chatId, path);
+                }
                 streamingChatContext.finishStreaming();
                 router.refresh();
               } else if (event.type === "error") {
@@ -138,7 +179,11 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
                   setErrorMessage(event.message);
                   setIsLoading(false);
                 }
+                if (chatId) {
+                  await revalidateChatAction(chatId, path);
+                }
                 streamingChatContext.finishStreaming();
+                router.refresh();
               }
             } catch {
               // ignore JSON parse errors
