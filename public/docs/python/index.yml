@@ -1,5 +1,5 @@
 name: Python
-description: Pythonの基礎から応用までを学べるチュートリアル
+description: 読みやすさ・書きやすさを追求した、万能な高水準スクリプト言語
 pages:
 - slug: 0-intro
   name: 環境構築と基本思想

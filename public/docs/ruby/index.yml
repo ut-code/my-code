@@ -1,5 +1,5 @@
 name: Ruby
-description: hoge
+description: シンプルさと生産性を追求した、オブジェクト指向スクリプト言語
 pages:
 - slug: 0-intro
   name: rubyの世界へようこそ
