@@ -28,7 +28,11 @@ export function cacheKeyForChat(chatId: string) {
   return `${CACHE_KEY_BASE}/getChatOne?chatId=${chatId}`;
 }
 
-async function revalidateChat(
+// nextjsのキャッシュのrevalidateはRouteHandlerではなくServerActionから呼ばないと正しく動作しないらしい。
+// https://github.com/vercel/next.js/issues/69064
+// そのためlib/以下の関数では直接revalidateChatを呼ばず、ServerActionの関数から呼ぶようにする。
+// Nextjs 16 に更新したらこれをupdateTag()で置き換える。
+export async function revalidateChat(
   chatId: string,
   userId: string,
   pagePath: string | PagePath
@@ -126,8 +130,6 @@ export async function addChat(
     chatDiffs = [] as never[];
   }
 
-  await revalidateChat(newChat.chatId, userId, path);
-
   return {
     ...newChat,
     section: {
@@ -173,8 +175,6 @@ export async function addMessagesAndDiffs(
       }))
     );
   }
-
-  await revalidateChat(chatId, userId, path);
 }
 
 export async function deleteChat(chatId: string, context: Context) {
@@ -192,10 +192,7 @@ export async function deleteChat(chatId: string, context: Context) {
   await drizzle.delete(message).where(eq(message.chatId, chatId));
   await drizzle.delete(diff).where(eq(diff.chatId, chatId));
 
-  const targetSection = await drizzle.query.section.findFirst({
-    where: eq(section.sectionId, deletedChat[0].sectionId),
-  });
-  await revalidateChat(chatId, userId, targetSection?.pagePath ?? "");
+  return deletedChat;
 }
 
 export async function getAllChat(

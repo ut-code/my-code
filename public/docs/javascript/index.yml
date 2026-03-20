@@ -1,5 +1,7 @@
 name: JavaScript
-description: hoge
+description: ブラウザに起源を持ち、様々な用途で使われる柔軟なスクリプト言語
+
+
 pages:
 - slug: 0-intro
   name: JavaScriptへようこそ

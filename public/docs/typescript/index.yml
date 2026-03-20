@@ -1,5 +1,5 @@
 name: TypeScript
-description: にゃー
+description: JavaScriptに静的型付けを加えたスーパーセットの言語
 pages:
 - slug: 0-intro
   name: TypeScriptへようこそ

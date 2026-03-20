@@ -1,5 +1,5 @@
 name: Rust
-description: a
+description: 安全性とパフォーマンスを両立する、モダンなシステムプログラミング言語
 pages:
 - slug: 0-intro
   name: Rustの世界へようこそ

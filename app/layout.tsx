@@ -13,6 +13,7 @@ import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./sidebar";
 import { RuntimeProvider } from "@my-code/runtime/context";
 import { getPagesList } from "@/lib/docs";
+import { Footer } from "./footer";
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +54,7 @@ export default async function RootLayout({
             </div>
           </div>
         </SidebarMdProvider>
+        <Footer />
       </body>
     </html>
   );
