@@ -2,9 +2,9 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { getPagesList } from "@/lib/docs";
 import clsx from "clsx";
-import { ReactNode } from "react";
 import { LanguageIcon } from "./terminal/icons";
 import { RuntimeLang } from "@my-code/runtime/languages";
+import { ChatImage, FeatureCard, PracticeImage, RuntimeImage } from "./featureCard";
 
 export const metadata: Metadata = {
   title: "my.code(); へようこそ",
@@ -71,9 +71,11 @@ export default async function Home() {
             icon="⚡"
             iconColor="bg-primary/10 text-primary"
             title="環境構築は一切不要。ブラウザで動く実行環境"
+            image={<RuntimeImage />}
           >
             面倒な開発環境のセットアップで挫折する必要はありません。
-            チュートリアル内のサンプルコードは、ボタン一つでそのまま実行可能。
+            チュートリアル内のサンプルコードは、 my.code();
+            のウェブサイト上でそのまま実行可能。
             もちろん自由に編集して結果を試すこともできます。
             {/*さらに、エラーメッセージの解説やエラー箇所のハイライト表示など、初心者に優しい機能も充実しています。*/}
           </FeatureCard>
@@ -82,6 +84,7 @@ export default async function Home() {
             iconColor="bg-secondary/10 text-secondary"
             title="AIアシスタントがあなたの学習をサポート"
             reversed
+            image={<ChatImage />}
           >
             エラーの原因がわからない？コードの意味を知りたい？
             AIアシスタントにいつでも質問できます。
@@ -90,12 +93,12 @@ export default async function Home() {
           <FeatureCard
             icon="✏️"
             iconColor="bg-accent/10 text-accent"
-            title="実践的な練習問題"
+            title="練習問題で理解を深める"
+            image={<PracticeImage />}
           >
-            {/*todo: 他セクションと同じスタイルの文章で書き直す？*/}
-            各チュートリアルには練習問題が含まれており、学んだ内容を実際に試すことができます。
-            練習問題は段階的に難易度が上がるように設計されており、理解度を深めるのに役立ちます。
-            書いたコードはその場ですぐにAIアシスタントがレビューし、フィードバックを提供します。
+            各チュートリアルには、学んだ内容を実践できる練習問題が用意されています。
+            実際に自分でコードを書いて実行することで、理解をさらに深めることができます。
+            {/*書いたコードはAIアシスタントがレビューし、フィードバックを提供します。*/}
           </FeatureCard>
         </div>
 
@@ -140,39 +143,6 @@ export default async function Home() {
               </Link>
             );
           })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FeatureCard(props: {
-  reversed?: boolean;
-  icon: ReactNode;
-  title: ReactNode;
-  children: ReactNode;
-  iconColor: string;
-}) {
-  return (
-    <div
-      className={clsx(
-        "flex flex-col items-center gap-4 md:gap-8 lg:gap-16",
-        props.reversed ? "md:flex-row-reverse" : "md:flex-row"
-      )}
-    >
-      <div className="flex-1 space-y-4 lg:space-y-8">
-        <div className="flex flex-row gap-2 items-center">
-          <span className={clsx("p-3 rounded-xl text-2xl", props.iconColor)}>
-            {props.icon}
-          </span>
-          <h3 className="text-2xl/8 md:text-3xl/10 font-bold">{props.title}</h3>
-        </div>
-        <p className="opacity-70 leading-relaxed text-lg">{props.children}</p>
-      </div>
-      <div className="w-80 max-w-full md:min-w-2/5 md:max-w-1/2">
-        {/* スクリーンショットのプレースホルダー（後で実際の画像に差し替えてください） */}
-        <div className="aspect-video bg-base-200 rounded-xl border border-base-300 shadow-lg flex items-center justify-center overflow-hidden">
-          <span className="text-base-content/40 font-mono">Screenshot</span>
         </div>
       </div>
     </div>
