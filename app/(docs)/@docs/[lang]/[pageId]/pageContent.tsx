@@ -146,7 +146,7 @@ export function PageContent(props: PageContentProps) {
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   return (
-    <div className="flex-1 p-4 flex flex-col">
+    <div className="flex-1 p-4 pb-16 flex flex-col">
       <div
         className="max-w-full mx-auto grid"
         style={{

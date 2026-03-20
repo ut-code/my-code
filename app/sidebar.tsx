@@ -1,7 +1,13 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DynamicMarkdownSection, LangId, LanguageEntry, PagePath, PageSlug } from "@/lib/docs";
+import {
+  DynamicMarkdownSection,
+  LangId,
+  LanguageEntry,
+  PagePath,
+  PageSlug,
+} from "@/lib/docs";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./themeToggle";
 import {
@@ -112,7 +118,7 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
   }, [currentLangIndex]);
 
   return (
-    <div className="bg-base-200 h-full w-sidebar flex flex-col">
+    <div className="bg-base-200 h-full w-sidebar flex flex-col relative">
       <h2 className="hidden has-sidebar:flex flex-row items-center p-4 gap-2">
         {/* サイドバーが常時表示されている場合のみ */}
         <Link href="/" className="flex-1 flex items-center">
@@ -150,8 +156,12 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
         </label>
       </span>
 
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-base-200 to-base-200/0 z-1" />
       <ul
-        className="menu w-full h-max flex-nowrap grow-1 overflow-y-auto overflow-x-clip"
+        className={clsx(
+          "menu w-full h-max flex-nowrap grow-1 overflow-y-auto overflow-x-clip",
+          "pb-16"
+        )}
         style={{
           scrollbarGutter: "stable",
           // DaisyUIはスクロールバーカラーを変更しているが、sidebarを開いた際にはさらに暗い色に変更してしまう

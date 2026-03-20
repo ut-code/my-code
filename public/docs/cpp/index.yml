@@ -1,5 +1,5 @@
 name: C++
-description: C++の基本から高度な機能までを学べるチュートリアル
+description: C言語を拡張して作られた、高性能と柔軟性を両立する汎用言語
 pages:
 - slug: 0-intro
   name: C++の世界へようこそ
