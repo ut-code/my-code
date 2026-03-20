@@ -2,6 +2,10 @@
 id: typescript-async-utilities-practice2
 title: '練習問題2: ユーティリティ型の活用'
 level: 3
+question:
+  - OmitやPartialをどのように使って型を定義するのか、具体的な書き方を示してほしいです。
+  - ProductionConfig型を持つ変数prodConfigに値を代入する際に、debugModeを含めないようにするにはどうすればいいですか？
+  - AppConfigの中のプロパティを任意にするというのは、具体的にどういうことですか？
 ---
 
 ### 練習問題2: ユーティリティ型の活用

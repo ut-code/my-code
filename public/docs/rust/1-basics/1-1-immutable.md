@@ -2,6 +2,7 @@
 id: rust-basics-immutable
 title: 不変変数（Immutable）
 level: 3
+question: []
 ---
 
 ### 不変変数（Immutable）

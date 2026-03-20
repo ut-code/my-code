@@ -2,6 +2,8 @@
 id: ruby-proc-lambda-practice1
 title: '練習問題1: Lambda の作成'
 level: 3
+question:
+  - adder = の右辺には具体的にどのようなコードを書けば良いですか？
 ---
 
 ### 練習問題1: Lambda の作成

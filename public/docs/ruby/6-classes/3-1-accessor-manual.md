@@ -2,6 +2,10 @@
 id: ruby-classes-accessor-manual
 title: 手動での定義
 level: 3
+question:
+  - ゲッターとセッターという用語の意味を教えてください。
+  - def name=(new_name)のように、メソッド名にイコール記号が含まれるのはなぜですか？
+  - item.name = "Desktop"と書いたとき、Rubyの内部ではどのようにセッターメソッドが呼び出されるのですか？
 ---
 
 ### 手動での定義

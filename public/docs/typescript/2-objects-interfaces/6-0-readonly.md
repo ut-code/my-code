@@ -2,9 +2,14 @@
 id: typescript-objects-interfaces-readonly
 title: 読み取り専用プロパティ (readonly)
 level: 2
+question:
+  - '`readonly`はオブジェクトのプロパティ以外にも使えますか。'
+  - '`readonly`プロパティを後から変更しようとすると、どこでエラーになりますか。'
+  - 実行時のJavaScriptコードでは通常のオブジェクトとして振る舞うとはどういう意味ですか。
+  - '`readonly`にすると、パフォーマンスに影響はありますか。'
 ---
 
-## 読み取り専用プロパティ (readonly)
+## 読み取り専用プロパティ (`readonly`)
 
 オブジェクトのプロパティを初期化した後に変更されたくない場合、`readonly` 修飾子を使用します。これは特に、IDや設定値など、不変であるべきデータを扱う際に有用です。
 

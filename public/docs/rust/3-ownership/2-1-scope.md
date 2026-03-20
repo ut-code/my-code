@@ -2,6 +2,8 @@
 id: rust-ownership-scope
 title: 変数のスコープ
 level: 3
+question:
+  - スコープを抜けた瞬間にRustが自動的に呼び出すという`drop`関数は、私たち開発者が明示的に書く必要がありますか？
 ---
 
 ### 変数のスコープ

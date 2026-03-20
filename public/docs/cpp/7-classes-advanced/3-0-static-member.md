@@ -2,6 +2,11 @@
 id: cpp-classes-advanced-static-member
 title: staticメンバ
 level: 2
+question:
+  - staticメンバ変数が「クラスそのものに属する」とは具体的にどういうことですか？
+  - staticメンバ変数の定義をクラス定義の外で行うのはなぜですか？クラス定義の中に書けないのですか？
+  - staticメンバ関数から、nameなどの非staticメンバにアクセスできないのはなぜですか？
+  - Player::getPlayerCount()のように、オブジェクトがなくてもstaticメンバ関数を呼び出せるのはどのような場合に便利ですか？
 ---
 
 ## staticメンバ

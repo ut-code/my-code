@@ -2,30 +2,17 @@
 id: typescript-types-never
 title: 'never: 決して発生しない'
 level: 3
+question:
+  - '`never`型はどんな関数の戻り値として使われることが多いですか？'
+  - '`void`型と`never`型は何が違うんですか？'
+  - '`never`型を変数の型として宣言することはできますか？'
 ---
 
-### never: 決して発生しない
+### `never`: 決して発生しない
 
 `never` は「値を持たない」ことを意味します。常に例外を投げる関数や、無限ループなど「終了しない関数」の戻り値として使われます。
 
-```ts:special_types.ts
-// --- any の例 ---
-let looseVariable: any = 4;
-looseVariable = "Maybe a string instead";
-looseVariable = false; // エラーにならない（危険！）
-console.log("Any:", looseVariable);
-
-// --- unknown の例 ---
-let uncertainValue: unknown = "I am actually a string";
-
-// uncertainValue.toUpperCase(); // エラー: Object is of type 'unknown'.
-
-// 型チェック（絞り込み）を行うと使用可能になる
-if (typeof uncertainValue === "string") {
-    console.log("Unknown (checked):", uncertainValue.toUpperCase());
-}
-
-// --- never の例 ---
+```ts:never_type.ts
 function throwError(message: string): never {
     throw new Error(message);
 }
@@ -38,10 +25,8 @@ try {
 }
 ```
 
-```ts-exec:special_types.ts
-Any: false
-Unknown (checked): I AM ACTUALLY A STRING
+```ts-exec:never_type.ts
 Error caught
 ```
-```js-readonly:special_types.js
+```js-readonly:never_type.js
 ```

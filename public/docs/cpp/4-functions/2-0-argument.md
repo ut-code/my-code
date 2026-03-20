@@ -2,6 +2,7 @@
 id: cpp-functions-argument
 title: 引数の渡し方（パフォーマンスと安全性）
 level: 2
+question: []
 ---
 
 ## 引数の渡し方（パフォーマンスと安全性）

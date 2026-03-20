@@ -2,6 +2,9 @@
 id: rust-basics-practice1
 title: '練習問題 1: 計算とシャドーイング'
 level: 3
+question:
+  - 文字列を数値にパースする `parse()` メソッドについて詳しく知りたいです。
+  - '`.expect("Not a number")` の `expect` は何をする関数ですか？'
 ---
 
 ### 練習問題 1: 計算とシャドーイング

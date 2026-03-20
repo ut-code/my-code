@@ -2,6 +2,10 @@
 id: javascript-promise-practice1
 title: '練習問題1: ランダムな成功/失敗'
 level: 3
+question:
+  - Math.random()を使って50%の確率で成功と失敗を判定する方法を教えてください。
+  - Promiseを返す関数`coinToss`を具体的にどのように実装すればよいですか？
+  - 成功時と失敗時で異なるメッセージをコンソールに表示するには、`then`と`catch`をどのように使えばよいですか？
 ---
 
 ### 練習問題1: ランダムな成功/失敗

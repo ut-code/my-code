@@ -2,9 +2,12 @@
 id: typescript-types-practice2
 title: '練習問題 2: unknown型の安全な利用'
 level: 3
+question:
+  - 練習問題2で、`input`が`string`型であることを確認しないと`input.length`が使えないのはなぜですか？
+  - 練習問題2の`printLength`関数に`null`や`undefined`を渡した場合、どのような結果になりますか？
 ---
 
-### 練習問題 2: unknown型の安全な利用
+### 練習問題 2: `unknown`型の安全な利用
 
 1.  `unknown` 型の引数 `input` を受け取る関数 `printLength` を作成してください。
 2.  関数内で、`input` が `string` 型である場合のみ、その文字列の長さをコンソールに出力してください（`input.length`）。

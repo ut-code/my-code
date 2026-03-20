@@ -2,6 +2,10 @@
 id: rust-intro-cargo-commands
 title: Cargoの主要コマンド
 level: 3
+question:
+  - '`cargo check` と `cargo build` はどう使い分ければ良いですか？'
+  - デバッグビルドとリリースビルドの違いは何ですか？
+  - '`cargo build --release` を使うと実行速度が劇的に向上するのはなぜですか？'
 ---
 
 ### Cargoの主要コマンド

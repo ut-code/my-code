@@ -2,6 +2,9 @@
 id: rust-structs-methods-practice1
 title: '練習問題1: RPGのキャラクター'
 level: 3
+question:
+  - hpが0未満にならないようにするロジックは、どのようなコードで実装すればよいですか？
+  - '&mut selfが必要な理由をもう一度確認したいです。'
 ---
 
 ### 練習問題1: RPGのキャラクター

@@ -2,6 +2,10 @@
 id: python-control-functions-keyword-var-arg
 title: '**kwargs'
 level: 3
+question:
+  - '`**user_info`の`**`は何を意味していますか？'
+  - '`**kwargs`で受け取った引数が辞書になるのはなぜですか？'
+  - '`Any`の代わりに特定の型を指定することはできますか？'
 ---
 
 ### `**kwargs`

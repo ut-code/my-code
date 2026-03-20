@@ -2,6 +2,8 @@
 id: ruby-testing-minites
 title: 標準添付のテスティングフレームワーク「Minitest」
 level: 2
+question:
+  - Minitestは標準添付とありますが、自分でインストールするRubyにも含まれているのですか？
 ---
 
 ## 標準添付のテスティングフレームワーク「Minitest」

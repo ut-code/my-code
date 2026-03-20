@@ -2,6 +2,9 @@
 id: ruby-blocks-iterators-practice2
 title: 練習問題2
 level: 3
+question:
+  - 文字列の文字数を取得するには、どのようなメソッドを使えば良いですか？
+  - select のブロック内で「真 (true)」を返すようにするには、どのような条件式を書けば良いですか？
 ---
 
 ### 練習問題2

@@ -1,10 +1,15 @@
 ---
 id: typescript-types-type-annotations
-title: 2.1 型注釈の構文 (Type Annotations)
+title: 型注釈の構文 (Type Annotations)
 level: 2
+question:
+  - 型注釈とは何のために使う機能ですか？
+  - JavaScriptと比べて、型注釈を付けることのメリットは何ですか？
+  - 型注釈で指定した型と異なる値を代入しようとすると、具体的にどうなりますか？
+  - '`let`と`const`で型注釈の使い方は何か違いがありますか？'
 ---
 
-## 2.1 型注釈の構文 (Type Annotations)
+## 型注釈の構文 (Type Annotations)
 
 変数を宣言する際、その変数がどのような種類のデータを扱うかを明示することを「型注釈（Type Annotation）」と呼びます。
 構文は非常にシンプルで、変数名の後ろに `: 型名` を記述します。

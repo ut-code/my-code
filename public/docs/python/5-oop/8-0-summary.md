@@ -2,6 +2,7 @@
 id: python-oop-summary
 title: この章のまとめ
 level: 2
+question: []
 ---
 
 ## この章のまとめ

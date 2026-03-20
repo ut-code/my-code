@@ -2,6 +2,11 @@
 id: rust-functions-control-stmt-expr
 title: 文（Statement）と式（Expression）
 level: 3
+question:
+  - なぜa + 1の後にセミコロンを付けるとコンパイルエラーになるのですか？
+  - なぜRustではreturnキーワードを使わずに最後の式を戻り値にするスタイルが好まれるのですか？
+  - 空のタプル () とは何ですか？
+  - main関数には戻り値の型が指定されていませんが、これはなぜですか？
 ---
 
 ### 文（Statement）と式（Expression）

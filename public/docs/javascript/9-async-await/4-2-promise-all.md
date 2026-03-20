@@ -2,6 +2,14 @@
 id: javascript-async-await-promise-all
 title: Promise.all() による並列実行
 level: 3
+question:
+  - Promise.all()は何をするための関数ですか？
+  - Promise.all()に渡す引数はどのような形式ですか？
+  - Promise.all()が一つでも失敗すると全体が失敗するとはどういう意味ですか？
+  - >-
+    const [user, post] = await Promise.all([p1, p2]);の[user,
+    post]はどのように値を受け取っていますか？
+  - console.timeとconsole.timeEndは何のために使われていますか？
 ---
 
 ### `Promise.all()` による並列実行

@@ -1,7 +1,9 @@
 ---
 id: javascript-this-bind-basic
-title: "this を固定する: bind, call, apply"
+title: 'this を固定する: bind, call, apply'
 level: 2
+question:
+  - '`this`を固定する必要があるのは、どのような場面ですか？'
 ---
 
 ## `this` を固定する: bind, call, apply

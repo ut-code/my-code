@@ -2,6 +2,8 @@
 id: rust-collections-strings-practice1
 title: 練習問題1：整数のリスト分析
 level: 3
+question:
+  - 平均値、中央値、最頻値の計算方法について、もう少し具体的なアルゴリズムのヒントを教えてもらえますか？
 ---
 
 ### 練習問題1：整数のリスト分析

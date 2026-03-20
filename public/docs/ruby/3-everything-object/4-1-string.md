@@ -2,6 +2,12 @@
 id: ruby-everything-object-string
 title: String (文字列)
 level: 3
+question:
+  - Stringクラスでよく使うメソッドは他にどんなものがありますか？
+  - .stripや.capitalizeは元の文字列を変更するのですか？それとも新しい文字列を返すのですか？
+  - gsubとsubの違いは何ですか？
+  - .start_with?メソッドの疑問符にはどんな意味があるのですか？
+  - pメソッドはputsメソッドとどう違うのですか？
 ---
 
 ### String (文字列)

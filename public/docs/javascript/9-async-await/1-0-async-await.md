@@ -2,6 +2,10 @@
 id: javascript-async-await-async-await
 title: Async/Await 構文
 level: 2
+question:
+  - Async/Awaitは何をするためのものですか？
+  - Promiseのシンタックスシュガーとはどういう意味ですか？
+  - Async/Awaitはいつ使うと便利ですか？
 ---
 
 ## Async/Await 構文

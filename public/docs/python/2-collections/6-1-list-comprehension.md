@@ -2,6 +2,9 @@
 id: python-collections-list-comprehension
 title: リスト内包表記
 level: 3
+question:
+  - リスト内包表記で複数の`if`条件を組み合わせることはできますか？
+  - リスト内包表記でネストした`for`ループを書くことは可能ですか？
 ---
 
 ### リスト内包表記

@@ -2,6 +2,14 @@
 id: typescript-generics-generics-func
 title: Generics関数
 level: 2
+question:
+  - <T>という書き方はどういう文法規則ですか？T以外の文字でも良いのですか？
+  - Tがどんな型でも良いなら、結局anyを使うのと何が違うのですか？
+  - 「型推論に任せる (推奨)」とありますが、なぜ明示的に型を指定しない方が良いのですか？
+  - output1.toFixed(2); がエラーになる理由を詳しく教えてください。
+  - >-
+    console.logの「引数の型:
+    string」というのは、TypeScriptの型とJavaScriptの実行時のtypeofがどのように対応しているのですか？
 ---
 
 ## Generics関数

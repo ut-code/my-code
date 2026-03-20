@@ -2,6 +2,11 @@
 id: javascript-async-await-practice1
 title: '練習問題1: ユーザー情報の取得と表示'
 level: 3
+question:
+  - displayUserSummary(userId)関数はasync関数にするべきですか？
+  - ユーザー情報とTODOリストを並列で取得するコードの書き方は？
+  - 完了済みのTODOの数を数えるにはどうすればいいですか？
+  - 通信エラー時のエラーメッセージはどのように表示すればいいですか？
 ---
 
 ### 練習問題1: ユーザー情報の取得と表示

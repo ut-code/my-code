@@ -2,6 +2,11 @@
 id: javascript-control-switch
 title: switch文
 level: 2
+question:
+  - 厳密等価演算子で比較されるとのことですが、それ以外の比較演算子とどう違うのですか？
+  - switch文のcaseの順番は結果に影響しますか？
+  - break文を書き忘れるとどうなりますか？
+  - default句は必ず書く必要がありますか？
 ---
 
 ## `switch`文

@@ -2,6 +2,9 @@
 id: python-collections-practice2
 title: '練習問題2: クラブ活動のメンバー分析'
 level: 3
+question:
+  - 集合演算の和集合、積集合、差集合の他に、排他的論理和（XOR）のようなものはありますか？
+  - 練習問題2の`math_club`と`science_club`をリストで作成した場合、同じ操作はできますか？
 ---
 
 ### 練習問題2: クラブ活動のメンバー分析

@@ -2,6 +2,9 @@
 id: ruby-basics-nil-false
 title: 🚫 重要： nil と false の扱い
 level: 2
+question:
+  - '`false` と `nil` だけが偽 (falsey) として扱われるのは、なぜ重要なのでしょうか。'
+  - '`0` や空文字列 `""` が真 (truthy) として扱われると、プログラミングでどのような問題が起こりやすいですか。'
 ---
 
 ## 🚫 重要： nil と false の扱い

@@ -2,6 +2,10 @@
 id: javascript-async-await-promise-all-race
 title: Promise.all() と Promise.race()
 level: 2
+question:
+  - awaitを連発するとパフォーマンスが落ちるというのはどういうことですか？
+  - 直列（シーケンシャル）とはどういう意味ですか？
+  - 複数の非同期処理を並列で実行するメリットは何ですか？
 ---
 
 ## `Promise.all()` と `Promise.race()`

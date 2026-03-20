@@ -2,6 +2,13 @@
 id: rust-modules-struct-visibility
 title: 構造体の可視性
 level: 3
+question:
+  - 構造体自体を`pub`にしても、フィールドが`pub`でないと使えないのはなぜですか？
+  - コンストラクタ（`pub fn summer`のような関数）がないと、外部から構造体のインスタンスを作れないのはなぜですか？
+  - 構造体のフィールドを非公開にするメリットは何ですか？
+  - >-
+    `meal.seasonal_fruit =
+    String::from("blueberries");`がエラーになるのは、具体的にどのようなエラーメッセージが出ますか？
 ---
 
 ### 構造体の可視性

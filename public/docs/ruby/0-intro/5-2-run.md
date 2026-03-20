@@ -2,6 +2,7 @@
 id: ruby-intro-run
 title: スクリプトファイルでの実行
 level: 3
+question: []
 ---
 
 ### スクリプトファイルでの実行
@@ -9,9 +10,6 @@ level: 3
 エディタで`hello.rb`という名前のファイルを作成します。
 
 ```ruby:hello.rb
-#!/usr/bin/env ruby
-# 1行目はShebang（シーバン）と言い、Unix系OSでスクリプトとして直接実行する際に使われます。
-
 # 変数に文字列を代入
 message = "Hello from script file!"
 

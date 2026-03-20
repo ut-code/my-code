@@ -2,6 +2,12 @@
 id: python-oop-inheritance
 title: 継承
 level: 2
+question:
+  - 継承を使うと具体的に何が便利ですか。
+  - 親クラスと子クラスの関係性についてもっと詳しく教えてください。
+  - super()は何のために使うのですか。
+  - super().__init__(name)と書かずにAnimal.__init__(self, name)と書いても良いのですか。
+  - メソッドのオーバーライドとは何ですか。
 ---
 
 ## 継承

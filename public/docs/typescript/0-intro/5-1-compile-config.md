@@ -2,6 +2,9 @@
 id: typescript-intro-compile-config
 title: 設定ファイルを使ったコンパイル
 level: 3
+question:
+  - '`npx tsc`だけでコンパイルできるのはなぜですか？'
+  - '`npx tsc`と打った場合、どのTypeScriptファイルがコンパイルされるのですか？'
 ---
 
 ### 設定ファイルを使ったコンパイル
@@ -11,5 +14,3 @@ level: 3
 ```bash
 npx tsc
 ```
-
-> **Note:** `strict: true` はTypeScriptの恩恵を最大限に受けるために非常に重要です。このチュートリアルでは常にこの設定が有効であることを前提に進めます。

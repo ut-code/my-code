@@ -2,6 +2,13 @@
 id: javascript-async-await-try-catch
 title: try...catch によるエラーハンドリング
 level: 2
+question:
+  - Async/Awaitでエラーを処理するにはtry...catchを使うのが一般的なのですか？
+  - Promiseの.catch()とtry...catchはどちらを使うべきですか？
+  - 同期エラーと非同期エラーを同じ構文で扱えるとはどういう意味ですか？
+  - randomRequest関数でrejectされた場合、tryブロックのどこでエラーが発生するのですか？
+  - error.messageにはどのような情報が入っていますか？
+  - finallyブロックはどのような時に使われますか？
 ---
 
 ## `try...catch` によるエラーハンドリング

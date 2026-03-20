@@ -2,6 +2,8 @@
 id: ruby-stdlib-regexp
 title: 正規表現 (Regexp)
 level: 2
+question:
+  - /pattern/リテラルという書き方以外に正規表現を定義する方法はありますか？
 ---
 
 ## 正規表現 (`Regexp`)

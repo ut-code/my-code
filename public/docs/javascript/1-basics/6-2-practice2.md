@@ -2,6 +2,11 @@
 id: javascript-basics-practice2
 title: '練習問題2: オブジェクトの操作と参照'
 level: 3
+question:
+  - なぜ `newList = originalList` だと `originalList` も変更されてしまうのですか？
+  - 「参照コピー」とはどういう状態ですか？
+  - スプレッド構文 `...` を使って、この問題をどう解決すれば良いですか？
+  - 配列をコピーする他の方法はありますか？
 ---
 
 ### 練習問題2: オブジェクトの操作と参照

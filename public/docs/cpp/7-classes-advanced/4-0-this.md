@@ -2,6 +2,10 @@
 id: cpp-classes-advanced-this
 title: thisポインタ
 level: 2
+question:
+  - thisポインタは、なぜメンバ関数に「暗黙的に渡される」のですか？明示的に渡すことはできないのですか？
+  - this->x = newX; のように this-> を付けなくても x = newX; と書けば良い場面はありますか？
+  - メソッドチェーンは、オブジェクトを何度もコピーしているわけではないのですか？
 ---
 
 ## thisポインタ

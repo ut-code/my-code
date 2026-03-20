@@ -2,6 +2,10 @@
 id: rust-collections-strings-hashmap-basic
 title: 基本的な操作
 level: 3
+question:
+  - scores.insertでString::fromを使う必要があるのはなぜですか？直接文字列リテラルを使えないのですか？
+  - getメソッドがOption<&V>を返すのは、Vecのgetと同じような理由ですか？
+  - ハッシュマップの反復処理で「順序は保証されない」とはどういう意味ですか？毎回違う順序で出力される可能性があるということですか？
 ---
 
 ### 基本的な操作

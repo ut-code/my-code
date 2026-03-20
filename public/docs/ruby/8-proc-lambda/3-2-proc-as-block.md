@@ -2,6 +2,9 @@
 id: ruby-proc-lambda-proc-as-block
 title: 2. Proc をブロックとして渡す
 level: 3
+question:
+  - numbers.map(&doubler)とnumbers.map { |n| n * 2 }は、全く同じ意味として使って良いのですか？
+  - Procをブロックとして渡すことのメリットは何ですか？
 ---
 
 ### 2\. `Proc` をブロックとして渡す

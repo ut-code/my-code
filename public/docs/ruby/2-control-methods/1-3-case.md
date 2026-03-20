@@ -2,6 +2,11 @@
 id: ruby-control-case
 title: case
 level: 3
+question:
+  - case文がC言語やJavaのswitch文より強力とは、具体的にどのような点ですか？
+  - when節で指定できる他のタイプは他にありますか？
+  - case文でbreakが不要なのはなぜですか？
+  - case文はif-elsif-else文の代わりにいつでも使えますか？
 ---
 
 ### `case`

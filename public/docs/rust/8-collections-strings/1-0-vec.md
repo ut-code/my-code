@@ -1,7 +1,9 @@
 ---
 id: rust-collections-strings-vec
-title: 'ベクタ (Vec<T>)：可変長配列'
+title: ベクタ (Vec<T>)：可変長配列
 level: 2
+question:
+  - ベクタはどのような場面で役立つデータ構造ですか？
 ---
 
 ## ベクタ (`Vec<T>`)：可変長配列

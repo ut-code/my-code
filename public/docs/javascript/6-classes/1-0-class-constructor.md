@@ -2,6 +2,12 @@
 id: javascript-classes-constructor
 title: クラスの定義とコンストラクタ
 level: 2
+question:
+  - クラスを使うと何ができるようになるのですか？
+  - constructorメソッドはいつ実行されるのですか？
+  - '`this.name = name;` の `this` は何を示しているのですか？'
+  - コードの実行結果で `undefined` と表示されるのは、エラーではないのですか？
+  - クラスなのに `typeof User` が `function` になるのはなぜですか？
 ---
 
 ## クラスの定義とコンストラクタ

@@ -2,6 +2,8 @@
 id: rust-basics-mutable
 title: 可変変数（Mutable）
 level: 3
+question:
+  - 常にmutを付けておくのは良くないことですか？
 ---
 
 ### 可変変数（Mutable）

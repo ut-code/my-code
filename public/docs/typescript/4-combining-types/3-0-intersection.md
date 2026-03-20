@@ -2,6 +2,10 @@
 id: typescript-combining-types-intersection
 title: Intersection型 (交差型)
 level: 2
+question:
+  - Intersection型とUnion型はどのように使い分けるのですか？
+  - Person & Employee のように、複数の型を「かつ」で組み合わせると、どのような新しい型が作られるのですか？
+  - プリミティブ型同士でIntersection型を使うとnever型になるのはなぜですか？ never型とは何ですか？
 ---
 
 ## Intersection型 (交差型)

@@ -2,6 +2,7 @@
 id: ruby-testing-tdd-green
 title: '2. Green: テストを通す最小限のコードを書く'
 level: 3
+question: []
 ---
 
 ### 2\. Green: テストを通す最小限のコードを書く

@@ -30,11 +30,7 @@ export interface PagePath {
   page: PageSlug;
 }
 
-export const MarkdownSectionSchema = z.object({
-  /**
-   * セクションのmdファイル名
-   */
-  file: z.string(),
+export const SectionFrontMatterSchema = z.object({
   /**
    * frontmatterに書くセクションid
    * (データベース上の sectionId)
@@ -42,6 +38,18 @@ export const MarkdownSectionSchema = z.object({
   id: z.string().transform((s) => s as SectionId),
   level: z.number(),
   title: z.string(),
+  /**
+   * そのセクションに対する質問例
+   * scripts/questionExample.ts で生成する
+   */
+  question: z.array(z.string()).optional(),
+});
+export type SectionFrontMatter = z.output<typeof SectionFrontMatterSchema>;
+export const MarkdownSectionSchema = SectionFrontMatterSchema.extend({
+  /**
+   * セクションのmdファイル名
+   */
+  file: z.string(),
   /**
    * frontmatterを除く、見出しも含めたもとのmarkdownの内容
    */
@@ -304,11 +312,7 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
   if (endIdx === -1) {
     throw new Error(`File ${file} has invalid frontmatter`);
   }
-  const fm = yaml.load(content.slice(4, endIdx)) as {
-    id: SectionId;
-    title: string;
-    level: number;
-  };
+  const fm = yaml.load(content.slice(4, endIdx)) as SectionFrontMatter;
   // TODO: validation of frontmatter using zod
   // replコードブロックにはセクションidをターミナルidとして与える。
   const rawContent = content
@@ -319,6 +323,7 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
     id: fm.id,
     title: fm.title,
     level: fm.level,
+    question: fm.question,
     rawContent,
     md5: crypto.createHash("md5").update(rawContent).digest("base64"),
   };

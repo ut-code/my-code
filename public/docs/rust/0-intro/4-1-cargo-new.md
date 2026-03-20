@@ -2,6 +2,9 @@
 id: rust-intro-cargo-new
 title: プロジェクトの作成 (cargo new)
 level: 3
+question:
+  - '`cargo new` コマンドは何をするものですか？'
+  - '`Cargo.toml` には何が記述されるのですか？'
 ---
 
 ### プロジェクトの作成 (`cargo new`)

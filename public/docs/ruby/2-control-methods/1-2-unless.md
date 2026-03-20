@@ -2,6 +2,10 @@
 id: ruby-control-unless
 title: unless
 level: 3
+question:
+  - unlessを使うべきか、if !を使うべきか、どちらがRubyらしい書き方ですか？
+  - unlessにelseを付けると可読性が低くなるのはなぜですか？
+  - unlessはどんな場面で使うのが適切ですか？
 ---
 
 ### `unless`

@@ -2,6 +2,9 @@
 id: cpp-stl-algorithms-algo
 title: 便利なアルゴリズム
 level: 2
+question:
+  - <algorithm>と<numeric>ヘッダには他にどのようなアルゴリズムがありますか？
+  - STLのアルゴリズムを使うと、自分でループを書くよりも何が良いのですか？
 ---
 
 ## 便利なアルゴリズム

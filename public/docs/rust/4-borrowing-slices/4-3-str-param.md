@@ -2,6 +2,9 @@
 id: rust-borrowing-slices-str-param
 title: 引数としての &str
 level: 3
+question:
+  - なぜ関数の引数として&Stringより&strを使う方が柔軟性が高いのですか？
+  - String型の変数を&strとして関数に渡すにはどうすればよいですか？
 ---
 
 ### 引数としての `&str`

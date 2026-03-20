@@ -2,6 +2,7 @@
 id: cpp-intro-basic
 title: C++の基本構造
 level: 2
+question: []
 ---
 
 ## C++の基本構造

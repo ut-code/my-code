@@ -2,6 +2,10 @@
 id: ruby-exception
 title: 例外処理
 level: 2
+question:
+  - rescueブロックの後にelseブロックは必須ですか？
+  - ensureブロックはどのような場面で使うことが多いですか？
+  - メソッド定義内でbeginとendを省略した場合、rescueの範囲はどこまでになりますか？
 ---
 
 ## 例外処理

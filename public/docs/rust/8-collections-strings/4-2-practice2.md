@@ -2,6 +2,10 @@
 id: rust-collections-strings-practice2
 title: 問題2：ピッグ・ラテン (Pig Latin) 変換
 level: 3
+question:
+  - 母音の判定はどのように行えばよいですか？
+  - 単語の最初の文字を移動したり、文字列を結合したりする具体的な方法を教えてください。
+  - '&strをStringに変換する必要があるのはどんな時ですか？'
 ---
 
 ### 問題2：ピッグ・ラテン (Pig Latin) 変換

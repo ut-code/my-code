@@ -2,6 +2,9 @@
 id: ruby-exception-raise
 title: raise (例外の発生)
 level: 3
+question:
+  - raiseを使って例外を発生させた後、プログラムの実行はどうなりますか？
+  - 自分で新しい例外クラスを定義してraiseすることはできますか？
 ---
 
 ### `raise` (例外の発生)

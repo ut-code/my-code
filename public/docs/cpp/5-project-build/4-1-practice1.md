@@ -2,6 +2,9 @@
 id: cpp-project-build-practice1
 title: '練習問題1: 電卓クラスの分割'
 level: 3
+question:
+  - '`Calculator.h` の中に、クラスの定義はどのように書けば良いですか？'
+  - '`Calculator.h` にインクルードガードは必要ですか？'
 ---
 
 ### 練習問題1: 電卓クラスの分割

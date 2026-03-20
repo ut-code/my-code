@@ -2,6 +2,7 @@
 id: cpp-types-modifier
 title: 型を厳密に扱う
 level: 2
+question: []
 ---
 
 ## 型を厳密に扱う

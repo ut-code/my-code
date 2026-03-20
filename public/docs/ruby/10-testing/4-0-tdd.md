@@ -2,6 +2,9 @@
 id: ruby-testing-tdd
 title: 簡単なTDD（テスト駆動開発）の体験
 level: 2
+question:
+  - TDDの「Red -> Green -> Refactor」のサイクルは、必ずこの順番でなければなりませんか？
+  - TDDを実践することで、どのようなメリットがあるのですか？
 ---
 
 ## 簡単なTDD（テスト駆動開発）の体験

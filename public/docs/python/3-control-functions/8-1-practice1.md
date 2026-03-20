@@ -2,6 +2,9 @@
 id: python-control-functions-practice1
 title: '練習問題1: 偶数とそのインデックスの発見'
 level: 3
+question:
+  - 偶数を判定する`%`（剰余）演算子の`== 0`の意味がよくわかりません。
+  - '`numbers: list[int]` のような書き方は何ですか？'
 ---
 
 ### 練習問題1: 偶数とそのインデックスの発見

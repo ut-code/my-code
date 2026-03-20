@@ -2,6 +2,10 @@
 id: rust-collections-strings-entry-api
 title: エントリ API による更新
 level: 3
+question:
+  - entry APIを使わない場合、「キーが存在しなければ挿入し、存在すれば何もしない」という処理はどのように書けばよいですか？
+  - or_insertが返す「挿入された値への可変参照(&mut V)」とは何ですか？
+  - '*count += 1;の*は、ベクタのイテレーションで使ったものと同じ意味ですか？'
 ---
 
 ### エントリ API による更新

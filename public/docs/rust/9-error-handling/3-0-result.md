@@ -1,7 +1,11 @@
 ---
 id: rust-error-handling-result
-title: '回復可能なエラー (Result<T, E>)'
+title: 回復可能なエラー (Result<T, E>)
 level: 2
+question:
+  - '`Result` と `Option` は何が似ていて、何が異なるのですか？'
+  - '`Result<T, E>` の `T` と `E` には、どのような型の値を入れれば良いですか？'
+  - '`Result` 型を使うメリットは何ですか？'
 ---
 
 ## 回復可能なエラー (`Result<T, E>`)

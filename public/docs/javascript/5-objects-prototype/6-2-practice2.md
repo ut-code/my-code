@@ -2,6 +2,10 @@
 id: javascript-objects-prototype-practice2
 title: '練習問題2: コンストラクタ関数'
 level: 3
+question:
+  - コンストラクタ関数 `Item` の中で `this.name = name;` は何をしているのですか？
+  - '`getTaxIncludedPrice` メソッドを `Item` 関数の中ではなく `Item.prototype` に追加する理由は何ですか？'
+  - 税率を後から変更できるようにするにはどうすれば良いですか？
 ---
 
 ### 練習問題2: コンストラクタ関数

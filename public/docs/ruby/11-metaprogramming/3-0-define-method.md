@@ -2,6 +2,12 @@
 id: ruby-metaprogramming-define-method
 title: 'define_method: メソッドを動的に定義する'
 level: 2
+question:
+  - define_methodはどのような場面で使うのが適切ですか。
+  - define_methodの第2引数に渡すブロック（ProcやLambda）について詳しく教えてください。
+  - 似たようなメソッドを多数定義する必要がある場合とは具体的にどのようなケースですか。
+  - 定義されたメソッド内で使われているprefixやtargetはどこから来る変数ですか。
+  - define_methodで定義したメソッドのスコープはどのようになりますか。
 ---
 
 ## `define_method`: メソッドを動的に定義する

@@ -2,6 +2,10 @@
 id: python-modules-sys
 title: sys
 level: 3
+question:
+  - '`sys`モジュールはどんなときに使うと便利ですか？'
+  - '`sys.version`はどのような情報を示していますか？'
+  - コマンドライン引数の取得とは、具体的にどういうことですか？
 ---
 
 ### `sys`

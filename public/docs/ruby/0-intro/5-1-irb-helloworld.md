@@ -2,6 +2,9 @@
 id: ruby-intro-irb-helloworld
 title: irbでの実行
 level: 3
+question:
+  - '`puts`は具体的にどのような場面で使うメソッドですか？'
+  - '`puts "Hello, World!"` の返り値が `nil` なのはなぜですか？'
 ---
 
 ### irbでの実行

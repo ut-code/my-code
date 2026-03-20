@@ -2,6 +2,13 @@
 id: javascript-async-await-fetch
 title: Fetch API によるHTTPリクエスト
 level: 2
+question:
+  - Fetch APIとは具体的に何ですか？
+  - fetch関数はなぜPromiseを返すのですか？
+  - responseオブジェクトにはどのような情報が含まれていますか？
+  - response.okはどのような状況でfalseになりますか？
+  - response.json()もawaitが必要なのはなぜですか？
+  - jsonplaceholder.typicode.comとは何ですか？
 ---
 
 ## Fetch API によるHTTPリクエスト

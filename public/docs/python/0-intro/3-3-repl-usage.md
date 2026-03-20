@@ -2,6 +2,10 @@
 id: python-intro-repl-usage
 title: REPL の基本的な使い方
 level: 3
+question:
+  - str以外の関数のヘルプも表示できますか？
+  - ヘルプモードを抜けるためのquitコマンドは、他のREPLコマンドと何が違うのですか？
+  - exit()とショートカットキーのどちらを使うのが一般的ですか？
 ---
 
 ### REPL の基本的な使い方

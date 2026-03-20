@@ -2,6 +2,11 @@
 id: ruby-stdlib-scan-gsub
 title: 検索と置換 (scan と gsub)
 level: 3
+question:
+  - String#scanはどんな場面で使われますか？
+  - String#gsubのgは何の略ですか？
+  - log.gsub("ERROR", "CRITICAL")のように、正規表現を使わずに単純な文字列置換もできますか？
+  - gsubのブロック内で$1を使うのはどのような時ですか？$1以外にも似たような特別な変数がありますか？
 ---
 
 ### 検索と置換 (`scan` と `gsub`)

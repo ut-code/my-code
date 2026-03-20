@@ -2,6 +2,10 @@
 id: rust-error-handling-custom-error
 title: カスタムエラー型の定義
 level: 2
+question:
+  - '`String` 型のエラーでは情報が不足するとは、どのような状況を指しますか？'
+  - '`Display` トレイトと `Error` トレイトを実装することには、それぞれどのような意味がありますか？'
+  - '`thiserror` クレートを使うと、なぜボイラープレートを減らせるのですか？'
 ---
 
 ## カスタムエラー型の定義

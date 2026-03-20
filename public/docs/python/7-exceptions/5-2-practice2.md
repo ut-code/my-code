@@ -2,6 +2,8 @@
 id: python-exceptions-practice2
 title: '練習問題2: ユーザー年齢の検証'
 level: 3
+question:
+  - 文字列を整数に変換する方法を教えてください。
 ---
 
 ### 練習問題2: ユーザー年齢の検証

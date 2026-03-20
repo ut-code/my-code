@@ -2,6 +2,7 @@
 id: rust-modules-summary
 title: 第8章のまとめ
 level: 2
+question: []
 ---
 
 ## 第8章のまとめ

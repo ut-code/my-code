@@ -2,6 +2,13 @@
 id: ruby-stdlib-file-read-write
 title: Fileクラスによる読み書き
 level: 3
+question:
+  - File.writeは常にファイルを上書きするのですか？
+  - 'ファイルに追記するためのmode: ''a''の''a''は何を意味するのですか？'
+  - File.readとFile.foreachはどのように使い分けるべきですか？
+  - File.deleteはファイルを完全に消去するのですか？
+  - 存在しないファイルを読み書きしようとするとどうなりますか？
+  - putsとprintの違いは何ですか？
 ---
 
 ### `File`クラスによる読み書き

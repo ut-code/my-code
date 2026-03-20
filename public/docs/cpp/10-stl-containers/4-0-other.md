@@ -2,6 +2,12 @@
 id: cpp-stl-containers-other
 title: 'その他: 目的に応じたコンテナ'
 level: 2
+question:
+  - std::listは「ランダムアクセスはできません」とありますが、それはどういうことですか。
+  - std::setとstd::mapはどちらもキーをソートするとありますが、どのような違いがありますか。
+  - std::unordered_mapはstd::mapより平均的に高速なら、常にunordered_mapを使うべきですか。
+  - コンテナアダプタとは、通常のコンテナと何が違うのですか。
+  - std::queueとstd::stackは、それぞれどのようなプログラムの場面で使うと便利ですか。
 ---
 
 ## その他: 目的に応じたコンテナ

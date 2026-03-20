@@ -2,6 +2,9 @@
 id: rust-enums-pattern-enum-vs-struct
 title: 構造体との違い
 level: 3
+question:
+  - 構造体で実装した場合の「型安全性が下がる」とは具体的にどういうことですか？
+  - なぜEnumを使うと「V4なら必ず4つの数値がある」と型レベルで保証されるのですか？
 ---
 
 ### 構造体との違い

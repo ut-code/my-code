@@ -2,6 +2,9 @@
 id: typescript-objects-interfaces-practice1
 title: '練習問題 1: 商品在庫管理'
 level: 3
+question:
+  - '`description`を省略した場合、`console.log`で出力するとどうなりますか。'
+  - '`id`を`readonly`にした場合、変更しようとしたときにエラーになることを実際に確認するにはどうすれば良いですか。'
 ---
 
 ### 練習問題 1: 商品在庫管理

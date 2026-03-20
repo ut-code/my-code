@@ -1,7 +1,8 @@
 ---
 id: rust-collections-strings-hashmap
-title: 'ハッシュマップ (HashMap<K, V>)'
+title: ハッシュマップ (HashMap<K, V>)
 level: 2
+question: []
 ---
 
 ## ハッシュマップ (`HashMap<K, V>`)

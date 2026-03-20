@@ -2,9 +2,13 @@
 id: typescript-async-utilities-partial
 title: '1. Partial<T>: 全てをオプショナルにする'
 level: 3
+question:
+  - Partial<T>を使うと、元の型定義のプロパティに？が付くということですか？
+  - 'updateProduct関数のupdateData: Partial<Product>が実際にどのような型になるのか、具体的な例を挙げてほしいです。'
+  - データの更新処理で一部のフィールドだけ送信したい場合に便利、というのは具体的なシナリオでどのように役立つのでしょうか？
 ---
 
-### 1\. Partial\<T\>: 全てをオプショナルにする
+### 1\. `Partial<T>`: 全てをオプショナルにする
 
 `Partial<T>` は、型 `T` のすべてのプロパティを「必須」から「任意（Optional / `?`付き）」に変更します。データの更新処理（パッチ）などで、一部のフィールドだけ送信したい場合に便利です。
 

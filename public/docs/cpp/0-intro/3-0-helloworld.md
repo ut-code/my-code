@@ -2,6 +2,9 @@
 id: cpp-intro-helloworld
 title: 最初のプログラム
 level: 2
+question:
+  - ファイル名はmain.cppである必要はありますか？他の名前ではだめですか？
+  - //は何のために使われていますか？
 ---
 
 ## 最初のプログラム

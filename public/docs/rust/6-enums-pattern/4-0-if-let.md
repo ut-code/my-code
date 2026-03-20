@@ -2,9 +2,14 @@
 id: rust-enums-pattern-if-let
 title: if let 記法
 level: 2
+question:
+  - if let はなぜ「糖衣構文」と呼ばれるのですか？
+  - matchの網羅性チェックの恩恵が失われるとは、どういうことですか？
+  - if let と else を使う場合の注意点はありますか？
+  - if let と match はどのように使い分けるべきですか？
 ---
 
-## if let 記法
+## `if let` 記法
 
 `match` は強力ですが、**「ある1つのパターンだけ処理して、他は全部無視したい」**という場合には記述が長くなりがちです。
 そのような場合に `if let` が便利です。

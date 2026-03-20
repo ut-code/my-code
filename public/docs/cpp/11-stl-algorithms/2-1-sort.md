@@ -2,6 +2,11 @@
 id: cpp-stl-algorithms-sort
 title: 'std::sort: 要素を並べ替える'
 level: 3
+question:
+  - std::sortは降順にソートすることもできますか？
+  - 整数や文字列以外の、自分で作ったクラスのオブジェクトもstd::sortでソートできますか？
+  - std::sortを実行すると、元のvectorの内容は変更されるのですか？
+  - ソートの処理はどれくらい速いのですか？
 ---
 
 ### `std::sort`: 要素を並べ替える

@@ -2,6 +2,10 @@
 id: typescript-combining-types-type-assertions
 title: 型アサーション (Type Assertions)
 level: 2
+question:
+  - unknown型とは何ですか？ なぜそのままでは操作できないのですか？
+  - asキーワードを使って型を強制する型アサーションは、どのような時に使うべきですか？
+  - 型アサーションの乱用がバグの元になるとありますが、具体的にどのようなバグが起きる可能性がありますか？
 ---
 
 ## 型アサーション (Type Assertions)

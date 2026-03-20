@@ -2,6 +2,10 @@
 id: rust-borrowing-slices-immutable-ref
 title: 不変参照（Immutable Reference）
 level: 3
+question:
+  - 不変参照を使うと元の変数の所有権は移動しないのですね？
+  - 不変参照で値を変更しようとするとどうなりますか？
+  - calculate_length関数でsがスコープを抜けてもメモリが解放されないのはなぜですか？
 ---
 
 ### 不変参照（Immutable Reference）

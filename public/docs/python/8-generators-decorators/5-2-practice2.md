@@ -2,6 +2,10 @@
 id: python-generators-decorators-practice2
 title: '問題2: 実行時間計測デコレータ'
 level: 3
+question:
+  - '`measure_time` デコレータで、元の関数 `func` を呼び出すにはどうすれば良いですか'
+  - '`time.time()` を使って実行時間を計算する方法を具体的に教えてください'
+  - '`slow_function` のように引数を受け取る関数をデコレートする場合、`wrapper` 関数はどのように修正すれば良いですか'
 ---
 
 ### 問題2: 実行時間計測デコレータ

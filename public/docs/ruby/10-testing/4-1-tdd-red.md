@@ -2,6 +2,8 @@
 id: ruby-testing-tdd-red
 title: '1. Red: 失敗するテストを書く'
 level: 3
+question:
+  - '`NoMethodError` が発生してエラー（E）になった場合と、アサーションが失敗して失敗（F）になった場合の違いは何ですか？'
 ---
 
 ### 1\. Red: 失敗するテストを書く

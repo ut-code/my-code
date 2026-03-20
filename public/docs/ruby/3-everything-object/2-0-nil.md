@@ -2,6 +2,12 @@
 id: ruby-everything-object-nil
 title: '👻 nil オブジェクト: 無ですらオブジェクト'
 level: 2
+question:
+  - nilがオブジェクトであることの具体的なメリットは何ですか？
+  - nilと他の言語のnullやNoneは全く同じものと考えて良いですか？
+  - NilClassとはどのようなクラスですか？
+  - nil.nil?は常にtrueを返すのですか？なぜnil?というメソッドがあるのですか？
+  - nil.to_sやnil.to_iはなぜ空の文字列や0を返すのですか？
 ---
 
 ## 👻 nil オブジェクト: 無ですらオブジェクト

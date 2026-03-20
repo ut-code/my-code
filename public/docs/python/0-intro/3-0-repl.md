@@ -2,6 +2,9 @@
 id: python-intro-repl
 title: 対話モード（REPL）でPythonを体験しよう
 level: 2
+question:
+  - REPLと通常のプログラム実行はどのように違いますか？
+  - デバッグツールとしてREPLが強力とはどういう意味ですか？
 ---
 
 ## 対話モード（REPL）でPythonを体験しよう

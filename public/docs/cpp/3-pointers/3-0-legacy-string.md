@@ -2,6 +2,10 @@
 id: cpp-pointers-legacy-string
 title: 文字列リテラルと char*
 level: 2
+question:
+  - '`const char* c_str = "Hello";` の`c_str`が指す文字列を変更することはできるのか。'
+  - Cスタイル文字列の終端文字`\0`を忘れた場合、何が起こるのか。
+  - '`std::string`が推奨されるとのことだが、`char*`の知識は完全に不要になるのか。'
 ---
 
 ## 文字列リテラルと `char*`

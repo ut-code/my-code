@@ -2,6 +2,10 @@
 id: javascript-function-expression
 title: 2. 関数式 (Function Expression)
 level: 3
+question:
+  - 関数式は定義する前に呼び出すとエラーになるのはなぜですか？
+  - 現代のJavaScript開発ではなぜ関数式が好まれる傾向にあるのですか？
+  - 関数式を使う主なメリットは何ですか？
 ---
 
 ### 2\. 関数式 (Function Expression)

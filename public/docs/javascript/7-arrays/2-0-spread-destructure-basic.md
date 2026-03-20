@@ -2,6 +2,8 @@
 id: javascript-arrays-spread-destructure-basic
 title: スプレッド構文 (...) とデストラクチャリング（分割代入）
 level: 2
+question:
+  - ReactやVueなどのフレームワークでスプレッド構文やデストラクチャリングが多用されるのはなぜですか？
 ---
 
 ## スプレッド構文 (...) とデストラクチャリング（分割代入）

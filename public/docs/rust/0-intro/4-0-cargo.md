@@ -2,6 +2,10 @@
 id: rust-intro-cargo
 title: Cargo：Rustのビルドシステムとパッケージマネージャ
 level: 2
+question:
+  - Cargoはなぜ必要なのですか？ `rustc` だけではダメなのですか？
+  - Node.jsの `npm` やPythonの `pip` と比較されていますが、何が違うのですか？
+  - 「プロジェクトのライフサイクル全体を管理する」とは具体的にどういうことですか？
 ---
 
 ## Cargo：Rustのビルドシステムとパッケージマネージャ

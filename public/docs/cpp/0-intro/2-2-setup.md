@@ -2,6 +2,10 @@
 id: cpp-intro-setup
 title: おすすめのセットアップ
 level: 3
+question:
+  - macOSでxcode-select --installを実行すると何がインストールされますか？
+  - Linuxのインストールコマンドは何をしていますか？
+  - Visual Studio Codeの拡張機能とは、具体的にどのようなものをインストールすれば良いですか？
 ---
 
 ### おすすめのセットアップ

@@ -2,6 +2,10 @@
 id: cpp-types-control-practice2
 title: 練習問題2：FizzBuzz（C++スタイル）
 level: 3
+question:
+  - 1から20までのループは、forとwhileのどちらを使うのが良いですか？
+  - FizzBuzzの複数の条件をif文で判定する際の書き方を教えてほしいです。
+  - autoをループカウンタの型に使う具体的な例を見たいです。
 ---
 
 ### 練習問題2：FizzBuzz（C++スタイル）

@@ -1,7 +1,13 @@
 ---
 id: cpp-intro-namespace
-title: 'std::cout と std::endl - 名前空間 (namespace)'
+title: std::cout と std::endl - 名前空間 (namespace)
 level: 3
+question:
+  - std::coutと書くのが毎回面倒なのですが、省略する方法はありますか？
+  - std::endlの代わりに改行コード（例えば\n）を使うことはできますか？その場合の違いは何ですか？
+  - ストリーム挿入演算子<<は、どのような種類のデータでも出力できますか？
+  - 名前空間stdを使わないとどうなりますか？
+  - 名前空間が名前衝突を防ぐとは、具体的にどういうことですか？
 ---
 
 ### `std::cout` と `std::endl` - 名前空間 (namespace)

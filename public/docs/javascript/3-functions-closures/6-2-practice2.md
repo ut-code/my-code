@@ -2,6 +2,7 @@
 id: javascript-functions-closures-practice2
 title: '問題2: クロージャによる掛け算生成器'
 level: 3
+question: []
 ---
 
 ### 問題2: クロージャによる掛け算生成器

@@ -2,6 +2,10 @@
 id: rust-error-handling-result-basic
 title: 基本的な Result の処理
 level: 3
+question:
+  - '`match` 式を使って `Result` を処理する具体的な手順を教えてください。'
+  - '`Result` を無視するとコンパイラはどのような警告を出しますか？'
+  - '`Err` の中に `String` 以外の型を入れることはできますか？'
 ---
 
 ### 基本的な `Result` の処理

@@ -2,9 +2,12 @@
 id: rust-functions-control-loop-return
 title: loop と値の戻り
 level: 4
+question:
+  - breakの後に値を置くことでループから値を返す機能は、どんな時に特に便利ですか？
+  - ループ内でbreak文が実行されなかった場合、loop式は何を返しますか？
 ---
 
-#### loop と値の戻り
+#### `loop` と値の戻り
 
 `loop` キーワードは、明示的に `break` するまで永遠に繰り返します。面白い機能として、`break` の後に値を置くことで、ループ全体の結果としてその値を返すことができます。
 

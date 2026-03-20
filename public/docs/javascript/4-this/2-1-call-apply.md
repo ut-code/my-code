@@ -2,6 +2,9 @@
 id: javascript-this-call-apply
 title: call と apply
 level: 3
+question:
+  - '`call`と`apply`の第一引数に渡す`thisArg`には、どのような値を指定するのですか？'
+  - '`call`と`apply`は、どちらを優先して使うべきですか？'
 ---
 
 ### call と apply

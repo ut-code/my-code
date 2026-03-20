@@ -2,6 +2,11 @@
 id: javascript-promise-basic
 title: Promiseの概念
 level: 2
+question:
+  - Promiseが非同期処理の「最終的な完了（または失敗）」とその「結果の値」を表すとはどういうことですか？
+  - Promiseの「約束手形」という例えを、もう少し具体的に説明してください。
+  - Pending、Fulfilled、Rejectedのそれぞれの状態は、Promiseのライフサイクルの中でどのように変化するのですか？
+  - Promiseの状態が一度変わると「二度と変化しない（Immutable）」というのは、どのようなメリットがありますか？
 ---
 
 ## Promiseの概念

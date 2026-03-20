@@ -2,6 +2,11 @@
 id: javascript-arrays-basic
 title: 配列リテラルと基本的な操作
 level: 2
+question:
+  - JavaScriptの配列リテラル [] と Array オブジェクトの違いは何ですか？
+  - push、pop、shift、unshift はそれぞれどのような時に使い分けるべきですか？
+  - push や pop を実行した後に返ってくる数値や undefined は何を意味するのですか？
+  - 存在しないインデックス番号で配列にアクセスするとどうなりますか？
 ---
 
 ## 配列リテラルと基本的な操作

@@ -2,6 +2,10 @@
 id: javascript-control-try-catch
 title: 例外処理 (try...catch...finally)
 level: 2
+question:
+  - catchブロックの(e)にはどのような情報が入っていますか？エラーオブジェクトの具体的な中身を知りたいです。
+  - finallyブロックはどのような場合に使うのが適切ですか？具体的な例を教えてください。
+  - try...catchで捕捉できないエラーは存在しますか？
 ---
 
 ## 例外処理 (`try...catch...finally`)

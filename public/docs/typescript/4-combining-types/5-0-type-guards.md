@@ -2,6 +2,9 @@
 id: typescript-combining-types-type-guards
 title: 型ガード (Type Guards)
 level: 2
+question:
+  - 型ガードを使わないと、Union型の変数を特定の型として扱うことができないのはなぜですか？
+  - 型の絞り込み（Narrowing）とは具体的にどういうことですか？
 ---
 
 ## 型ガード (Type Guards)

@@ -2,6 +2,8 @@
 id: python-basics-practice1
 title: 練習問題1
 level: 3
+question:
+  - 変数名は日本語でも問題ありませんか？
 ---
 
 ### 練習問題1

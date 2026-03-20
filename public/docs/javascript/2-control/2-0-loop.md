@@ -2,6 +2,7 @@
 id: javascript-control-loop
 title: 繰り返し (for, while)
 level: 2
+question: []
 ---
 
 ## 繰り返し (for, while)

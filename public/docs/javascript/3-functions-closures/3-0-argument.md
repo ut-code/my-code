@@ -2,6 +2,7 @@
 id: javascript-functions-argument
 title: 引数：デフォルト引数、Restパラメータ (...)
 level: 2
+question: []
 ---
 
 ## 引数：デフォルト引数、Restパラメータ (...)

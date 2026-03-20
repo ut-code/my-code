@@ -2,6 +2,9 @@
 id: javascript-classes-class-expr
 title: クラス式
 level: 3
+question:
+  - クラスを式として定義するメリットは何ですか？
+  - 「あまり頻繁には使われませんが」とありますが、どのような場合に使うべきなのでしょうか？
 ---
 
 ### クラス式

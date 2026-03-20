@@ -2,6 +2,7 @@
 id: python-file-io-textfile
 title: テキストファイルの読み書き
 level: 2
+question: []
 ---
 
 ## テキストファイルの読み書き

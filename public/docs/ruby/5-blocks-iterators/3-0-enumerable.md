@@ -2,6 +2,13 @@
 id: ruby-blocks-iterators-enumerable
 title: Enumerableモジュール：イテレーションの力
 level: 2
+question:
+  - 「モジュール」とは何ですか？クラスとはどう違うのですか？
+  - 「Mix-in（ミックスイン）」機能とは具体的にどのような仕組みで、どのようなメリットがあるのですか？
+  - each メソッドさえ定義されていれば、なぜ map や select などの数十ものメソッドが自動的に使えるようになるのですか？
+  - Array や Hash はどこで Enumerable モジュールを include しているのですか？
+  - yield(item) の yield は、この文脈で何を意味しているのですか？
+  - 「each メソッドを持つものは、すべて Enumerable である（あるいはそう振る舞える）」という考え方が重要なのはなぜですか？
 ---
 
 ## Enumerableモジュール：イテレーションの力

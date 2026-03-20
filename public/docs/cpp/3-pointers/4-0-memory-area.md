@@ -2,6 +2,7 @@
 id: cpp-pointers-memory-area
 title: 動的なメモリ確保
 level: 2
+question: []
 ---
 
 ## 動的なメモリ確保

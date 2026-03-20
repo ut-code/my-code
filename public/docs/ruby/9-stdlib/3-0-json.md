@@ -2,6 +2,12 @@
 id: ruby-stdlib-json
 title: JSONのパースと生成 (json)
 level: 2
+question:
+  - require 'json'はなぜ必要なのですか？
+  - JSON.parseはJSON文字列を常にHashに変換するのですか？Arrayの場合はどうなりますか？
+  - RubyのHashのシンボルキーがJSONでは文字列になるのはなぜですか？
+  - to_jsonメソッドはどんなRubyオブジェクトでもJSONに変換できますか？
+  - JSON.pretty_generateは何のために使うのですか？
 ---
 
 ## JSONのパースと生成 (`json`)

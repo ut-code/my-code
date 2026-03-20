@@ -2,6 +2,7 @@
 id: cpp-classes-basics-constructor-destructor
 title: 'コンストラクタとデストラクタ: オブジェクトが生まれてから消えるまで'
 level: 2
+question: []
 ---
 
 ## コンストラクタとデストラクタ: オブジェクトが生まれてから消えるまで

@@ -2,6 +2,7 @@
 id: ruby-testing-test-class
 title: 1. テスト対象のクラスの作成
 level: 3
+question: []
 ---
 
 ### 1\. テスト対象のクラスの作成

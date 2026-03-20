@@ -2,6 +2,11 @@
 id: ruby-classes-initialize
 title: '💴 クラス定義: class, initialize'
 level: 2
+question:
+  - initializeメソッドは、他の言語のコンストラクタとどう違うのですか？
+  - newメソッドは誰がどこで定義しているのですか？
+  - '@で始まる変数（インスタンス変数）とは具体的に何ですか？'
+  - p user1の出力にある0x0000...は何を表しているのですか？
 ---
 
 ## 💴 クラス定義: class, initialize

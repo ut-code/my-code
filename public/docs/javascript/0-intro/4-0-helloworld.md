@@ -2,6 +2,7 @@
 id: javascript-intro-helloworld
 title: '"Hello, World!"'
 level: 2
+question: []
 ---
 
 ## "Hello, World\!"

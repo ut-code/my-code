@@ -2,6 +2,8 @@
 id: cpp-intro-usage
 title: C++が使われる分野
 level: 3
+question:
+  - 組み込みシステムでリソースが限られているとはどういう意味ですか？
 ---
 
 ### C++が使われる分野

@@ -2,6 +2,10 @@
 id: python-intro-install
 title: Pythonのインストール方法
 level: 2
+question:
+  - Microsoft Storeからインストールするのと公式インストーラからインストールするのとでは、何が違いますか？
+  - Homebrewとは何ですか？
+  - すでにPythonがインストールされている場合でも、最新版をインストールし直した方が良いのですか？
 ---
 
 ## Pythonのインストール方法

@@ -2,6 +2,10 @@
 id: rust-intro-clippy
 title: clippy (リンタ)
 level: 3
+question:
+  - '`clippy` はどのようなパフォーマンスの改善案を提案してくれますか？'
+  - 「Idiomatic Rust」とはどういう意味ですか？
+  - Clippyの警告に従うだけでRustの理解が深まるのはなぜですか？
 ---
 
 ### `clippy` (リンタ)

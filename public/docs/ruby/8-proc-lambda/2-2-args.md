@@ -2,6 +2,10 @@
 id: ruby-proc-lambda-args
 title: 2. 引数の厳密さ
 level: 3
+question:
+  - ArgumentErrorはどのような時に発生するエラーですか？
+  - なぜProc.newとlambdaで引数の厳密さが異なるのですか？設計思想の違いは何でしょうか？
+  - 引数の厳密さを考えると、どちらをより積極的に使うべきですか？
 ---
 
 ### 2\. 引数の厳密さ

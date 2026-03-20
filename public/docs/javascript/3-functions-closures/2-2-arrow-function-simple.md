@@ -2,6 +2,9 @@
 id: javascript-arrow-function-simple
 title: 省略記法
 level: 3
+question:
+  - 引数が複数ある場合や、処理が複数行ある場合はアロー関数をどのように書くのですか？
+  - オブジェクトを返すときにカッコ `()` で囲むのはなぜですか？
 ---
 
 ### 省略記法

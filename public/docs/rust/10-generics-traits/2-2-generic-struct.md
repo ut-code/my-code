@@ -2,6 +2,8 @@
 id: rust-generics-traits-generic-struct
 title: ジェネリックな構造体
 level: 3
+question:
+  - 構造体にジェネリクスを使うことで、通常の構造体と比べて何かパフォーマンスの違いはありますか？
 ---
 
 ### ジェネリックな構造体

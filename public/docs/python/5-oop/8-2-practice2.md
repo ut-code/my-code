@@ -2,6 +2,11 @@
 id: python-oop-practice2
 title: '練習問題2: 継承を使ったEBookクラスの作成'
 level: 3
+question:
+  - Bookクラスを継承する具体的な書き方を教えてください。
+  - EBookクラスの__init__でBookクラスの__init__を呼び出す方法がわかりません。
+  - info()メソッドのオーバーライドの具体的な書き方を教えてください。
+  - from practice6_1 import Bookは何のために書くのですか。
 ---
 
 ### 練習問題2: 継承を使った`EBook`クラスの作成

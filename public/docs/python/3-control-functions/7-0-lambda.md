@@ -2,6 +2,10 @@
 id: python-control-functions-lambda
 title: ラムダ式（Lambda expressions）
 level: 2
+question:
+  - ラムダ式は通常の関数とどう使い分ければいいですか？
+  - ラムダ式で複数の処理（複数行のコード）を書くことはできますか？
+  - '`key=lambda student: student[1]`は何をしていますか？'
 ---
 
 ## ラムダ式（Lambda expressions）

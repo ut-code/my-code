@@ -2,6 +2,9 @@
 id: cpp-classes-advanced-practice1
 title: '練習問題1: 複素数クラス'
 level: 3
+question:
+  - 複素数クラスで、虚部が負の場合に (a - bi) のように表示するにはどうすればいいですか？
+  - 練習問題1のComplexクラスでは、ポインタを使う必要はないのですか？
 ---
 
 ### 練習問題1: 複素数クラス

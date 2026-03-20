@@ -2,6 +2,10 @@
 id: rust-intro-rustup
 title: rustup のインストール
 level: 3
+question:
+  - rustupとは何ですか？なぜこれを使うのが標準なのですか？
+  - WindowsでC++ビルドツールが必要になるのはなぜですか？
+  - '`rustc --version` と `cargo --version` は、それぞれ何を確認するコマンドですか？'
 ---
 
 ### `rustup` のインストール

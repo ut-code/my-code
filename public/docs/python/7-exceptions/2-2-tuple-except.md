@@ -2,6 +2,10 @@
 id: python-exceptions-tuple-except
 title: 2. 1つの except ブロックでタプルを使ってまとめる
 level: 3
+question:
+  - '`except (ValueError, ZeroDivisionError) as e:`の`as e`は何ですか？'
+  - '`e`という変数にはどんな情報が入っているのですか？'
+  - 複数の例外を個別に書く方法と、タプルでまとめる方法の使い分けはどうすればいいですか？
 ---
 
 ### 2\. 1つの `except` ブロックでタプルを使ってまとめる

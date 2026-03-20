@@ -1,7 +1,15 @@
 ---
 id: javascript-this-basic
-title: "this は呼び出し方で決まる"
+title: this は呼び出し方で決まる
 level: 2
+question:
+  - '`this`とはそもそも何ですか？何の目的で使うものですか？'
+  - '`this`が「定義された場所」ではなく「呼び出された場所」で決まる、というのはどういう意味ですか？'
+  - グローバルオブジェクトとは具体的に何ですか？
+  - Strict Modeとは何ですか？なぜ`this`が`undefined`になるのですか？
+  - コード例で、`person.show()`と`standaloneShow()`で`this`の値が異なるのはなぜですか？
+  - '`person.show`を`standaloneShow`に代入した時点でオブジェクトとの結びつきが失われる、という部分がよく理解できません。'
+  - '`toString`メソッドは、`console.log`での出力にどのように影響するのですか？'
 ---
 
 ## `this` は呼び出し方で決まる

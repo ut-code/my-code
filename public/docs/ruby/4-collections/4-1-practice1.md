@@ -2,6 +2,8 @@
 id: ruby-collections-practice1
 title: '練習問題1: ショッピングカートの管理'
 level: 3
+question:
+  - カートから特定の商品を削除するにはどうすればいいですか？
 ---
 
 ### 練習問題1: ショッピングカートの管理

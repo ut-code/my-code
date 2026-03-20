@@ -2,6 +2,10 @@
 id: cpp-classes-advanced-practice2
 title: '練習問題2: 動的配列クラスのコピー制御'
 level: 3
+question:
+  - IntArrayクラスのgetメソッドやsetメソッドはどのように実装すればいいですか？
+  - new[] と delete[] のように、配列の動的確保と解放には角括弧が必要なのですか？通常の new と delete とは何が違いますか？
+  - arr3 = arr1; のように、異なるサイズの配列オブジェクト間で代入する場合、IntArrayクラスの内部ではどのような処理が行われるべきですか？
 ---
 
 ### 練習問題2: 動的配列クラスのコピー制御

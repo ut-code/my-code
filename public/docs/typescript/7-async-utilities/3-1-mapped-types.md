@@ -2,6 +2,13 @@
 id: typescript-async-utilities-mapped-types
 title: Mapped Types (マップ型)
 level: 3
+question:
+  - >-
+    Mapped Typesの[P in keyof Item]: boolean;のP in keyof
+    Itemが具体的に何をしているのか理解できません。
+  - keyof Itemは何ですか？
+  - 'BooleanItemの結果が{ a: boolean; b: boolean; }になるのはなぜですか？'
+  - .map()の型バージョン、という例えがイメージしにくいです。
 ---
 
 ### Mapped Types (マップ型)

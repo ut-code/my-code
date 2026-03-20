@@ -2,6 +2,9 @@
 id: typescript-function-types-arrow-type
 title: アロー関数の型定義
 level: 3
+question:
+  - アロー関数を変数に代入する際の型定義は、functionキーワードの関数とどう異なりますか
+  - 1行で書く場合の「暗黙のreturn」について、もう少し詳しく教えてください
 ---
 
 ### アロー関数の型定義

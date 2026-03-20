@@ -2,6 +2,9 @@
 id: rust-intro-zero-cost
 title: 2. ゼロコスト抽象化（Zero-cost Abstractions）
 level: 3
+question:
+  - ゼロコスト抽象化とは何ですか？
+  - 「手書きのコード以上のコストをかけない」とは具体的にどのような意味ですか？
 ---
 
 ### 2\. ゼロコスト抽象化（Zero-cost Abstractions）

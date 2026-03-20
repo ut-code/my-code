@@ -2,6 +2,11 @@
 id: javascript-basics-equality
 title: 演算子と等価性 (== vs ===)
 level: 2
+question:
+  - '`==` （等価演算子）をなぜ使うべきではないのですか？'
+  - 「暗黙的な型変換」とは、具体的にJavaScriptが何をしているのですか？
+  - '`1 == "1"` がtrueになるのは、どのようなプロセスでそうなるのですか？'
+  - '`null == undefined` がtrueになるのは、特別なルールがあるのですか？'
 ---
 
 ## 演算子と等価性 (== vs ===)

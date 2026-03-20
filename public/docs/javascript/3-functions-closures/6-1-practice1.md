@@ -2,6 +2,9 @@
 id: javascript-functions-closures-practice1
 title: '練習問題1: アロー関数への書き換え'
 level: 3
+question:
+  - アロー関数に書き換える際に、省略可能な記号を見つけるコツはありますか？
+  - '`n % 2 === 0` はどのような意味の式ですか？'
 ---
 
 ### 練習問題1: アロー関数への書き換え

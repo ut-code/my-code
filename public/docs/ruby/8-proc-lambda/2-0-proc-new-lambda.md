@@ -2,6 +2,10 @@
 id: ruby-proc-new-lambda
 title: Proc.new と lambda の違い
 level: 2
+question:
+  - lambdaもProcオブジェクトなのに、なぜわざわざlambdaという別の名前があるのですか？
+  - '->というリテラル構文はどのような場面で使うのが一般的ですか？'
+  - adder_lambdaの出力にある「(lambda)」は何を意味しているのですか？
 ---
 
 ## `Proc.new` と `lambda` の違い

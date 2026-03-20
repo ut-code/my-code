@@ -2,6 +2,11 @@
 id: cpp-intro-ide
 title: コンパイラとIDE
 level: 3
+question:
+  - 複数のコンパイラがありますが、どれを使えば良いですか？
+  - IDEとエディタは同じものですか？それとも違いがありますか？
+  - Visual StudioとVisual Studio Codeは、名前が似ていますが何が違いますか？
+  - エラーメッセージが分かりやすいClangは初心者におすすめですか？
 ---
 
 ### コンパイラとIDE

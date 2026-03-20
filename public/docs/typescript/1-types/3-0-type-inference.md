@@ -1,10 +1,14 @@
 ---
 id: typescript-types-type-inference
-title: 2.3 型推論 (Type Inference)
+title: 型推論 (Type Inference)
 level: 2
+question:
+  - 型推論とは具体的にどのような仕組みですか？
+  - いつ型注釈を省略して、いつ型注釈を書くべきですか？
+  - 型推論された変数に、推論された型と違う型の値を代入しようとするとどうなりますか？
 ---
 
-## 2.3 型推論 (Type Inference)
+## 型推論 (Type Inference)
 
 ここがJavaScript経験者にとって嬉しいポイントです。
 変数の初期化と同時に値を代入する場合、**型注釈を省略してもTypeScriptが自動的に型を判別**してくれます。これを「型推論」と呼びます。

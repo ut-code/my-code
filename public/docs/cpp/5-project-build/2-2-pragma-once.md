@@ -2,6 +2,10 @@
 id: cpp-project-build-pragma-once
 title: '#pragma once'
 level: 3
+question:
+  - '`#pragma once` と伝統的なインクルードガードは、どちらを使うべきですか？'
+  - '`#pragma once` がサポートされていないコンパイラではどうなりますか？'
+  - '`#pragma once` を書く場所は、ファイルの先頭でなければいけませんか？'
 ---
 
 ### \#pragma once

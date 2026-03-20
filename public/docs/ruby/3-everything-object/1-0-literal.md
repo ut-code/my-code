@@ -2,6 +2,10 @@
 id: ruby-everything-object-literal
 title: '🎯 Rubyの核心: 5.times の衝撃'
 level: 2
+question:
+  - 5という数値がオブジェクトだとはどういう意味ですか？
+  - .classメソッドは何のために使うのですか？
+  - 他のプログラミング言語では数値はオブジェクトではないのが一般的なのですか？
 ---
 
 ## 🎯 Rubyの核心: 5.times の衝撃

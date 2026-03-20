@@ -2,6 +2,12 @@
 id: python-modules-json
 title: json
 level: 3
+question:
+  - JSONとは何ですか？
+  - Web APIで広く使われているとは、具体的にどういうことですか？
+  - '`json.dumps()`と`json.loads()`の違いは何ですか？'
+  - '`indent=2`は何のために指定するのですか？'
+  - Pythonのリスト型をJSON形式に変換することもできますか？
 ---
 
 ### `json`

@@ -2,6 +2,8 @@
 id: rust-generics-traits-generics
 title: ジェネリックなデータ型と関数
 level: 2
+question:
+  - ジェネリクスを使うと具体的にどのようなメリットがありますか？
 ---
 
 ## ジェネリックなデータ型と関数

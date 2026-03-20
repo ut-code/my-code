@@ -2,6 +2,11 @@
 id: typescript-generics-generics-intro
 title: 'Genericsの必要性: 型を引数のように扱う'
 level: 2
+question:
+  - 「型を引数のように扱う」とは具体的にどういう意味ですか？
+  - returnAny関数で型チェックが無効になることの具体的な問題点は何ですか？
+  - returnNumberとreturnStringでロジックが重複することのデメリットは何ですか？
+  - JavaScriptにはジェネリクスのような概念はないのでしょうか？
 ---
 
 ## Genericsの必要性: 型を引数のように扱う

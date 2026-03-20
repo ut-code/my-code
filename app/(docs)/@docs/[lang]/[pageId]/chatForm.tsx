@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect, useRef, useCallback } from "react";
+import { useState, FormEvent, useEffect, useRef, useCallback, useMemo } from "react";
 // import useSWR from "swr";
 // import {
 //   getQuestionExample,
@@ -25,8 +25,6 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // const lang = getLanguageName(docs_id);
 
   const { files, replOutputs, execResults } = useEmbedContext();
 
@@ -64,42 +62,43 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
     }
   }, [pathname]);
 
-  // const documentContentInView = sectionContent
-  //   .filter((s) => s.inView)
-  //   .map((s) => s.rawContent)
-  //   .join("\n\n");
-  // const { data: exampleData, error: exampleError } = useSWR(
-  //   // 質問フォームを開いたときだけで良い
-  //   {
-  //     lang,
-  //     documentContent: documentContentInView,
-  //   } satisfies QuestionExampleParams,
-  //   getQuestionExample,
-  //   {
-  //     // リクエストは古くても構わないので1回でいい
-  //     revalidateIfStale: false,
-  //     revalidateOnFocus: false,
-  //     revalidateOnReconnect: false,
-  //   }
-  // );
-  // if (exampleError) {
-  //   console.error("Error getting question example:", exampleError);
-  // }
+  const exampleData = useMemo(
+    () =>
+      sectionContent
+        .filter((s) => s.inView)
+        .map((s) => s.question)
+        .filter((qe) => qe !== undefined)
+        .flat(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
   // 質問フォームを開くたびにランダムに選び直し、
   // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
-  const [exampleChoice, setExampleChoice] = useState<number>(0); // 0〜1
+  const [exampleChoice, setExampleChoice] = useState<number | undefined>(
+    undefined
+  ); // 0〜1
   useEffect(() => {
-    if (exampleChoice === 0) {
+    if (exampleChoice === undefined) {
       setExampleChoice(Math.random());
     }
   }, [exampleChoice]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+
+    let userQuestion = inputValue;
+    if (!userQuestion && exampleData.length > 0 && exampleChoice) {
+      // 質問が空欄なら、質問例を使用
+      userQuestion =
+        exampleData[Math.floor(exampleChoice * exampleData.length)];
+      setInputValue(userQuestion);
+    }
+    if (!userQuestion) {
+      return;
+    }
+
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage(null);
-
-    const userQuestion = inputValue;
+    setErrorMessage(null); // Clear previous error message
 
     let response: Response;
     try {
@@ -214,10 +213,10 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
       <textarea
         className="textarea textarea-ghost textarea-md rounded-box bg-transparent!"
         placeholder={
-          "質問を入力してください" /* +
-          (exampleData
+          "質問を入力してください" +
+          (exampleData.length > 0 && exampleChoice !== undefined
             ? ` (例:「${exampleData[Math.floor(exampleChoice * exampleData.length)]}」)`
-            : "")*/
+            : "")
         }
         style={{
           width: "100%",

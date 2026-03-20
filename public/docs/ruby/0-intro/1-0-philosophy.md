@@ -2,6 +2,8 @@
 id: ruby-intro-philosophy
 title: Rubyの哲学と特徴
 level: 2
+question:
+  - 「すべてがオブジェクト」とありますが、それがプログラミングをする上でどう便利なのですか？
 ---
 
 ## Rubyの哲学と特徴

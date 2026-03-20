@@ -2,6 +2,7 @@
 id: ruby-intro-helloworld
 title: '"Hello, World!" とスクリプトの実行'
 level: 2
+question: []
 ---
 
 ## "Hello, World\!" とスクリプトの実行

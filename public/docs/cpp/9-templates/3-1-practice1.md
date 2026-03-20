@@ -2,6 +2,12 @@
 id: cpp-templates-practice1
 title: '練習問題1: 汎用的なprint関数'
 level: 3
+question:
+  - std::vector以外の配列、例えば生のCスタイル配列を渡しても動作しますか
+  - print_elements関数の引数をconst参照にしないとどうなりますか
+  - print_elements関数で、要素の間にカンマなどを入れたい場合はどうすればいいですか
+  - std::coutで出力できないようなカスタムクラスをvectorに入れた場合どうなりますか
+  - 空のvectorを渡した場合、print_elementsはどのように動作しますか
 ---
 
 ### 練習問題1: 汎用的なprint関数

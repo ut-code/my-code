@@ -2,6 +2,9 @@
 id: python-modules-std-library
 title: 標準ライブラリ：Pythonに備わった強力なツール群
 level: 2
+question:
+  - 標準ライブラリを使うメリットは何ですか？
+  - 標準ライブラリ以外にも利用できるライブラリはありますか？
 ---
 
 ## 標準ライブラリ：Pythonに備わった強力なツール群

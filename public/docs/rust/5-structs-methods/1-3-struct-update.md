@@ -2,6 +2,10 @@
 id: rust-structs-methods-struct-update
 title: 構造体更新記法
 level: 3
+question:
+  - user2を作成した後、user1はどのように変化しますか？
+  - ..user1の構文は、コピーしているということですか？
+  - 複数のフィールドだけを変更したい場合も、この構文を使えますか？
 ---
 
 ### 構造体更新記法

@@ -2,6 +2,10 @@
 id: python-control-functions-for
 title: forループ
 level: 2
+question:
+  - 「イテラブルオブジェクト」とは具体的にどのようなものですか？
+  - 他の言語のようなカウンタ変数を使ったループはPythonではどう書けばいいですか？
+  - '`for fruit in fruits:` の `fruit` は何を表しているのですか？'
 ---
 
 ## `for`ループ

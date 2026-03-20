@@ -2,6 +2,10 @@
 id: ruby-collections-range
 title: 範囲 (Range)
 level: 2
+question:
+  - Rangeオブジェクトはどのような場面で役に立ちますか？
+  - Rangeオブジェクトを直接ループで使うことはできますか？
+  - 数字以外の範囲、例えばアルファベットの範囲を作ることはできますか？
 ---
 
 ## 範囲 (Range)

@@ -1,7 +1,14 @@
 ---
 id: cpp-data-containers-array
-title: '固定長配列：std::array'
+title: 固定長配列：std::array
 level: 2
+question:
+  - std::vectorとstd::arrayのどちらを使うべきか、判断に迷うことがあります。簡単な使い分けの基準を教えてください。
+  - >-
+    Cスタイルの配列 int arr[5]; とstd::array<int,
+    3>の違いをもっと詳しく知りたいです。なぜstd::arrayの方が良いのですか？
+  - std::arrayは宣言時にサイズが固定されますが、後からサイズを変更することはできませんか？
+  - 「スタック確保」とありますが、スタックとは何ですか？ヒープとは違うのですか？
 ---
 
 ## 固定長配列：`std::array`

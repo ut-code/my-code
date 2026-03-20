@@ -2,6 +2,7 @@
 id: typescript-intro-first-ts
 title: 最初のTypeScript
 level: 2
+question: []
 ---
 
 ## 最初のTypeScript

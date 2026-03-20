@@ -2,6 +2,10 @@
 id: javascript-prototype-getprototypeof
 title: __proto__ と Object.getPrototypeOf
 level: 3
+question:
+  - '`__proto__` と `Object.getPrototypeOf` は同じプロトタイプにアクセスしているのですか？'
+  - なぜ `__proto__` は非推奨なのですか？
+  - '`Object.prototype` の親が `null` なのはなぜですか？'
 ---
 
 ### `__proto__` と `Object.getPrototypeOf`

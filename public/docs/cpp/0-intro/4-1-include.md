@@ -2,6 +2,11 @@
 id: cpp-intro-include
 title: '#include <iostream> - ヘッダファイルのインクルード'
 level: 3
+question:
+  - プリプロセッサ命令とは何ですか？
+  - iostreamがないとstd::coutは使えないのですか？
+  - ヘッダファイルとは何ですか？
+  - '#includeを書き忘れたらどうなりますか？'
 ---
 
 ### `#include <iostream>` - ヘッダファイルのインクルード

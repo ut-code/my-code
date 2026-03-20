@@ -2,6 +2,10 @@
 id: cpp-functions-arg-by-reference
 title: 3. 参照渡し (Pass by Reference)
 level: 3
+question:
+  - 「参照（Reference）」が既存の変数に別の名前をつける機能とは、具体的にどのようなイメージですか？
+  - 参照渡しは`nullptr`にならないとのことですが、なぜですか？
+  - 参照渡しで「意図しない変更に注意」とありますが、どのような場合に問題になりますか？
 ---
 
 ### 3\. 参照渡し (Pass by Reference)

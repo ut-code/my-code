@@ -2,6 +2,10 @@
 id: javascript-functions-rest-arg
 title: Restパラメータ (残余引数)
 level: 3
+question:
+  - 引数の数が不定な場合とは、具体的にどんなケースを指しますか？
+  - 以前使われていた `arguments` オブジェクトとは何ですか？なぜRestパラメータの方が良いのですか？
+  - Restパラメータは必ず最後の引数としてしか使えないのですか？
 ---
 
 ### Restパラメータ (残余引数)

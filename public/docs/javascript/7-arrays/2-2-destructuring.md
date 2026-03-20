@@ -2,6 +2,10 @@
 id: javascript-arrays-destructuring
 title: デストラクチャリング（分割代入）
 level: 3
+question:
+  - デストラクチャリングの const [first, second] = users; の [] は配列リテラルと同じ意味ですか？
+  - const [, , third] = users; のようにカンマで要素をスキップする書き方は、どのような時に役立ちますか？
+  - '[a, b] = [b, a]; のように書くだけで変数の値を入れ替えられるのはなぜですか？'
 ---
 
 ### デストラクチャリング（分割代入）

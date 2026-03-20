@@ -2,6 +2,9 @@
 id: rust-basics-data-types
 title: 基本的なデータ型
 level: 2
+question:
+  - 型推論が強力とは具体的にどういうことですか？
+  - 型注釈はどのような場合に必要になりますか？
 ---
 
 ## 基本的なデータ型

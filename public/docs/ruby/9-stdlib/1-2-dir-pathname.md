@@ -2,6 +2,11 @@
 id: ruby-stdlib-dir-pathname
 title: DirクラスとPathname
 level: 3
+question:
+  - Pathnameライブラリを使うメリットは何ですか？
+  - require 'pathname'は毎回コードの最初に書く必要がありますか？
+  - パスの連結で+や/演算子を使うのは、文字列操作と比べてどう安全なのですか？
+  - basename, extname, dirname, absolute?メソッドはどのような情報を返しますか？
 ---
 
 ### `Dir`クラスと`Pathname`

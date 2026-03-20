@@ -2,6 +2,11 @@
 id: cpp-stl-algorithms-find
 title: 'std::find: 要素を検索する'
 level: 3
+question:
+  - std::findで探している値が複数あった場合、どれが返されるのですか？
+  - std::distanceは何のために使うのですか？
+  - '特定の条件を満たす最初の要素を検索したい場合はどうすれば良いですか？（例: 50より大きい最初の値）'
+  - std::findはstd::vector以外のコンテナでも使えますか？
 ---
 
 ### `std::find`: 要素を検索する

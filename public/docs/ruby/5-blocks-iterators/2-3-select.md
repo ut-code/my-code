@@ -2,6 +2,10 @@
 id: ruby-iterators-select
 title: select (filter)
 level: 3
+question:
+  - select と filter は全く同じ機能なら、どちらを使うべきですか？
+  - ブロックの戻り値が「真 (true)」になる条件とは、具体的にどのような場合ですか？ falseやnilでなければ何でも良いのですか？
+  - n.even? のようにメソッド名に「?」が付いているのは何か特別な意味がありますか？
 ---
 
 ### `select` (`filter`)

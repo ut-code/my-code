@@ -2,6 +2,8 @@
 id: rust-lifetimes-dangling-ref
 title: ダングリング参照を防ぐ
 level: 3
+question:
+  - ダングリング参照とは、どのような問題を引き起こすのですか？
 ---
 
 ### ダングリング参照を防ぐ

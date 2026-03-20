@@ -2,6 +2,8 @@
 id: cpp-data-containers-practice2
 title: '練習問題2: 単語のフィルタリング'
 level: 3
+question:
+  - フィルタリングされた単語を、直接画面に表示するのではなく、新しいstd::vector<std::string>に格納したい場合はどうすれば良いですか？
 ---
 
 ### 練習問題2: 単語のフィルタリング

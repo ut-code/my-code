@@ -2,6 +2,8 @@
 id: python-basics-practice2
 title: 練習問題2
 level: 3
+question:
+  - 型ヒントが実行時に強制されないことのメリットは何ですか？
 ---
 
 ### 練習問題2

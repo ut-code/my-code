@@ -2,6 +2,9 @@
 id: typescript-function-types-practice2
 title: '練習問題 2: データ変換のオーバーロード'
 level: 3
+question:
+  - 練習問題2で、オーバーロードシグネチャを定義する際に特に注意すべきことは何ですか
+  - stringからnumber、numberからstringへの変換には、どのような関数を使用するのが適切ですか
 ---
 
 ### 練習問題 2: データ変換のオーバーロード

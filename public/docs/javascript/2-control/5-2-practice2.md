@@ -2,6 +2,9 @@
 id: javascript-control-practice2
 title: '問題 2: 簡易コマンドディスパッチャ'
 level: 3
+question:
+  - commandがnullやundefinedの場合もエラーとして処理するには、どのようなチェックをすれば良いですか？
+  - switch文を使わずに、if...else if...elseで同じ関数を実装することはできますか？
 ---
 
 ### 問題 2: 簡易コマンドディスパッチャ

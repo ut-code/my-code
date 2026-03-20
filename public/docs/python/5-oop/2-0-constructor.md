@@ -2,6 +2,12 @@
 id: python-oop-constructor
 title: コンストラクタ (__init__) と self
 level: 2
+question:
+  - __init__はなぜアンダースコア2つで囲まれているのですか。
+  - selfはなぜ必ず最初の引数に書く必要があるのですか。
+  - selfという名前は変更しても良いのですか。
+  - インスタンス変数self.nameと引数nameの違いは何ですか。
+  - __init__内でインスタンス変数を定義しないとどうなりますか。
 ---
 
 ## コンストラクタ (`__init__`) と `self`

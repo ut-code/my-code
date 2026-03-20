@@ -2,6 +2,9 @@
 id: ruby-classes-practice2
 title: '練習問題2: 継承を使った EBook クラスの作成'
 level: 3
+question:
+  - require './practice7_1.rb'は何のために必要ですか？いつも書くものなのですか？
+  - 親クラスのinfoメソッドの結果をsuperで利用するヒントは、具体的にどう書くのですか？
 ---
 
 ### 練習問題2: 継承を使った `EBook` クラスの作成

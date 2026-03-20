@@ -2,6 +2,10 @@
 id: cpp-functions-overload
 title: オーバーロード (Function Overloading)
 level: 3
+question:
+  - C言語では関数名がユニークである必要があったのに、C++でオーバーロードが可能になったのはなぜですか？
+  - 戻り値の型だけが異なる関数を同じ名前で定義することはできますか？
+  - オーバーロードされた関数を呼び出す際に、意図しない関数が呼び出されるようなことはありませんか？
 ---
 
 ### オーバーロード (Function Overloading)

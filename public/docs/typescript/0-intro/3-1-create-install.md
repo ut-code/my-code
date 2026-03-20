@@ -2,6 +2,10 @@
 id: typescript-intro-create-install
 title: プロジェクトの作成とTypeScriptのインストール
 level: 3
+question:
+  - '`npm init -y`は何のために必要なのですか？'
+  - '`npm install --save-dev typescript`の`--save-dev`は何を意味するのですか？'
+  - '`npx`とは何ですか？`npm`とは違うのですか？'
 ---
 
 ### プロジェクトの作成とTypeScriptのインストール
@@ -28,3 +32,5 @@ npm install --save-dev typescript
 npx tsc --version
 # Output: Version 5.x.x (バージョンは時期によります)
 ```
+
+> **Note:** 実際にウェブアプリケーションを開発する際には、Viteなどのフレームワークをセットアップする際に自動的にTypeScriptもインストールされるため、このように手動でTypeScriptをインストールする必要はない場合が多いです。

@@ -2,6 +2,7 @@
 id: cpp-control
 title: 制御構文：if, switch, while, for
 level: 2
+question: []
 ---
 
 ## 制御構文：if, switch, while, for

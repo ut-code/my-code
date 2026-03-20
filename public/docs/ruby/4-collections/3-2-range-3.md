@@ -2,6 +2,8 @@
 id: ruby-collections-range-3
 title: ... (終端を含まない)
 level: 3
+question:
+  - inclusive_range.include?(10)とexclusive_range.include?(10)の結果が違うのはなぜですか？
 ---
 
 ### `...` (終端を含まない)

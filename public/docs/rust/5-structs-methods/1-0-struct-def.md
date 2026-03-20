@@ -2,6 +2,9 @@
 id: rust-structs-methods-struct-def
 title: 構造体の定義とインスタンス化
 level: 2
+question:
+  - 構造体とは具体的にどのような場面で使うものですか？
+  - 「カスタムデータ型」とはどういう意味ですか？
 ---
 
 ## 構造体の定義とインスタンス化

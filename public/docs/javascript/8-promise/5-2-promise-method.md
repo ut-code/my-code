@@ -2,6 +2,11 @@
 id: javascript-promise-method
 title: .then(), .catch(), .finally()
 level: 3
+question:
+  - '`.then()`, `.catch()`, `.finally()`は、それぞれどのような状況で使うのが適切ですか？'
+  - '`.then()`の中で新しいPromiseを返すと、なぜ「フラットな連鎖」になるのですか？具体例で説明してほしいです。'
+  - チェーンの途中で発生したエラーが、最後の`.catch()`で捕捉されるのはなぜですか？
+  - Promiseのエラー処理は`try-catch`とどのように違うのですか？
 ---
 
 ### `.then()`, `.catch()`, `.finally()`

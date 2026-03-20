@@ -2,6 +2,15 @@
 id: python-modules-init-py
 title: パッケージの概念と __init__.py
 level: 3
+question:
+  - '`__init__.py`ファイルはなぜ必要なのでしょうか？'
+  - 近年のPythonでは`__init__.py`が必須ではないとありますが、それでも置くべき理由は何ですか？
+  - '`__init__.py`が空でもパッケージとして認識されるのはなぜですか？'
+  - >-
+    `my_app/__init__.py`の`from .services import
+    fetch_user_data`における`.`は何を意味しますか？
+  - パッケージのトップレベルにインポートするとはどういうことですか？
+  - '`__init__.py`に初期化処理を記述するメリットは何ですか？'
 ---
 
 ### パッケージの概念と `__init__.py`

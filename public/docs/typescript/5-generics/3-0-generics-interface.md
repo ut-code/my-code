@@ -2,6 +2,10 @@
 id: typescript-generics-generics-interface
 title: Genericsインターフェース
 level: 2
+question:
+  - インターフェースでジェネリクスを使うと、具体的にどのような場面で役立ちますか？
+  - Box<string>のように型を指定した際に、TypeScriptは内部で何をしているのですか？
+  - JavaScriptで「中身が何かわからない」状態とは具体的にどういうことですか？
 ---
 
 ## Genericsインターフェース

@@ -2,6 +2,10 @@
 id: ruby-proc-lambda-return
 title: 1. return の挙動
 level: 3
+question:
+  - ローカルリターンとProcからのリターンの違いをもう少し分かりやすく説明してもらえますか？
+  - Proc.newの例で、「この行は表示されません」とコメントされている理由が理解できません。
+  - returnの挙動の違いがあることで、どのような問題が起こり得ますか？
 ---
 
 ### 1\. `return` の挙動

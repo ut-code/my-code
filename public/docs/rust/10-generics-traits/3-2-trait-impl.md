@@ -2,6 +2,10 @@
 id: rust-generics-traits-trait-impl
 title: トレイトの実装
 level: 3
+question:
+  - デフォルト実装の `greeting` メソッドを `Tweet` で記述しなかった場合、具体的に何が起こるのですか？
+  - '`Summary` トレイトを `NewsArticle` や `Tweet` に実装することで、それらの構造体はどのような恩恵を受けますか？'
+  - '`String::from` と `String::from("...")` のような文字列リテラルを直接使う場合の違いは何ですか？'
 ---
 
 ### トレイトの実装

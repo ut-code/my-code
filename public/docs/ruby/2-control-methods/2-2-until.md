@@ -2,6 +2,8 @@
 id: ruby-control-methods-until
 title: until
 level: 3
+question:
+  - untilとwhileはどちらを使うべきか、使い分けの基準はありますか？
 ---
 
 ### `until`

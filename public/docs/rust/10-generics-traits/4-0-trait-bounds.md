@@ -2,6 +2,9 @@
 id: rust-generics-traits-trait-bounds
 title: トレイト境界（Trait Bounds）
 level: 2
+question:
+  - トレイト境界はなぜ必要なのですか？ 「どんな型でもいい」としてしまうと何が問題になりますか？
+  - ジェネリックな型に複数のトレイト境界を課すと、どのような時に便利ですか？
 ---
 
 ## トレイト境界（Trait Bounds）

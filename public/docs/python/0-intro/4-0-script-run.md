@@ -2,6 +2,10 @@
 id: python-intro-script-run
 title: スクリプトの実行方法
 level: 2
+question:
+  - なぜREPLではprint()なしで結果が表示され、スクリプトでは必要なのですか？
+  - python hello.py以外のスクリプト実行方法はありますか？
+  - スクリプトを実行する際のターミナルの場所はどこでも良いのですか？
 ---
 
 ## スクリプトの実行方法

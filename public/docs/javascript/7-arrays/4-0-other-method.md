@@ -2,6 +2,10 @@
 id: javascript-arrays-other-method
 title: その他の便利なメソッド：find, some, every
 level: 2
+question:
+  - find と findIndex はどのような違いがあり、どのように使い分けますか？
+  - some と every の違いを具体的な例で教えてください。
+  - これらのメソッドに渡す「コールバック関数」とは、具体的にどのような関数を指しますか？
 ---
 
 ## その他の便利なメソッド：`find`, `some`, `every`

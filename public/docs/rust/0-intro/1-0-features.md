@@ -2,6 +2,7 @@
 id: rust-intro-features
 title: Rustの特徴：なぜ学ぶのか？
 level: 2
+question: []
 ---
 
 ## Rustの特徴：なぜ学ぶのか？

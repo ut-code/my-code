@@ -2,6 +2,12 @@
 id: python-intro-main-snippet
 title: __main__ について
 level: 3
+question:
+  - __name__とは何ですか？
+  - __main__とは何ですか？
+  - 'def main(): のmainは他の名前にしても良いのですか？'
+  - この書き方を使わないと、どのような問題が起こる可能性がありますか？
+  - なぜmy_utils.pyをインポートした時にテストコードが実行されないのですか？
 ---
 
 ### `__main__` について

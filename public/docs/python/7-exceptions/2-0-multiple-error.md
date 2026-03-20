@@ -2,6 +2,9 @@
 id: python-exceptions-multiple-error
 title: 複数の例外を処理する方法
 level: 2
+question:
+  - 複数のエラーを処理する必要があるのはどんな時ですか？
+  - '`ValueError`はどんな時に発生するのですか？'
 ---
 
 ## 複数の例外を処理する方法

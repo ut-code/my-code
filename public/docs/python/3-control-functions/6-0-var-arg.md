@@ -1,7 +1,10 @@
 ---
 id: python-control-functions-var-arg
-title: '可変長引数 (*args, **kwargs)'
+title: 可変長引数 (*args, **kwargs)
 level: 2
+question:
+  - '`*args`と`**kwargs`を同時に使うことはできますか？'
+  - '`typing`モジュールから`Any`をインポートするのはなぜですか？'
 ---
 
 ## 可変長引数 (`*args`, `**kwargs`)

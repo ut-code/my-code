@@ -2,6 +2,13 @@
 id: cpp-inheritance-inheritance
 title: クラスの継承
 level: 2
+question:
+  - 「継承」という言葉が少し難しいです。結局何ができるようになるのですか？
+  - >-
+    `class Dog : public Animal` の `public` は何のために書くのですか？ `private` や `protected`
+    にするとどうなりますか？
+  - 親クラスのメンバ変数 `name` は、子クラスで自動的に使えるようになるのですか？
+  - '`Dog` クラスが `Animal` と `Canine` のように、複数のクラスから同時に継承することはできますか？'
 ---
 
 ## クラスの継承

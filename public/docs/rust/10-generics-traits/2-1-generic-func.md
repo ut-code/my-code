@@ -2,6 +2,9 @@
 id: rust-generics-traits-generic-func
 title: ジェネリックな関数
 level: 3
+question:
+  - '`inspect` 関数が「あまり役に立たない」とありますが、ジェネリックな関数はどのような時に使うと便利ですか？'
+  - '`println!`でジェネリックな型 `T` の値をそのまま表示できないのはなぜですか？'
 ---
 
 ### ジェネリックな関数

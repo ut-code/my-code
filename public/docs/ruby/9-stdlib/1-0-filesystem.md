@@ -2,6 +2,7 @@
 id: ruby-stdlib-filesystem
 title: ファイル操作 (File, Dir, Pathname)
 level: 2
+question: []
 ---
 
 ## ファイル操作 (`File`, `Dir`, `Pathname`)

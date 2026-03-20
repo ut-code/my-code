@@ -1,7 +1,14 @@
 ---
 id: cpp-smartptr-sharedptr
-title: 'std::shared_ptr'
+title: std::shared_ptr
 level: 3
+question:
+  - shared_ptrの「共有された所有権」とは具体的にどういう意味ですか？
+  - 参照カウンタとは何ですか？どのように増減するのですか？
+  - 参照カウンタが0になったときにオブジェクトが解放される仕組みはどのように動作しますか？
+  - shared_ptrがunique_ptrよりオーバーヘッドが大きいというのは、具体的にどのようなことですか？
+  - std::make_sharedを使うのが効率的で安全なのはなぜですか？new演算子を使うのと何が違いますか？
+  - shared_ptrは複数コピーしても、デストラクタは一度しか呼ばれないのですか？
 ---
 
 ### `std::shared_ptr`

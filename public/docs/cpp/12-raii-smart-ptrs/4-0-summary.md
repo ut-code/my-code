@@ -2,6 +2,8 @@
 id: cpp-raii-smartptr-summary
 title: この章のまとめ
 level: 2
+question:
+  - スマートポインタ以外にRAIIを実装する例はありますか？
 ---
 
 ## この章のまとめ

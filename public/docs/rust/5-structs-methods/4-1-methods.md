@@ -2,6 +2,10 @@
 id: rust-structs-methods-methods
 title: メソッドの定義
 level: 3
+question:
+  - '&self、&mut self、selfの違いについて、もう少し詳しく説明してください。'
+  - '#[derive(Debug)]は何のために必要なのですか？'
+  - 「自動参照外し機能」とは、具体的にどのような機能ですか？
 ---
 
 ### メソッドの定義

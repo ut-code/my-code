@@ -2,6 +2,8 @@
 id: rust-error-handling-error-types
 title: エラーの分類
 level: 2
+question:
+  - '`panic!` と `Result` はそれぞれどのような状況で使うのが適切ですか？'
 ---
 
 ## エラーの分類

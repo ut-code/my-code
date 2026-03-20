@@ -2,6 +2,10 @@
 id: javascript-intro-repl
 title: REPL (Read-Eval-Print Loop) での実行
 level: 3
+question:
+  - REPLとは何ですか？
+  - console.logとは何ですか？何のために使うのですか？
+  - undefinedと表示されるのはなぜですか？
 ---
 
 ### REPL (Read-Eval-Print Loop) での実行

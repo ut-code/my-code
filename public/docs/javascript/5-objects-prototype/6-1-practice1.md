@@ -2,6 +2,9 @@
 id: javascript-objects-prototype-practice1
 title: '練習問題1: 基本的なプロトタイプ継承'
 level: 3
+question:
+  - '`robot` オブジェクトの `battery` プロパティを `cleaningRobot` が利用できるのはなぜですか？'
+  - '`cleaningRobot.work()` を呼び出すと、`cleaningRobot` 自身の `battery` が減るのですか？'
 ---
 
 ### 練習問題1: 基本的なプロトタイプ継承

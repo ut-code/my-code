@@ -2,6 +2,11 @@
 id: ruby-blocks-iterators-yield
 title: yield：ブロックを受け取るメソッド
 level: 2
+question:
+  - yield は return とどう違うのですか？
+  - ブロックが渡されなかった場合、メソッド内で yield を呼び出すとどうなりますか？
+  - yield に引数を渡さない場合でも、ブロック側で引数を受け取るとどうなりますか？
+  - each や map が内部で yield を使っている、とは具体的にどのようなコードになっているのですか？
 ---
 
 ## `yield`：ブロックを受け取るメソッド

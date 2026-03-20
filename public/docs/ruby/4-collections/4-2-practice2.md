@@ -2,6 +2,9 @@
 id: ruby-collections-practice2
 title: '練習問題2: ハッシュの操作'
 level: 3
+question:
+  - この問題のsettingsハッシュの初期化はどのように記述すればよいですか？
+  - settingsハッシュのキーはなぜシンボルが良いのですか？
 ---
 
 ### 練習問題2: ハッシュの操作

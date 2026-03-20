@@ -2,6 +2,11 @@
 id: ruby-testing-test-file
 title: 2. テストファイルの作成
 level: 3
+question:
+  - テストファイルの命名規約は、必ず守る必要があるのですか？
+  - '`require ''minitest/autorun''` と `require_relative ''calculator''` の違いは何ですか？'
+  - '`Minitest::Test` を継承しないと、何が問題になるのですか？'
+  - '`test_` で始まらないメソッドはテストとして実行されないとありますが、それはなぜですか？'
 ---
 
 ### 2\. テストファイルの作成

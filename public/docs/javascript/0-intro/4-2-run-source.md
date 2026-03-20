@@ -2,6 +2,8 @@
 id: javascript-intro-run-source
 title: ソースファイルからの実行
 level: 3
+question:
+  - ターミナルでファイルのあるディレクトリに移動するにはどうすればよいですか？
 ---
 
 ### ソースファイルからの実行

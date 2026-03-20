@@ -2,6 +2,10 @@
 id: ruby-proc-lambda-closure
 title: クロージャ（スコープ）の概念
 level: 2
+question:
+  - counter_generatorメソッドが終了した後でも、count変数が消えずに保持されているのはなぜですか？
+  - クロージャは、Rubyでどのような具体的な問題解決に役立ちますか？
+  - JavaScriptのクロージャとRubyのクロージャは、完全に同じ概念と考えて大丈夫ですか？
 ---
 
 ## クロージャ（スコープ）の概念

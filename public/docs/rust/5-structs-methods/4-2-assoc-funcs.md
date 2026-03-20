@@ -2,6 +2,10 @@
 id: rust-structs-methods-assoc-funcs
 title: 関連関数 (Associated Functions)
 level: 3
+question:
+  - 関連関数とメソッドの使い分けの基準は何ですか？
+  - newという名前の関連関数は、必ず定義しなければならないのですか？
+  - 他の言語の静的メソッドと同じように考えても大丈夫ですか？
 ---
 
 ### 関連関数 (Associated Functions)

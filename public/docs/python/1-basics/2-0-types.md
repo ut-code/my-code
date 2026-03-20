@@ -2,6 +2,8 @@
 id: python-basics-types
 title: 基本的なデータ型
 level: 2
+question:
+  - 他にどのような基本的なデータ型がありますか？
 ---
 
 ## 基本的なデータ型

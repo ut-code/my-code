@@ -1,7 +1,13 @@
 ---
 id: cpp-data-containers-string
-title: '文字列の扱い：std::string'
+title: 文字列の扱い：std::string
 level: 2
+question:
+  - C言語のchar*とchar[]を使う場合と比べて、std::stringは具体的に何が楽になるのですか？
+  - .size()と.length()はどちらを使っても同じですか？何か違いはありますか？
+  - 文字列を結合する際に、+演算子をたくさん使うとパフォーマンスに影響はありますか？
+  - std::stringを使うためには必ず#include <string>が必要ですか？
+  - std::stringの.size()メソッドは、半角英数字以外の文字（日本語など）でも正しく文字数を数えられますか？
 ---
 
 ## 文字列の扱い：`std::string`

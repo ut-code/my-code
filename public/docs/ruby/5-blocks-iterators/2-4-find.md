@@ -2,6 +2,10 @@
 id: ruby-iterators-find
 title: find (detect)
 level: 3
+question:
+  - find と detect は全く同じ機能なら、どちらを使うべきですか？
+  - nil が返される、とありますが、nilとは何ですか？他の言語のnullと同じようなものですか？
+  - 最初の要素が見つかったら、残りの要素はもうチェックしないのですか？
 ---
 
 ### `find` (`detect`)

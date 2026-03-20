@@ -2,6 +2,10 @@
 id: python-control-functions-while
 title: whileループ
 level: 2
+question:
+  - '`n += 1` は何を表す記号ですか？'
+  - '`break`と`continue`は`for`ループでも使えますか？'
+  - '`while`ループが無限ループになってしまうことはありますか？どうすれば避けられますか？'
 ---
 
 ## `while`ループ

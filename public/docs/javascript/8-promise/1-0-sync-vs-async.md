@@ -2,6 +2,10 @@
 id: javascript-promise-sync-vs-async
 title: 同期処理 vs 非同期処理
 level: 2
+question:
+  - コード例のsetTimeoutが1秒後に実行されるはずなのに、なぜEndが先に表示されるのでしょうか？
+  - ブロッキングとノンブロッキングが、具体的にどのような状況でメリットやデメリットになるのか教えてください。
+  - JavaScript以外で非同期処理を扱う言語は他にもありますか？
 ---
 
 ## 同期処理 vs 非同期処理

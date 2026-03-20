@@ -2,6 +2,9 @@
 id: ruby-control-while
 title: while
 level: 3
+question:
+  - ループの条件式が常に真になってしまった場合、どうなりますか？
+  - printとputsの違いは何ですか？
 ---
 
 ### `while`

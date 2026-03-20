@@ -2,6 +2,12 @@
 id: cpp-data-containers-range-based-for
 title: 範囲ベース for ループ (Range-based for)
 level: 2
+question:
+  - 範囲ベースforループの「要素の型 変数名」の部分に、auto以外で具体的な型を書くとしたらどうなりますか？
+  - autoを使うと型名を省略できて便利ですが、何かデメリットはありますか？
+  - 「要素を『コピー』して取り出す」とは具体的にどういうことですか？
+  - 「const auto& item」の「&」は何を意味するのですか？なぜコピーコストを避けられるのですか？
+  - 従来のforループ (int i = 0; ...) と範囲ベースforループでは、パフォーマンスに違いはありますか？
 ---
 
 ## 範囲ベース `for` ループ (Range-based for)
