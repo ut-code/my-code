@@ -2,9 +2,7 @@
 id: javascript-promise-summary
 title: この章のまとめ
 level: 2
-question:
-  - イベントループとPromiseは、それぞれどのように関連しているのでしょうか？
-  - async/awaitはPromiseをさらに同期処理のように書けるとありますが、Promiseを学ぶ必要はありますか？
+question: []
 ---
 
 ## この章のまとめ

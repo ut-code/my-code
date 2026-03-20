@@ -2,9 +2,7 @@
 id: javascript-this-summary
 title: この章のまとめ
 level: 2
-question:
-  - '`this`の概念はこれで全てですか？他に知っておくべき重要なことはありますか？'
-  - まとめにある4つのルールの適用順序や優先順位はありますか？
+question: []
 ---
 
 ## この章のまとめ

@@ -2,8 +2,7 @@
 id: javascript-control-summary
 title: この章のまとめ
 level: 2
-question:
-  - この章のまとめに書かれている注意点以外に、初心者が特に注意すべき点はありますか？
+question: []
 ---
 
 ## この章のまとめ

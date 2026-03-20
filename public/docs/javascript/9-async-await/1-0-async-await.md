@@ -5,7 +5,6 @@ level: 2
 question:
   - Async/Awaitは何をするためのものですか？
   - Promiseのシンタックスシュガーとはどういう意味ですか？
-  - Async/Awaitを使うと本当に同期処理のようになるのですか？
   - Async/Awaitはいつ使うと便利ですか？
 ---
 
