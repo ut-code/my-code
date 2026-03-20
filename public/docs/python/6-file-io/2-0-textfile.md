@@ -2,8 +2,7 @@
 id: python-file-io-textfile
 title: テキストファイルの読み書き
 level: 2
-question:
-  - テキストファイルとバイナリファイルの主な違いは何ですか？
+question: []
 ---
 
 ## テキストファイルの読み書き
