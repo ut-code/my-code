@@ -2,8 +2,7 @@
 id: ruby-everything-object-basic-method
 title: 🛠️ よく使う組み込みクラスのメソッド
 level: 2
-question:
-  - 組み込みクラスのメソッドとは何ですか？
+question: []
 ---
 
 ## 🛠️ よく使う組み込みクラスのメソッド

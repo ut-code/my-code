@@ -2,9 +2,7 @@
 id: ruby-testing-test-class
 title: 1. テスト対象のクラスの作成
 level: 3
-question:
-  - このCalculatorクラスは、テストのために特別に作られたものですか？
-  - テスト対象のクラスは、常にこのようにシンプルな形で作成するのですか？
+question: []
 ---
 
 ### 1\. テスト対象のクラスの作成

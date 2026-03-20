@@ -3,7 +3,6 @@ id: ruby-collections-range-3
 title: ... (終端を含まない)
 level: 3
 question:
-  - (1...10) の「未満」という概念がよく理解できません。具体的にどう違いますか？
   - inclusive_range.include?(10)とexclusive_range.include?(10)の結果が違うのはなぜですか？
 ---
 

@@ -2,9 +2,7 @@
 id: ruby-stdlib-filesystem
 title: ファイル操作 (File, Dir, Pathname)
 level: 2
-question:
-  - ファイルシステムとは具体的に何のことですか？
-  - なぜファイル操作が多くのアプリケーションで重要になるのですか？
+question: []
 ---
 
 ## ファイル操作 (`File`, `Dir`, `Pathname`)

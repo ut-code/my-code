@@ -2,8 +2,7 @@
 id: ruby-testing-test-basic
 title: テストファイルの作成と実行
 level: 2
-question:
-  - ここで言う「簡単なクラスをテストしてみましょう」の「テスト」とは、具体的に何をすることですか？
+question: []
 ---
 
 ## テストファイルの作成と実行

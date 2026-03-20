@@ -2,9 +2,7 @@
 id: ruby-proc-lambda-summary
 title: ☕ この章のまとめ
 level: 2
-question:
-  - このまとめ以外に、初心者が特に注意すべき点や、理解を深めるための次のステップはありますか？
-  - Proc、Lambda、&演算子、クロージャのそれぞれの関連性をもう一度教えてください。
+question: []
 ---
 
 ## ☕ この章のまとめ

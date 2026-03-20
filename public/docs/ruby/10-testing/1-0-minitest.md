@@ -4,8 +4,6 @@ title: 標準添付のテスティングフレームワーク「Minitest」
 level: 2
 question:
   - Minitestは標準添付とありますが、自分でインストールするRubyにも含まれているのですか？
-  - MinitestがUnitスタイルとSpecスタイルを提供するとありますが、この章でUnitスタイルを学ぶのはなぜですか？
-  - Ruby on RailsがMinitestを採用しているというのは、Minitestがとても一般的だということですか？
 ---
 
 ## 標準添付のテスティングフレームワーク「Minitest」

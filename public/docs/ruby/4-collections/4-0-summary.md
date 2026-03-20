@@ -2,9 +2,7 @@
 id: ruby-collections-summary
 title: この章のまとめ
 level: 2
-question:
-  - Symbolについて、もう少し詳しく説明してもらえますか？
-  - ArrayとHashを組み合わせて使う例をもう少し見たいです。
+question: []
 ---
 
 ## この章のまとめ

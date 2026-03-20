@@ -2,10 +2,7 @@
 id: ruby-intro-run
 title: スクリプトファイルでの実行
 level: 3
-question:
-  - スクリプトファイルの1行目にある`#!/usr/bin/env ruby`は必ず必要ですか？
-  - '`message = "Hello from script file!"` のように、変数を使うメリットは何ですか？'
-  - '`ruby hello.rb` のように実行する際に、スクリプトファイルでどんなことができるようになりますか？'
+question: []
 ---
 
 ### スクリプトファイルでの実行
@@ -13,9 +10,6 @@ question:
 エディタで`hello.rb`という名前のファイルを作成します。
 
 ```ruby:hello.rb
-#!/usr/bin/env ruby
-# 1行目はShebang（シーバン）と言い、Unix系OSでスクリプトとして直接実行する際に使われます。
-
 # 変数に文字列を代入
 message = "Hello from script file!"
 

@@ -2,10 +2,7 @@
 id: ruby-stdlib-summary
 title: この章のまとめ
 level: 2
-question:
-  - 標準ライブラリとは何ですか？
-  - requireが必要なライブラリと不要なライブラリの見分け方はありますか？
-  - CSVの処理やHTTP通信など、具体的にどのような時に使うのですか？
+question: []
 ---
 
 ## この章のまとめ

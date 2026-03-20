@@ -3,8 +3,6 @@ id: ruby-stdlib-time-date
 title: 日付と時刻 (Time, Date)
 level: 2
 question:
-  - TimeとDateのどちらを使うべきか、どのように判断すればよいですか？
-  - Time.nowの出力にある+0900 (JST)は何を意味しますか？
   - UNIXタイムスタンプとは何ですか？
   - strftimeの%Y-%m-%dのような記号の意味はどこで確認できますか？
   - require 'date'が必要なのはなぜですか？

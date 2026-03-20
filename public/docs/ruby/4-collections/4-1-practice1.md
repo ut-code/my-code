@@ -3,7 +3,6 @@ id: ruby-collections-practice1
 title: '練習問題1: ショッピングカートの管理'
 level: 3
 question:
-  - この問題の解決策はどのようなコードになりますか？
   - カートから特定の商品を削除するにはどうすればいいですか？
 ---
 

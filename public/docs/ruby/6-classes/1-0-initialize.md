@@ -3,7 +3,6 @@ id: ruby-classes-initialize
 title: '💴 クラス定義: class, initialize'
 level: 2
 question:
-  - クラス名は大文字で始めるという慣習は、なぜ存在するのですか？
   - initializeメソッドは、他の言語のコンストラクタとどう違うのですか？
   - newメソッドは誰がどこで定義しているのですか？
   - '@で始まる変数（インスタンス変数）とは具体的に何ですか？'
