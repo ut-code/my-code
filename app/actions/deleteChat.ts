@@ -16,5 +16,7 @@ export async function deleteChatAction(chatId: string) {
   const targetSection = await ctx.drizzle.query.section.findFirst({
     where: eq(section.sectionId, deletedChat[0].sectionId),
   });
-  await revalidateChat(chatId, ctx.userId, targetSection?.pagePath ?? "");
+  if (targetSection) {
+    await revalidateChat(chatId, ctx.userId, targetSection.pagePath);
+  }
 }
