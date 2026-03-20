@@ -1325,6 +1325,9 @@ javascript-intro-browser:
   - git: de11512
     md5: Esh7ZLeZgIWuVfyy2FNjSg==
     path: public/docs/javascript/0-intro/4-3-browser.md
+  - git: 422c7ea
+    md5: /1OlERHTDN9rqw7pyVtyiQ==
+    path: public/docs/javascript/0-intro/4-3-browser.md
 javascript-intro-comparison:
   page: javascript/0-intro
   rev:
@@ -2663,6 +2666,9 @@ ruby-intro-run:
   - git: de11512
     md5: aQnSPSE55t6cMLyg06KEPw==
     path: public/docs/ruby/0-intro/5-2-run.md
+  - git: 422c7ea
+    md5: JFIU1WZaA5SQTfv+N+gA4w==
+    path: public/docs/ruby/0-intro/5-2-run.md
 ruby-iterators:
   page: ruby/5-blocks-iterators
   rev:
@@ -2957,6 +2963,9 @@ ruby-testing-assert_equal:
   - git: de11512
     md5: qliqUqLjuG5auXK7qowWLA==
     path: public/docs/ruby/10-testing/3-1-assert_equal.md
+  - git: 422c7ea
+    md5: Uso5PL6Sjja8RffpGP5GoA==
+    path: public/docs/ruby/10-testing/3-1-assert_equal.md
 ruby-testing-assert_nil:
   page: ruby/10-testing
   rev:
@@ -3004,6 +3013,9 @@ ruby-testing-run:
   rev:
   - git: de11512
     md5: 5WL/nQtjAViwBqPuXUYYqw==
+    path: public/docs/ruby/10-testing/2-3-run.md
+  - git: 422c7ea
+    md5: 2PFj2M0JuR/UTsOXHXIP5Q==
     path: public/docs/ruby/10-testing/2-3-run.md
 ruby-testing-summary:
   page: ruby/10-testing
@@ -3149,6 +3161,9 @@ rust-basics-let-mut:
   - git: de11512
     md5: FeaAxpYAUgXW47aaJd4iEg==
     path: public/docs/rust/1-basics/1-0-let-mut.md
+  - git: 422c7ea
+    md5: uHxZnUI8EdV7vmAKGlleBA==
+    path: public/docs/rust/1-basics/1-0-let-mut.md
 rust-basics-mutable:
   page: rust/1-basics
   rev:
@@ -3191,11 +3206,17 @@ rust-borrowing-slices-borrow-rules:
   - git: de11512
     md5: Vvnkl8DcURGfRn9LXgwzYA==
     path: public/docs/rust/4-borrowing-slices/2-0-borrow-rules.md
+  - git: 422c7ea
+    md5: 6ZVk3yQb3DS1CjNfu1kiTA==
+    path: public/docs/rust/4-borrowing-slices/2-0-borrow-rules.md
 rust-borrowing-slices-dangling-ptr:
   page: rust/4-borrowing-slices
   rev:
   - git: de11512
     md5: ixwCSG7YHy6np7MR+yi0Lw==
+    path: public/docs/rust/4-borrowing-slices/3-0-dangling-ptr.md
+  - git: 422c7ea
+    md5: YncZAIWUKss75DR5stW+6w==
     path: public/docs/rust/4-borrowing-slices/3-0-dangling-ptr.md
 rust-borrowing-slices-immutable-ref:
   page: rust/4-borrowing-slices
@@ -3221,23 +3242,35 @@ rust-borrowing-slices-other-slices:
   - git: de11512
     md5: +oVjpl94Jfue1oXzqbaZQQ==
     path: public/docs/rust/4-borrowing-slices/5-0-other-slices.md
+  - git: 422c7ea
+    md5: f/zwwc/tsV+ILpYfHUMH2A==
+    path: public/docs/rust/4-borrowing-slices/5-0-other-slices.md
 rust-borrowing-slices-practice1:
   page: rust/4-borrowing-slices
   rev:
   - git: de11512
     md5: PdBVfB+cg4T2b3qNXn7o7Q==
     path: public/docs/rust/4-borrowing-slices/7-0-practice1.md
+  - git: 422c7ea
+    md5: oErumIZg89fZkmi5TJJGXw==
+    path: public/docs/rust/4-borrowing-slices/6-1-practice1.md
 rust-borrowing-slices-practice2:
   page: rust/4-borrowing-slices
   rev:
   - git: de11512
     md5: Fsm4qOPyU1dHTGG4vIg9Mg==
     path: public/docs/rust/4-borrowing-slices/7-1-practice2.md
+  - git: 422c7ea
+    md5: 1ieX6MOavJ90A8GWW4dyjA==
+    path: public/docs/rust/4-borrowing-slices/6-2-practice2.md
 rust-borrowing-slices-ref-borrow:
   page: rust/4-borrowing-slices
   rev:
   - git: de11512
     md5: tVxJFneE+kH+YYeBcFKuAA==
+    path: public/docs/rust/4-borrowing-slices/1-0-ref-borrow.md
+  - git: 422c7ea
+    md5: dWmPlB09m75T5w1tZ4WDIQ==
     path: public/docs/rust/4-borrowing-slices/1-0-ref-borrow.md
 rust-borrowing-slices-single-mut-ref:
   page: rust/4-borrowing-slices
@@ -3250,6 +3283,9 @@ rust-borrowing-slices-slice:
   rev:
   - git: de11512
     md5: PMFY0cARBD/FBsyU7PCp+g==
+    path: public/docs/rust/4-borrowing-slices/4-0-slice.md
+  - git: 422c7ea
+    md5: Mu08UTtWLGZV3hhiGhpXgg==
     path: public/docs/rust/4-borrowing-slices/4-0-slice.md
 rust-borrowing-slices-str-literal:
   page: rust/4-borrowing-slices
@@ -3389,11 +3425,17 @@ rust-enums-pattern-if-let:
   - git: de11512
     md5: Kp7z34ed53bOU5qveEVpfg==
     path: public/docs/rust/6-enums-pattern/4-0-if-let.md
+  - git: 422c7ea
+    md5: a8IOgG13wJ4zO7rn2/0Gkg==
+    path: public/docs/rust/6-enums-pattern/4-0-if-let.md
 rust-enums-pattern-match:
   page: rust/6-enums-pattern
   rev:
   - git: de11512
     md5: owv9xRYqQeD1GyP2SBsPog==
+    path: public/docs/rust/6-enums-pattern/3-0-match.md
+  - git: 422c7ea
+    md5: J9/KyGjsKvYZhfKmPGzbKA==
     path: public/docs/rust/6-enums-pattern/3-0-match.md
 rust-enums-pattern-option:
   page: rust/6-enums-pattern
@@ -3401,11 +3443,17 @@ rust-enums-pattern-option:
   - git: de11512
     md5: izzTDgHeXi/E0Ue+bZ+H1Q==
     path: public/docs/rust/6-enums-pattern/2-0-option.md
+  - git: 422c7ea
+    md5: 0qib/qmwBaQzz6l9mS5Mqw==
+    path: public/docs/rust/6-enums-pattern/2-0-option.md
 rust-enums-pattern-option-match:
   page: rust/6-enums-pattern
   rev:
   - git: de11512
     md5: vSzcXRe76qgwjpPITgFR+A==
+    path: public/docs/rust/6-enums-pattern/3-2-option-match.md
+  - git: 422c7ea
+    md5: OTo4N84h+mniJdAj53N0dQ==
     path: public/docs/rust/6-enums-pattern/3-2-option-match.md
 rust-enums-pattern-placeholder:
   page: rust/6-enums-pattern
@@ -3455,6 +3503,9 @@ rust-error-handling-expect:
   - git: de11512
     md5: yyzTEa6nj35QuYX7sYyNKw==
     path: public/docs/rust/9-error-handling/4-2-expect.md
+  - git: 422c7ea
+    md5: 2xrfqU/ned3iVru2VHwZjg==
+    path: public/docs/rust/9-error-handling/4-2-expect.md
 rust-error-handling-panic:
   page: rust/9-error-handling
   rev:
@@ -3503,11 +3554,17 @@ rust-error-handling-unwrap:
   - git: de11512
     md5: kMerfeWQ+lXuLkF8+r8sgg==
     path: public/docs/rust/9-error-handling/4-1-unwrap.md
+  - git: 422c7ea
+    md5: xWwPYCD3P+/K+R7nsMr0nA==
+    path: public/docs/rust/9-error-handling/4-1-unwrap.md
 rust-error-handling-unwrap-expect:
   page: rust/9-error-handling
   rev:
   - git: de11512
     md5: WjHJjWAQ5jXbdAWCZzXTHw==
+    path: public/docs/rust/9-error-handling/4-0-unwrap-expect.md
+  - git: 422c7ea
+    md5: O3A53WU+90e8nMvm5kZLAg==
     path: public/docs/rust/9-error-handling/4-0-unwrap-expect.md
 rust-functions-control-control-flow:
   page: rust/2-functions-control
@@ -3521,6 +3578,9 @@ rust-functions-control-for:
   - git: de11512
     md5: 0QlH6EsRQHcTCtpkHXO/sw==
     path: public/docs/rust/2-functions-control/2-5-for.md
+  - git: 422c7ea
+    md5: dxH3KmC85inTP5ZlYiT7CQ==
+    path: public/docs/rust/2-functions-control/2-5-for.md
 rust-functions-control-functions-expr:
   page: rust/2-functions-control
   rev:
@@ -3533,11 +3593,17 @@ rust-functions-control-if:
   - git: de11512
     md5: fL1t+2RN1222WoP1GTHpkQ==
     path: public/docs/rust/2-functions-control/2-1-if.md
+  - git: 422c7ea
+    md5: z3qJgZOws7wZYKOA4li2hA==
+    path: public/docs/rust/2-functions-control/2-1-if.md
 rust-functions-control-loop-return:
   page: rust/2-functions-control
   rev:
   - git: de11512
     md5: /UhA3++x3Gx2mc70TUryYg==
+    path: public/docs/rust/2-functions-control/2-3-loop-return.md
+  - git: 422c7ea
+    md5: z/QehGg7eTEydS8Dtj2ncA==
     path: public/docs/rust/2-functions-control/2-3-loop-return.md
 rust-functions-control-loops:
   page: rust/2-functions-control
@@ -3580,6 +3646,9 @@ rust-functions-control-while:
   rev:
   - git: de11512
     md5: G6+NP8C+LUDkGOVF5yqqcA==
+    path: public/docs/rust/2-functions-control/2-4-while.md
+  - git: 422c7ea
+    md5: OusVnccfZb+ry/bEy4YGxQ==
     path: public/docs/rust/2-functions-control/2-4-while.md
 rust-generics-traits-basic-syntax:
   page: rust/10-generics-traits
@@ -3713,6 +3782,9 @@ rust-intro-hello-world:
   - git: de11512
     md5: BNml+Ro7y0BmL+gI15Cx6Q==
     path: public/docs/rust/0-intro/3-0-hello-world.md
+  - git: 422c7ea
+    md5: itFqlZOiShy2YL392C6WhQ==
+    path: public/docs/rust/0-intro/3-0-hello-world.md
 rust-intro-memory-safety:
   page: rust/0-intro
   rev:
@@ -3742,6 +3814,9 @@ rust-intro-setup:
   rev:
   - git: de11512
     md5: l9fqhi84bOoRi+olhLm2dA==
+    path: public/docs/rust/0-intro/2-0-setup.md
+  - git: 422c7ea
+    md5: tJrqrWn/B/7iA93ZORSRdA==
     path: public/docs/rust/0-intro/2-0-setup.md
 rust-intro-zero-cost:
   page: rust/0-intro
@@ -3790,6 +3865,9 @@ rust-lifetimes-static-lifetime:
   rev:
   - git: de11512
     md5: BT7pc5lYe2Zh5ygq1hIVRg==
+    path: public/docs/rust/11-lifetimes/5-0-static-lifetime.md
+  - git: 422c7ea
+    md5: ASxjKCoxKci6DcFCGjdStg==
     path: public/docs/rust/11-lifetimes/5-0-static-lifetime.md
 rust-lifetimes-struct-lifetime:
   page: rust/11-lifetimes
@@ -3881,6 +3959,9 @@ rust-modules-use-paths:
   - git: de11512
     md5: 54HyFslI6bH2vU8RXZeNwA==
     path: public/docs/rust/7-modules/3-0-use-paths.md
+  - git: 422c7ea
+    md5: su+PqXjG9P4bcsS91h/UiA==
+    path: public/docs/rust/7-modules/3-0-use-paths.md
 rust-modules-visibility:
   page: rust/7-modules
   rev:
@@ -3893,11 +3974,17 @@ rust-ownership-clone:
   - git: de11512
     md5: jgiph8a6udF2kgpg8cW26A==
     path: public/docs/rust/3-ownership/3-3-clone.md
+  - git: 422c7ea
+    md5: zFYTh7Fn4bF5wVY+z7F+Ug==
+    path: public/docs/rust/3-ownership/3-3-clone.md
 rust-ownership-copy:
   page: rust/3-ownership
   rev:
   - git: de11512
     md5: 1KHOQIfw66cQGZZhAMpmtA==
+    path: public/docs/rust/3-ownership/3-1-copy.md
+  - git: 422c7ea
+    md5: 9m7fBX2pK/GUJegurTZhAg==
     path: public/docs/rust/3-ownership/3-1-copy.md
 rust-ownership-heap:
   page: rust/3-ownership
@@ -3910,6 +3997,9 @@ rust-ownership-move:
   rev:
   - git: de11512
     md5: qo4uB2aakSKrX4/CE2wdnw==
+    path: public/docs/rust/3-ownership/3-2-move.md
+  - git: 422c7ea
+    md5: sVM7kB8tK/3nq9tRKfBVzA==
     path: public/docs/rust/3-ownership/3-2-move.md
 rust-ownership-move-copy:
   page: rust/3-ownership
@@ -3994,6 +4084,9 @@ rust-structs-methods-impl:
   rev:
   - git: de11512
     md5: MUa48R9CKRMuEksalY5TAg==
+    path: public/docs/rust/5-structs-methods/4-0-impl.md
+  - git: 422c7ea
+    md5: Kt8wJNAu7WNTm/3bPQfXrQ==
     path: public/docs/rust/5-structs-methods/4-0-impl.md
 rust-structs-methods-methods:
   page: rust/5-structs-methods
@@ -4115,6 +4208,9 @@ typescript-async-utilities-async-types:
   - git: de11512
     md5: 10WflSmoyDgKd6XZSUWSzQ==
     path: public/docs/typescript/7-async-utilities/1-0-async-types.md
+  - git: 422c7ea
+    md5: zBOpQ7bk+YN/CE4Zs8PgRA==
+    path: public/docs/typescript/7-async-utilities/1-0-async-types.md
 typescript-async-utilities-base-types:
   page: typescript/7-async-utilities
   rev:
@@ -4151,17 +4247,26 @@ typescript-async-utilities-omit:
   - git: de11512
     md5: +pvX7UHkZPxbvH6aFxiQ/Q==
     path: public/docs/typescript/7-async-utilities/2-5-omit.md
+  - git: 422c7ea
+    md5: NaeTkrNRowX6IIiKiPmnLA==
+    path: public/docs/typescript/7-async-utilities/2-5-omit.md
 typescript-async-utilities-partial:
   page: typescript/7-async-utilities
   rev:
   - git: de11512
     md5: CVEFcXFD01/6DSn5kfZg3A==
     path: public/docs/typescript/7-async-utilities/2-2-partial.md
+  - git: 422c7ea
+    md5: ChaaB2K/DcZmV8nbAyR1aA==
+    path: public/docs/typescript/7-async-utilities/2-2-partial.md
 typescript-async-utilities-pick:
   page: typescript/7-async-utilities
   rev:
   - git: de11512
     md5: knU564yY9QcEX01vRW1j1Q==
+    path: public/docs/typescript/7-async-utilities/2-4-pick.md
+  - git: 422c7ea
+    md5: DNAXSDKKjWSt3dh1cqwk8Q==
     path: public/docs/typescript/7-async-utilities/2-4-pick.md
 typescript-async-utilities-practice1:
   page: typescript/7-async-utilities
@@ -4181,6 +4286,9 @@ typescript-async-utilities-readonly:
   - git: de11512
     md5: 0L6mqXzkSBRsvo0o98SljA==
     path: public/docs/typescript/7-async-utilities/2-3-readonly.md
+  - git: 422c7ea
+    md5: ov5BSlZdyjiAYQN4rrEwHg==
+    path: public/docs/typescript/7-async-utilities/2-3-readonly.md
 typescript-async-utilities-summary:
   page: typescript/7-async-utilities
   rev:
@@ -4193,11 +4301,17 @@ typescript-async-utilities-utility-types:
   - git: de11512
     md5: +91ZaKq8pZ79MANnStJgbA==
     path: public/docs/typescript/7-async-utilities/2-0-utility-types.md
+  - git: 422c7ea
+    md5: UVCQJjL2wURIxQMumXykQA==
+    path: public/docs/typescript/7-async-utilities/2-0-utility-types.md
 typescript-classes-abstract:
   page: typescript/6-classes
   rev:
   - git: de11512
     md5: UPCwfypg7Ww/tIxmJ22mMQ==
+    path: public/docs/typescript/6-classes/6-0-abstract.md
+  - git: 422c7ea
+    md5: Qn2A0UqFE3EmjWzkaqmVew==
     path: public/docs/typescript/6-classes/6-0-abstract.md
 typescript-classes-access-modifiers:
   page: typescript/6-classes
@@ -4205,17 +4319,26 @@ typescript-classes-access-modifiers:
   - git: de11512
     md5: BDUpb74ncr5ScNj1sZE8vQ==
     path: public/docs/typescript/6-classes/3-0-access-modifiers.md
+  - git: 422c7ea
+    md5: dkOSilxc6lcDXzHLjbf9Nw==
+    path: public/docs/typescript/6-classes/3-0-access-modifiers.md
 typescript-classes-implements:
   page: typescript/6-classes
   rev:
   - git: de11512
     md5: eNCwKcj+HEvRM3Tptg7j2g==
     path: public/docs/typescript/6-classes/5-0-implements.md
+  - git: 422c7ea
+    md5: 36DlSA5K4enocfJZvTSXyA==
+    path: public/docs/typescript/6-classes/5-0-implements.md
 typescript-classes-js-class-review:
   page: typescript/6-classes
   rev:
   - git: de11512
     md5: ZlF2Gr/nwqtjKyHg7sa6rw==
+    path: public/docs/typescript/6-classes/1-0-js-class-review.md
+  - git: 422c7ea
+    md5: WSW5LGtfsUz4PQExTFvdoQ==
     path: public/docs/typescript/6-classes/1-0-js-class-review.md
 typescript-classes-param-props:
   page: typescript/6-classes
@@ -4241,6 +4364,9 @@ typescript-classes-readonly:
   - git: de11512
     md5: 7TFYw8uKvWusMAMxcPRxoA==
     path: public/docs/typescript/6-classes/4-0-readonly.md
+  - git: 422c7ea
+    md5: AyPgTd2MgR0ZLy3ASH6KTQ==
+    path: public/docs/typescript/6-classes/4-0-readonly.md
 typescript-classes-summary:
   page: typescript/6-classes
   rev:
@@ -4259,11 +4385,17 @@ typescript-combining-types-in:
   - git: de11512
     md5: VnP5hOGyHfVjf5+jTVbLeg==
     path: public/docs/typescript/4-combining-types/5-2-in.md
+  - git: 422c7ea
+    md5: n8hKexsJCc1rzBQHziqdJg==
+    path: public/docs/typescript/4-combining-types/5-2-in.md
 typescript-combining-types-instanceof:
   page: typescript/4-combining-types
   rev:
   - git: de11512
     md5: /29sJal1NwhnXXr9WE2IKg==
+    path: public/docs/typescript/4-combining-types/5-3-instanceof.md
+  - git: 422c7ea
+    md5: UYGMqQTXMY8kY705EyH8Mw==
     path: public/docs/typescript/4-combining-types/5-3-instanceof.md
 typescript-combining-types-intersection:
   page: typescript/4-combining-types
@@ -4282,6 +4414,9 @@ typescript-combining-types-null-undefined:
   rev:
   - git: de11512
     md5: DUMI24FViCLyd8lzaK42Zw==
+    path: public/docs/typescript/4-combining-types/4-0-null-undefined.md
+  - git: 422c7ea
+    md5: HycARIwK+isyp/20oudXXA==
     path: public/docs/typescript/4-combining-types/4-0-null-undefined.md
 typescript-combining-types-practice1:
   page: typescript/4-combining-types
@@ -4319,6 +4454,9 @@ typescript-combining-types-typeof:
   - git: de11512
     md5: r4A5iD3KUZR6X+grN6R7EA==
     path: public/docs/typescript/4-combining-types/5-1-typeof.md
+  - git: 422c7ea
+    md5: oEdRvXO1f6p0iNhqTDYcng==
+    path: public/docs/typescript/4-combining-types/5-1-typeof.md
 typescript-combining-types-union:
   page: typescript/4-combining-types
   rev:
@@ -4343,11 +4481,17 @@ typescript-function-types-default:
   - git: de11512
     md5: Uw8eWP4/3DdDSvBNezHm6A==
     path: public/docs/typescript/3-function-types/2-2-default.md
+  - git: 422c7ea
+    md5: Muwhwc4POmHoNOPneglrRQ==
+    path: public/docs/typescript/3-function-types/2-2-default.md
 typescript-function-types-optional:
   page: typescript/3-function-types
   rev:
   - git: de11512
     md5: 67YfLt4pw/4NoR17vJ6stA==
+    path: public/docs/typescript/3-function-types/2-1-optional.md
+  - git: 422c7ea
+    md5: wUrL2HEAFzRLYS6lcJB+6A==
     path: public/docs/typescript/3-function-types/2-1-optional.md
 typescript-function-types-optional-default:
   page: typescript/3-function-types
@@ -4451,6 +4595,9 @@ typescript-generics-type-constraint:
   - git: de11512
     md5: HFrKbE6dwcTSqOod8Uvt/A==
     path: public/docs/typescript/5-generics/5-0-type-constraint.md
+  - git: 422c7ea
+    md5: BQvUw/6+YBdKh4IVZRUlxQ==
+    path: public/docs/typescript/5-generics/5-0-type-constraint.md
 typescript-intro-about:
   page: typescript/0-intro
   rev:
@@ -4469,17 +4616,26 @@ typescript-intro-compile-config:
   - git: de11512
     md5: 5UTHQDj3aqAx+t4pwRlnjQ==
     path: public/docs/typescript/0-intro/5-1-compile-config.md
+  - git: 422c7ea
+    md5: oPSMqk9IoohYk6Xpgl3dYw==
+    path: public/docs/typescript/0-intro/5-1-compile-config.md
 typescript-intro-compile-run:
   page: typescript/0-intro
   rev:
   - git: de11512
     md5: Z69vxSJneix640DJSsVaVQ==
     path: public/docs/typescript/0-intro/4-2-compile-run.md
+  - git: 422c7ea
+    md5: yaQiOEK2AroH+Prj3kWnDA==
+    path: public/docs/typescript/0-intro/4-2-compile-run.md
 typescript-intro-create-install:
   page: typescript/0-intro
   rev:
   - git: de11512
     md5: JMLpdLlxQB8H8dXl6BUbGw==
+    path: public/docs/typescript/0-intro/3-1-create-install.md
+  - git: 422c7ea
+    md5: 2t4Mlh4tNmJLXJJtfAAj9g==
     path: public/docs/typescript/0-intro/3-1-create-install.md
 typescript-intro-first-ts:
   page: typescript/0-intro
@@ -4493,11 +4649,17 @@ typescript-intro-setup:
   - git: de11512
     md5: nqmEWB2TEtupMIB2JrvpMw==
     path: public/docs/typescript/0-intro/3-0-setup.md
+  - git: 422c7ea
+    md5: V2fs6XLUAfcws/CBpT/Ebw==
+    path: public/docs/typescript/0-intro/3-0-setup.md
 typescript-intro-tsconfig:
   page: typescript/0-intro
   rev:
   - git: de11512
     md5: 3PIWgUlGThS/SrevvoR4Tw==
+    path: public/docs/typescript/0-intro/5-0-tsconfig.md
+  - git: 422c7ea
+    md5: f1V8TDWT7MCyryATN7/TZg==
     path: public/docs/typescript/0-intro/5-0-tsconfig.md
 typescript-intro-why:
   page: typescript/0-intro
@@ -4511,6 +4673,9 @@ typescript-objects-interfaces-interface:
   - git: de11512
     md5: uOAeuATwtf4NUJ3AF9n1rg==
     path: public/docs/typescript/2-objects-interfaces/3-0-interface.md
+  - git: 422c7ea
+    md5: 3X2XwwbVJ8BNL3y58ZVrgg==
+    path: public/docs/typescript/2-objects-interfaces/3-0-interface.md
 typescript-objects-interfaces-object-types:
   page: typescript/2-objects-interfaces
   rev:
@@ -4522,6 +4687,9 @@ typescript-objects-interfaces-optional-props:
   rev:
   - git: de11512
     md5: wRUFjYN+O+0u26IxfhlbeA==
+    path: public/docs/typescript/2-objects-interfaces/5-0-optional-props.md
+  - git: 422c7ea
+    md5: JHB0v3Kz22e+/nmn+G6Qvg==
     path: public/docs/typescript/2-objects-interfaces/5-0-optional-props.md
 typescript-objects-interfaces-practice1:
   page: typescript/2-objects-interfaces
@@ -4541,6 +4709,9 @@ typescript-objects-interfaces-readonly:
   - git: de11512
     md5: dkV4Wvp46yfSqDRYD7AYbw==
     path: public/docs/typescript/2-objects-interfaces/6-0-readonly.md
+  - git: 422c7ea
+    md5: 1KqUo4SkgUWnMtZoFRElHg==
+    path: public/docs/typescript/2-objects-interfaces/6-0-readonly.md
 typescript-objects-interfaces-summary:
   page: typescript/2-objects-interfaces
   rev:
@@ -4553,11 +4724,17 @@ typescript-objects-interfaces-type-alias:
   - git: de11512
     md5: OJW3Fv1QaECPsJ+UzfS+ZA==
     path: public/docs/typescript/2-objects-interfaces/2-0-type-alias.md
+  - git: 422c7ea
+    md5: 2G7Ji8Mg9q8+RjL5UQlQLw==
+    path: public/docs/typescript/2-objects-interfaces/2-0-type-alias.md
 typescript-objects-interfaces-type-vs-interface:
   page: typescript/2-objects-interfaces
   rev:
   - git: de11512
     md5: A8IrPIcDxOVNcx10ZR6dhw==
+    path: public/docs/typescript/2-objects-interfaces/4-0-type-vs-interface.md
+  - git: 422c7ea
+    md5: gHCSbmKjd8kf+9E2Q4gKbg==
     path: public/docs/typescript/2-objects-interfaces/4-0-type-vs-interface.md
 typescript-types-any:
   page: typescript/1-types
@@ -4565,11 +4742,17 @@ typescript-types-any:
   - git: de11512
     md5: uKVGYZ+m2mWb9/CVhqiVSw==
     path: public/docs/typescript/1-types/4-1-any.md
+  - git: 422c7ea
+    md5: H1y07X3JadpIevKDgAS6hA==
+    path: public/docs/typescript/1-types/4-1-any.md
 typescript-types-array:
   page: typescript/1-types
   rev:
   - git: de11512
     md5: Jb3KXU8xjx7oVaFNflZ/dA==
+    path: public/docs/typescript/1-types/5-1-array.md
+  - git: 422c7ea
+    md5: fppkWvOJitPIIGMTKEdR5Q==
     path: public/docs/typescript/1-types/5-1-array.md
 typescript-types-array-tuple:
   page: typescript/1-types
@@ -4577,11 +4760,17 @@ typescript-types-array-tuple:
   - git: de11512
     md5: fqyfq/EvIfDh7PMRhzi/Aw==
     path: public/docs/typescript/1-types/5-0-array-tuple.md
+  - git: 422c7ea
+    md5: /w4D+zOw6zqoQ4uaodMRMw==
+    path: public/docs/typescript/1-types/5-0-array-tuple.md
 typescript-types-never:
   page: typescript/1-types
   rev:
   - git: de11512
     md5: GiibNu1nSi27XVSHiTFlsg==
+    path: public/docs/typescript/1-types/4-3-never.md
+  - git: 422c7ea
+    md5: IOF5qHV69xor46r6jSj1Mw==
     path: public/docs/typescript/1-types/4-3-never.md
 typescript-types-practice1:
   page: typescript/1-types
@@ -4595,17 +4784,26 @@ typescript-types-practice2:
   - git: de11512
     md5: iWkHRM7ik/6bSpJGmul2gw==
     path: public/docs/typescript/1-types/6-2-practice2.md
+  - git: 422c7ea
+    md5: guoxL4SjfzZtpPyJnahRCw==
+    path: public/docs/typescript/1-types/6-2-practice2.md
 typescript-types-primitive-types:
   page: typescript/1-types
   rev:
   - git: de11512
     md5: pCXUiESxlgZTtG+MGI5bCA==
     path: public/docs/typescript/1-types/2-0-primitive-types.md
+  - git: 422c7ea
+    md5: GrT3GpzLVXhFFzeqCNLh9A==
+    path: public/docs/typescript/1-types/2-0-primitive-types.md
 typescript-types-special-types:
   page: typescript/1-types
   rev:
   - git: de11512
     md5: jng4NMAvCX37m83fCdlMFg==
+    path: public/docs/typescript/1-types/4-0-special-types.md
+  - git: 422c7ea
+    md5: jWZ+Bbyy+iZztPAg0cJ/mA==
     path: public/docs/typescript/1-types/4-0-special-types.md
 typescript-types-summary:
   page: typescript/1-types
@@ -4619,11 +4817,17 @@ typescript-types-tuple:
   - git: de11512
     md5: 8uaBHcGGwchyFEaUwgzIUw==
     path: public/docs/typescript/1-types/5-2-tuple.md
+  - git: 422c7ea
+    md5: kSE6rR5vfBVgx1gco3U0wg==
+    path: public/docs/typescript/1-types/5-2-tuple.md
 typescript-types-type-annotations:
   page: typescript/1-types
   rev:
   - git: de11512
     md5: t8tuJPYX60yRsKhbfO/LSQ==
+    path: public/docs/typescript/1-types/1-0-type-annotations.md
+  - git: 422c7ea
+    md5: cxXuwzisvu8FYGybq62iIw==
     path: public/docs/typescript/1-types/1-0-type-annotations.md
 typescript-types-type-inference:
   page: typescript/1-types
@@ -4631,9 +4835,15 @@ typescript-types-type-inference:
   - git: de11512
     md5: Ec/Mbq91sZAUVOknzfNe8w==
     path: public/docs/typescript/1-types/3-0-type-inference.md
+  - git: 422c7ea
+    md5: p6GDmBnO+A9pDSgn/4DANg==
+    path: public/docs/typescript/1-types/3-0-type-inference.md
 typescript-types-unknown:
   page: typescript/1-types
   rev:
   - git: de11512
     md5: LbhnYdM7JM7v6YOcUwANeA==
+    path: public/docs/typescript/1-types/4-2-unknown.md
+  - git: 422c7ea
+    md5: G7TRVAFyqCO0KbQkMozKTQ==
     path: public/docs/typescript/1-types/4-2-unknown.md
