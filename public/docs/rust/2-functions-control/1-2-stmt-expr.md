@@ -3,7 +3,6 @@ id: rust-functions-control-stmt-expr
 title: 文（Statement）と式（Expression）
 level: 3
 question:
-  - 文と式の違いがまだよく分かりません。もっと具体的な例で説明してもらえませんか？
   - なぜa + 1の後にセミコロンを付けるとコンパイルエラーになるのですか？
   - なぜRustではreturnキーワードを使わずに最後の式を戻り値にするスタイルが好まれるのですか？
   - 空のタプル () とは何ですか？

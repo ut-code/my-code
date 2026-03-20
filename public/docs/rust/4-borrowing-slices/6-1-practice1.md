@@ -1,13 +1,13 @@
 ---
 id: rust-borrowing-slices-practice1
 title: '練習問題 1: 参照渡しへの書き換え'
-level: 2
+level: 3
 question:
   - この問題のRectangleはなぜCopyトレイトを実装しないのですか？
   - 修正後、rect1が再利用できるようになるのはなぜですか？
 ---
 
-## 練習問題 1: 参照渡しへの書き換え
+### 練習問題 1: 参照渡しへの書き換え
 
 以下のコードは動作しますが、`calculate_area` 関数が所有権を奪ってしまうため、再度 `rect1` を使おうとするとエラーになります。
 `calculate_area` が `Rectangle` の**不変参照**を受け取るように修正し、`main` 関数で `rect1` を再利用できるようにしてください。

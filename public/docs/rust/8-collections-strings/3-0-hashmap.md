@@ -2,10 +2,7 @@
 id: rust-collections-strings-hashmap
 title: ハッシュマップ (HashMap<K, V>)
 level: 2
-question:
-  - ハッシュマップは具体的にどのような問題を解決するために使われますか？
-  - PythonのdictやJavaScriptのMapを知らない場合、ハッシュマップとはどんなものか教えてください。
-  - std::collectionsモジュールからインポートする必要があるのはなぜですか？
+question: []
 ---
 
 ## ハッシュマップ (`HashMap<K, V>`)

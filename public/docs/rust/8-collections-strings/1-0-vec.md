@@ -4,7 +4,6 @@ title: ベクタ (Vec<T>)：可変長配列
 level: 2
 question:
   - ベクタはどのような場面で役立つデータ構造ですか？
-  - C++のstd::vectorやJavaのArrayListを知らない場合、ベクタをどのように理解すればよいですか？
 ---
 
 ## ベクタ (`Vec<T>`)：可変長配列

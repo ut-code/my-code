@@ -2,9 +2,7 @@
 id: rust-collections-strings-summary
 title: この章のまとめ
 level: 2
-question:
-  - このまとめを読んだ上で、さらに深く学ぶにはどのセクションを再度読み返すべきですか？
-  - 各データ構造を使う上で、初心者が特に注意すべき点は何ですか？
+question: []
 ---
 
 ## この章のまとめ

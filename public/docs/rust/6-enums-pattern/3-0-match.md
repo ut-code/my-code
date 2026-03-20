@@ -4,9 +4,8 @@ title: match フロー制御演算子
 level: 2
 question:
   - matchフロー制御演算子はC言語やJavaのswitch文とどう違うのですか？
-  - 網羅性チェックとは何ですか？
 ---
 
-## match フロー制御演算子
+## `match` フロー制御演算子
 
 `match` は、Enumの値を処理するための最も強力なツールです。C言語やJavaの `switch` に似ていますが、より表現力が高く、コンパイラによる**網羅性チェック（Exhaustiveness Check）**があります。

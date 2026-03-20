@@ -2,9 +2,7 @@
 id: rust-enums-pattern-summary
 title: この章のまとめ
 level: 2
-question:
-  - 代数的データ型とは何ですか？
-  - Optionの皮を剥く処理とは具体的に何のことですか？
+question: []
 ---
 
 ## この章のまとめ

@@ -2,9 +2,7 @@
 id: rust-borrowing-slices-summary
 title: この章のまとめ
 level: 2
-question:
-  - 「ボローチェッカー」とは何ですか？
-  - コンパイルが通った時点でロジックの正しさに自信が持てるというのは、どういう意味ですか？
+question: []
 ---
 
 ## この章のまとめ
