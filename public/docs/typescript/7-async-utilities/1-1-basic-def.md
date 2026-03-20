@@ -3,7 +3,7 @@ id: typescript-async-utilities-basic-def
 title: 基本的な定義
 level: 3
 question:
-  - Promise<string>やPromise<number>とは何が違うのですか？
+  - Promise<string>とPromise<number>は何が違うのですか？
   - Promise<void>はいつ使うのですか？
   - asyncキーワードをつけると、なぜ自動的にPromiseでラップされるのですか？
   - >-

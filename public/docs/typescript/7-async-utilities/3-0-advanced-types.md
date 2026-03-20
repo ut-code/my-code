@@ -2,9 +2,7 @@
 id: typescript-async-utilities-advanced-types
 title: 高度な型操作（概要）
 level: 2
-question:
-  - 高度な型操作は、初心者でもすぐに学ぶべきものですか？
-  - これらの型はどのような場面でよく使われるのですか？
+question: []
 ---
 
 ## 高度な型操作（概要）

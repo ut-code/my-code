@@ -2,9 +2,7 @@
 id: typescript-async-utilities-summary
 title: この章のまとめ
 level: 2
-question:
-  - この章のまとめで述べられている内容が、実際の開発でどのように役立つのか、もっと具体的なイメージが欲しいです。
-  - JavaScriptの柔軟性を保ちつつ、堅牢さを加える、とはどういう意味ですか？
+question: []
 ---
 
 ## この章のまとめ

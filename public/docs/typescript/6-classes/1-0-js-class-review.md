@@ -10,7 +10,7 @@ question:
   - TypeScriptでJavaScriptのクラスを書くと、具体的にどんなメリットがありますか？
 ---
 
-## JSのクラス構文の復習: constructor, extends
+## JSのクラス構文の復習: `constructor`, `extends`
 
 まずは、基本的なJavaScriptのクラス構文をTypeScriptのファイルとして書いてみましょう。TypeScriptはJavaScriptのスーパーセット（上位互換）であるため、標準的なJSの書き方もほぼそのまま動作しますが、少しだけ「型」の意識が必要です。
 

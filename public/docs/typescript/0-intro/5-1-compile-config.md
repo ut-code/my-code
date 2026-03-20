@@ -14,5 +14,3 @@ question:
 ```bash
 npx tsc
 ```
-
-> **Note:** `strict: true` はTypeScriptの恩恵を最大限に受けるために非常に重要です。このチュートリアルでは常にこの設定が有効であることを前提に進めます。

@@ -9,7 +9,7 @@ question:
   - 一貫して`type`を使うチームが増えているのはなぜですか。
 ---
 
-## type vs interface: 使い分けの基本的なガイドライン
+## `type` vs `interface`: 使い分けの基本的なガイドライン
 
 「`type` と `interface` のどちらを使うべきか？」は、TypeScriptにおける最大の論点の一つです。
 現在のTypeScriptでは機能的な差は非常に少なくなっていますが、基本的な使い分けのガイドラインは以下の通りです。

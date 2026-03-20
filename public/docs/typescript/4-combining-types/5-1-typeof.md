@@ -7,7 +7,7 @@ question:
   - typeof演算子はプリミティブ型以外には使えないのでしょうか？
 ---
 
-### typeof 演算子
+### `typeof` 演算子
 
 プリミティブ型（string, number, boolean, symbol, undefined）の判定に使います。
 

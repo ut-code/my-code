@@ -1,6 +1,6 @@
 ---
 id: typescript-types-primitive-types
-title: 2.2 主要なプリミティブ型
+title: 主要なプリミティブ型
 level: 2
 question:
   - プリミティブ型には具体的にどんな種類がありますか？
@@ -8,7 +8,7 @@ question:
   - テンプレートリテラルを使うと、なぜ文字列型になるんですか？
 ---
 
-## 2.2 主要なプリミティブ型
+## 主要なプリミティブ型
 
 JavaScriptでおなじみのプリミティブ型は、TypeScriptでもそのまま使用できます。
 

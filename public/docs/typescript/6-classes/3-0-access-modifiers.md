@@ -9,7 +9,7 @@ question:
   - JavaScriptにはこれらの概念がないと思うのですが、TypeScript独自のものですか？
 ---
 
-## アクセス修飾子: public, private, protected
+## アクセス修飾子: `public`, `private`, `protected`
 
 TypeScriptには、クラスのメンバー（プロパティやメソッド）へのアクセスを制御するための3つの修飾子があります。これはJavaやC\#などの言語と同様の概念です。
 

@@ -2,9 +2,7 @@
 id: typescript-function-types-summary
 title: この章のまとめ
 level: 2
-question:
-  - この章で学んだ中で、特にTypeScriptらしいと感じる機能は何ですか
-  - 関数定義で型を明記しないとどのような問題が起こりえますか
+question: []
 ---
 
 ## この章のまとめ

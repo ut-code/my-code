@@ -2,9 +2,7 @@
 id: typescript-generics-summary
 title: この章のまとめ
 level: 2
-question:
-  - ジェネリクスを理解すると、ライブラリの型定義ファイル(.d.ts)が読みやすくなるとありますが、具体的にどう読みやすくなりますか？
-  - ジェネリクスが使われている具体的なTypeScriptライブラリの例を教えてください。
+question: []
 ---
 
 ## この章のまとめ

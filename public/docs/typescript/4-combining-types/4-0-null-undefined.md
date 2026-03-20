@@ -8,7 +8,7 @@ question:
   - 変数にnullを代入した後、もう一度文字列などを代入できますか？
 ---
 
-## null と undefined
+## `null` と `undefined`
 
 TypeScriptには `null` 型と `undefined` 型が存在します。
 `tsconfig.json` の設定で `strictNullChecks: true`（推奨設定）になっている場合、これらは他の型（stringなど）には代入できません。
