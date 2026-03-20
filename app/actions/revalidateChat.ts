@@ -2,7 +2,7 @@
 
 import { initContext, revalidateChat } from "@/lib/chatHistory";
 import { LangId, PagePath, PagePathSchema, PageSlug } from "@/lib/docs";
-import z from "zod";
+import { z } from "zod";
 
 export async function revalidateChatAction(
   chatId: string,
