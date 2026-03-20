@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useMemo } from "react";
 // import useSWR from "swr";
 // import {
 //   getQuestionExample,
@@ -30,11 +30,16 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   const router = useRouter();
   const streamingChatContext = useStreamingChatContext();
 
-  const exampleData = sectionContent
-    .filter((s) => s.inView)
-    .map((s) => s.question)
-    .filter((qe) => qe !== undefined)
-    .flat();
+  const exampleData = useMemo(
+    () =>
+      sectionContent
+        .filter((s) => s.inView)
+        .map((s) => s.question)
+        .filter((qe) => qe !== undefined)
+        .flat(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
   // 質問フォームを開くたびにランダムに選び直し、
   // exampleData[Math.floor(exampleChoice * exampleData.length)] を採用する
   const [exampleChoice, setExampleChoice] = useState<number | undefined>(
