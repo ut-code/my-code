@@ -34,14 +34,14 @@ export function FeatureCard(props: {
         <p className="opacity-70 leading-relaxed text-lg">{props.children}</p>
       </div>
       <div className="w-80 max-w-full md:min-w-3/7 md:max-w-1/2">
-        <div
+        <figure
           className={clsx(
             "aspect-video bg-base-200 rounded-xl border border-base-300 shadow-sm",
             "relative overflow-hidden select-none"
           )}
         >
           {props.image}
-        </div>
+        </figure>
       </div>
     </div>
   );
