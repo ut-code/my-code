@@ -109,7 +109,8 @@ for (const id in revisions) {
   if (!existsSync(join(docsDir, revisions[id].page))) {
     console.warn(
       `The page slug ${revisions[id].page} previously used by section ${id} does not exist. ` +
-        `Please replace 'page: ${revisions[id].page}' in public/docs/revisions.yml with new page path manually.`
+        `Please replace 'page: ${revisions[id].page}' in public/docs/revisions.yml with new page path manually. ` +
+        `Also add redirects in next.config.ts if necessary.`
     );
     if (doWrite || doCheckDiff) {
       process.exit(1);
