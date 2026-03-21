@@ -17,3 +17,20 @@ question:
   * **Object**: キーと値のペアの集合（辞書、ハッシュマップに近い）。
   * **Array**: 順序付きリスト。
   * **Function**: JavaScriptでは関数もオブジェクトであり、変数に代入したり引数として渡すことができます（第一級関数）。
+
+```js-repl
+> const user = { name: "Alice", age: 25 };  // Object
+undefined
+> user.name
+'Alice'
+> user["age"]
+25
+> const colors = ["Red", "Green", "Blue"];  // Array
+undefined
+> colors[0]
+'Red'
+> colors.length
+3
+```
+
+Object と Array の詳しい操作方法については、それぞれ **第5章（オブジェクトとプロトタイプ）** および **第7章（配列）** で解説します。
