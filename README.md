@@ -44,6 +44,12 @@ npx drizzle-kit migrate
 でデータベースを初期化
 
 ```bash
+npx tsx ./scripts/checkDocs.ts --write
+```
+でデータベースにドキュメントのページ情報を挿入します。
+(public/docs/以下にmarkdownを追加・削除したら再度実行する必要があります)
+
+```bash
 npm run dev
 ```
 [http://localhost:3000](http://localhost:3000) で開きます。
