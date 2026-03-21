@@ -14,6 +14,23 @@ question:
 
 主なオブジェクト型には以下があります。
 
-  * **Object**: キーと値のペアの集合（辞書、ハッシュマップに近い）。
-  * **Array**: 順序付きリスト。
+  * **Object**: キーと値のペアの集合（辞書、ハッシュマップに近い）。詳しくは5章で解説します。
+  * **Array**: 順序付きリスト。詳しくは7章で解説します。
   * **Function**: JavaScriptでは関数もオブジェクトであり、変数に代入したり引数として渡すことができます（第一級関数）。
+
+```js-repl
+> // Object: キーと値のペアの集合
+> const user = { name: "Alice", age: 25 };
+undefined
+> user.name
+'Alice'
+> user["age"]
+25
+> // Array: 順序付きリスト（インデックスは 0 から始まる）
+> const colors = ["Red", "Green", "Blue"];
+undefined
+> colors[0]
+'Red'
+> colors.length
+3
+```

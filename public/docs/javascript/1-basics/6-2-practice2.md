@@ -1,30 +1,20 @@
 ---
 id: javascript-basics-practice2
-title: '練習問題2: オブジェクトの操作と参照'
+title: '練習問題2: constとオブジェクトの変更'
 level: 3
 question:
-  - なぜ `newList = originalList` だと `originalList` も変更されてしまうのですか？
-  - 「参照コピー」とはどういう状態ですか？
-  - スプレッド構文 `...` を使って、この問題をどう解決すれば良いですか？
-  - 配列をコピーする他の方法はありますか？
+  - constで宣言したのにプロパティを変更できるのはなぜですか？
+  - プロパティの変更と、変数への再代入の違いは何ですか？
 ---
 
-### 練習問題2: オブジェクトの操作と参照
+### 練習問題2: constとオブジェクトの変更
 
-以下のコードにはバグ（意図しない挙動）があります。
-`originalList` の内容を保持したまま、新しい要素を追加した `newList` を作成したいのですが、現状では `originalList` も変更されてしまいます。
-スプレッド構文 `...` などを使い、`originalList` を変更せずに `newList` を作成するように修正してください。
+`const` を使って、`name`（商品名・文字列）と `price`（価格・数値）を持つ商品オブジェクト `product` を作成してください。
+次に、`price` を別の値に変更し、さらに `stock`（在庫数・数値）プロパティを新たに追加してから、`console.log()` でオブジェクトの内容を出力してみましょう。
 
 ```js:practice2_2.js
-const originalList = ["Apple", "Banana"];
-
-// 参照コピーになっているため originalList も変わってしまう
-const newList = originalList;
-newList.push("Orange");
-
-console.log("Original:", originalList); // ["Apple", "Banana"] と出力させたい
-console.log("New:", newList);           // ["Apple", "Banana", "Orange"] と出力させたい
 ```
 
 ```js-exec:practice2_2.js
+(出力例) { name: 'コーヒー', price: 550, stock: 30 }
 ```
