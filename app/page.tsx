@@ -4,7 +4,13 @@ import { getPagesList } from "@/lib/docs";
 import clsx from "clsx";
 import { LanguageIcon } from "./terminal/icons";
 import { RuntimeLang } from "@my-code/runtime/languages";
-import { ChatImage, FeatureCard, PracticeImage, RuntimeImage } from "./featureCard";
+import {
+  ChatImage,
+  FeatureCard,
+  PracticeImage,
+  RuntimeImage,
+} from "./featureCard";
+import { DaisyInfoIcon } from "./daisyAlertIcon";
 
 export const metadata: Metadata = {
   title: "my.code(); へようこそ",
@@ -107,9 +113,33 @@ export default async function Home() {
         <h2 id="tutorials" className="text-3xl font-bold mb-4 text-center">
           さあ、学習を始めましょう
         </h2>
-        <p className="text-center opacity-70 mb-10">
+        <p className="text-center opacity-70 mb-4">
           豊富なラインナップから、学びたい言語を選択してください。
+          <br />
+          my.code();
+          ならあなたがまだ触ったことがない言語を気軽に体験することができます。
         </p>
+        <div className="alert alert-info alert-dash mb-4 w-max max-w-full mx-auto">
+          <DaisyInfoIcon />
+          <span>
+            プログラミング未経験の方、何から始めればいいかわからない...という方は、
+            <br className="hidden md:block" />
+            まずは
+            <a
+              className="link mx-1"
+              style={{
+                color: "#25c2a0",
+                fontFamily:
+                  'system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+              }}
+              href="https://learn.utcode.net"
+              target="_blank"
+            >
+              ut.code(); Learn
+            </a>
+            でプログラミングの基礎を学ぶことをおすすめします！
+          </span>
+        </div>
         <div
           className="grid items-center gap-4"
           style={{
