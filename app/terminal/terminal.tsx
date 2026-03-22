@@ -148,11 +148,13 @@ export function useTerminal(props: TerminalProps): TerminalContext {
       globals.cssでフォントを指定し読み込んでいるが、
       それが読み込まれる前にterminalを初期化してしまうとバグるので、
       ここで fonts.load() をawaitしている。
+
+      拡張機能などでフォントをブロックしている場合のエラーはcatchしてとにかく続行する
       */
       Promise.all([
         import("@xterm/xterm"),
         import("@xterm/addon-fit"),
-        document.fonts.load("1rem Inconsolata Variable"),
+        document.fonts.load("1rem Inconsolata Variable").catch(() => undefined),
       ]).then(([{ Terminal }, { FitAddon }]) => {
         if (!abortController.signal.aborted) {
           const term = new Terminal({
