@@ -39,12 +39,12 @@ GITHUB_CLIENT_SECRET=
 
 別のターミナルで、
 ```bash
-npx drizzle-kit migrate
+npm run db-migrate
 ```
 でデータベースを初期化
 
 ```bash
-npx tsx ./scripts/checkDocs.ts --write
+npm run db-docs
 ```
 でデータベースにドキュメントのページ情報を挿入します。
 (public/docs/以下にmarkdownを追加・削除したら再度実行する必要があります)
@@ -66,7 +66,7 @@ npm run lint
 
 ### データベースのスキーマ
 
-* データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `npx drizzle-kit generate` でmigrationファイルを作成し、 `npx drizzle-kit migrate` でデータベースに反映します。
+* データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `npm run db-generate` (`npx drizzle-kit generate`) でmigrationファイルを作成し、 `npm run db-migrate` (`npx drizzle-kit migrate`) でデータベースに反映します。
     * 本番環境のデータベースのmigrateはmainにpushされた際にGitHub Actionで実行されます
 * スキーマのファイルを追加した場合は app/lib/drizzle.ts でimportを追加する必要があります(たぶん)
 * `npx prisma dev` で立ち上げたデータベースは `npx prisma dev ls` でデータベース名の確認・ `npx prisma dev rm default` で削除ができるらしい
@@ -128,8 +128,8 @@ npm run checkDocs
 * REPLのコード例は1セクションに最大1つまで。
     * コードエディターとコード実行ブロックはいくつでも置けます。
 * ページ0以外の各ページの最後はレベル2見出し「この章のまとめ」と、レベル3見出し「練習問題n」を置く
-* 編集したドキュメントにローカルの開発環境でアクセスする際は `npx tsx ./scripts/checkDocs.ts --write` でrevisions.ymlを更新してください。チャットを正しく動作させるために必要です。基本的には手動でこのファイルを編集する必要はありません。
-    * 本番環境ではドキュメントの変更がmainブランチにpushされた際に自動で更新されます。gitのコミットidを参照して更新するため、ローカルで更新したrevisions.ymlはpushしないでください。
+* 編集したドキュメントにローカルの開発環境でアクセスする際は `npm run db-docs` を実行してください。これにより `public/docs/revisions-dev.yml` が更新・作成され、チャットが正しく動作するようになります。
+    * 本番環境用の `revisions.yml` は、main ブランチに push された際に GitHub Action によって自動的に更新されます。
 
 ### ベースとなるドキュメントの作り方
 
