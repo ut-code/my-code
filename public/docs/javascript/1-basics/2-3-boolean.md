@@ -4,7 +4,6 @@ title: 真偽値（Boolean）
 level: 3
 question:
   - Boolean型はどんな場面で使いますか？
-  - 論理演算子 `&&` と `||` と `!` の基本を教えてください。
   - '`true` / `false` は文字列の `"true"` / `"false"` と何が違いますか？'
 ---
 
