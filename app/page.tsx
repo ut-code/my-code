@@ -22,6 +22,15 @@ export default async function Home() {
   const pagesList = await getPagesList();
   return (
     <div className="w-full p-4 pb-16 md:pb-20 lg:pb-24">
+      {/*og画像を生成する時に使ったもの
+      <figure className="border w-[1200px] h-[630px]">
+        <div className="flex gap-1 items-center justify-center w-[240px] h-[126px] scale-500 origin-top-left">
+          <img src="/icon.svg" alt="my.code(); Logo" className="size-[48px]" />
+          <span className="text-[32px] font-bold font-mono drop-shadow-sm text-primary">
+            my.code();
+          </span>
+        </div>
+      </figure>*/}
       <div className="max-w-docs mx-auto">
         <div
           className={clsx(

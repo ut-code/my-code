@@ -8,10 +8,15 @@ export default function manifest(): MetadataRoute.Manifest {
     description: pageMetadata.description as string,
     start_url: "/",
     display: "standalone",
-    // TODO:
-    // background_color: "#fff",
-    // theme_color: "#fff",
+    background_color: "#fef7f2", // base-100
+    theme_color: "#ba6900", // primary
     icons: [
+      {
+        src: "/icon_pad.png", // これだけ背景色もついている
+        sizes: "512x512",
+        purpose: "maskable",
+        type: "image/png",
+      },
       {
         src: "/favicon.ico",
         sizes: "any",

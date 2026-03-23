@@ -20,6 +20,17 @@ export const metadata: Metadata = {
     template: "%s - my.code();",
     default: "my.code();",
   },
+  metadataBase: new URL("https://my-code.utcode.net"),
+  openGraph: {
+    type: "website",
+    siteName: "my.code();",
+    images: "/icon_title.png",
+  },
+  twitter: {
+    card: "summary",
+    site: "@utokyo_code",
+    images: "/icon_pad.png",
+  },
 };
 
 export default async function RootLayout({
