@@ -218,7 +218,9 @@ export async function getPagesList(): Promise<LanguageEntry[]> {
 export async function getRevisions(
   sectionId: SectionId
 ): Promise<RevisionYmlEntry | undefined> {
-  const revisionsYml = await readPublicFile(`docs/revisions.yml`);
+  const revisionsYml = await readPublicFile(
+    `docs/revisions${process.env.NODE_ENV === "development" ? "-dev" : ""}.yml`
+  );
   return (yaml.load(revisionsYml) as Record<string, RevisionYmlEntry>)[
     sectionId
   ];
@@ -230,7 +232,9 @@ export async function getCommitDate(id: string): Promise<Date> {
     return commitDateCache.get(id)!;
   }
   const p = (async () => {
-    const commitInfoYml = await readPublicFile(`docs/commits.yml`);
+    const commitInfoYml = await readPublicFile(
+      `docs/commits${process.env.NODE_ENV === "development" ? "-dev" : ""}.yml`
+    );
     const commitInfo = yaml.load(commitInfoYml) as Record<string, string>;
     const timestamp = commitInfo[id];
     if (timestamp) {
