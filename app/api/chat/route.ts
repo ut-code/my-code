@@ -292,7 +292,7 @@ export async function POST(request: NextRequest) {
 
         // Parse diffs from the full body content
         const diffRegex =
-          /<{3,}\s*SEARCH\n([\s\S]*?)\n={3,}\n([\s\S]*?)\n>{3,}\s*REPLACE/g;
+          /<{3,}\s*SEARCH\n*([\s\S]*?)\n*={3,}\n*([\s\S]*?)\n*>{3,}\s*REPLACE/g;
         const diffRaw: CreateChatDiff[] = [];
         for (const m of contentAfterHeader.matchAll(diffRegex)) {
           const search = m[1];
