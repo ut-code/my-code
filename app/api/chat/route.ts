@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
 
           if (!headerParsed) {
             // Wait until we have at least 2 lines (sectionId + title + start of body)
-            const headerMatch = fullText.match(/^([^\n]*?)\n+([^\n]*?)\n+/);
+            const headerMatch = fullText.match(/^([^\n]+?)\n+([^\n]+?)\n+/);
             if (headerMatch) {
               headerParsed = true;
               let targetSectionId = headerMatch[1].trim() as SectionId;
