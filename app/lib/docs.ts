@@ -196,6 +196,7 @@ async function getLanguageIds(): Promise<LangId[]> {
 }
 
 export async function getPagesList(): Promise<LanguageEntry[]> {
+  "use cache";
   const langIds = await getLanguageIds();
   return await Promise.all(
     langIds.map(async (langId) => {
@@ -254,6 +255,7 @@ export async function getMarkdownSections(
   lang: LangId,
   page: PageSlug
 ): Promise<MarkdownSection[]> {
+  "use cache";
   if (isCloudflare()) {
     const sectionsJson = await readPublicFile(
       `docs/${lang}/${page}/sections.json`

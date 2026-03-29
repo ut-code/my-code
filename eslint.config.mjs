@@ -1,17 +1,22 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
+import reactHooks from "eslint-plugin-react-hooks";
 
 const eslintConfig = [
-  ...compat.config({
-    extends: ["next/core-web-vitals", "next/typescript"],
+  {
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "public/**",
+      "cloudflare-env.d.ts",
+      "packages/runtime/node_modules/**",
+      "packages/runtime/dist/**",
+    ],
+  },
+  ...nextCoreWebVitals,
+  ...nextTypescript,
+  {
+    plugins: { "react-hooks": reactHooks },
     rules: {
       // Next.jsのデフォルト設定を上書き
       "@typescript-eslint/no-unused-vars": [
@@ -22,8 +27,12 @@ const eslintConfig = [
           ignoreRestSiblings: true,
         },
       ],
+      // react-hooks/refs と react-hooks/set-state-in-effect は Next.js 16 で追加された新しいルールで、
+      // 既存のコードパターンと相性が悪いため無効化する
+      "react-hooks/refs": "off",
+      "react-hooks/set-state-in-effect": "off",
     },
-  }),
+  },
 ];
 
 export default eslintConfig;
