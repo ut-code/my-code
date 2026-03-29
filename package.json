@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "prebuild": "npm run cf-typegen && tsx ./scripts/checkDocs.ts && tsx ./scripts/generateDocsMeta.ts && tsx ./scripts/copyAllDTSFiles.ts && tsx ./scripts/removeHinting.ts",
-    "dev": "npm run prebuild && next dev",
+    "dev": "npm run prebuild && next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "npm run cf-typegen && eslint .",

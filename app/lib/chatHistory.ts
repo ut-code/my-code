@@ -282,7 +282,7 @@ export async function migrateChatUser(oldUserId: string, newUserId: string) {
   const pagesList = await getPagesList();
   for (const lang of pagesList) {
     for (const page of lang.pages) {
-      revalidateTag(
+      updateTag(
         cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
       );
     }
