@@ -25,7 +25,7 @@
     "@fontsource-variable/inconsolata": "^5.2.7",
     "@fontsource/m-plus-rounded-1c": "^5.2.9",
     "@google/genai": "^1.21.0",
-    "@opennextjs/cloudflare": "^1.16.1",
+    "@opennextjs/cloudflare": "^1.18.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.1.0-beta.168",
     "ace-builds": "^1.43.2",
