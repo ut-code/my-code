@@ -3,7 +3,7 @@ import { describe, beforeAll, afterAll, it, beforeEach } from "vitest";
 import { RuntimeProvider, useRuntimeAll } from "../src/context";
 import { RuntimeLang } from "../src/languages";
 import { RuntimeContext } from "../src/interface";
-import { RefObject } from "react";
+import { RefObject, useImperativeHandle } from "react";
 
 import { RUNTIME_TIMEOUTS, waitForRuntimeReady } from "./utils";
 import { replTests } from "./repl";
@@ -15,8 +15,7 @@ const RuntimeLoader = ({
   runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext> | null>;
 }) => {
   const runtimeAll = useRuntimeAll();
-  // eslint-disable-next-line react-hooks/refs
-  runtimeRef.current = runtimeAll;
+  useImperativeHandle(runtimeRef, () => runtimeAll, [runtimeAll]);
   return null;
 };
 
