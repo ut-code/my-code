@@ -14,7 +14,7 @@ import {
   PagePath,
   PageSlug,
 } from "@/lib/docs";
-import { unstable_cacheLife, unstable_cacheTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
 import { DocsAutoRedirect } from "./autoRedirect";
 
@@ -83,12 +83,12 @@ async function getChatFromCache(path: PagePath, userId?: string) {
   // 一方、use cacheの関数内でheaders()にはアクセスできない。
   // したがって、外でheaders()を使ってuserIdを取得した後、関数の中で再度drizzleを初期化しないといけない。
   "use cache";
-  unstable_cacheLife("days");
+  cacheLife("days");
 
   if (!userId) {
     return [];
   }
-  unstable_cacheTag(cacheKeyForPage(path, userId));
+  cacheTag(cacheKeyForPage(path, userId));
 
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");

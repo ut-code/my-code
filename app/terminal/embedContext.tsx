@@ -7,7 +7,6 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -58,7 +57,7 @@ export function useEmbedContext() {
 export function EmbedContextProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  const [currentPathname, setCurrentPathname] = useState<PagePathname>("");
+  const [prevPathname, setPrevPathname] = useState<PagePathname>("");
   const [files, setFiles] = useState<
     Record<PagePathname, Record<Filename, string>>
   >({});
@@ -72,15 +71,12 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   const [execResults, setExecResults] = useState<
     Record<Filename, ReplOutput[]>
   >({});
-  // pathnameが変わったらデータを初期化
-  useEffect(() => {
-    if (pathname && pathname !== currentPathname) {
-      setCurrentPathname(pathname);
-      setReplOutputs({});
-      setCommandIdCounters({});
-      setExecResults({});
-    }
-  }, [pathname, currentPathname]);
+  if (pathname && pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setReplOutputs({});
+    setCommandIdCounters({});
+    setExecResults({});
+  }
 
   const writeFile = useCallback(
     (updatedFiles: Record<Filename, string>) => {

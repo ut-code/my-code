@@ -4,7 +4,7 @@ import { getDrizzle } from "./drizzle";
 import { chat, diff, message, section } from "@/schema/chat";
 import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
 import { getPagesList, LangId, PagePath, PageSlug, SectionId } from "./docs";
 
@@ -31,7 +31,6 @@ export function cacheKeyForChat(chatId: string) {
 // nextjsのキャッシュのrevalidateはRouteHandlerではなくServerActionから呼ばないと正しく動作しないらしい。
 // https://github.com/vercel/next.js/issues/69064
 // そのためlib/以下の関数では直接revalidateChatを呼ばず、ServerActionの関数から呼ぶようにする。
-// Nextjs 16 に更新したらこれをupdateTag()で置き換える。
 export async function revalidateChat(
   chatId: string,
   userId: string,
@@ -41,8 +40,8 @@ export async function revalidateChat(
     const [lang, page] = pagePath.split("/") as [LangId, PageSlug];
     pagePath = { lang, page };
   }
-  revalidateTag(cacheKeyForChat(chatId));
-  revalidateTag(cacheKeyForPage(pagePath, userId));
+  updateTag(cacheKeyForChat(chatId));
+  updateTag(cacheKeyForPage(pagePath, userId));
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
     await cache.delete(cacheKeyForChat(chatId));
@@ -283,7 +282,7 @@ export async function migrateChatUser(oldUserId: string, newUserId: string) {
   const pagesList = await getPagesList();
   for (const lang of pagesList) {
     for (const page of lang.pages) {
-      revalidateTag(
+      updateTag(
         cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
       );
     }

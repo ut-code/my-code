@@ -6,7 +6,7 @@ import {
 } from "@/lib/chatHistory";
 import { getMarkdownSections, getPagesList } from "@/lib/docs";
 import { ChatAreaContainer, ChatAreaContent } from "./chatArea";
-import { unstable_cacheLife, unstable_cacheTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
 
 export default async function ChatPage({
@@ -56,8 +56,8 @@ export default async function ChatPage({
 
 async function getChatOneFromCache(chatId: string, userId?: string) {
   "use cache";
-  unstable_cacheLife("days");
-  unstable_cacheTag(cacheKeyForChat(chatId));
+  cacheLife("days");
+  cacheTag(cacheKeyForChat(chatId));
 
   if (!userId) {
     return null;

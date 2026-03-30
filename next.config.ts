@@ -11,9 +11,6 @@ const nextConfig: NextConfig = {
   experimental: {
     useCache: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -45,7 +42,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config) => {
     config.plugins.push(
       new PyodidePlugin({
         // public/ 以下に書き出すと404

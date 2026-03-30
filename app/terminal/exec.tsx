@@ -77,8 +77,8 @@ export function ExecFile(props: ExecProps) {
   >("idle");
   useEffect(() => {
     if (executionState === "triggered" && ready) {
-      setExecutionState("executing");
       (async () => {
+        setExecutionState("executing");
         clearTerminal(terminalInstanceRef.current!);
         terminalInstanceRef.current!.write(systemMessageColor("実行中です..."));
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
