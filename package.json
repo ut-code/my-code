@@ -52,7 +52,6 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@pyodide/webpack-plugin": "^1.4.0",
     "@tailwindcss/postcss": "^4",
     "@types/js-yaml": "^4.0.9",
