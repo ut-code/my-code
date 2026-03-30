@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, RefObject, useEffect, useRef } from "react";
+import { ReactNode, useEffect } from "react";
 import { RuntimeContext } from "./interface";
 import { RuntimeLang } from "./languages";
 import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
@@ -12,14 +12,14 @@ import { WorkerProvider } from "./worker/runtime";
 
 export function useRuntime(language: RuntimeLang): RuntimeContext {
   const runtimes = useRuntimeAll();
-  const runtime = runtimes.current[language];
+  const runtime = runtimes[language];
   const { init } = runtime;
   useEffect(() => {
     init?.();
   }, [init]);
   return runtime;
 }
-export function useRuntimeAll(): RefObject<Record<RuntimeLang, RuntimeContext>> {
+export function useRuntimeAll(): Record<RuntimeLang, RuntimeContext> {
   // すべての言語のcontextをインスタンス化
   const pyodide = usePyodide();
   const ruby = useRuby();
@@ -28,16 +28,15 @@ export function useRuntimeAll(): RefObject<Record<RuntimeLang, RuntimeContext>> 
   const wandboxCpp = useWandbox("cpp");
   const wandboxRust = useWandbox("rust");
 
-  const runtimes = useRef<Record<RuntimeLang, RuntimeContext>>({} as never);
-  runtimes.current.python = pyodide;
-  runtimes.current.ruby = ruby;
-  runtimes.current.javascript = jsEval;
-  runtimes.current.typescript = typescript;
-  runtimes.current.cpp = wandboxCpp;
-  runtimes.current.rust = wandboxRust;
-
   // initはしない。呼び出し側でする必要がある
-  return runtimes;
+  return {
+    python: pyodide,
+    ruby: ruby,
+    javascript: jsEval,
+    typescript: typescript,
+    cpp: wandboxCpp,
+    rust: wandboxRust,
+  };
 }
 export function RuntimeProvider({ children }: { children: ReactNode }) {
   return (

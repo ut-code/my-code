@@ -2,7 +2,7 @@
 
 import { Heading } from "@/markdown/heading";
 import "mocha/mocha.css";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
 import { ReplTerminal } from "./repl";
 import { EditorComponent } from "./editor";
@@ -202,7 +202,11 @@ function AnsiColorSample() {
 }
 
 function MochaTest() {
-  const runtimeRef = useRuntimeAll();
+  const runtimeAll = useRuntimeAll();
+  const runtimeRef = useRef(runtimeAll);
+  for (const lang of Object.keys(runtimeAll) as RuntimeLang[]) {
+    runtimeRef.current[lang] = runtimeAll[lang];
+  }
 
   const [searchParams, setSearchParams] = useState<string>("");
   useEffect(() => {

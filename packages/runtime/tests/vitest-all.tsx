@@ -14,8 +14,9 @@ const RuntimeLoader = ({
 }: {
   runtimeRef: RefObject<Record<RuntimeLang, RuntimeContext> | null>;
 }) => {
-  const runtimes = useRuntimeAll();
-  runtimeRef.current = runtimes.current;
+  const runtimeAll = useRuntimeAll();
+  // eslint-disable-next-line react-hooks/refs
+  runtimeRef.current = runtimeAll;
   return null;
 };
 
