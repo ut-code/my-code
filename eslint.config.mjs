@@ -6,11 +6,11 @@ const eslintConfig = [
   {
     ignores: [
       ".next/**",
+      ".open-next/**",
+      ".wrangler/**",
       "node_modules/**",
       "public/**",
       "cloudflare-env.d.ts",
-      "packages/runtime/node_modules/**",
-      "packages/runtime/dist/**",
     ],
   },
   ...nextCoreWebVitals,
@@ -27,10 +27,6 @@ const eslintConfig = [
           ignoreRestSiblings: true,
         },
       ],
-      // react-hooks/refs と react-hooks/set-state-in-effect は Next.js 16 で追加された新しいルールで、
-      // 既存のコードパターンと相性が悪いため無効化する
-      "react-hooks/refs": "off",
-      "react-hooks/set-state-in-effect": "off",
     },
   },
 ];

@@ -5,9 +5,10 @@ import {
   tomorrow,
   tomorrowNight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import { LangConstants } from "@my-code/runtime/languages";
 import clsx from "clsx";
+import { useIsClient } from "@/lib/clientOnly";
 
 // SyntaxHighlighterはファイルサイズがでかいので & HydrationErrorを起こすので、SSRを無効化する
 const SyntaxHighlighter = lazy(() => {
@@ -24,11 +25,8 @@ export function StyledSyntaxHighlighter(props: {
 }) {
   const theme = useChangeTheme();
   const codetheme = theme === "tomorrow" ? tomorrow : tomorrowNight;
-  const [initHighlighter, setInitHighlighter] = useState(false);
-  useEffect(() => {
-    setInitHighlighter(true);
-  }, []);
-  return initHighlighter ? (
+  const isClient = useIsClient();
+  return isClient ? (
     <Suspense fallback={<FallbackPre>{props.children}</FallbackPre>}>
       <SyntaxHighlighter
         language={props.language.rsh}

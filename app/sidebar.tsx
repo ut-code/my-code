@@ -15,7 +15,6 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import clsx from "clsx";
@@ -100,22 +99,17 @@ export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
 
   // 目次の開閉状態
   const [detailsOpen, setDetailsOpen] = useState<boolean[]>([]);
-  const currentLangIndex = pagesList.findIndex(
-    (group) => currentLang === group.id
-  );
-  useEffect(() => {
-    // 表示しているグループが変わったときに現在のグループのdetailsを開く
-    if (currentLangIndex !== -1) {
-      setDetailsOpen((detailsOpen) => {
-        const newDetailsOpen = [...detailsOpen];
-        while (newDetailsOpen.length <= currentLangIndex) {
-          newDetailsOpen.push(false);
-        }
-        newDetailsOpen[currentLangIndex] = true;
-        return newDetailsOpen;
-      });
-    }
-  }, [currentLangIndex]);
+  const [prevLangIndex, setPrevLangIndex] = useState<number>(-1);
+  const langIndex = pagesList.findIndex((group) => currentLang === group.id);
+  // 表示しているグループが変わったときに現在のグループのdetailsを開く
+  if (prevLangIndex !== langIndex) {
+    setPrevLangIndex(langIndex);
+    setDetailsOpen((detailsOpen) => {
+      const newDetailsOpen = [...detailsOpen];
+      newDetailsOpen[langIndex] = true;
+      return newDetailsOpen;
+    });
+  }
 
   return (
     <div className="bg-base-200 h-full w-sidebar flex flex-col relative">

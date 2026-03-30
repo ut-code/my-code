@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { ChatForm } from "./chatForm";
 import { StyledMarkdown } from "@/markdown/markdown";
 import { useSidebarMdContext } from "@/sidebar";
@@ -32,11 +32,41 @@ export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
   const { splitMdContent, pageEntry, path, chatHistories } = props;
 
-  const initDynamicMdContent = useCallback(() => {
+  const [sectionInView, setSectionInView] = useState<boolean[]>([]);
+  const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
+  useEffect(() => {
+    const handleScroll = () => {
+      setSectionInView((sectionInView) => {
+        sectionInView = sectionInView.slice(); // Reactの変更検知のために新しい配列を作成
+        for (
+          let i = 0;
+          i < sectionRefs.current.length || i < sectionInView.length;
+          i++
+        ) {
+          if (sectionRefs.current.at(i)) {
+            const rect = sectionRefs.current.at(i)!.getBoundingClientRect();
+            sectionInView[i] =
+              rect.top < window.innerHeight * 0.9 &&
+              rect.bottom >= window.innerHeight * 0.1;
+          } else {
+            sectionInView[i] = false;
+          }
+        }
+        return sectionInView;
+      });
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const dynamicMdContent = useMemo(() => {
     const newContent: DynamicMarkdownSection[] = splitMdContent.map(
-      (section) => ({
+      (section, i) => ({
         ...section,
-        inView: false,
+        inView: sectionInView[i],
         replacedContent: section.rawContent,
         replacedRange: [],
       })
@@ -94,54 +124,13 @@ export function PageContent(props: PageContentProps) {
     }
 
     return newContent;
-  }, [splitMdContent, chatHistories]);
-
-  // SSR用のローカルstate
-  const [dynamicMdContent, setDynamicMdContent] = useState<
-    DynamicMarkdownSection[]
-  >(() => initDynamicMdContent());
+  }, [splitMdContent, chatHistories, sectionInView]);
 
   useEffect(() => {
     // props.splitMdContentが変わったとき, チャットのdiffが変わった時に
-    // ローカルstateとcontextの両方を更新
-    const newContent = initDynamicMdContent();
-    setDynamicMdContent(newContent);
-    setSidebarMdContent(path, newContent);
-  }, [initDynamicMdContent, path, setSidebarMdContent]);
-
-  const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
-  // sectionRefsの長さをsplitMdContentに合わせる
-  while (sectionRefs.current.length < props.splitMdContent.length) {
-    sectionRefs.current.push(null);
-  }
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const updateContent = (
-        prevDynamicMdContent: DynamicMarkdownSection[]
-      ) => {
-        const dynMdContent = prevDynamicMdContent.slice(); // Reactの変更検知のために新しい配列を作成
-        for (let i = 0; i < sectionRefs.current.length; i++) {
-          if (sectionRefs.current.at(i) && dynMdContent.at(i)) {
-            const rect = sectionRefs.current.at(i)!.getBoundingClientRect();
-            dynMdContent.at(i)!.inView =
-              rect.top < window.innerHeight * 0.9 &&
-              rect.bottom >= window.innerHeight * 0.1;
-          }
-        }
-        return dynMdContent;
-      };
-
-      // ローカルstateとcontextの両方を更新
-      setDynamicMdContent(updateContent);
-      setSidebarMdContent(path, updateContent);
-    };
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [setSidebarMdContent, path]);
+    // sidebarのcontextを更新
+    setSidebarMdContent(path, dynamicMdContent);
+  }, [dynamicMdContent, path, setSidebarMdContent]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
