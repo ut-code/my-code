@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function AutoAnonymousLogin() {
@@ -18,6 +18,7 @@ export function AutoAnonymousLogin() {
 export function AccountMenu() {
   const { data: session, isPending } = authClient.useSession();
   const pathname = usePathname();
+  const router = useRouter();
 
   const signout = () => {
     if (
@@ -27,7 +28,7 @@ export function AccountMenu() {
     ) {
       authClient.signOut({
         fetchOptions: {
-          onSuccess: () => window.location.reload(),
+          onSuccess: () => router.refresh(),
         },
       });
     }
@@ -36,7 +37,7 @@ export function AccountMenu() {
     if (window.confirm("チャット履歴は削除され、アクセスできなくなります。")) {
       authClient.signOut({
         fetchOptions: {
-          onSuccess: () => window.location.reload(),
+          onSuccess: () => router.refresh(),
         },
       });
     }
@@ -102,7 +103,7 @@ export function AccountMenu() {
             onClick={() =>
               authClient.signIn.social({
                 provider: "github",
-                callbackURL: pathname,
+                callbackURL: `/clear-cache?redirect=${encodeURIComponent(pathname)}`,
               })
             }
           >
@@ -114,7 +115,7 @@ export function AccountMenu() {
             onClick={() =>
               authClient.signIn.social({
                 provider: "google",
-                callbackURL: pathname,
+                callbackURL: `/clear-cache?redirect=${encodeURIComponent(pathname)}`,
               })
             }
           >

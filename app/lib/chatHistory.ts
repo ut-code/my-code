@@ -6,7 +6,7 @@ import { and, asc, eq, exists } from "drizzle-orm";
 import { Auth } from "better-auth";
 import { updateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
-import { getPagesList, LangId, PagePath, PageSlug, SectionId } from "./docs";
+import { LangId, PagePath, PageSlug, SectionId } from "./docs";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -279,22 +279,4 @@ export async function migrateChatUser(oldUserId: string, newUserId: string) {
     .update(chat)
     .set({ userId: newUserId })
     .where(eq(chat.userId, oldUserId));
-  const pagesList = await getPagesList();
-  for (const lang of pagesList) {
-    for (const page of lang.pages) {
-      updateTag(
-        cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
-      );
-    }
-  }
-  if (isCloudflare()) {
-    const cache = await caches.open("chatHistory");
-    for (const lang of pagesList) {
-      for (const page of lang.pages) {
-        await cache.delete(
-          cacheKeyForPage({ lang: lang.id, page: page.slug }, newUserId)
-        );
-      }
-    }
-  }
 }
