@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { invalidateCurrentUserChatCache } from "@/actions/invalidateUserCache";
 
@@ -18,17 +18,7 @@ export function AutoAnonymousLogin() {
 
 export function AccountMenu() {
   const { data: session, isPending } = authClient.useSession();
-  const pathname = usePathname();
   const router = useRouter();
-
-  useEffect(() => {
-    if (!isPending && session && !session.user.isAnonymous) {
-      if (sessionStorage.getItem("pendingCacheInvalidation") === "true") {
-        sessionStorage.removeItem("pendingCacheInvalidation");
-        invalidateCurrentUserChatCache().then(() => router.refresh());
-      }
-    }
-  }, [isPending, session, router]);
 
   const signout = () => {
     if (
@@ -110,26 +100,34 @@ export function AccountMenu() {
         </li>
         <li>
           <button
-            onClick={() => {
-              sessionStorage.setItem("pendingCacheInvalidation", "true");
+            onClick={() =>
               authClient.signIn.social({
                 provider: "github",
-                callbackURL: pathname,
-              });
-            }}
+                fetchOptions: {
+                  onSuccess: async () => {
+                    await invalidateCurrentUserChatCache();
+                    router.refresh();
+                  },
+                },
+              })
+            }
           >
             GitHub でログイン
           </button>
         </li>
         <li>
           <button
-            onClick={() => {
-              sessionStorage.setItem("pendingCacheInvalidation", "true");
+            onClick={() =>
               authClient.signIn.social({
                 provider: "google",
-                callbackURL: pathname,
-              });
-            }}
+                fetchOptions: {
+                  onSuccess: async () => {
+                    await invalidateCurrentUserChatCache();
+                    router.refresh();
+                  },
+                },
+              })
+            }
           >
             Google でログイン
           </button>
