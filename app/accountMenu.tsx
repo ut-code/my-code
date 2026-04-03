@@ -1,8 +1,9 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { invalidateCurrentUserChatCache } from "@/actions/invalidateUserCache";
 
 export function AutoAnonymousLogin() {
   const { data: session, isPending } = authClient.useSession();
@@ -18,6 +19,16 @@ export function AutoAnonymousLogin() {
 export function AccountMenu() {
   const { data: session, isPending } = authClient.useSession();
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && session && !session.user.isAnonymous) {
+      if (sessionStorage.getItem("pendingCacheInvalidation") === "true") {
+        sessionStorage.removeItem("pendingCacheInvalidation");
+        invalidateCurrentUserChatCache().then(() => router.refresh());
+      }
+    }
+  }, [isPending, session, router]);
 
   const signout = () => {
     if (
@@ -27,7 +38,7 @@ export function AccountMenu() {
     ) {
       authClient.signOut({
         fetchOptions: {
-          onSuccess: () => window.location.reload(),
+          onSuccess: () => router.refresh(),
         },
       });
     }
@@ -36,7 +47,7 @@ export function AccountMenu() {
     if (window.confirm("チャット履歴は削除され、アクセスできなくなります。")) {
       authClient.signOut({
         fetchOptions: {
-          onSuccess: () => window.location.reload(),
+          onSuccess: () => router.refresh(),
         },
       });
     }
@@ -99,24 +110,26 @@ export function AccountMenu() {
         </li>
         <li>
           <button
-            onClick={() =>
+            onClick={() => {
+              sessionStorage.setItem("pendingCacheInvalidation", "true");
               authClient.signIn.social({
                 provider: "github",
                 callbackURL: pathname,
-              })
-            }
+              });
+            }}
           >
             GitHub でログイン
           </button>
         </li>
         <li>
           <button
-            onClick={() =>
+            onClick={() => {
+              sessionStorage.setItem("pendingCacheInvalidation", "true");
               authClient.signIn.social({
                 provider: "google",
                 callbackURL: pathname,
-              })
-            }
+              });
+            }}
           >
             Google でログイン
           </button>
