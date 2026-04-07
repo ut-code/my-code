@@ -57,13 +57,11 @@ const nextConfig: NextConfig = {
         ...config.optimization.splitChunks.cacheGroups,
         sentry: {
           test: /@sentry/,
-          name: "sentry",
           priority: 10,
           enforce: true,
         },
         opentelemetry: {
           test: /(?<!compiled\/@?)opentelemetry/,
-          name: "opentelemetry",
           priority: 10,
           enforce: true,
         },
