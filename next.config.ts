@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { PyodidePlugin } from "@pyodide/webpack-plugin";
 import { version as pyodideVersion } from "pyodide/package.json";
+import { withSentryConfig } from "@sentry/nextjs";
 
 initOpenNextCloudflareForDev();
 
@@ -144,4 +145,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: "bugsinkhasnoorgs",
+  project: "ignoredfornow",
+  sentryUrl: "https://bugsink.utcode.net",
+  debug: true, // important for debugging
+
+  // Use a fixed route (recommended)
+  tunnelRoute: "/monitoring",
+  // Pass the auth token
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  // Only print logs for uploading source maps in CI
+  // silent: !process.env.CI,
+});

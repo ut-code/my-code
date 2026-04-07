@@ -2,6 +2,8 @@
 
 import clsx from "clsx";
 import { ChatAreaContainer } from "./chat/[chatId]/chatArea";
+import { useEffect } from "react";
+import { captureException } from "@sentry/nextjs";
 
 export default function Error({
   error,
@@ -10,6 +12,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    captureException(error);
+  }, [error]);
+
   return (
     <ChatAreaContainer chatId={"error"}>
       <p>ページの読み込み中にエラーが発生しました。</p>

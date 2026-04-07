@@ -53,6 +53,15 @@ export default function RuntimeTestPage() {
       <Heading level={2}>Xterm.js Colors</Heading>
       <AnsiColorSample />
 
+      <button
+        className="btn mt-4"
+        onClick={() => {
+          throw new Error("Sentry Test Error");
+        }}
+      >
+        Sentry Test Error
+      </button>
+
       <Heading level={2}>自動テスト</Heading>
       <MochaTest />
     </div>
