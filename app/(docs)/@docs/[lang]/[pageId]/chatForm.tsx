@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, FormEvent, useEffect, useRef, useCallback, useMemo } from "react";
+import {
+  useState,
+  FormEvent,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 // import useSWR from "swr";
 // import {
 //   getQuestionExample,
@@ -13,6 +20,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
 import { revalidateChatAction } from "@/actions/revalidateChat";
+import { captureException } from "@sentry/nextjs";
 
 interface ChatFormProps {
   path: PagePath;
@@ -84,7 +92,6 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
   }, [exampleChoice]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-
     let userQuestion = inputValue;
     if (!userQuestion && exampleData.length > 0 && exampleChoice) {
       // 質問が空欄なら、質問例を使用
@@ -114,7 +121,8 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
           execResults,
         }),
       });
-    } catch {
+    } catch (e) {
+      captureException(e);
       setErrorMessage("AIへの接続に失敗しました");
       setIsLoading(false);
       return;
@@ -184,12 +192,14 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
                 streamingChatContext.finishStreaming();
                 router.refresh();
               }
-            } catch {
+            } catch (e) {
+              captureException(e);
               // ignore JSON parse errors
             }
           }
         }
       } catch (err) {
+        captureException(err);
         console.error("Stream reading failed:", err);
         // ナビゲーション後のエラーはストリーミングを終了してローディングを止める
         if (!navigated) {
