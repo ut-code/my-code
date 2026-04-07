@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.plugins.push(
       new PyodidePlugin({
         // public/ 以下に書き出すと404
@@ -52,6 +52,23 @@ const nextConfig: NextConfig = {
         outDirectory: `static/pyodide/v${pyodideVersion}`,
       })
     );
+    if (isServer) {
+      config.optimization.splitChunks.cacheGroups = {
+        ...config.optimization.splitChunks.cacheGroups,
+        sentry: {
+          test: /@sentry/,
+          name: "sentry",
+          priority: 10,
+          enforce: true,
+        },
+        opentelemetry: {
+          test: /(?<!compiled\/@?)opentelemetry/,
+          name: "opentelemetry",
+          priority: 10,
+          enforce: true,
+        },
+      };
+    }
     // import hoge from "./file?raw" でfileの中身を文字列としてインポート
     for (const rule of config.module.rules) {
       if (rule.resourceQuery instanceof RegExp) {
