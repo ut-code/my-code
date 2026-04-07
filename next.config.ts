@@ -15,7 +15,18 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  serverExternalPackages: ["@prisma/client", ".prisma/client"],
+  serverExternalPackages: [
+    "@prisma/client",
+    ".prisma/client",
+    // 普通にimportするとこれが4回バンドルされてcloudflareの3MB制限を超えてしまう
+    "@sentry/nextjs",
+  ],
+  outputFileTracingIncludes: {
+    // sentryのバージョン違うけど、serverExternalPackagesに@sentry/nextjsを追加したら
+    // https://github.com/getsentry/sentry-javascript/issues/14931#issuecomment-3641871022
+    // と同じエラーが出たので、そこに書かれていたのと同じでっちあげをしてみる
+    "*": ["node_modules/@sentry/nextjs/build/**/*"],
+  },
   async headers() {
     return [
       {
@@ -43,7 +54,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config) => {
     config.plugins.push(
       new PyodidePlugin({
         // public/ 以下に書き出すと404
@@ -52,21 +63,6 @@ const nextConfig: NextConfig = {
         outDirectory: `static/pyodide/v${pyodideVersion}`,
       })
     );
-    if (isServer) {
-      config.optimization.splitChunks.cacheGroups = {
-        ...config.optimization.splitChunks.cacheGroups,
-        sentry: {
-          test: /@sentry/,
-          priority: 10,
-          enforce: true,
-        },
-        opentelemetry: {
-          test: /(?<!compiled\/@?)opentelemetry/,
-          priority: 10,
-          enforce: true,
-        },
-      };
-    }
     // import hoge from "./file?raw" でfileの中身を文字列としてインポート
     for (const rule of config.module.rules) {
       if (rule.resourceQuery instanceof RegExp) {
