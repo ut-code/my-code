@@ -76,6 +76,7 @@
     "tsx": "^4.20.6",
     "typescript": "5.9.3",
     "unified": "^11.0.5",
+    "webpack-license-plugin": "^4.5.1",
     "wrangler": "^4.27.0"
   }
 }
