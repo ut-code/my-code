@@ -3,7 +3,7 @@
 import { captureException } from "@sentry/nextjs";
 import clsx from "clsx";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function ErrorPage({
   error,
@@ -12,8 +12,9 @@ export default function ErrorPage({
   error: unknown;
   reset: () => void;
 }) {
+  const [eventId, setEventId] = useState<string>();
   useEffect(() => {
-    captureException(error);
+    setEventId(captureException(error));
   }, [error]);
 
   return (
@@ -32,6 +33,9 @@ export default function ErrorPage({
         <p className="mt-2 text-sm text-base-content/50">
           Digest: {(error as { digest: string }).digest}
         </p>
+      )}
+      {eventId && (
+        <p className="mt-2 text-sm text-base-content/50">eventID: {eventId}</p>
       )}
       <div className="divider w-full self-auto!" />
       <div className="flex flex-row gap-4">

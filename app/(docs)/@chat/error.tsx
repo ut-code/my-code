@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { ChatAreaContainer } from "./chat/[chatId]/chatArea";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { captureException } from "@sentry/nextjs";
 
 export default function Error({
@@ -12,8 +12,9 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [eventId, setEventId] = useState<string>();
   useEffect(() => {
-    captureException(error);
+    setEventId(captureException(error));
   }, [error]);
 
   return (
@@ -31,6 +32,9 @@ export default function Error({
         <p className="mt-2 text-sm text-base-content/50">
           Digest: {error.digest}
         </p>
+      )}
+      {eventId && (
+        <p className="mt-2 text-sm text-base-content/50">eventID: {eventId}</p>
       )}
     </ChatAreaContainer>
   );
