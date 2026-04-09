@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content p-10 z-30">
@@ -41,6 +43,26 @@ export function Footer() {
           target="_blank"
         >
           公式 𝕏 アカウント
+        </a>
+      </nav>
+      <nav>
+        <h6 className="footer-title normal-case">my.code(); について</h6>
+        <Link href="/about/runtime" className="link link-hover">
+          コード実行環境について
+        </Link>
+        <Link href="/about/ai" className="link link-hover">
+          AI質問機能について
+        </Link>
+        <Link href="/about/license" className="link link-hover">
+          ライセンス
+        </Link>
+        <a
+          className="link link-hover"
+          href="https://forms.gle/XXXXXXXXXXXXXXXX"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          お問い合わせ
         </a>
       </nav>
     </footer>

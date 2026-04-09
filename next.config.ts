@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { PyodidePlugin } from "@pyodide/webpack-plugin";
 import { version as pyodideVersion } from "pyodide/package.json";
+import LicensePlugin from "webpack-license-plugin";
 
 initOpenNextCloudflareForDev();
 
@@ -42,7 +43,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.plugins.push(
       new PyodidePlugin({
         // public/ 以下に書き出すと404
@@ -68,6 +69,12 @@ const nextConfig: NextConfig = {
       resourceQuery: /raw/,
       type: "asset/source",
     });
+    // クライアントビルドのみサードパーティライセンスを /_next/static/oss-licenses.json に出力
+    if (!isServer) {
+      config.plugins.push(
+        new LicensePlugin({ outputFilename: "static/oss-licenses.json" })
+      );
+    }
     return config;
   },
   async redirects() {
