@@ -29,23 +29,6 @@ export function Footer() {
         <p>Copyright © 2026 ut.code();</p>
       </aside>
       <nav>
-        <h6 className="footer-title normal-case">ut.code(); について</h6>
-        <a
-          className="link link-hover"
-          href="https://utcode.net/"
-          target="_blank"
-        >
-          公式ウェブサイト
-        </a>
-        <a
-          className="link link-hover"
-          href="https://twitter.com/utokyo_code"
-          target="_blank"
-        >
-          公式 𝕏 アカウント
-        </a>
-      </nav>
-      <nav>
         <h6 className="footer-title normal-case">my.code(); について</h6>
         <Link href="/about/runtime" className="link link-hover">
           コード実行環境について
@@ -63,6 +46,23 @@ export function Footer() {
           rel="noopener noreferrer"
         >
           お問い合わせ
+        </a>
+      </nav>
+      <nav>
+        <h6 className="footer-title normal-case">ut.code(); について</h6>
+        <a
+          className="link link-hover"
+          href="https://utcode.net/"
+          target="_blank"
+        >
+          公式ウェブサイト
+        </a>
+        <a
+          className="link link-hover"
+          href="https://twitter.com/utokyo_code"
+          target="_blank"
+        >
+          公式 𝕏 アカウント
         </a>
       </nav>
     </footer>
