@@ -89,7 +89,9 @@ const nextConfig: NextConfig = {
           outputFilename: "static/oss-licenses.json",
           includeNoticeText: true,
           excludedPackageTest: (packageName /*, version*/) => {
-            return packageName.startsWith("@my-code");
+            return (
+              packageName.startsWith("@my-code") || packageName === "my-code"
+            );
           },
           licenseOverrides: {
             "@better-auth/core@1.4.20": "MIT",
