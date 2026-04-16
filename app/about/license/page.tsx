@@ -1,11 +1,11 @@
 import { Metadata } from "next";
-import { Heading } from "@/markdown/heading";
-import licenseText from "../../../LICENSE?raw";
+import licenseText from "@/../LICENSE?raw";
 import { LicenseEntry, ThirdPartyLicenses } from "./ThirdPartyLicenses";
 import { isCloudflare } from "@/lib/detectCloudflare";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { StyledMarkdown } from "@/markdown/markdown";
 
 export const metadata: Metadata = {
   title: "ライセンス",
@@ -13,13 +13,28 @@ export const metadata: Metadata = {
     "my.code(); のライセンスおよび使用しているサードパーティライブラリのライセンス情報です。",
 };
 
+const content = `
+# ライセンス
+
+## my.code(); のライセンス
+
+my.code(); のソースコードは MIT ライセンスのもとで公開されています。
+
+\`\`\`
+${licenseText}
+\`\`\`
+
+## サードパーティライブラリのライセンス
+
+my.code(); は以下のオープンソースライブラリを使用しています。
+`;
+
 export default async function LicensePage() {
   let licenses: LicenseEntry[];
   if (isCloudflare()) {
     const cfAssets = getCloudflareContext().env.ASSETS;
     const res = await cfAssets!.fetch(
-      `https://assets.local/_next/static/oss-licenses.json`,
-      { cache: "no-cache" }
+      `https://assets.local/_next/static/oss-licenses.json`
     );
     licenses = await res.json();
   } else {
@@ -38,20 +53,7 @@ export default async function LicensePage() {
 
   return (
     <div className="p-4 pb-16 w-full max-w-docs mx-auto">
-      <Heading level={1}>ライセンス</Heading>
-
-      <Heading level={2}>my.code(); のライセンス</Heading>
-      <p className="my-4 opacity-80">
-        my.code(); のソースコードは MIT ライセンスのもとで公開されています。
-      </p>
-      <pre className="bg-base-200 rounded-box p-4 text-sm whitespace-pre-wrap overflow-x-auto my-4">
-        {licenseText}
-      </pre>
-
-      <Heading level={2}>サードパーティライブラリのライセンス</Heading>
-      <p className="my-4 opacity-80">
-        my.code(); は以下のオープンソースライブラリを使用しています。
-      </p>
+      <StyledMarkdown content={content} />
       <ThirdPartyLicenses licenses={licenses} />
     </div>
   );
