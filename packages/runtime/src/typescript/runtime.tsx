@@ -9,9 +9,16 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
+import {
+  ReplOutput,
+  RuntimeContext,
+  RuntimeErrorHandler,
+  RuntimeInfo,
+  UpdatedFile,
+} from "../interface";
 
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],
@@ -20,15 +27,23 @@ export const compilerOptions: CompilerOptions = {
 };
 
 const TypeScriptContext = createContext<{
-  init: () => void;
+  init: (onError?: RuntimeErrorHandler) => void;
+  reportError: (error: unknown) => void;
   tsEnv: VirtualTypeScriptEnvironment | null;
   tsVersion?: string;
-}>({ init: () => undefined, tsEnv: null });
+}>({ init: () => undefined, reportError: () => undefined, tsEnv: null });
 export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
   const [tsVersion, setTSVersion] = useState<string | undefined>(undefined);
   const [doInit, setDoInit] = useState(false);
-  const init = useCallback(() => setDoInit(true), []);
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+  const init = useCallback((onError?: RuntimeErrorHandler) => {
+    onErrorRef.current = onError;
+    setDoInit(true);
+  }, []);
+  const reportError = useCallback((error: unknown) => {
+    onErrorRef.current?.(error);
+  }, []);
   useEffect(() => {
     // useEffectはサーバーサイドでは実行されないが、
     // typeof window !== "undefined" でガードしないとなぜかesbuildが"typescript"を
@@ -36,59 +51,70 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
     if (doInit && tsEnv === null && typeof window !== "undefined") {
       const abortController = new AbortController();
       (async () => {
-        const ts = await import("typescript");
-        const vfs = await import("@typescript/vfs");
-        const system = vfs.createSystem(new Map());
-        const libFiles = vfs.knownLibFilesForCompilerOptions(
-          compilerOptions,
-          ts
-        );
-        const libFileContents = await Promise.all(
-          libFiles.map(async (libFile) => {
-            const response = await fetch(
-              `/typescript/${ts.version}/${libFile}`,
-              { signal: abortController.signal }
-            );
-            if (response.ok) {
-              return response.text();
-            } else {
-              return undefined;
+        try {
+          const ts = await import("typescript");
+          const vfs = await import("@typescript/vfs");
+          const system = vfs.createSystem(new Map());
+          const libFiles = vfs.knownLibFilesForCompilerOptions(
+            compilerOptions,
+            ts
+          );
+          const libFileContents = await Promise.all(
+            libFiles.map(async (libFile) => {
+              const response = await fetch(
+                `/typescript/${ts.version}/${libFile}`,
+                { signal: abortController.signal }
+              );
+              if (response.ok) {
+                return response.text();
+              } else {
+                return undefined;
+              }
+            })
+          );
+          libFiles.forEach((libFile, index) => {
+            const content = libFileContents[index];
+            if (content !== undefined) {
+              system.writeFile(`/${libFile}`, content);
             }
-          })
-        );
-        libFiles.forEach((libFile, index) => {
-          const content = libFileContents[index];
-          if (content !== undefined) {
-            system.writeFile(`/${libFile}`, content);
+          });
+          const env = vfs.createVirtualTypeScriptEnvironment(
+            system,
+            [],
+            ts,
+            compilerOptions
+          );
+          setTSEnv(env);
+          setTSVersion(ts.version);
+        } catch (error) {
+          if (
+            error instanceof DOMException &&
+            error.name === "AbortError"
+          ) {
+            return;
           }
-        });
-        const env = vfs.createVirtualTypeScriptEnvironment(
-          system,
-          [],
-          ts,
-          compilerOptions
-        );
-        setTSEnv(env);
-        setTSVersion(ts.version);
+          reportError(error);
+        }
       })();
       return () => {
         abortController.abort();
       };
     }
-  }, [tsEnv, setTSEnv, doInit]);
+  }, [tsEnv, setTSEnv, doInit, reportError]);
   return (
-    <TypeScriptContext.Provider value={{ init, tsEnv, tsVersion }}>
+    <TypeScriptContext.Provider value={{ init, reportError, tsEnv, tsVersion }}>
       {children}
     </TypeScriptContext.Provider>
   );
 }
 
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
-  const { init: tsInit, tsEnv, tsVersion } = useContext(TypeScriptContext);
+  const { init: tsInit, reportError, tsEnv, tsVersion } =
+    useContext(TypeScriptContext);
   const { init: jsInit } = jsEval;
-  const init = useCallback(() => {
-    tsInit();
-    jsInit?.();
+  const init = useCallback((onError?: RuntimeErrorHandler) => {
+    tsInit(onError);
+    jsInit?.(onError);
   }, [tsInit, jsInit]);
 
   const runFiles = useCallback(
@@ -100,7 +126,8 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
       if (tsEnv === null || typeof window === "undefined") {
         onOutput({ type: "error", message: "TypeScript is not ready yet." });
         return;
-      } else {
+      }
+      try {
         for (const [filename, content] of Object.entries(files)) {
           tsEnv.createFile(filename, content);
         }
@@ -151,9 +178,15 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
           { ...files, ...emittedFiles },
           onOutput
         );
+      } catch (error) {
+        reportError(error);
+        onOutput({
+          type: "fatalError",
+          message: error instanceof Error ? error.message : String(error),
+        });
       }
     },
-    [tsEnv, jsEval]
+    [tsEnv, jsEval, reportError]
   );
 
   const runtimeInfo = useMemo<RuntimeInfo>(

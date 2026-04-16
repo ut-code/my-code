@@ -17,6 +17,7 @@ import { useEmbedContext } from "./embedContext";
 import { LangConstants } from "@my-code/runtime/languages";
 import clsx from "clsx";
 import { InlineCode } from "@/markdown/codeBlock";
+import { captureException } from "@sentry/nextjs";
 import {
   emptyMutex,
   ReplCommand,
@@ -38,6 +39,9 @@ export function writeOutput(
   switch (output.type) {
     case "error":
       term.writeln(chalk.red(message));
+      break;
+    case "fatalError":
+      term.writeln(chalk.bgRed.white(message));
       break;
     case "trace":
       term.writeln(chalk.blue.italic(message));
@@ -86,6 +90,13 @@ export function ReplTerminal({
       `Language ${language.originalLang} does not have a runtime environment.`
     );
   }
+  const handleRuntimeError = useCallback((error: unknown) => {
+    if (error instanceof Error) {
+      captureException(error);
+      return;
+    }
+    captureException(new Error(String(error)));
+  }, []);
 
   const {
     ready: runtimeReady,
@@ -95,7 +106,7 @@ export function ReplTerminal({
     checkSyntax,
     splitReplExamples,
     runtimeInfo,
-  } = useRuntime(language.runtime);
+  } = useRuntime(language.runtime, { onError: handleRuntimeError });
   const { tabSize, prompt, promptMore, returnPrefix } = language;
   if (!prompt) {
     console.warn(`prompt not defined for language: ${language}`);

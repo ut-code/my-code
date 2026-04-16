@@ -13,6 +13,7 @@ import { useEmbedContext } from "./embedContext";
 import clsx from "clsx";
 import { LangConstants } from "@my-code/runtime/languages";
 import { useRuntime } from "@my-code/runtime/context";
+import { captureException } from "@sentry/nextjs";
 import { MinMaxButton, Modal } from "./modal";
 
 interface ExecProps {
@@ -68,8 +69,15 @@ export function ExecFile(props: ExecProps) {
       `Language ${props.language.originalLang} does not have a runtime environment.`
     );
   }
+  const handleRuntimeError = useCallback((error: unknown) => {
+    if (error instanceof Error) {
+      captureException(error);
+      return;
+    }
+    captureException(new Error(String(error)));
+  }, []);
   const { ready, runFiles, getCommandlineStr, runtimeInfo, interrupt } =
-    useRuntime(props.language.runtime);
+    useRuntime(props.language.runtime, { onError: handleRuntimeError });
 
   // ユーザーがクリックした時(triggered) && ランタイムが準備できた時に、実際にinitCommandを実行する(executing)
   const [executionState, setExecutionState] = useState<

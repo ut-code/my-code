@@ -5,18 +5,27 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
 } from "react";
 import useSWR from "swr";
 import { compilerInfoFetcher, SelectedCompiler } from "./api";
 import { cppRunFiles, selectCppCompiler } from "./cpp";
 import { RuntimeLang } from "../languages";
 import { rustRunFiles, selectRustCompiler } from "./rust";
-import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
+import {
+  ReplOutput,
+  RuntimeContext,
+  RuntimeErrorHandler,
+  RuntimeInfo,
+  UpdatedFile,
+} from "../interface";
 
 type WandboxLang = "cpp" | "rust";
 
 interface IWandboxContext {
+  init: (onError?: RuntimeErrorHandler) => void;
   ready: boolean;
   getCommandlineStrWithLang: (
     lang: WandboxLang
@@ -34,10 +43,17 @@ interface IWandboxContext {
 const WandboxContext = createContext<IWandboxContext>(null!);
 
 export function WandboxProvider({ children }: { children: ReactNode }) {
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+  const init = useCallback((onError?: RuntimeErrorHandler) => {
+    onErrorRef.current = onError;
+  }, []);
   const { data: compilerList, error } = useSWR("list", compilerInfoFetcher);
-  if (error) {
-    console.error("Failed to fetch compiler list from Wandbox:", error);
-  }
+  useEffect(() => {
+    if (error) {
+      console.error("Failed to fetch compiler list from Wandbox:", error);
+      onErrorRef.current?.(error);
+    }
+  }, [error]);
 
   const ready = !!compilerList;
 
@@ -76,16 +92,29 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
           onOutput({ type: "error", message: "Wandbox is not ready yet." });
           return;
         }
-        switch (lang) {
-          case "cpp":
-            await cppRunFiles(selectedCompiler.cpp, files, filenames, onOutput);
-            break;
-          case "rust":
-            await rustRunFiles(selectedCompiler.rust, files, filenames, onOutput);
-            break;
-          default:
-            lang satisfies never;
-            throw new Error(`unsupported language: ${lang}`);
+        try {
+          switch (lang) {
+            case "cpp":
+              await cppRunFiles(selectedCompiler.cpp, files, filenames, onOutput);
+              break;
+            case "rust":
+              await rustRunFiles(
+                selectedCompiler.rust,
+                files,
+                filenames,
+                onOutput
+              );
+              break;
+            default:
+              lang satisfies never;
+              throw new Error(`unsupported language: ${lang}`);
+          }
+        } catch (error) {
+          onErrorRef.current?.(error);
+          onOutput({
+            type: "fatalError",
+            message: error instanceof Error ? error.message : String(error),
+          });
         }
       },
     [selectedCompiler]
@@ -94,6 +123,7 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
   return (
     <WandboxContext.Provider
       value={{
+        init,
         ready,
         getCommandlineStrWithLang,
         runFilesWithLang,
@@ -123,6 +153,7 @@ export function useWandbox(lang: WandboxLang): RuntimeContext {
   );
 
   return {
+    init: context.init,
     ready: context.ready,
     runFiles,
     getCommandlineStr,
