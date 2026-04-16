@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-interface LicenseEntry {
+export interface LicenseEntry {
   name: string;
   version: string;
   author?: string;
@@ -12,37 +12,8 @@ interface LicenseEntry {
   licenseText?: string;
 }
 
-export function ThirdPartyLicenses() {
-  const [licenses, setLicenses] = useState<LicenseEntry[] | null>(null);
-  const [error, setError] = useState(false);
+export function ThirdPartyLicenses({ licenses }: { licenses: LicenseEntry[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/_next/static/oss-licenses.json")
-      .then((res) => {
-        if (!res.ok) throw new Error("not found");
-        return res.json();
-      })
-      .then((data) => setLicenses(data))
-      .catch(() => setError(true));
-  }, []);
-
-  if (error) {
-    return (
-      <p className="opacity-60 text-sm">
-        ライセンス情報の読み込みに失敗しました。
-      </p>
-    );
-  }
-
-  if (!licenses) {
-    return (
-      <div className="flex items-center gap-2 opacity-60">
-        <span className="loading loading-spinner loading-sm" />
-        <span>読み込み中...</span>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-2">
