@@ -1,5 +1,3 @@
-"use client";
-
 // Markdownで指定される可能性のある言語名を列挙
 export type MarkdownLang =
   | "python"

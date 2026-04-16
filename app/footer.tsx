@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content p-10 z-30">
@@ -26,6 +28,25 @@ export function Footer() {
         </a>
         <p>Copyright © 2026 ut.code();</p>
       </aside>
+      <nav>
+        <h6 className="footer-title normal-case">my.code(); について</h6>
+        <Link href="/about/runtime" className="link link-hover">
+          コード実行環境について
+        </Link>
+        <Link href="/about/ai" className="link link-hover">
+          AI質問機能について
+        </Link>
+        <Link href="/about/license" className="link link-hover">
+          ライセンス
+        </Link>
+        <a
+          className="link link-hover"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfkM2LKhUDgCdY2fGntuv75O3jaWISwKuBIu9MW3h3UD1I3sw/viewform?usp=publish-editor"
+          target="_blank"
+        >
+          お問い合わせ
+        </a>
+      </nav>
       <nav>
         <h6 className="footer-title normal-case">ut.code(); について</h6>
         <a
