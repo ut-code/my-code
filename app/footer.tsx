@@ -41,9 +41,8 @@ export function Footer() {
         </Link>
         <a
           className="link link-hover"
-          href="https://forms.gle/XXXXXXXXXXXXXXXX"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfkM2LKhUDgCdY2fGntuv75O3jaWISwKuBIu9MW3h3UD1I3sw/viewform?usp=publish-editor"
           target="_blank"
-          rel="noopener noreferrer"
         >
           お問い合わせ
         </a>
