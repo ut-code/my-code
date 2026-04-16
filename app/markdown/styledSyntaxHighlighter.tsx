@@ -21,32 +21,47 @@ const SyntaxHighlighter = lazy(() => {
 
 export function StyledSyntaxHighlighter(props: {
   children: string;
+  className?: string;
   language: LangConstants;
 }) {
   const theme = useChangeTheme();
   const codetheme = theme === "tomorrow" ? tomorrow : tomorrowNight;
   const isClient = useIsClient();
   return isClient ? (
-    <Suspense fallback={<FallbackPre>{props.children}</FallbackPre>}>
+    <Suspense
+      fallback={
+        <FallbackPre className={props.className}>{props.children}</FallbackPre>
+      }
+    >
       <SyntaxHighlighter
-        language={props.language.rsh}
+        language={props.language.rsh ?? "text"}
         PreTag="div"
-        className="border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!"
+        className={clsx(
+          "border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!",
+          props.className
+        )}
         style={codetheme}
       >
         {props.children}
       </SyntaxHighlighter>
     </Suspense>
   ) : (
-    <FallbackPre>{props.children}</FallbackPre>
+    <FallbackPre className={props.className}>{props.children}</FallbackPre>
   );
 }
-function FallbackPre({ children }: { children: string }) {
+function FallbackPre({
+  children,
+  className,
+}: {
+  children: string;
+  className?: string;
+}) {
   return (
     <pre
       className={clsx(
         "border-2 border-current/20 mx-2 my-2 rounded-box p-4! bg-base-300! text-base-content!",
-        "w-full overflow-auto"
+        "w-full overflow-auto",
+        className
       )}
     >
       {children}
