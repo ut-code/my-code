@@ -27,6 +27,13 @@ import { useRuntime } from "@my-code/runtime/context";
 import { MinMaxButton, Modal } from "./modal";
 import { StopButtonContent } from "./exec";
 
+function handleRuntimeError(error: unknown) {
+  captureException(error);
+  window.alert(
+    "コード実行環境で予期せぬエラーが発生しました: \n" + String(error)
+  );
+}
+
 export function writeOutput(
   term: Terminal,
   output: ReplOutput,
@@ -88,13 +95,6 @@ export function ReplTerminal({
       `Language ${language.originalLang} does not have a runtime environment.`
     );
   }
-  const handleRuntimeError = useCallback((error: unknown) => {
-    if (error instanceof Error) {
-      captureException(error);
-      return;
-    }
-    captureException(new Error(String(error)));
-  }, []);
 
   const {
     ready: runtimeReady,

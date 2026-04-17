@@ -16,6 +16,13 @@ import { useRuntime } from "@my-code/runtime/context";
 import { captureException } from "@sentry/nextjs";
 import { MinMaxButton, Modal } from "./modal";
 
+function handleRuntimeError(error: unknown) {
+  captureException(error);
+  window.alert(
+    "コード実行環境で予期せぬエラーが発生しました: \n" + String(error)
+  );
+}
+
 interface ExecProps {
   /*
    * Pythonの場合はメインファイル1つのみを指定する。
@@ -69,13 +76,7 @@ export function ExecFile(props: ExecProps) {
       `Language ${props.language.originalLang} does not have a runtime environment.`
     );
   }
-  const handleRuntimeError = useCallback((error: unknown) => {
-    if (error instanceof Error) {
-      captureException(error);
-      return;
-    }
-    captureException(new Error(String(error)));
-  }, []);
+
   const { ready, runFiles, getCommandlineStr, runtimeInfo, interrupt } =
     useRuntime(props.language.runtime, { onError: handleRuntimeError });
 
