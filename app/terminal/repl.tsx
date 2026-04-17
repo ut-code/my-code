@@ -38,10 +38,8 @@ export function writeOutput(
   const message = String(output.message).replace(/\n/g, "\r\n");
   switch (output.type) {
     case "error":
-      term.writeln(chalk.red(message));
-      break;
     case "fatalError":
-      term.writeln(chalk.bgRed.white(message));
+      term.writeln(chalk.red(message));
       break;
     case "trace":
       term.writeln(chalk.blue.italic(message));
