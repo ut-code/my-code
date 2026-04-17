@@ -14,6 +14,7 @@ import { RuntimeLang } from "../languages";
 import { Mutex, MutexInterface } from "async-mutex";
 import {
   ReplOutput,
+  RuntimeErrorHandler,
   RuntimeContext,
   SyntaxStatus,
   UpdatedFile,
@@ -57,7 +58,11 @@ export function WorkerProvider({
   const [ready, setReady] = useState<boolean>(false);
   const mutex = useMemo<MutexInterface>(() => new Mutex(), []);
   const [doInit, setDoInit] = useState(false);
-  const init = useCallback(() => setDoInit(true), []);
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+  const init = useCallback((onError?: RuntimeErrorHandler) => {
+    onErrorRef.current = onError;
+    setDoInit(true);
+  }, []);
   const interruptBuffer = useRef<Uint8Array | null>(null);
   const capabilities = useRef<WorkerCapabilities | null>(null);
   const commandHistory = useRef<string[]>([]);
@@ -126,8 +131,12 @@ export function WorkerProvider({
   useEffect(() => {
     if (doInit) {
       void mutex.runExclusive(async () => {
-        await initializeWorker();
-        setReady(true);
+        try {
+          await initializeWorker();
+          setReady(true);
+        } catch (error) {
+          onErrorRef.current?.(error);
+        }
       });
       if (isIOS()) {
         alert(
@@ -179,6 +188,8 @@ export function WorkerProvider({
             await workerApiRef.current.restoreState(commandHistory.current);
           }
           setReady(true);
+        }).catch((error) => {
+          onErrorRef.current?.(error);
         });
         break;
       }
@@ -219,6 +230,9 @@ export function WorkerProvider({
             proxy(async (item: ReplOutput | UpdatedFile) => {
               if (item.type !== "file") {
                 output.push(item);
+                if (item.type === "fatalError") {
+                  onErrorRef.current?.(new Error(item.message));
+                }
               }
               onOutput(item);
             })
@@ -227,12 +241,23 @@ export function WorkerProvider({
 
         // Save command to history if interrupt method is 'restart'
         if (capabilities.current?.interrupt === "restart") {
-          const hasError = output.some((o) => o.type === "error");
+          const hasError = output.some(
+            (o) => o.type === "error" || o.type === "fatalError"
+          );
           if (!hasError) {
             commandHistory.current.push(code);
           }
         }
       } catch (error) {
+        const message =
+          error instanceof Error ? error.message : String(error);
+        const isExpectedControlError =
+          message === "Worker interrupted" || message === "Worker terminated";
+        if (!isExpectedControlError) {
+          onErrorRef.current?.(error);
+          onOutput({ type: "fatalError", message });
+          return;
+        }
         if (error instanceof Error) {
           onOutput({ type: "error", message: error.message });
         } else {
@@ -280,17 +305,33 @@ export function WorkerProvider({
       ) {
         interruptBuffer.current[0] = 0;
       }
-      return mutex.runExclusive(async () => {
-        await trackPromise(
-          workerApiRef.current!.runFile(
-            filenames[0],
-            files,
-            proxy(async (item: ReplOutput | UpdatedFile) => {
-              onOutput(item);
-            })
-          )
-        );
-      });
+      try {
+        return await mutex.runExclusive(async () => {
+          await trackPromise(
+            workerApiRef.current!.runFile(
+              filenames[0],
+              files,
+              proxy(async (item: ReplOutput | UpdatedFile) => {
+                if (item.type === "fatalError") {
+                  onErrorRef.current?.(new Error(item.message));
+                }
+                onOutput(item);
+              })
+            )
+          );
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : String(error);
+        const isExpectedControlError =
+          message === "Worker interrupted" || message === "Worker terminated";
+        if (!isExpectedControlError) {
+          onErrorRef.current?.(error);
+          onOutput({ type: "fatalError", message });
+          return;
+        }
+        onOutput({ type: "error", message });
+      }
     },
     [ready, mutex, trackPromise]
   );

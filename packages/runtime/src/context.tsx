@@ -10,13 +10,20 @@ import { PyodideContext, usePyodide } from "./worker/pyodide";
 import { RubyContext, useRuby } from "./worker/ruby";
 import { WorkerProvider } from "./worker/runtime";
 
-export function useRuntime(language: RuntimeLang): RuntimeContext {
+interface UseRuntimeOptions {
+  onError?: (error: unknown) => void;
+}
+export function useRuntime(
+  language: RuntimeLang,
+  options?: UseRuntimeOptions
+): RuntimeContext {
   const runtimes = useRuntimeAll();
   const runtime = runtimes[language];
   const { init } = runtime;
+  const { onError } = options ?? {};
   useEffect(() => {
-    init?.();
-  }, [init]);
+    init?.(onError);
+  }, [init, onError]);
   return runtime;
 }
 export function useRuntimeAll(): Record<RuntimeLang, RuntimeContext> {
