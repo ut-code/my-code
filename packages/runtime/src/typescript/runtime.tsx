@@ -28,10 +28,9 @@ export const compilerOptions: CompilerOptions = {
 
 const TypeScriptContext = createContext<{
   init: (onError?: RuntimeErrorHandler) => void;
-  reportError: (error: unknown) => void;
   tsEnv: VirtualTypeScriptEnvironment | null;
   tsVersion?: string;
-}>({ init: () => undefined, reportError: () => undefined, tsEnv: null });
+}>({ init: () => undefined, tsEnv: null });
 export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
   const [tsVersion, setTSVersion] = useState<string | undefined>(undefined);
@@ -41,78 +40,71 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
     onErrorRef.current = onError;
     setDoInit(true);
   }, []);
-  const reportError = useCallback((error: unknown) => {
-    onErrorRef.current?.(error);
-  }, []);
   useEffect(() => {
     // useEffectはサーバーサイドでは実行されないが、
     // typeof window !== "undefined" でガードしないとなぜかesbuildが"typescript"を
     // サーバーサイドでのインポート対象とみなしてしまう。
     if (doInit && tsEnv === null && typeof window !== "undefined") {
       const abortController = new AbortController();
-      (async () => {
-        try {
-          const ts = await import("typescript");
-          const vfs = await import("@typescript/vfs");
-          const system = vfs.createSystem(new Map());
-          const libFiles = vfs.knownLibFilesForCompilerOptions(
-            compilerOptions,
-            ts
-          );
-          const libFileContents = await Promise.all(
-            libFiles.map(async (libFile) => {
-              const response = await fetch(
-                `/typescript/${ts.version}/${libFile}`,
-                { signal: abortController.signal }
-              );
-              if (response.ok) {
-                return response.text();
-              } else {
-                return undefined;
-              }
-            })
-          );
-          libFiles.forEach((libFile, index) => {
-            const content = libFileContents[index];
-            if (content !== undefined) {
-              system.writeFile(`/${libFile}`, content);
+      void (async () => {
+        const ts = await import("typescript");
+        const vfs = await import("@typescript/vfs");
+        const system = vfs.createSystem(new Map());
+        const libFiles = vfs.knownLibFilesForCompilerOptions(
+          compilerOptions,
+          ts
+        );
+        const libFileContents = await Promise.all(
+          libFiles.map(async (libFile) => {
+            const response = await fetch(
+              `/typescript/${ts.version}/${libFile}`,
+              { signal: abortController.signal }
+            );
+            if (response.ok) {
+              return response.text();
+            } else {
+              return undefined;
             }
-          });
-          const env = vfs.createVirtualTypeScriptEnvironment(
-            system,
-            [],
-            ts,
-            compilerOptions
-          );
-          setTSEnv(env);
-          setTSVersion(ts.version);
-        } catch (error) {
-          if (
-            error instanceof DOMException &&
-            error.name === "AbortError"
-          ) {
-            return;
+          })
+        );
+        libFiles.forEach((libFile, index) => {
+          const content = libFileContents[index];
+          if (content !== undefined) {
+            system.writeFile(`/${libFile}`, content);
           }
-          reportError(error);
+        });
+        const env = vfs.createVirtualTypeScriptEnvironment(
+          system,
+          [],
+          ts,
+          compilerOptions
+        );
+        setTSEnv(env);
+        setTSVersion(ts.version);
+      })().catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
         }
-      })();
+        onErrorRef.current?.(error);
+      });
       return () => {
         abortController.abort();
       };
     }
-  }, [tsEnv, setTSEnv, doInit, reportError]);
+  }, [tsEnv, setTSEnv, doInit]);
   return (
-    <TypeScriptContext.Provider value={{ init, reportError, tsEnv, tsVersion }}>
+    <TypeScriptContext.Provider value={{ init, tsEnv, tsVersion }}>
       {children}
     </TypeScriptContext.Provider>
   );
 }
 
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
-  const { init: tsInit, reportError, tsEnv, tsVersion } =
-    useContext(TypeScriptContext);
+  const { init: tsInit, tsEnv, tsVersion } = useContext(TypeScriptContext);
   const { init: jsInit } = jsEval;
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
   const init = useCallback((onError?: RuntimeErrorHandler) => {
+    onErrorRef.current = onError;
     tsInit(onError);
     jsInit?.(onError);
   }, [tsInit, jsInit]);
@@ -126,8 +118,8 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
       if (tsEnv === null || typeof window === "undefined") {
         onOutput({ type: "error", message: "TypeScript is not ready yet." });
         return;
-      }
-      try {
+      } else {
+        try {
         for (const [filename, content] of Object.entries(files)) {
           tsEnv.createFile(filename, content);
         }
@@ -178,15 +170,16 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
           { ...files, ...emittedFiles },
           onOutput
         );
-      } catch (error) {
-        reportError(error);
-        onOutput({
-          type: "fatalError",
-          message: error instanceof Error ? error.message : String(error),
-        });
+        } catch (error) {
+          onErrorRef.current?.(error);
+          onOutput({
+            type: "fatalError",
+            message: error instanceof Error ? error.message : String(error),
+          });
+        }
       }
     },
-    [tsEnv, jsEval, reportError]
+    [tsEnv, jsEval]
   );
 
   const runtimeInfo = useMemo<RuntimeInfo>(
