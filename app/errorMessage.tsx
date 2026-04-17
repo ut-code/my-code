@@ -21,7 +21,9 @@ export function ErrorMessage({ error, reset, ...props }: Props) {
   }, [error]);
 
   const digest =
-    "digest" in (error as { digest: string })
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error
       ? (error as { digest: string }).digest
       : undefined;
 
