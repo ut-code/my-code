@@ -50,6 +50,7 @@ export function ErrorMessage({ error, reset, ...props }: Props) {
           className="link link-info my-2"
           href={`https://docs.google.com/forms/d/e/1FAIpQLSfkM2LKhUDgCdY2fGntuv75O3jaWISwKuBIu9MW3h3UD1I3sw/viewform?usp=pp_url&entry.758323891=${eventId}${digest ? "/" + digest : ""}`}
           target="_blank"
+          rel="noopener noreferrer"
         >
           問い合わせフォームで報告する
         </a>
