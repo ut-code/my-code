@@ -11,6 +11,11 @@ COPY packages/runtime/package.json ./packages/runtime/
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
 
+# これだけ時間かかるので先に実行する
+WORKDIR /app
+COPY ./scripts ./scripts
+RUN mkdir app && npx tsx ./scripts/removeHinting.ts
+
 FROM node:lts-slim AS builder
 
 # ビルド中にsentryでソースマップをアップロードするのに必要
@@ -24,6 +29,8 @@ COPY --from=dependencies /app/node_modules ./node_modules
 
 # Copy application source code
 COPY . .
+
+COPY --from=dependencies /app/app/m-plus-rounded-1c-nohint ./app/m-plus-rounded-1c-nohint
 
 # Stop if documentation has any change that is not reflected to revisions.yml and database.
 RUN npx tsx ./scripts/checkDocs.ts --check-diff
