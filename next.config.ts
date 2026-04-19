@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  env: {
+    SENTRY_DSN: process.env.SENTRY_DSN,
+  },
   serverExternalPackages: [
     "@prisma/client",
     ".prisma/client",
@@ -181,10 +184,10 @@ const nextConfig: NextConfig = {
 };
 
 export default withSentryConfig(nextConfig, {
-  org: "bugsinkhasnoorgs",
-  project: "ignoredfornow",
-  sentryUrl: "https://bugsink.utcode.net",
-  debug: true, // important for debugging
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  sentryUrl: process.env.SENTRY_URL,
+  // debug: true, // important for debugging
 
   // Use a fixed route (recommended)
   tunnelRoute: "/monitoring",
