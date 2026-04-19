@@ -189,6 +189,11 @@ export default withSentryConfig(nextConfig, {
   sentryUrl: process.env.SENTRY_URL,
   // debug: true, // important for debugging
 
+  // coolifyではgitがコンテキストに与えられない代わりに環境変数SOURCE_COMMITがある
+  ...(process.env.SOURCE_COMMIT
+    ? { release: { name: process.env.SOURCE_COMMIT } }
+    : {}),
+
   // Use a fixed route (recommended)
   tunnelRoute: "/monitoring",
   // Pass the auth token

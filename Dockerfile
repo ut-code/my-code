@@ -1,5 +1,8 @@
 # https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile をベースに
 
+# (TODO?) 本来は ARG で各種環境変数を記述してビルド時に与えられるようにする必要がある。
+# 現在このdockerfileはcoolify上でのビルドのみに使用しており、coolifyが自動的にARG文を挿入するため動作している。
+
 FROM node:lts-slim AS dependencies
 
 WORKDIR /app
