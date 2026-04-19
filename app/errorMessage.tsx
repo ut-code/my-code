@@ -21,11 +21,13 @@ export function ErrorMessage({ error, reset, ...props }: Props) {
   }, [error]);
 
   const digest =
-    typeof error === "object" &&
-    error !== null &&
-    "digest" in error
+    typeof error === "object" && error !== null && "digest" in error
       ? (error as { digest: string }).digest
       : undefined;
+
+  const formParam = eventId
+    ? encodeURIComponent(eventId + (digest ? "/" + digest : ""))
+    : undefined;
 
   return (
     <div
@@ -45,10 +47,10 @@ export function ErrorMessage({ error, reset, ...props }: Props) {
       {eventId && (
         <p className="my-1 text-sm text-base-content/50">EventID: {eventId}</p>
       )}
-      {eventId && (
+      {formParam && (
         <a
           className="link link-info my-2"
-          href={`https://docs.google.com/forms/d/e/1FAIpQLSfkM2LKhUDgCdY2fGntuv75O3jaWISwKuBIu9MW3h3UD1I3sw/viewform?usp=pp_url&entry.758323891=${eventId}${digest ? "/" + digest : ""}`}
+          href={`https://docs.google.com/forms/d/e/1FAIpQLSfkM2LKhUDgCdY2fGntuv75O3jaWISwKuBIu9MW3h3UD1I3sw/viewform?usp=pp_url&entry.758323891=${formParam}`}
           target="_blank"
           rel="noopener noreferrer"
         >

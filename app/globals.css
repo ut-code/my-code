@@ -122,6 +122,11 @@ mycdark:
   }
 }
 
+body {
+  /* mocha.css がbodyに背景色などを設定してしまうので、それを上書きしている */
+  @apply bg-transparent! text-inherit! m-0!
+}
+
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */
 @theme {
   /*
