@@ -101,8 +101,8 @@ const nextConfig: NextConfig = {
             "@better-fetch/fetch@1.1.21": "MIT",
           },
           includePackages: () =>
-            ["tailwindcss", "@fontsource/m-plus-rounded-1c"].map((pkg) =>
-              dirname(import.meta.resolve(`${pkg}/package.json`))
+            ["tailwindcss", "daisyui", "@fontsource/m-plus-rounded-1c"].map(
+              (pkg) => dirname(import.meta.resolve(`${pkg}/package.json`))
             ),
         })
       );
