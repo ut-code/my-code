@@ -17,6 +17,7 @@ import { useEmbedContext } from "./embedContext";
 import { LangConstants } from "@my-code/runtime/languages";
 import clsx from "clsx";
 import { InlineCode } from "@/markdown/codeBlock";
+import { captureException } from "@sentry/nextjs";
 import {
   emptyMutex,
   ReplCommand,
@@ -25,6 +26,13 @@ import {
 import { useRuntime } from "@my-code/runtime/context";
 import { MinMaxButton, Modal } from "./modal";
 import { StopButtonContent } from "./exec";
+
+function handleRuntimeError(error: unknown) {
+  captureException(error);
+  window.alert(
+    "コード実行環境で予期せぬエラーが発生しました: \n" + String(error)
+  );
+}
 
 export function writeOutput(
   term: Terminal,
@@ -37,6 +45,7 @@ export function writeOutput(
   const message = String(output.message).replace(/\n/g, "\r\n");
   switch (output.type) {
     case "error":
+    case "fatalError":
       term.writeln(chalk.red(message));
       break;
     case "trace":
@@ -95,7 +104,7 @@ export function ReplTerminal({
     checkSyntax,
     splitReplExamples,
     runtimeInfo,
-  } = useRuntime(language.runtime);
+  } = useRuntime(language.runtime, { onError: handleRuntimeError });
   const { tabSize, prompt, promptMore, returnPrefix } = language;
   if (!prompt) {
     console.warn(`prompt not defined for language: ${language}`);

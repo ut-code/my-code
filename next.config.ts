@@ -4,6 +4,7 @@ import { PyodidePlugin } from "@pyodide/webpack-plugin";
 import { version as pyodideVersion } from "pyodide/package.json";
 import LicensePlugin from "webpack-license-plugin";
 import { dirname } from "node:path";
+import { withSentryConfig } from "@sentry/nextjs";
 
 initOpenNextCloudflareForDev();
 
@@ -16,7 +17,21 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  serverExternalPackages: ["@prisma/client", ".prisma/client"],
+  env: {
+    SENTRY_DSN: process.env.SENTRY_DSN,
+  },
+  serverExternalPackages: [
+    "@prisma/client",
+    ".prisma/client",
+    // 普通にimportするとこれが4回バンドルされてcloudflareの3MB制限を超えてしまう
+    "@sentry/nextjs",
+  ],
+  outputFileTracingIncludes: {
+    // sentryのバージョン違うけど、serverExternalPackagesに@sentry/nextjsを追加したら
+    // https://github.com/getsentry/sentry-javascript/issues/14931#issuecomment-3641871022
+    // と同じエラーが出たので、そこに書かれていたのと同じでっちあげをしてみる
+    "*": ["node_modules/@sentry/nextjs/build/**/*"],
+  },
   async headers() {
     return [
       {
@@ -77,7 +92,9 @@ const nextConfig: NextConfig = {
           outputFilename: "static/oss-licenses.json",
           includeNoticeText: true,
           excludedPackageTest: (packageName /*, version*/) => {
-            return packageName.startsWith("@my-code");
+            return (
+              packageName.startsWith("@my-code") || packageName === "my-code"
+            );
           },
           licenseOverrides: {
             "@better-auth/core@1.4.20": "MIT",
@@ -166,4 +183,25 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  sentryUrl: process.env.SENTRY_URL,
+  // debug: true, // important for debugging
+
+  // Use a fixed route (recommended)
+  tunnelRoute: "/monitoring",
+  // Pass the auth token
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  // Only print logs for uploading source maps in CI
+  // silent: !process.env.CI,
+
+  // 以下の設定を追加してサイズを削減
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+    excludeTracing: true,
+    excludeReplayIframe: true,
+    excludeReplayShadowDom: true,
+    excludeReplayWorker: true,
+  },
+});

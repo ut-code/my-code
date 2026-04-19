@@ -49,7 +49,7 @@ export function StyledSyntaxHighlighter(props: {
     <FallbackPre className={props.className}>{props.children}</FallbackPre>
   );
 }
-function FallbackPre({
+export function FallbackPre({
   children,
   className,
 }: {

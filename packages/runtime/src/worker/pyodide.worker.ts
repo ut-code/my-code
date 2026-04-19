@@ -115,13 +115,13 @@ async function runCode(
         });
       } else {
         await onOutput({
-          type: "error",
+          type: "fatalError",
           message: `予期せぬエラー: ${e.message.trim()}`,
         });
       }
     } else {
       await onOutput({
-        type: "error",
+        type: "fatalError",
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
     }
@@ -175,13 +175,13 @@ async function runFile(
         });
       } else {
         await onOutput({
-          type: "error",
+          type: "fatalError",
           message: `予期せぬエラー: ${e.message.trim()}`,
         });
       }
     } else {
       await onOutput({
-        type: "error",
+        type: "fatalError",
         message: `予期せぬエラー: ${String(e).trim()}`,
       });
     }

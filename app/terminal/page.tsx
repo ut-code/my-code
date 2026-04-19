@@ -15,6 +15,7 @@ import {
 import { replTests } from "@my-code/runtime/tests/repl";
 import { fileExecutionTests } from "@my-code/runtime/tests/fileExecution";
 import { useRuntimeAll } from "@my-code/runtime/context";
+import { captureException } from "@sentry/nextjs";
 
 import main_py from "./samples/main.py?raw";
 import main_rb from "./samples/main.rb?raw";
@@ -52,6 +53,15 @@ export default function RuntimeTestPage() {
 
       <Heading level={2}>Xterm.js Colors</Heading>
       <AnsiColorSample />
+
+      <button
+        className="btn mt-4"
+        onClick={() => {
+          throw new Error("Sentry Test Error");
+        }}
+      >
+        Sentry Test Error
+      </button>
 
       <Heading level={2}>自動テスト</Heading>
       <MochaTest />
@@ -201,6 +211,10 @@ function AnsiColorSample() {
   );
 }
 
+function handleRuntimeError(error: unknown) {
+  captureException(error);
+}
+
 function MochaTest() {
   const runtimeAll = useRuntimeAll();
   const runtimeRef = useRef(runtimeAll);
@@ -224,7 +238,7 @@ function MochaTest() {
       mocha.setup("bdd");
 
       for (const lang of Object.keys(runtimeRef.current) as RuntimeLang[]) {
-        runtimeRef.current[lang].init?.();
+        runtimeRef.current[lang].init?.(handleRuntimeError);
 
         describe(`${lang} Runtime`, function () {
           this.timeout(RUNTIME_TIMEOUTS[lang]);
@@ -261,6 +275,14 @@ function MochaTest() {
       }
 
       const runner = mocha.run();
+      runner.on("fail", (test, err: unknown) => {
+        console.error(err, {
+          extra: {
+            fullTitle: test.fullTitle(),
+            ...(typeof err === "object" && err ? err : {}),
+          },
+        });
+      });
       runner.on("end", () => {
         setMochaState("finished");
       });

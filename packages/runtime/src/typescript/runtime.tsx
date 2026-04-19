@@ -9,9 +9,16 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import { ReplOutput, RuntimeContext, RuntimeInfo, UpdatedFile } from "../interface";
+import {
+  ReplOutput,
+  RuntimeContext,
+  RuntimeErrorHandler,
+  RuntimeInfo,
+  UpdatedFile,
+} from "../interface";
 
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],
@@ -20,7 +27,7 @@ export const compilerOptions: CompilerOptions = {
 };
 
 const TypeScriptContext = createContext<{
-  init: () => void;
+  init: (onError?: RuntimeErrorHandler) => void;
   tsEnv: VirtualTypeScriptEnvironment | null;
   tsVersion?: string;
 }>({ init: () => undefined, tsEnv: null });
@@ -28,14 +35,18 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
   const [tsEnv, setTSEnv] = useState<VirtualTypeScriptEnvironment | null>(null);
   const [tsVersion, setTSVersion] = useState<string | undefined>(undefined);
   const [doInit, setDoInit] = useState(false);
-  const init = useCallback(() => setDoInit(true), []);
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+  const init = useCallback((onError?: RuntimeErrorHandler) => {
+    onErrorRef.current = onError;
+    setDoInit(true);
+  }, []);
   useEffect(() => {
     // useEffectはサーバーサイドでは実行されないが、
     // typeof window !== "undefined" でガードしないとなぜかesbuildが"typescript"を
     // サーバーサイドでのインポート対象とみなしてしまう。
     if (doInit && tsEnv === null && typeof window !== "undefined") {
       const abortController = new AbortController();
-      (async () => {
+      void (async () => {
         const ts = await import("typescript");
         const vfs = await import("@typescript/vfs");
         const system = vfs.createSystem(new Map());
@@ -70,7 +81,12 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
         );
         setTSEnv(env);
         setTSVersion(ts.version);
-      })();
+      })().catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        onErrorRef.current?.(error);
+      });
       return () => {
         abortController.abort();
       };
@@ -86,9 +102,11 @@ export function TypeScriptProvider({ children }: { children: ReactNode }) {
 export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
   const { init: tsInit, tsEnv, tsVersion } = useContext(TypeScriptContext);
   const { init: jsInit } = jsEval;
-  const init = useCallback(() => {
-    tsInit();
-    jsInit?.();
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+  const init = useCallback((onError?: RuntimeErrorHandler) => {
+    onErrorRef.current = onError;
+    tsInit(onError);
+    jsInit?.(onError);
   }, [tsInit, jsInit]);
 
   const runFiles = useCallback(
@@ -101,6 +119,7 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
         onOutput({ type: "error", message: "TypeScript is not ready yet." });
         return;
       } else {
+        try {
         for (const [filename, content] of Object.entries(files)) {
           tsEnv.createFile(filename, content);
         }
@@ -151,6 +170,13 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
           { ...files, ...emittedFiles },
           onOutput
         );
+        } catch (error) {
+          onErrorRef.current?.(error);
+          onOutput({
+            type: "fatalError",
+            message: error instanceof Error ? error.message : String(error),
+          });
+        }
       }
     },
     [tsEnv, jsEval]

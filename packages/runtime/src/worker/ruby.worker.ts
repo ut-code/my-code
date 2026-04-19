@@ -84,9 +84,12 @@ async function flushOutput() {
   stderrBuffer = "";
 }
 
-function formatRubyError(error: unknown, isFile: boolean): string {
+function formatRubyError(
+  error: unknown,
+  isFile: boolean
+): { message: string; isFatal: boolean } {
   if (!(error instanceof Error)) {
-    return `予期せぬエラー: ${String(error).trim()}`;
+    return { message: `予期せぬエラー: ${String(error).trim()}`, isFatal: true };
   }
 
   let errorMessage = error.message;
@@ -101,7 +104,7 @@ function formatRubyError(error: unknown, isFile: boolean): string {
     errorMessage = lines.join("\n");
   }
 
-  return errorMessage;
+  return { message: errorMessage, isFatal: false };
 }
 
 async function runCode(
@@ -134,10 +137,11 @@ async function runCode(
 
     // Flush any buffered output
     await flushOutput();
+    const { message, isFatal } = formatRubyError(e, false);
 
     await onOutput({
-      type: "error",
-      message: formatRubyError(e, false),
+      type: isFatal ? "fatalError" : "error",
+      message,
     });
   }
 
@@ -185,10 +189,11 @@ async function runFile(
 
     // Flush any buffered output
     await flushOutput();
+    const { message, isFatal } = formatRubyError(e, true);
 
     await onOutput({
-      type: "error",
-      message: formatRubyError(e, true),
+      type: isFatal ? "fatalError" : "error",
+      message,
     });
   }
 

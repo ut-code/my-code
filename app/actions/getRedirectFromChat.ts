@@ -5,31 +5,44 @@ import { initContext } from "@/lib/chatHistory";
 import { LangId, PageSlug } from "@/lib/docs";
 import { chat, section } from "@/schema/chat";
 import { and, eq } from "drizzle-orm";
+import { setExtra, withServerActionInstrumentation } from "@sentry/nextjs";
+import { headers } from "next/headers";
 
 export async function getRedirectFromChat(chatId: string): Promise<string> {
-  chatId = z.uuid().parse(chatId);
-  
-  const { drizzle, userId } = await initContext();
-  if (!userId) {
-    throw new Error("Not authenticated");
-  }
-
-  const chatData = (await drizzle.query.chat.findFirst({
-    where: and(eq(chat.chatId, chatId), eq(chat.userId, userId)),
-    with: {
-      section: true,
+  return withServerActionInstrumentation(
+    "getRedirectFromChat", // Action name for Sentry
+    {
+      headers: await headers(), // Connect client and server traces
+      recordResponse: true, // Include response data
     },
-  })) as
-    | (typeof chat.$inferSelect & {
-        section: typeof section.$inferSelect;
-      })
-    | undefined;
-  if (!chatData?.section) {
-    throw new Error("Chat or section not found");
-  }
-  const [lang, page] = (chatData.section.pagePath.split("/") ?? []) as [
-    LangId,
-    PageSlug,
-  ];
-  return `/${lang}/${page}#${chatData.sectionId}`;
+    async () => {
+      setExtra("args", { chatId });
+
+      chatId = z.uuid().parse(chatId);
+
+      const { drizzle, userId } = await initContext();
+      if (!userId) {
+        throw new Error("Not authenticated");
+      }
+
+      const chatData = (await drizzle.query.chat.findFirst({
+        where: and(eq(chat.chatId, chatId), eq(chat.userId, userId)),
+        with: {
+          section: true,
+        },
+      })) as
+        | (typeof chat.$inferSelect & {
+            section: typeof section.$inferSelect;
+          })
+        | undefined;
+      if (!chatData?.section) {
+        throw new Error("Chat or section not found");
+      }
+      const [lang, page] = (chatData.section.pagePath.split("/") ?? []) as [
+        LangId,
+        PageSlug,
+      ];
+      return `/${lang}/${page}#${chatData.sectionId}`;
+    }
+  );
 }

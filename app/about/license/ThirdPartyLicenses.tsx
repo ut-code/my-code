@@ -1,7 +1,6 @@
 "use client";
 
-import { StyledSyntaxHighlighter } from "@/markdown/styledSyntaxHighlighter";
-import { langConstants } from "@my-code/runtime/languages";
+import { FallbackPre } from "@/markdown/styledSyntaxHighlighter";
 import { useState } from "react";
 
 export interface LicenseEntry {
@@ -80,12 +79,7 @@ export function ThirdPartyLicenses({ licenses }: { licenses: LicenseEntry[] }) {
                 </p>
               )}
               {pkg.licenseText && (
-                <StyledSyntaxHighlighter
-                  className="text-sm"
-                  language={langConstants(undefined)}
-                >
-                  {pkg.licenseText}
-                </StyledSyntaxHighlighter>
+                <FallbackPre className="text-sm">{pkg.licenseText}</FallbackPre>
               )}
             </div>
           </div>

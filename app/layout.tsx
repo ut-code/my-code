@@ -39,8 +39,7 @@ export default async function RootLayout({
   const pagesList = await getPagesList();
   return (
     <html lang="ja">
-      <body className="w-full min-h-screen bg-transparent! text-inherit! m-0!">
-        {/* mocha.css がbodyに背景色などを設定してしまうので、それを上書きしている */}
+      <body className="w-full min-h-screen">
         <AutoAnonymousLogin />
         <SidebarMdProvider>
           <div className="drawer has-sidebar:drawer-open min-h-screen">

@@ -27,7 +27,7 @@ export interface RuntimeContext {
    * 初期化とcleanupはuseEffect()で非同期に行うのがよいです。
    *
    */
-  init?: () => void;
+  init?: (onError?: RuntimeErrorHandler) => void;
   /**
    * ランタイムの初期化が完了したか、不要である場合true
    */
@@ -148,11 +148,13 @@ export interface RuntimeInfo {
   prettyLangName: string;
   version?: string;
 }
+export type RuntimeErrorHandler = (error: unknown) => void;
 
 export const ReplOutputTypeSchema = z.enum([
   "stdout",
   "stderr",
   "error",
+  "fatalError",
   "return",
   "trace",
   "system",

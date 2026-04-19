@@ -15,7 +15,7 @@ export default function WorkspaceLayout({
   return (
     <StreamingChatProvider>
       <ChatAreaStateProvider>
-        <div className="w-full flex flex-row">
+        <div className="flex-1 w-full flex flex-row">
           {docs}
 
           {chat}

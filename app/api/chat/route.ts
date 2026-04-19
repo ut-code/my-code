@@ -18,6 +18,7 @@ import {
   ReplOutputSchema,
 } from "@my-code/runtime/interface";
 import { z } from "zod";
+import { captureException } from "@sentry/nextjs";
 
 const ChatParamsSchema = z.object({
   path: PagePathSchema,
@@ -209,9 +210,9 @@ export async function POST(request: NextRequest) {
       function send(event: ChatStreamEvent) {
         controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
       }
+      let fullText = "";
 
       try {
-        let fullText = "";
         let headerParsed = false;
         let chatId: string | undefined;
         let contentAfterHeader = "";
@@ -244,6 +245,15 @@ export async function POST(request: NextRequest) {
                   type: "error",
                   message: "AIからの応答にタイトルが含まれていませんでした",
                 });
+                captureException(
+                  "AIからの応答にタイトルが含まれていませんでした",
+                  {
+                    extra: {
+                      prompt,
+                      fullText,
+                    },
+                  }
+                );
                 controller.close();
                 return;
               }
@@ -286,6 +296,12 @@ export async function POST(request: NextRequest) {
             type: "error",
             message: "AIからの応答の形式が正しくありませんでした",
           });
+          captureException("AIからの応答の形式が正しくありませんでした", {
+            extra: {
+              prompt,
+              fullText,
+            },
+          });
           controller.close();
           return;
         }
@@ -321,6 +337,7 @@ export async function POST(request: NextRequest) {
         send({ type: "done" });
         controller.close();
       } catch (error: unknown) {
+        captureException(error, { extra: { prompt, fullText } });
         console.error("Error in AI streaming:", error);
         try {
           controller.enqueue(
