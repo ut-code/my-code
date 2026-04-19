@@ -13,6 +13,9 @@ RUN --mount=type=cache,target=/root/.npm \
 
 FROM node:lts-slim AS builder
 
+# ビルド中にsentryでソースマップをアップロードするのに必要
+RUN apt-get update && apt-get install -y ca-certificates
+
 # Set working directory
 WORKDIR /app
 
