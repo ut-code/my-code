@@ -1,11 +1,9 @@
 import { Metadata } from "next";
 import licenseText from "@/../LICENSE?raw";
-import { LicenseEntry, ThirdPartyLicenses } from "./ThirdPartyLicenses";
-import { isCloudflare } from "@/lib/detectCloudflare";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { ThirdPartyLicenses } from "./ThirdPartyLicenses";
 import { StyledMarkdown } from "@/markdown/markdown";
+import { getLicenses, LicenseEntry } from "next-license-list";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "ライセンス",
@@ -30,26 +28,8 @@ my.code(); は以下のオープンソースライブラリを使用していま
 `;
 
 export default async function LicensePage() {
-  let licenses: LicenseEntry[];
-  if (isCloudflare()) {
-    const cfAssets = getCloudflareContext().env.ASSETS;
-    const res = await cfAssets!.fetch(
-      `https://assets.local/_next/static/oss-licenses.json`
-    );
-    licenses = await res.json();
-  } else {
-    licenses = JSON.parse(
-      await readFile(
-        join(
-          process.cwd(),
-          process.env.NODE_ENV === "development"
-            ? ".next/dev/static/oss-licenses.json"
-            : ".next/static/oss-licenses.json"
-        ),
-        "utf-8"
-      )
-    );
-  }
+  await headers();
+  const licenses: LicenseEntry[] = await getLicenses();
 
   return (
     <div className="p-4 pb-16 w-full max-w-docs mx-auto">
