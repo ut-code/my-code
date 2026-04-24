@@ -1,17 +1,8 @@
 "use client";
 
 import { FallbackPre } from "@/markdown/styledSyntaxHighlighter";
+import { LicenseEntry } from "next-license-list";
 import { useState } from "react";
-
-export interface LicenseEntry {
-  name: string;
-  version: string;
-  author?: string;
-  repository?: string;
-  source?: string;
-  license: string;
-  licenseText?: string;
-}
 
 export function ThirdPartyLicenses({ licenses }: { licenses: LicenseEntry[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -21,30 +12,6 @@ export function ThirdPartyLicenses({ licenses }: { licenses: LicenseEntry[] }) {
       {licenses.map((pkg) => {
         const key = `${pkg.name}@${pkg.version}`;
         const isOpen = expanded === key;
-        let repositoryURL: string | undefined = undefined;
-        if (pkg.repository?.startsWith("http")) {
-          repositoryURL = pkg.repository;
-        } else if (pkg.repository?.startsWith("git+http")) {
-          repositoryURL = pkg.repository?.slice(4);
-        } else if (pkg.repository?.startsWith("git@")) {
-          repositoryURL =
-            "https://" +
-            pkg.repository
-              .slice(4)
-              .replace(":", "/")
-              .replace(/\.git$/, "");
-        } else if (
-          pkg.repository &&
-          /github:[\w-]+\/[\w-]+/.test(pkg.repository)
-        ) {
-          repositoryURL = `https://github.com/${pkg.repository.slice(7)}`;
-        } else if (pkg.repository && /[\w-]+\/[\w-]+/.test(pkg.repository)) {
-          // assume github username/repository
-          repositoryURL = `https://github.com/${pkg.repository}`;
-        } else {
-          // fallback to source url
-          // repositoryURL = pkg.source ?? "";
-        }
         return (
           <div key={key} className="collapse collapse-arrow bg-base-200">
             <input
@@ -66,15 +33,15 @@ export function ThirdPartyLicenses({ licenses }: { licenses: LicenseEntry[] }) {
                   {pkg.author}
                 </p>
               )}
-              {repositoryURL && (
+              {pkg.repository && (
                 <p className="mb-1">
                   <span className="opacity-60">Repository: </span>
                   <a
                     className="link link-info break-all"
-                    href={repositoryURL}
+                    href={pkg.repository}
                     target="_blank"
                   >
-                    {repositoryURL}
+                    {pkg.repository}
                   </a>
                 </p>
               )}
