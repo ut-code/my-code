@@ -28,7 +28,6 @@ my.code(); は以下のオープンソースライブラリを使用していま
 `;
 
 export default async function LicensePage() {
-  await headers();
   const licenses: LicenseEntry[] = await getLicenses();
 
   return (
