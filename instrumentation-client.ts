@@ -6,6 +6,12 @@ Sentry.init({
     Sentry.extraErrorDataIntegration({ depth: 10 }),
     Sentry.zodErrorsIntegration(),
   ],
+  beforeSend: function (event, hint) {
+    if (hint.syntheticException?.name === "ChunkLoadError") {
+      event.fingerprint = ["ChunkLoadError"];
+    }
+    return event;
+  },
   // Adds request headers and IP for users
   sendDefaultPii: true,
 });
