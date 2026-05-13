@@ -3,7 +3,6 @@ import licenseText from "@/../LICENSE?raw";
 import { ThirdPartyLicenses } from "./ThirdPartyLicenses";
 import { StyledMarkdown } from "@/markdown/markdown";
 import { getLicenses, LicenseEntry } from "next-license-list";
-import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "ライセンス",
