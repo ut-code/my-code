@@ -193,6 +193,8 @@ nextConfig = withSentryConfig(nextConfig, {
   // Only print logs for uploading source maps in CI
   // silent: !process.env.CI,
 
+  widenClientFileUpload: true,
+
   // 以下の設定を追加してサイズを削減
   bundleSizeOptimizations: {
     excludeDebugStatements: true,
