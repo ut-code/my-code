@@ -186,8 +186,6 @@ nextConfig = withSentryConfig(nextConfig, {
     ? { release: { name: process.env.SOURCE_COMMIT } }
     : {}),
 
-  // Use a fixed route (recommended)
-  tunnelRoute: "/monitoring",
   // Pass the auth token
   authToken: process.env.SENTRY_AUTH_TOKEN,
   // Only print logs for uploading source maps in CI
