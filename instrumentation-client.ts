@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 Sentry.init({
-  enabled: process.env.NODE_ENV !== 'development',
+  enabled: process.env.NODE_ENV !== "development",
   dsn: process.env.SENTRY_DSN,
   tunnel: "https://s-proxy.utcode.net",
   integrations: [
@@ -8,8 +8,22 @@ Sentry.init({
     Sentry.zodErrorsIntegration(),
   ],
   beforeSend: function (event, hint) {
-    if (hint.syntheticException?.name === "ChunkLoadError") {
-      event.fingerprint = ["ChunkLoadError"];
+    if (
+      hint.originalException instanceof Error &&
+      hint.originalException.name === "ChunkLoadError"
+    ) {
+      return null;
+    }
+    if (
+      String(hint.originalException).includes(
+        "CompileError: WebAssembly.compileStreaming()"
+      )
+    ) {
+      event.fingerprint = [
+        String(hint.originalException).match(
+          /^.*?CompileError: WebAssembly\.compileStreaming\(\)/
+        )![0],
+      ];
     }
     return event;
   },
