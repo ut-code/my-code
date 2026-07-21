@@ -17,6 +17,7 @@ import {
 import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
 import { DocsAutoRedirect } from "./autoRedirect";
+import { dateReviver } from "@/lib/dateReviver";
 
 export async function generateMetadata({
   params,
@@ -95,7 +96,10 @@ async function getChatFromCache(path: PagePath, userId?: string) {
     const cachedResponse = await cache.match(cacheKeyForPage(path, userId));
     if (cachedResponse) {
       // console.log("Cache hit for chatHistory/getChat");
-      const data = (await cachedResponse.json()) as ChatWithMessages[];
+      const data = JSON.parse(
+        await cachedResponse.text(),
+        dateReviver
+      ) as ChatWithMessages[];
       return data;
     } else {
       // console.log("Cache miss for chatHistory/getChat");

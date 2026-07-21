@@ -8,6 +8,7 @@ import { getMarkdownSections, getPagesList } from "@/lib/docs";
 import { ChatAreaContainer, ChatAreaContent } from "./chatArea";
 import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
+import { dateReviver } from "@/lib/dateReviver";
 
 export default async function ChatPage({
   params,
@@ -67,7 +68,10 @@ async function getChatOneFromCache(chatId: string, userId?: string) {
     const cache = await caches.open("chatHistory");
     const cachedResponse = await cache.match(cacheKeyForChat(chatId));
     if (cachedResponse) {
-      const data = (await cachedResponse.json()) as ChatWithMessages;
+      const data = JSON.parse(
+        await cachedResponse.text(),
+        dateReviver
+      ) as ChatWithMessages;
       return data;
     }
   }
