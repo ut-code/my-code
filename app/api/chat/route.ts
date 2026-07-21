@@ -105,7 +105,9 @@ export async function POST(request: NextRequest) {
     const selectedPageSlug = routeResult
       .trim()
       .split(/\s+/)[0]
-      ?.trim() as typeof path.page | undefined;
+      ?.replace(/^slug:/i, "")
+      .replace(/^["'`]+|["'`.,:;]+$/g, "")
+      .trim() as typeof path.page | undefined;
     if (selectedPageSlug && langEntry.pages.some((page) => page.slug === selectedPageSlug)) {
       targetPath = {
         lang: path.lang,
