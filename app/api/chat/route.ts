@@ -8,6 +8,7 @@ import {
 } from "@/lib/chatHistory";
 import {
   DynamicMarkdownSectionSchema,
+  getMarkdownSections,
   getPagesList,
   introSectionId,
   PagePathSchema,
@@ -23,6 +24,7 @@ import { captureException } from "@sentry/nextjs";
 const ChatParamsSchema = z.object({
   path: PagePathSchema,
   userQuestion: z.string().min(1),
+  questionScope: z.enum(["page", "language"]).default("page"),
   sectionContent: z.array(DynamicMarkdownSectionSchema),
   replOutputs: z.record(z.string(), z.array(ReplCommandSchema)),
   files: z.record(z.string(), z.string()),
@@ -30,7 +32,7 @@ const ChatParamsSchema = z.object({
 });
 
 export type ChatStreamEvent =
-  | { type: "chat"; chatId: string; sectionId: string }
+  | { type: "chat"; chatId: string; sectionId: string; pagePath: string }
   | { type: "chunk"; text: string }
   | { type: "done" }
   | { type: "error"; message: string };
@@ -48,6 +50,7 @@ export async function POST(request: NextRequest) {
   const {
     path,
     userQuestion,
+    questionScope,
     sectionContent,
     replOutputs,
     files,
@@ -55,7 +58,71 @@ export async function POST(request: NextRequest) {
   } = parseResult.data;
 
   const pagesList = await getPagesList();
-  const langName = pagesList.find((lang) => lang.id === path.lang)?.name;
+  const langEntry = pagesList.find((lang) => lang.id === path.lang);
+  const langName = langEntry?.name ?? path.lang;
+  let targetPath = path;
+  let targetSectionContent = sectionContent;
+
+  if (questionScope === "language" && langEntry) {
+    const routePrompt: string[] = [];
+    routePrompt.push(
+      `あなたは${langName}言語チュートリアルの質問ルーターです。ユーザーの質問に最も関連するページslugを選んでください。`
+    );
+    routePrompt.push(``);
+    routePrompt.push("# 指示");
+    routePrompt.push(
+      "- 1行目にページslugのみを出力してください（引用符や補足説明は不要です）。"
+    );
+    routePrompt.push(
+      "- どのページにも関連しない場合は null と出力してください。"
+    );
+    routePrompt.push(``);
+    routePrompt.push("# 目次");
+    routePrompt.push(``);
+    for (const page of langEntry.pages) {
+      const sections = await getMarkdownSections(path.lang, page.slug);
+      const sectionTitles = sections
+        .map((s) => s.title.trim())
+        .filter((title) => title.length > 0)
+        .join(" / ");
+      routePrompt.push(
+        `- slug: ${page.slug} | 章題: ${page.title} | セクション: ${sectionTitles}`
+      );
+    }
+    routePrompt.push(``);
+    routePrompt.push(`# ユーザーの質問`);
+    routePrompt.push(userQuestion);
+    routePrompt.push(``);
+    routePrompt.push(`# 回答`);
+
+    let routeResult = "";
+    for await (const chunk of generateContentStream(
+      userQuestion,
+      routePrompt.join("\n")
+    )) {
+      routeResult += chunk;
+    }
+    const selectedPageSlug = routeResult
+      .trim()
+      .split(/\s+/)[0]
+      ?.trim() as typeof path.page | undefined;
+    if (langEntry.pages.some((page) => page.slug === selectedPageSlug)) {
+      targetPath = {
+        lang: path.lang,
+        page: selectedPageSlug,
+      };
+      const routedSections = await getMarkdownSections(
+        targetPath.lang,
+        targetPath.page
+      );
+      targetSectionContent = routedSections.map((section) => ({
+        ...section,
+        inView: false,
+        replacedContent: section.rawContent,
+        replacedRange: [],
+      }));
+    }
+  }
 
   const prompt: string[] = [];
 
@@ -64,16 +131,21 @@ export async function POST(request: NextRequest) {
     `以下の${langName}チュートリアルのドキュメントの内容を正確に理解し、ユーザーからの質問に対して、初心者にも分かりやすく、丁寧な解説を提供してください。`
   );
   prompt.push(``);
-  const sectionTitlesInView = sectionContent
+  const sectionTitlesInView = targetSectionContent
     .filter((s) => s.inView)
-    .map((s) => s.title)
-    .join(", ");
-  prompt.push(
-    `ユーザーはドキュメント内の ${sectionTitlesInView} の付近のセクションを閲覧している際にこの質問を行っていると推測されます。`
-  );
-  prompt.push(
-    `質問に答える際には、ユーザーが閲覧しているセクションの内容を特に考慮してください。`
-  );
+    .map((s) => s.title);
+  if (sectionTitlesInView.length > 0) {
+    prompt.push(
+      `ユーザーはドキュメント内の ${sectionTitlesInView.join(", ")} の付近のセクションを閲覧している際にこの質問を行っていると推測されます。`
+    );
+    prompt.push(
+      `質問に答える際には、ユーザーが閲覧しているセクションの内容を特に考慮してください。`
+    );
+  } else {
+    prompt.push(
+      `ユーザーは特定のセクションを閲覧していない可能性があります。質問全体に最も関連する内容を優先して回答してください。`
+    );
+  }
   prompt.push(``);
   prompt.push(
     `質問への回答はユーザー向けのメッセージに加えて、ドキュメント自体を改訂するという形でも可能です。`
@@ -84,7 +156,7 @@ export async function POST(request: NextRequest) {
   prompt.push(``);
   prompt.push(`# ドキュメント`);
   prompt.push(``);
-  for (const section of sectionContent) {
+  for (const section of targetSectionContent) {
     prompt.push(`[セクションid: ${section.id}]`);
     prompt.push(section.replacedContent.trim());
     prompt.push(``);
@@ -235,9 +307,9 @@ export async function POST(request: NextRequest) {
 
               if (
                 !targetSectionId ||
-                !sectionContent.some((s) => s.id === targetSectionId)
+                !targetSectionContent.some((s) => s.id === targetSectionId)
               ) {
-                targetSectionId = introSectionId(path);
+                targetSectionId = introSectionId(targetPath);
               }
 
               if (!title) {
@@ -260,7 +332,7 @@ export async function POST(request: NextRequest) {
 
               // Create chat record in DB immediately
               const newChat = await addChat(
-                path,
+                targetPath,
                 targetSectionId,
                 title,
                 [{ role: "user", content: userQuestion }],
@@ -274,6 +346,7 @@ export async function POST(request: NextRequest) {
                 type: "chat",
                 chatId,
                 sectionId: targetSectionId,
+                pagePath: `${targetPath.lang}/${targetPath.page}`,
               });
 
               // Send any content that came after the header in this chunk
@@ -313,7 +386,7 @@ export async function POST(request: NextRequest) {
         for (const m of contentAfterHeader.matchAll(diffRegex)) {
           const search = m[1];
           const replace = m[2];
-          const targetSection = sectionContent.find((s) =>
+          const targetSection = targetSectionContent.find((s) =>
             s.replacedContent.includes(search)
           );
           diffRaw.push({
@@ -328,7 +401,7 @@ export async function POST(request: NextRequest) {
         // Save messages and diffs to DB
         await addMessagesAndDiffs(
           chatId,
-          path,
+          targetPath,
           [{ role: "ai", content: cleanMessage }],
           diffRaw,
           context

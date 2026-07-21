@@ -24,13 +24,17 @@ import { captureException } from "@sentry/nextjs";
 
 interface ChatFormProps {
   path: PagePath;
+  langName: string;
   sectionContent: DynamicMarkdownSection[];
   close: () => void;
 }
 
-export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
+export function ChatForm({ path, langName, sectionContent, close }: ChatFormProps) {
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
+  const [questionScope, setQuestionScope] = useState<"page" | "language">(
+    "page"
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -115,6 +119,7 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
         body: JSON.stringify({
           path,
           userQuestion,
+          questionScope,
           sectionContent,
           replOutputs,
           files,
@@ -138,6 +143,7 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
     const decoder = new TextDecoder();
     let buffer = "";
     let chatId: string | null = null;
+    let chatPagePath: string | PagePath = path;
     let navigated = false;
 
     // ストリームを非同期で読み続ける（ナビゲーション後もバックグラウンドで継続）
@@ -158,13 +164,16 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
               const event = JSON.parse(line) as ChatStreamEvent;
 
               if (event.type === "chat") {
+                chatPagePath = event.pagePath;
                 // revalidateChatは/api/chatの中では呼ばず、別のServerActionとして呼び出す
-                await revalidateChatAction(event.chatId, path);
+                await revalidateChatAction(event.chatId, event.pagePath);
                 chatId = event.chatId;
                 streamingChatContext.startStreaming(event.chatId);
-                document.getElementById(event.sectionId)?.scrollIntoView({
-                  behavior: "smooth",
-                });
+                if (event.pagePath === `${path.lang}/${path.page}`) {
+                  document.getElementById(event.sectionId)?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }
                 await asyncRouterPush(`/chat/${event.chatId}`, {
                   scroll: false,
                 });
@@ -177,7 +186,7 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
                 streamingChatContext.appendChunk(event.text);
               } else if (event.type === "done") {
                 if (chatId) {
-                  await revalidateChatAction(chatId, path);
+                  await revalidateChatAction(chatId, chatPagePath);
                 }
                 streamingChatContext.finishStreaming();
                 router.refresh();
@@ -187,7 +196,7 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
                   setIsLoading(false);
                 }
                 if (chatId) {
-                  await revalidateChatAction(chatId, path);
+                  await revalidateChatAction(chatId, chatPagePath);
                 }
                 streamingChatContext.finishStreaming();
                 router.refresh();
@@ -238,6 +247,32 @@ export function ChatForm({ path, sectionContent, close }: ChatFormProps) {
         onChange={(e) => setInputValue(e.target.value)}
         disabled={isLoading}
       ></textarea>
+      <div className="px-4 pt-1 pb-2 text-left">
+        <label className="label cursor-pointer justify-start gap-2 py-1">
+          <input
+            type="radio"
+            className="radio radio-sm radio-secondary"
+            name="question-scope"
+            value="page"
+            checked={questionScope === "page"}
+            onChange={() => setQuestionScope("page")}
+            disabled={isLoading}
+          />
+          <span className="label-text">このページの内容について質問</span>
+        </label>
+        <label className="label cursor-pointer justify-start gap-2 py-1">
+          <input
+            type="radio"
+            className="radio radio-sm radio-secondary"
+            name="question-scope"
+            value="language"
+            checked={questionScope === "language"}
+            onChange={() => setQuestionScope("language")}
+            disabled={isLoading}
+          />
+          <span className="label-text">{`${langName}全体について質問`}</span>
+        </label>
+      </div>
       <div
         style={{
           margin: "10px",

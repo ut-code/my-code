@@ -183,6 +183,7 @@ export function PageContent(props: PageContentProps) {
         <div className="fixed bottom-4 right-4 left-4 has-sidebar:left-[calc(var(--container-sidebar)+1rem)] z-40">
           <ChatForm
             path={path}
+            langName={props.langEntry.name}
             sectionContent={dynamicMdContent}
             close={() => setIsFormVisible(false)}
           />
