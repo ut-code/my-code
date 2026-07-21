@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth/minimal";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { anonymous } from "better-auth/plugins";
 import { migrateChatUser } from "./chatHistory";
@@ -33,6 +33,15 @@ export async function getAuthServer(
           migrateChatUser(anonymousUser.user.id, newUser.user.id),
       }),
     ],
+    baseURL: {
+      allowedHosts: [
+        "localhost:3000",
+        "my-code.utcode.net",
+        "my-code.ut-code.workers.dev",
+        "*-my-code.ut-code.workers.dev",
+      ],
+      protocol: process.env.NODE_ENV === "development" ? "http" : "https",
+    },
     socialProviders: {
       github: {
         clientId:

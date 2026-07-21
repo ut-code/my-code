@@ -3,7 +3,6 @@ import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
 import { chat, diff, message, section } from "@/schema/chat";
 import { and, asc, eq, exists } from "drizzle-orm";
-import { Auth } from "better-auth";
 import { updateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
 import { LangId, PagePath, PageSlug, SectionId } from "./docs";
@@ -51,7 +50,7 @@ export async function revalidateChat(
 
 interface Context {
   drizzle: Awaited<ReturnType<typeof getDrizzle>>;
-  auth: Auth;
+  auth: Awaited<ReturnType<typeof getAuthServer>>;
   userId?: string;
 }
 /**
