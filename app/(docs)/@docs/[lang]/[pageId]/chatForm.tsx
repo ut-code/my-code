@@ -225,7 +225,6 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
       className="border border-2 border-secondary shadow-lg rounded-box bg-base-100/60 backdrop-blur-xs"
       style={{
         width: "100%",
-        textAlign: "center",
       }}
       onSubmit={handleSubmit}
     >
@@ -247,8 +246,8 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
         onChange={(e) => setInputValue(e.target.value)}
         disabled={isLoading}
       ></textarea>
-      <div className="px-4 pt-1 pb-2 text-left">
-        <label className="label cursor-pointer justify-start gap-2 py-1">
+      <div className="px-3 flex flex-wrap gap-3 text-sm">
+        <label className="label cursor-pointer gap-2">
           <input
             type="radio"
             className="radio radio-sm radio-secondary"
@@ -260,7 +259,7 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
           />
           <span className="label-text">このページの内容について質問</span>
         </label>
-        <label className="label cursor-pointer justify-start gap-2 py-1">
+        <label className="label cursor-pointer gap-2">
           <input
             type="radio"
             className="radio radio-sm radio-secondary"
@@ -274,8 +273,8 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
         </label>
       </div>
       <div
+        className="m-3"
         style={{
-          margin: "10px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
