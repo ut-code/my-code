@@ -2,7 +2,7 @@
 
 import { authClient } from "@/lib/auth-client";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function AutoAnonymousLogin() {
   const { data: session, isPending } = authClient.useSession();
@@ -19,6 +19,12 @@ export function AccountMenu() {
   const { data: session, isPending } = authClient.useSession();
   const pathname = usePathname();
   const router = useRouter();
+  const [signingInProvider, setSigningInProvider] = useState<
+    "github" | "google" | null
+  >(null);
+  const [signinErrorMessage, setSigninErrorMessage] = useState<string | null>(
+    null
+  );
 
   const signout = () => {
     if (
@@ -40,6 +46,25 @@ export function AccountMenu() {
           onSuccess: () => router.refresh(),
         },
       });
+    }
+  };
+  const signInWithSocial = async (provider: "github" | "google") => {
+    if (signingInProvider) return;
+    setSigninErrorMessage(null);
+    setSigningInProvider(provider);
+    try {
+      const result = await authClient.signIn.social({
+        provider,
+        callbackURL: `/clear-cache?redirect=${encodeURIComponent(pathname)}`,
+      });
+      if (result?.error) {
+        throw new Error(result.error.message);
+      }
+    } catch {
+      setSigningInProvider(null);
+      setSigninErrorMessage(
+        "ログインに失敗しました。しばらくしてから再度お試しください。"
+      );
     }
   };
 
@@ -100,28 +125,31 @@ export function AccountMenu() {
         </li>
         <li>
           <button
-            onClick={() =>
-              authClient.signIn.social({
-                provider: "github",
-                callbackURL: `/clear-cache?redirect=${encodeURIComponent(pathname)}`,
-              })
-            }
+            onClick={() => signInWithSocial("github")}
+            disabled={signingInProvider !== null}
+            aria-busy={signingInProvider === "github"}
           >
+            {signingInProvider === "github" && (
+              <span className="loading loading-spinner loading-xs" />
+            )}
             GitHub でログイン
           </button>
         </li>
         <li>
           <button
-            onClick={() =>
-              authClient.signIn.social({
-                provider: "google",
-                callbackURL: `/clear-cache?redirect=${encodeURIComponent(pathname)}`,
-              })
-            }
+            onClick={() => signInWithSocial("google")}
+            disabled={signingInProvider !== null}
+            aria-busy={signingInProvider === "google"}
           >
+            {signingInProvider === "google" && (
+              <span className="loading loading-spinner loading-xs" />
+            )}
             Google でログイン
           </button>
         </li>
+        {signinErrorMessage && (
+          <li className="text-error px-4 py-2 text-sm">{signinErrorMessage}</li>
+        )}
         {session?.user && (
           <>
             <div className="divider my-0" />
