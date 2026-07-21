@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth/minimal";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { anonymous } from "better-auth/plugins";
 import { migrateChatUser } from "./chatHistory";
