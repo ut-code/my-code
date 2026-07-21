@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       .trim()
       .split(/\s+/)[0]
       ?.trim() as typeof path.page | undefined;
-    if (langEntry.pages.some((page) => page.slug === selectedPageSlug)) {
+    if (selectedPageSlug && langEntry.pages.some((page) => page.slug === selectedPageSlug)) {
       targetPath = {
         lang: path.lang,
         page: selectedPageSlug,
@@ -140,10 +140,6 @@ export async function POST(request: NextRequest) {
     );
     prompt.push(
       `質問に答える際には、ユーザーが閲覧しているセクションの内容を特に考慮してください。`
-    );
-  } else {
-    prompt.push(
-      `ユーザーは特定のセクションを閲覧していない可能性があります。質問全体に最も関連する内容を優先して回答してください。`
     );
   }
   prompt.push(``);
