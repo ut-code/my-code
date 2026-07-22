@@ -2,13 +2,12 @@ import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import removeComments from "remark-remove-comments";
 import remarkCjkFriendly from "remark-cjk-friendly";
-import {
-  MultiHighlightTag,
-  remarkMultiHighlight,
-} from "./multiHighlight";
+import { MultiHighlightTag, remarkMultiHighlight } from "./multiHighlight";
 import { Heading } from "./heading";
 import { AutoCodeBlock } from "./codeBlock";
 import { ReplacedRange } from "@/lib/docs";
+import remarkTerm from "./remarkTerm";
+import Term from "./term";
 
 export function StyledMarkdown(props: {
   content: string;
@@ -21,6 +20,7 @@ export function StyledMarkdown(props: {
         removeComments,
         remarkCjkFriendly,
         [remarkMultiHighlight, props.replacedRange],
+        remarkTerm,
       ]}
       components={components}
     >
@@ -58,4 +58,5 @@ const components: Components = {
   pre: ({ node, ...props }) => props.children,
   code: AutoCodeBlock,
   ins: MultiHighlightTag,
+  q: Term,
 };
