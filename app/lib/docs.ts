@@ -43,6 +43,10 @@ export const SectionFrontMatterSchema = z.object({
    * scripts/questionExample.ts で生成する
    */
   question: z.array(z.string()).optional(),
+  /**
+   * 他のページで [[キーワード]] と書いた場合に、このセクションの内容がポップアップで表示される。
+   */
+  term: z.array(z.string()).optional(),
 });
 export type SectionFrontMatter = z.output<typeof SectionFrontMatterSchema>;
 export const MarkdownSectionSchema = SectionFrontMatterSchema.extend({
@@ -60,6 +64,15 @@ export const MarkdownSectionSchema = SectionFrontMatterSchema.extend({
   md5: z.string(),
 });
 export type MarkdownSection = z.output<typeof MarkdownSectionSchema>;
+
+export const TermDefinitionSchema = z.object({
+  term: z.array(z.string()),
+  page: z.string().transform((s) => s as PageSlug),
+  id: z.string().transform((s) => s as SectionId),
+  title: z.string(),
+  rawContentWithoutCode: z.string(),
+});
+export type TermDefinition = z.output<typeof TermDefinitionSchema>;
 
 export const ReplacedRangeSchema = z.object({
   start: z.number(),
@@ -199,7 +212,9 @@ export async function getPagesList(): Promise<LanguageEntry[]> {
   const langIds = await getLanguageIds();
   return await Promise.all(langIds.map(getPagesListForLang));
 }
-export async function getPagesListForLang(langId: LangId): Promise<LanguageEntry> {
+export async function getPagesListForLang(
+  langId: LangId
+): Promise<LanguageEntry> {
   const raw = await readPublicFile(`docs/${langId}/index.yml`);
   const data = yaml.load(raw) as IndexYml;
   return {
@@ -327,6 +342,7 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
     title: fm.title,
     level: fm.level,
     question: fm.question,
+    term: fm.term,
     rawContent,
     md5: crypto.createHash("md5").update(rawContent).digest("base64"),
   };
@@ -357,5 +373,49 @@ export async function getRevisionOfMarkdownSection(
     throw new Error(
       `Revision for sectionId=${sectionId}, md5=${md5} not found`
     );
+  }
+}
+
+export async function getTermDefinitions(
+  langId: LangId
+): Promise<TermDefinition[]> {
+  if (isCloudflare()) {
+    const termsJson = await readPublicFile(
+      `docs/${langId}/termDefinitions.json`
+    );
+    return JSON.parse(termsJson) as TermDefinition[];
+  } else {
+    // これに関しては<Term>の表示のたびに毎回全ファイルを読むのは非効率なので、
+    // cloudflareでない場合でも事前生成済みファイルがあれば利用
+    try {
+      const termsJson = await readPublicFile(
+        `docs/${langId}/termDefinitions.json`
+      );
+      return JSON.parse(termsJson) as TermDefinition[];
+    } catch (e) {
+      // not found?
+      console.warn(`failed to read docs/${langId}/termDefinitions.json:`, e);
+    }
+    const terms: TermDefinition[] = [];
+    const langEntry = await getPagesListForLang(langId);
+    const codeBlockRegex = /^(`{3,})(.*)\n([\s\S]*?)\n^\1/gm;
+    for (const page of langEntry.pages) {
+      const sections = await getMarkdownSections(langId, page.slug);
+      for (const section of sections) {
+        if (section.term && section.term.length >= 1) {
+          terms.push({
+            term: section.term,
+            page: page.slug,
+            id: section.id,
+            title: section.title,
+            rawContentWithoutCode: section.rawContent.replace(
+              codeBlockRegex,
+              ""
+            ),
+          });
+        }
+      }
+    }
+    return terms;
   }
 }

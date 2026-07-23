@@ -1,9 +1,14 @@
 // Generates public/docs/{lang}/{pageId}/sections.yml for each page directory.
 // Each sections.yml lists the .md files in that directory in display order.
 
-import { writeFile } from "node:fs/promises";
+import { unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { getMarkdownSections, getPagesList } from "@/lib/docs";
+import {
+  getMarkdownSections,
+  getPagesList,
+  getTermDefinitions,
+} from "@/lib/docs";
+import { existsSync } from "node:fs";
 
 const docsDir = join(process.cwd(), "public", "docs");
 
@@ -16,6 +21,19 @@ console.log(
 );
 
 for (const lang of langEntries) {
+  if (existsSync(join(docsDir, lang.id, "termDefinitions.json"))) {
+    await unlink(join(docsDir, lang.id, "termDefinitions.json"));
+  }
+  const terms = await getTermDefinitions(lang.id);
+  await writeFile(
+    join(docsDir, lang.id, "termDefinitions.json"),
+    JSON.stringify(terms),
+    "utf-8"
+  );
+  console.log(
+    `Generated ${lang.id}/termDefinitions.json (${terms.length} definitions, ${terms.reduce((sum, td) => sum + td.term.length, 0)} terms)`
+  );
+
   for (const page of lang.pages) {
     const sections = await getMarkdownSections(lang.id, page.slug);
     await writeFile(
