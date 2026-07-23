@@ -197,22 +197,21 @@ async function getLanguageIds(): Promise<LangId[]> {
 
 export async function getPagesList(): Promise<LanguageEntry[]> {
   const langIds = await getLanguageIds();
-  return await Promise.all(
-    langIds.map(async (langId) => {
-      const raw = await readPublicFile(`docs/${langId}/index.yml`);
-      const data = yaml.load(raw) as IndexYml;
-      return {
-        id: langId,
-        name: data.name as LangName,
-        description: data.description,
-        pages: data.pages.map((p, index) => ({
-          ...p,
-          slug: p.slug as PageSlug,
-          index,
-        })),
-      };
-    })
-  );
+  return await Promise.all(langIds.map(getPagesListForLang));
+}
+export async function getPagesListForLang(langId: LangId): Promise<LanguageEntry> {
+  const raw = await readPublicFile(`docs/${langId}/index.yml`);
+  const data = yaml.load(raw) as IndexYml;
+  return {
+    id: langId,
+    name: data.name as LangName,
+    description: data.description,
+    pages: data.pages.map((p, index) => ({
+      ...p,
+      slug: p.slug as PageSlug,
+      index,
+    })),
+  };
 }
 
 export async function getRevisions(

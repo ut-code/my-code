@@ -9,7 +9,7 @@ import {
 } from "@/lib/chatHistory";
 import {
   getMarkdownSections,
-  getPagesList,
+  getPagesListForLang,
   LangId,
   PagePath,
   PageSlug,
@@ -25,8 +25,7 @@ export async function generateMetadata({
   params: Promise<{ lang: LangId; pageId: PageSlug }>;
 }): Promise<Metadata> {
   const { lang, pageId } = await params;
-  const pagesList = await getPagesList();
-  const langEntry = pagesList.find((l) => l.id === lang);
+  const langEntry = await getPagesListForLang(lang);
   const pageEntry = langEntry?.pages.find((p) => p.slug === pageId);
   if (!langEntry || !pageEntry) notFound();
 
@@ -45,8 +44,7 @@ export default async function Page({
   params: Promise<{ lang: LangId; pageId: PageSlug }>;
 }) {
   const { lang, pageId } = await params;
-  const pagesList = await getPagesList();
-  const langEntry = pagesList.find((l) => l.id === lang);
+  const langEntry = await getPagesListForLang(lang);
   const pageEntryIndex =
     langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
   const pageEntry = langEntry?.pages[pageEntryIndex];

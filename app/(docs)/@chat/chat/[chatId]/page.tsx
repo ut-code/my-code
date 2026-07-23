@@ -4,7 +4,7 @@ import {
   getChatOne,
   initContext,
 } from "@/lib/chatHistory";
-import { getMarkdownSections, getPagesList } from "@/lib/docs";
+import { getMarkdownSections, getPagesListForLang, LangId } from "@/lib/docs";
 import { ChatAreaContainer, ChatAreaContent } from "./chatArea";
 import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
@@ -29,9 +29,8 @@ export default async function ChatPage({
     );
   }
 
-  const pagesList = await getPagesList();
-  const targetLang = pagesList.find(
-    (lang) => lang.id === chatData.section.pagePath.split("/")[0]
+  const targetLang = await getPagesListForLang(
+    chatData.section.pagePath.split("/")[0] as LangId
   );
   const targetPage = targetLang?.pages.find(
     (page) => page.slug === chatData.section.pagePath.split("/")[1]
