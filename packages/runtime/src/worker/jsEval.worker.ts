@@ -4,94 +4,21 @@ import { expose } from "comlink";
 import type { ReplOutput, UpdatedFile } from "../interface";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
-import { replLikeEval, checkSyntax } from "@my-code/js-eval";
+import { replLikeEval, checkSyntax, createReplConsole } from "@my-code/js-eval";
 
-function format(...args: unknown[]): string {
-  // TODO: console.logの第1引数はフォーマット指定文字列を取ることができる
-  // https://nodejs.org/api/util.html#utilformatformat-args
-  return args.map((a) => (typeof a === "string" ? a : inspect(a))).join(" ");
-}
 let currentOutputCallback: ((output: ReplOutput) => Promise<void>) | null =
   null;
 let pendingOutputPromise: Promise<void>[] = [];
-const consoleTimers = new Map<string, number>();
-
-function formatElapsedTime(ms: number): string {
-  if (ms < 1000) return `${ms.toFixed(3)}ms`;
-  return `${(ms / 1000).toFixed(3)}s`;
-}
 
 // Helper function to capture console output
 const originalConsole = self.console;
 self.console = {
   ...originalConsole,
-  time: (label: unknown = "default") => {
-    const key = String(label);
-    if (consoleTimers.has(key)) {
-      if (currentOutputCallback) {
-        pendingOutputPromise.push(
-          currentOutputCallback({
-            type: "stderr",
-            message: `Warning: Label '${key}' already exists for console.time()`,
-          })
-        );
-      }
-      return;
-    }
-    consoleTimers.set(key, performance.now());
-  },
-  timeEnd: (label: unknown = "default") => {
-    const key = String(label);
-    const start = consoleTimers.get(key);
-    if (start === undefined) {
-      if (currentOutputCallback) {
-        pendingOutputPromise.push(
-          currentOutputCallback({
-            type: "stderr",
-            message: `Warning: No such label '${key}' for console.timeEnd()`,
-          })
-        );
-      }
-      return;
-    }
-    consoleTimers.delete(key);
+  ...createReplConsole((output) => {
     if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({
-          type: "stdout",
-          message: `${key}: ${formatElapsedTime(performance.now() - start)}`,
-        })
-      );
+      pendingOutputPromise.push(currentOutputCallback(output));
     }
-  },
-  log: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stdout", message: format(...args) })
-      );
-    }
-  },
-  error: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stderr", message: format(...args) })
-      );
-    }
-  },
-  warn: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stderr", message: format(...args) })
-      );
-    }
-  },
-  info: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stdout", message: format(...args) })
-      );
-    }
-  },
+  }),
 };
 
 async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
