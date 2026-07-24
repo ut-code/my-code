@@ -157,6 +157,64 @@ export const replTests: Record<string, (lang: RuntimeLang) => TestBody | null> =
       };
     },
 
+    "should support console.time and console.timeEnd": (lang) => {
+      const timeCode = (
+        {
+          python: null,
+          ruby: null,
+          cpp: null,
+          rust: null,
+          javascript: `console.time("t"); console.timeEnd("t")`,
+          typescript: null,
+        } satisfies Record<RuntimeLang, string | null>
+      )[lang];
+      if (!timeCode) return null;
+
+      return async (runtimeRef) => {
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current![lang].mutex || emptyMutex).runExclusive(() =>
+          runtimeRef.current![lang].runCommand!(timeCode, (output) => {
+            if (output.type !== "file") outputs.push(output);
+          })
+        );
+        console.log(`${lang} REPL console.time test: `, outputs);
+        expect(
+          outputs.some(
+            (o) => o.type === "stdout" && /^t: \d+(\.\d+)?m?s$/.test(o.message)
+          )
+        ).to.be.true;
+      };
+    },
+
+    "should warn on console.timeEnd with no matching console.time": (lang) => {
+      const timeCode = (
+        {
+          python: null,
+          ruby: null,
+          cpp: null,
+          rust: null,
+          javascript: `console.timeEnd("missing")`,
+          typescript: null,
+        } satisfies Record<RuntimeLang, string | null>
+      )[lang];
+      if (!timeCode) return null;
+
+      return async (runtimeRef) => {
+        const outputs: ReplOutput[] = [];
+        await (runtimeRef.current![lang].mutex || emptyMutex).runExclusive(() =>
+          runtimeRef.current![lang].runCommand!(timeCode, (output) => {
+            if (output.type !== "file") outputs.push(output);
+          })
+        );
+        console.log(`${lang} REPL console.timeEnd warning test: `, outputs);
+        expect(
+          outputs.some(
+            (o) => o.type === "stderr" && o.message.includes("missing")
+          )
+        ).to.be.true;
+      };
+    },
+
     "should capture files modified by command": (lang) => {
       const targetFile = "test.txt";
       const msg = "Hello, World!";

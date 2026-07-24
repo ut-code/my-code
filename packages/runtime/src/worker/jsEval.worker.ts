@@ -14,11 +14,56 @@ function format(...args: unknown[]): string {
 let currentOutputCallback: ((output: ReplOutput) => Promise<void>) | null =
   null;
 let pendingOutputPromise: Promise<void>[] = [];
+const consoleTimers = new Map<string, number>();
+
+function formatElapsedTime(ms: number): string {
+  if (ms < 1000) return `${ms.toFixed(3)}ms`;
+  return `${(ms / 1000).toFixed(3)}s`;
+}
 
 // Helper function to capture console output
 const originalConsole = self.console;
 self.console = {
   ...originalConsole,
+  time: (label: unknown = "default") => {
+    const key = String(label);
+    if (consoleTimers.has(key)) {
+      if (currentOutputCallback) {
+        pendingOutputPromise.push(
+          currentOutputCallback({
+            type: "stderr",
+            message: `Warning: Label '${key}' already exists for console.time()`,
+          })
+        );
+      }
+      return;
+    }
+    consoleTimers.set(key, performance.now());
+  },
+  timeEnd: (label: unknown = "default") => {
+    const key = String(label);
+    const start = consoleTimers.get(key);
+    if (start === undefined) {
+      if (currentOutputCallback) {
+        pendingOutputPromise.push(
+          currentOutputCallback({
+            type: "stderr",
+            message: `Warning: No such label '${key}' for console.timeEnd()`,
+          })
+        );
+      }
+      return;
+    }
+    consoleTimers.delete(key);
+    if (currentOutputCallback) {
+      pendingOutputPromise.push(
+        currentOutputCallback({
+          type: "stdout",
+          message: `${key}: ${formatElapsedTime(performance.now() - start)}`,
+        })
+      );
+    }
+  },
   log: (...args: unknown[]) => {
     if (currentOutputCallback) {
       pendingOutputPromise.push(
