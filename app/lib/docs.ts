@@ -398,6 +398,7 @@ export async function getTermDefinitions(
     }
     const terms: TermDefinition[] = [];
     const langEntry = await getPagesListForLang(langId);
+    const headingRegex = /^#+(.*)$/m;
     const codeBlockRegex = /^(`{3,})(.*)\n([\s\S]*?)\n^\1/gm;
     for (const page of langEntry.pages) {
       const sections = await getMarkdownSections(langId, page.slug);
@@ -408,10 +409,9 @@ export async function getTermDefinitions(
             page: page.slug,
             id: section.id,
             title: section.title,
-            rawContentWithoutCode: section.rawContent.replace(
-              codeBlockRegex,
-              ""
-            ),
+            rawContentWithoutCode: section.rawContent
+              .replace(codeBlockRegex, "")
+              .replace(headingRegex, ""),
           });
         }
       }

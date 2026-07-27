@@ -10,6 +10,7 @@ import {
 import {
   getMarkdownSections,
   getPagesListForLang,
+  getTermDefinitions,
   LangId,
   PagePath,
   PageSlug,
@@ -18,6 +19,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
 import { DocsAutoRedirect } from "./autoRedirect";
 import { dateReviver } from "@/lib/dateReviver";
+import { TermDefinitionProvider } from "@/markdown/term";
 
 export async function generateMetadata({
   params,
@@ -60,17 +62,21 @@ export default async function Page({
   const context = await initContext();
   const chatHistories = await getChatFromCache(path, context.userId);
 
+  const termDefinitions = await getTermDefinitions(lang);
+
   return (
     <>
-      <PageContent
-        chatHistories={chatHistories}
-        splitMdContent={sections}
-        langEntry={langEntry}
-        pageEntry={pageEntry}
-        prevPage={prevPage}
-        nextPage={nextPage}
-        path={path}
-      />
+      <TermDefinitionProvider termDefinitions={termDefinitions} lang={lang}>
+        <PageContent
+          chatHistories={chatHistories}
+          splitMdContent={sections}
+          langEntry={langEntry}
+          pageEntry={pageEntry}
+          prevPage={prevPage}
+          nextPage={nextPage}
+          path={path}
+        />
+      </TermDefinitionProvider>
       <DocsAutoRedirect path={path} />
     </>
   );
