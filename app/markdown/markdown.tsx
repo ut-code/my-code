@@ -12,6 +12,7 @@ import Term from "./term";
 export function StyledMarkdown(props: {
   content: string;
   replacedRange?: ReplacedRange[];
+  interactive?: boolean;
 }) {
   return (
     <Markdown
@@ -22,7 +23,7 @@ export function StyledMarkdown(props: {
         [remarkMultiHighlight, props.replacedRange],
         remarkTerm,
       ]}
-      components={components}
+      components={props.interactive ? interactiveComponents : baseComponents}
     >
       {props.content}
     </Markdown>
@@ -30,7 +31,8 @@ export function StyledMarkdown(props: {
 }
 
 // TailwindCSSがh1などのタグのスタイルを消してしまうので、手動でスタイルを指定する必要がある
-const components: Components = {
+// チャット回答、term定義内などではコードブロックの操作やtermリンクを無効化したbaseComponentを使用
+const baseComponents: Components = {
   h1: ({ children }) => <Heading level={1}>{children}</Heading>,
   h2: ({ children }) => <Heading level={2}>{children}</Heading>,
   h3: ({ children }) => <Heading level={3}>{children}</Heading>,
@@ -55,8 +57,15 @@ const components: Components = {
     </div>
   ),
   hr: () => null,
-  pre: ({ node, ...props }) => props.children,
-  code: AutoCodeBlock,
+  pre: ({ children }) => children,
+  code: (props) => <AutoCodeBlock interactive={false} {...props} />,
+  ins: ({ children }) => children,
+  q: ({ children }) => children,
+};
+// ドキュメント本文で使うフルバージョン:
+const interactiveComponents: Components = {
+  ...baseComponents,
+  code: (props) => <AutoCodeBlock interactive={true} {...props} />,
   ins: MultiHighlightTag,
   q: Term,
 };

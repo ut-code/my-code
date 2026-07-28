@@ -159,6 +159,7 @@ export function PageContent(props: PageContentProps) {
               <StyledMarkdown
                 content={section.replacedContent}
                 replacedRange={section.replacedRange}
+                interactive
               />
             </div>
             <div>

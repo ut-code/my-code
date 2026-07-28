@@ -181,6 +181,7 @@ Pythonは整数 (\`int\`) と浮動小数点数 (\`float\`) を区別します�
 浮動小数点数 (\`float\`) は、他の言語の double 型に相当する倍精度浮動小数点数です。
 `}
               replacedRange={[{ start: 64, end: 120, id: "sample" }]}
+              interactive
             />
           </div>
           <div className={clsx(docsReplaced && "hidden")}>
