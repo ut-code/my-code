@@ -65,14 +65,15 @@ export const MarkdownSectionSchema = SectionFrontMatterSchema.extend({
 });
 export type MarkdownSection = z.output<typeof MarkdownSectionSchema>;
 
-export const TermDefinitionSchema = z.object({
-  term: z.array(z.string()),
-  page: z.string().transform((s) => s as PageSlug),
-  id: z.string().transform((s) => s as SectionId),
-  title: z.string(),
-  rawContentWithoutCode: z.string(),
-});
-export type TermDefinition = z.output<typeof TermDefinitionSchema>;
+export interface TermDefinition {
+  alias: string[];
+  pageSlug: PageSlug;
+  pageIndex: number;
+  pageName: string;
+  id: SectionId;
+  title: string;
+  rawContentWithoutCode: string;
+}
 
 export const ReplacedRangeSchema = z.object({
   start: z.number(),
@@ -405,8 +406,10 @@ export async function getTermDefinitions(
       for (const section of sections) {
         if (section.term && section.term.length >= 1) {
           terms.push({
-            term: section.term,
-            page: page.slug,
+            alias: section.term,
+            pageSlug: page.slug,
+            pageIndex: page.index,
+            pageName: page.name,
             id: section.id,
             title: section.title,
             rawContentWithoutCode: section.rawContent

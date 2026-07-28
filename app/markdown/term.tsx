@@ -86,7 +86,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   }
 
   const termText = onlyText(props.children);
-  const term = termDefinitions.find((t) => t.term.includes(termText));
+  const term = termDefinitions.find((t) => t.alias.includes(termText));
   if (!term) {
     console.error(`'${termText}'という用語は定義されていません`);
     return props.children;
@@ -97,7 +97,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
       <Link
         ref={refs.setReference}
         {...getReferenceProps()}
-        href={`/${lang}/${term.page}#${term.id}`}
+        href={`/${lang}/${term.pageSlug}#${term.id}`}
         className="inline-block link link-info decoration-dotted underline-offset-[0.2rem]"
       >
         {props.children}
@@ -116,8 +116,8 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
             )}
           >
             <h6 className="breadcrumbs text-info font-bold flex justify-center text-base wrap-none py-2">
-              <ul className="">
-                <li>{term.page}</li>
+              <ul className="flex-wrap justify-center">
+                <li>{term.pageIndex}. {term.pageName}</li>
                 <li>{term.title}</li>
               </ul>
             </h6>

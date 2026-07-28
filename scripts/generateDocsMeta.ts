@@ -31,7 +31,7 @@ for (const lang of langEntries) {
     "utf-8"
   );
   console.log(
-    `Generated ${lang.id}/termDefinitions.json (${terms.length} definitions, ${terms.reduce((sum, td) => sum + td.term.length, 0)} terms)`
+    `Generated ${lang.id}/termDefinitions.json (${terms.length} definitions, ${terms.reduce((sum, td) => sum + td.alias.length, 0)} terms)`
   );
 
   for (const page of lang.pages) {
