@@ -1,11 +1,25 @@
 "use client";
 
-import { createContext, JSX, ReactNode, useContext } from "react";
+import { createContext, JSX, ReactNode, useContext, useState } from "react";
 import { ExtraProps } from "react-markdown";
 import { onlyText } from "react-children-utilities";
 import { LangId, TermDefinition } from "@/lib/docs";
 import Link from "next/link";
 import { StyledMarkdown } from "./markdown";
+import {
+  useFloating,
+  autoUpdate,
+  offset,
+  flip,
+  shift,
+  useHover,
+  useFocus,
+  useDismiss,
+  useRole,
+  useInteractions,
+  FloatingPortal,
+} from "@floating-ui/react";
+import clsx from "clsx";
 
 const TermDefinitionContext = createContext<{
   lang: LangId;
@@ -36,6 +50,37 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   // @docs/lang/pageId/page.tsx で取得したものをcontextに渡してそれを取得する
   const { lang, termDefinitions } = useContext(TermDefinitionContext) ?? {};
 
+  // 1. Manage the tooltip's open state
+  const [isOpen, setIsOpen] = useState(false);
+
+  // 2. Setup Floating UI
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    placement: "top", // Preferred placement
+    // Make sure the tooltip stays anchored to the trigger when scrolling/resizing
+    whileElementsMounted: autoUpdate,
+    middleware: [
+      offset(2), // Gap between trigger and tooltip
+      flip(), // Flip to bottom if no space on top
+      shift(), // Keep tooltip on screen
+    ],
+  });
+
+  // 3. Setup interactions (trigger on hover, focus, and dismiss on click outside/escape)
+  const hover = useHover(context, { move: false });
+  const focus = useFocus(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: "tooltip" });
+
+  // Merge the interactions into prop getters
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    hover,
+    focus,
+    dismiss,
+    role,
+  ]);
+
   if (!termDefinitions) {
     return props.children;
   }
@@ -47,25 +92,39 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
     return props.children;
   }
 
-  // [{props.children} → term:{onlyText(props.children)}]
-
   return (
-    <span className="tooltip tooltip-primary">
-      <span className="tooltip-content bg-primary-content/60 border border-primary text-base-content backdrop-blur-xs">
-        <span className="breadcrumbs text-info text-center text-base wrap-none mb-4">
-          <ul className="">
-            <li>{term.page}</li>
-            <li>{term.title}</li>
-          </ul>
-        </span>
-        <StyledMarkdown content={term.rawContentWithoutCode} />
-      </span>
+    <>
       <Link
+        ref={refs.setReference}
+        {...getReferenceProps()}
         href={`/${lang}/${term.page}#${term.id}`}
-        className="link link-info decoration-dotted underline-offset-[0.2rem]"
+        className="inline-block link link-info decoration-dotted underline-offset-[0.2rem]"
       >
         {props.children}
       </Link>
-    </span>
+      {isOpen && (
+        <FloatingPortal>
+          <div
+            // eslint-disable-next-line react-hooks/refs
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className={clsx(
+              "max-w-sm rounded-box bg-primary-content/60 border border-primary text-base-content",
+              "p-1 shadow-xl backdrop-blur-xs z-50",
+              "text-justify"
+            )}
+          >
+            <h6 className="breadcrumbs text-info font-bold flex justify-center text-base wrap-none py-2">
+              <ul className="">
+                <li>{term.page}</li>
+                <li>{term.title}</li>
+              </ul>
+            </h6>
+            <StyledMarkdown content={term.rawContentWithoutCode} />
+          </div>
+        </FloatingPortal>
+      )}
+    </>
   );
 }

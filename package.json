@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.6.23",
+    "@floating-ui/react": "^0.27.20",
     "@fontsource-variable/inconsolata": "^5.2.7",
     "@fontsource/m-plus-rounded-1c": "^5.2.9",
     "@google/genai": "^1.21.0",
