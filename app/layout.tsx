@@ -14,6 +14,7 @@ import { SidebarMdProvider } from "./sidebar";
 import { RuntimeProvider } from "@my-code/runtime/context";
 import { getPagesList } from "@/lib/docs";
 import { Footer } from "./footer";
+import { PagesListContextProvider } from "./pagesListContext";
 
 export const metadata: Metadata = {
   title: {
@@ -41,6 +42,7 @@ export default async function RootLayout({
     <html lang="ja">
       <body className="w-full min-h-screen">
         <AutoAnonymousLogin />
+        <PagesListContextProvider pagesList={pagesList}>
         <SidebarMdProvider>
           <div className="drawer has-sidebar:drawer-open min-h-screen">
             <input
@@ -60,10 +62,11 @@ export default async function RootLayout({
                 aria-label="close sidebar"
                 className="drawer-overlay"
               />
-              <Sidebar pagesList={pagesList} />
+              <Sidebar />
             </div>
           </div>
         </SidebarMdProvider>
+      </PagesListContextProvider>
         <Footer />
       </body>
     </html>

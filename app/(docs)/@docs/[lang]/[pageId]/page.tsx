@@ -46,14 +46,6 @@ export default async function Page({
   params: Promise<{ lang: LangId; pageId: PageSlug }>;
 }) {
   const { lang, pageId } = await params;
-  const langEntry = await getPagesListForLang(lang);
-  const pageEntryIndex =
-    langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
-  const pageEntry = langEntry?.pages[pageEntryIndex];
-  if (!langEntry || !pageEntry) notFound();
-
-  const prevPage = langEntry.pages[pageEntryIndex - 1];
-  const nextPage = langEntry.pages[pageEntryIndex + 1];
 
   // server componentなのでuseMemoいらない
   const path = { lang: lang, page: pageId };
@@ -70,10 +62,8 @@ export default async function Page({
         <PageContent
           chatHistories={chatHistories}
           splitMdContent={sections}
-          langEntry={langEntry}
-          pageEntry={pageEntry}
-          prevPage={prevPage}
-          nextPage={nextPage}
+          langId={lang}
+          pageSlug={pageId}
           path={path}
         />
       </TermDefinitionProvider>

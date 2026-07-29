@@ -67,9 +67,7 @@ export type MarkdownSection = z.output<typeof MarkdownSectionSchema>;
 
 export interface TermDefinition {
   alias: string[];
-  pageSlug: PageSlug;
-  pageIndex: number;
-  pageName: string;
+  page: PageSlug;
   id: SectionId;
   title: string;
   rawContentWithoutCode: string;
@@ -99,6 +97,9 @@ export type DynamicMarkdownSection = z.output<
 
 /**
  * 各言語のindex.ymlから読み込んだデータにid,index等を追加したデータ型
+ *
+ * getPagesList() で取得できるが、クライアントコンポーネントで頻繁に使うので、
+ * layout.tsxでcontextを初期化しておりusePagesList()で取得することもできる (pagesListContext.tsx)
  */
 export interface LanguageEntry {
   /**
@@ -216,6 +217,10 @@ export async function getPagesList(): Promise<LanguageEntry[]> {
 export async function getPagesListForLang(
   langId: LangId
 ): Promise<LanguageEntry> {
+  if (!(await getLanguageIds()).includes(langId)) {
+    notFound();
+  }
+
   const raw = await readPublicFile(`docs/${langId}/index.yml`);
   const data = yaml.load(raw) as IndexYml;
   return {
@@ -269,6 +274,13 @@ export async function getMarkdownSections(
   lang: LangId,
   page: PageSlug
 ): Promise<MarkdownSection[]> {
+  if (
+    /*!(await getLanguageIds()).includes(lang) || // getPagesListForLangのなかでチェック */
+    !(await getPagesListForLang(lang)).pages.some((p) => p.slug === page)
+  ) {
+    notFound();
+  }
+
   if (isCloudflare()) {
     const sectionsJson = await readPublicFile(
       `docs/${lang}/${page}/sections.json`
@@ -380,6 +392,10 @@ export async function getRevisionOfMarkdownSection(
 export async function getTermDefinitions(
   langId: LangId
 ): Promise<TermDefinition[]> {
+  if (!(await getLanguageIds()).includes(langId)) {
+    notFound();
+  }
+
   if (isCloudflare()) {
     const termsJson = await readPublicFile(
       `docs/${langId}/termDefinitions.json`
@@ -407,9 +423,7 @@ export async function getTermDefinitions(
         if (section.term && section.term.length >= 1) {
           terms.push({
             alias: section.term,
-            pageSlug: page.slug,
-            pageIndex: page.index,
-            pageName: page.name,
+            page: page.slug,
             id: section.id,
             title: section.title,
             rawContentWithoutCode: section.rawContent

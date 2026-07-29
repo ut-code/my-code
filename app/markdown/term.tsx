@@ -20,6 +20,7 @@ import {
   FloatingPortal,
 } from "@floating-ui/react";
 import clsx from "clsx";
+import { usePagesListForLang } from "@/pagesListContext";
 
 const TermDefinitionContext = createContext<{
   lang: LangId;
@@ -49,6 +50,8 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   // termDefinitionの取得がasync関数であり、clientコンポーネントから直接取得できないので、
   // @docs/lang/pageId/page.tsx で取得したものをcontextに渡してそれを取得する
   const { lang, termDefinitions } = useContext(TermDefinitionContext) ?? {};
+
+  const langEntry = usePagesListForLang(lang);
 
   // 1. Manage the tooltip's open state
   const [isOpen, setIsOpen] = useState(false);
@@ -101,12 +104,14 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
     );
   }
 
+  const pageEntry = langEntry?.pages.find((p) => p.slug === term.page);
+
   return (
     <>
       <Link
         ref={refs.setReference}
         {...getReferenceProps()}
-        href={`/${lang}/${term.pageSlug}#${term.id}`}
+        href={`/${lang}/${term.page}#${term.id}`}
         className="link link-info decoration-dotted underline-offset-[0.2rem]"
       >
         {props.children}
@@ -127,7 +132,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
             <h6 className="breadcrumbs text-info font-bold flex justify-center text-base wrap-none py-2">
               <ul className="flex-wrap justify-center">
                 <li>
-                  {term.pageIndex}. {term.pageName}
+                  {pageEntry?.index}. {pageEntry?.name}
                 </li>
                 <li>{term.title}</li>
               </ul>
