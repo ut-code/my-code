@@ -3,7 +3,7 @@
 import { createContext, JSX, ReactNode, useContext, useState } from "react";
 import { ExtraProps } from "react-markdown";
 import { onlyText } from "react-children-utilities";
-import { LangId, TermDefinition } from "@/lib/docs";
+import { LangId, PageEntry, PageSlug, TermDefinition } from "@/lib/docs";
 import Link from "next/link";
 import { StyledMarkdown } from "./markdown";
 import {
@@ -24,19 +24,22 @@ import { usePagesListForLang } from "@/pagesListContext";
 
 const TermDefinitionContext = createContext<{
   lang: LangId;
+  page: PageSlug;
   termDefinitions: TermDefinition[];
 } | null>(null);
 export function TermDefinitionProvider({
   lang,
+  page,
   termDefinitions,
   children,
 }: {
   lang: LangId;
+  page: PageSlug;
   termDefinitions: TermDefinition[];
   children: ReactNode;
 }) {
   return (
-    <TermDefinitionContext.Provider value={{ lang, termDefinitions }}>
+    <TermDefinitionContext.Provider value={{ lang, page, termDefinitions }}>
       {children}
     </TermDefinitionContext.Provider>
   );
@@ -49,7 +52,8 @@ export function TermDefinitionProvider({
 export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   // termDefinitionの取得がasync関数であり、clientコンポーネントから直接取得できないので、
   // @docs/lang/pageId/page.tsx で取得したものをcontextに渡してそれを取得する
-  const { lang, termDefinitions } = useContext(TermDefinitionContext) ?? {};
+  const { lang, page, termDefinitions } =
+    useContext(TermDefinitionContext) ?? {};
 
   const langEntry = usePagesListForLang(lang);
 
@@ -91,6 +95,58 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   const termText = onlyText(props.children);
   const term = termDefinitions.find((t) => t.alias.includes(termText));
   if (!term) {
+    const internalLink = (pageEntry: PageEntry) => (
+      <span
+        className="tooltip tooltip-info"
+        data-tip={`${pageEntry.index}. ${pageEntry.name}`}
+      >
+        <Link
+          href={`/${lang}/${pageEntry.slug}`}
+          className="link link-info decoration-dotted underline-offset-[0.2rem]"
+        >
+          第{pageEntry.index}章
+        </Link>
+      </span>
+    );
+
+    // ./1, ./1-foo, ./next, ./prev →同じ言語のドキュメントへのリンクで、「第n章」
+    const pageIndexMatch = termText.match(/^.\/(\d+)$/);
+    const pageSlugMatch = termText.match(/^.\/([0-9a-zA-Z_-]+)$/);
+    if (
+      pageIndexMatch &&
+      langEntry &&
+      Number(pageIndexMatch[1]) < langEntry.pages.length
+    ) {
+      return internalLink(langEntry.pages[Number(pageIndexMatch[1])]);
+    }
+    if (
+      pageSlugMatch &&
+      langEntry?.pages.find((p) => p.slug === pageSlugMatch[1])
+    ) {
+      return internalLink(
+        langEntry.pages.find((p) => p.slug === pageSlugMatch[1])!
+      );
+    }
+    const currentPageIndex = langEntry?.pages.findIndex((p) => p.slug === page);
+    if (
+      pageSlugMatch &&
+      langEntry &&
+      pageSlugMatch[1] === "prev" &&
+      currentPageIndex !== undefined
+    ) {
+      // ./prev → 前のページ
+      return internalLink(langEntry.pages[currentPageIndex - 1]);
+    }
+    if (
+      pageSlugMatch &&
+      langEntry &&
+      pageSlugMatch[1] === "next" &&
+      currentPageIndex !== undefined
+    ) {
+      // ./next → 次のページ
+      return internalLink(langEntry.pages[currentPageIndex + 1]);
+    }
+
     console.error(`'${termText}' という用語は定義されていません`);
     return (
       <span

@@ -58,7 +58,11 @@ export default async function Page({
 
   return (
     <>
-      <TermDefinitionProvider termDefinitions={termDefinitions} lang={lang}>
+      <TermDefinitionProvider
+        termDefinitions={termDefinitions}
+        lang={lang}
+        page={pageId}
+      >
         <PageContent
           chatHistories={chatHistories}
           splitMdContent={sections}
