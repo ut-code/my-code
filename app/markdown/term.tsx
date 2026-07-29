@@ -88,8 +88,17 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   const termText = onlyText(props.children);
   const term = termDefinitions.find((t) => t.alias.includes(termText));
   if (!term) {
-    console.error(`'${termText}'という用語は定義されていません`);
-    return props.children;
+    console.error(`'${termText}' という用語は定義されていません`);
+    return (
+      <span
+        className="tooltip tooltip-error"
+        data-tip={`'${termText}' という用語は定義されていません`}
+      >
+        <span className="link link-error decoration-dotted underline-offset-[0.2rem]">
+          {props.children}
+        </span>
+      </span>
+    );
   }
 
   return (
@@ -98,7 +107,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
         ref={refs.setReference}
         {...getReferenceProps()}
         href={`/${lang}/${term.pageSlug}#${term.id}`}
-        className="inline-block link link-info decoration-dotted underline-offset-[0.2rem]"
+        className="link link-info decoration-dotted underline-offset-[0.2rem]"
       >
         {props.children}
       </Link>
@@ -110,14 +119,16 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
             style={floatingStyles}
             {...getFloatingProps()}
             className={clsx(
-              "max-w-sm rounded-box bg-primary-content/60 border border-primary text-base-content",
+              "max-w-sm rounded-box bg-base-100/60 border border-info text-base-content",
               "p-1 shadow-xl backdrop-blur-xs z-50",
               "text-justify"
             )}
           >
             <h6 className="breadcrumbs text-info font-bold flex justify-center text-base wrap-none py-2">
               <ul className="flex-wrap justify-center">
-                <li>{term.pageIndex}. {term.pageName}</li>
+                <li>
+                  {term.pageIndex}. {term.pageName}
+                </li>
                 <li>{term.title}</li>
               </ul>
             </h6>
