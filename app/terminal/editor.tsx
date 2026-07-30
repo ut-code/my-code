@@ -86,7 +86,7 @@ export function EditorComponent(props: EditorProps) {
   return (
     <Modal
       id={`edit-${props.filename}`}
-      className={clsx("overflow-hidden", "flex flex-col")}
+      className={clsx("overflow-hidden", "flex flex-col", "text-base-content")}
       open={isModal}
       setOpen={setIsModal}
     >

@@ -139,7 +139,7 @@ export function ExecFile(props: ExecProps) {
   return (
     <Modal
       id={`exec-${props.filenames.join("-")}`}
-      className={clsx("relative", "flex flex-col", "isolate")}
+      className={clsx("relative", "flex flex-col", "isolate", "text-base-content")}
       open={isModal}
       setOpen={setIsModal}
     >

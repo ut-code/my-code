@@ -462,7 +462,7 @@ export function ReplTerminal({
   return (
     <Modal
       id={"repl-" + terminalId}
-      className={clsx("bg-base-300", "flex flex-col", "isolate")}
+      className={clsx("bg-base-300 text-base-content", "flex flex-col", "isolate")}
       open={isModal}
       setOpen={setIsModal}
     >

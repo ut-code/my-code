@@ -8,6 +8,14 @@ import { AutoCodeBlock } from "./codeBlock";
 import { ReplacedRange } from "@/lib/docs";
 import remarkTerm from "./remarkTerm";
 import Term from "./term";
+import remarkAlert from "./remarkGithubAlerts";
+import clsx from "clsx";
+import {
+  DaisyErrorIcon,
+  DaisyInfoIcon,
+  DaisySuccessIcon,
+  DaisyWarningIcon,
+} from "@/daisyAlertIcon";
 
 export function StyledMarkdown(props: {
   content: string;
@@ -22,6 +30,7 @@ export function StyledMarkdown(props: {
         remarkCjkFriendly,
         [remarkMultiHighlight, props.replacedRange],
         remarkTerm,
+        remarkAlert,
       ]}
       components={props.interactive ? interactiveComponents : baseComponents}
     >
@@ -57,6 +66,30 @@ const baseComponents: Components = {
     </div>
   ),
   hr: () => null,
+  blockquote: ({ node, className, children, ...props }) => (
+    <blockquote
+      className={clsx(
+        "alert",
+        className,
+        className?.includes("alert-") && "alert-soft shadow-xs",
+        "mx-2 my-2",
+        "flex items-start"
+      )}
+      {...props}
+    >
+      {className?.includes("alert-info") ? (
+        <DaisyInfoIcon />
+      ) : className?.includes("alert-success") ? (
+        <DaisySuccessIcon />
+      ) : className?.includes("alert-warning") ? (
+        <DaisyWarningIcon />
+      ) : className?.includes("alert-error") ? (
+        <DaisyErrorIcon />
+      ) : null}
+      {/* <p>がmx-2 my-2を設定するので、その分広げて相殺 */}
+      <div className="flex-1 w-full -m-2 self-center">{children}</div>
+    </blockquote>
+  ),
   pre: ({ children }) => children,
   code: (props) => <AutoCodeBlock interactive={false} {...props} />,
   ins: ({ children }) => children,
