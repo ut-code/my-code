@@ -189,6 +189,16 @@ Cloudflare Worker のビルドログとステータス表示が見れますが�
         ````
     - 練習問題のファイル名は不都合がなければ `practice(章番号)_(問題番号).拡張子` で統一。空でもよいのでファイルコードブロックとexecコードブロックを置く
 
+### Alert
+
+GitHubのalert記法の、`NOTE` `TIP` `WARNING` `CAUTION` が使えます。
+`IMPORTANT` はwarningに置き換えられます。
+
+```
+> [!NOTE]  
+> Highlights information that users should take into account, even when skimming.
+```
+
 ### 内部リンク
 
 ```
