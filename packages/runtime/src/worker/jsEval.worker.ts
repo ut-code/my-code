@@ -4,13 +4,8 @@ import { expose } from "comlink";
 import type { ReplOutput, UpdatedFile } from "../interface";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
-import { replLikeEval, checkSyntax } from "@my-code/js-eval";
+import { replLikeEval, checkSyntax, createReplConsole } from "@my-code/js-eval";
 
-function format(...args: unknown[]): string {
-  // TODO: console.logの第1引数はフォーマット指定文字列を取ることができる
-  // https://nodejs.org/api/util.html#utilformatformat-args
-  return args.map((a) => (typeof a === "string" ? a : inspect(a))).join(" ");
-}
 let currentOutputCallback: ((output: ReplOutput) => Promise<void>) | null =
   null;
 let pendingOutputPromise: Promise<void>[] = [];
@@ -19,34 +14,11 @@ let pendingOutputPromise: Promise<void>[] = [];
 const originalConsole = self.console;
 self.console = {
   ...originalConsole,
-  log: (...args: unknown[]) => {
+  ...createReplConsole((output) => {
     if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stdout", message: format(...args) })
-      );
+      pendingOutputPromise.push(currentOutputCallback(output));
     }
-  },
-  error: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stderr", message: format(...args) })
-      );
-    }
-  },
-  warn: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stderr", message: format(...args) })
-      );
-    }
-  },
-  info: (...args: unknown[]) => {
-    if (currentOutputCallback) {
-      pendingOutputPromise.push(
-        currentOutputCallback({ type: "stdout", message: format(...args) })
-      );
-    }
-  },
+  }),
 };
 
 async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
