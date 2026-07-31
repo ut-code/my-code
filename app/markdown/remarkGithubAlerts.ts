@@ -56,7 +56,7 @@ type Option = {
  */
 export const remarkAlert: Plugin<[Option?], Root> = ({
   legacyTitle = false,
-  tagName = "blockquote",
+  tagName = "aside",
   classNames = "",
 } = {}) => {
   return (tree) => {

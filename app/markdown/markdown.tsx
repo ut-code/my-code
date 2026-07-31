@@ -16,6 +16,7 @@ import {
   DaisySuccessIcon,
   DaisyWarningIcon,
 } from "@/daisyAlertIcon";
+import { CSSProperties } from "react";
 
 export function StyledMarkdown(props: {
   content: string;
@@ -68,6 +69,20 @@ const baseComponents: Components = {
   hr: () => null,
   blockquote: ({ node, className, children, ...props }) => (
     <blockquote
+      className={clsx("alert", className, "mx-2 my-2", "flex")}
+      {...props}
+    >
+      <div
+        // <p>がmx-2 my-2を設定するので、その分広げて相殺
+        className="flex-1 w-full -m-2"
+      >
+        {children}
+      </div>
+    </blockquote>
+  ),
+  aside: ({ node, className, children, ...props }) => (
+    // remarkGitHubAlerts.ts でalertをasideタグにしている
+    <aside
       className={clsx(
         "alert",
         className,
@@ -86,9 +101,15 @@ const baseComponents: Components = {
       ) : className?.includes("alert-error") ? (
         <DaisyErrorIcon />
       ) : null}
-      {/* <p>がmx-2 my-2を設定するので、その分広げて相殺 */}
-      <div className="flex-1 w-full -m-2 self-center">{children}</div>
-    </blockquote>
+      <div
+        // <p>がmx-2 my-2を設定するので、その分広げて相殺
+        className="flex-1 w-full -m-2 self-center"
+        // alertネスト対応
+        style={{ "--alert-color": "initial" } as CSSProperties}
+      >
+        {children}
+      </div>
+    </aside>
   ),
   pre: ({ children }) => children,
   code: (props) => <AutoCodeBlock interactive={false} {...props} />,
