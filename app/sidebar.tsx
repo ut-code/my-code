@@ -1,13 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  DynamicMarkdownSection,
-  LangId,
-  LanguageEntry,
-  PagePath,
-  PageSlug,
-} from "@/lib/docs";
+import { DynamicMarkdownSection, LangId, PagePath, PageSlug } from "@/lib/docs";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./themeToggle";
 import {

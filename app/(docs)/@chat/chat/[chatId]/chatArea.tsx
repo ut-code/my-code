@@ -4,13 +4,7 @@ import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
 import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
 import { deleteChatAction } from "@/actions/deleteChat";
 import { ChatWithMessages } from "@/lib/chatHistory";
-import {
-  LangId,
-  LanguageEntry,
-  MarkdownSection,
-  PageEntry,
-  PageSlug,
-} from "@/lib/docs";
+import { LangId, MarkdownSection, PageSlug } from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import { StyledMarkdown } from "@/markdown/markdown";
 import { usePagesListForLang } from "@/pagesListContext";
