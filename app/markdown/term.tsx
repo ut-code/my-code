@@ -21,7 +21,7 @@ import {
 } from "@floating-ui/react";
 import clsx from "clsx";
 import { usePagesListForLang } from "@/pagesListContext";
-import { updateTooltipPosition } from "./tooltipPosition";
+import { WithAutoTooltipPosition } from "./tooltipPosition";
 
 const TermDefinitionContext = createContext<{
   lang: LangId;
@@ -97,14 +97,14 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   const term = termDefinitions.find((t) => t.alias.includes(termText));
   if (!term) {
     const internalLink = (pageEntry: PageEntry) => (
-      <Link
-        ref={(node) => updateTooltipPosition(node)}
+      <WithAutoTooltipPosition
+        as={Link}
         className="link link-info decoration-dotted tooltip tooltip-info"
         data-tip={`${pageEntry.index}. ${pageEntry.name}`}
         href={`/${lang}/${pageEntry.slug}`}
       >
         第{pageEntry.index}章
-      </Link>
+      </WithAutoTooltipPosition>
     );
 
     // ./1, ./1-foo, ./next, ./prev →同じ言語のドキュメントへのリンクで、「第n章」
@@ -147,13 +147,13 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
 
     console.error(`'${termText}' という用語は定義されていません`);
     return (
-      <span
-        ref={(node) => updateTooltipPosition(node)}
+      <WithAutoTooltipPosition
+        as="span"
         className="link link-error decoration-dotted tooltip tooltip-error"
         data-tip={`'${termText}' という用語は定義されていません`}
       >
         {props.children}
-      </span>
+      </WithAutoTooltipPosition>
     );
   }
 

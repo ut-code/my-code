@@ -26,7 +26,7 @@ import {
 import { useRuntime } from "@my-code/runtime/context";
 import { MinMaxButton, Modal } from "./modal";
 import { StopButtonContent } from "./exec";
-import { updateTooltipPosition } from "@/markdown/tooltipPosition";
+import { WithAutoTooltipPosition } from "@/markdown/tooltipPosition";
 
 function handleRuntimeError(error: unknown) {
   captureException(error);
@@ -499,8 +499,8 @@ export function ReplTerminal({
         <span className="text-sm my-1 ml-3 text-left">
           {runtimeInfo?.prettyLangName || language.runtime} 実行環境
         </span>
-        <div
-          ref={(node) => updateTooltipPosition(node)}
+        <WithAutoTooltipPosition
+          as="div"
           className="ml-1 tooltip tooltip-secondary tooltip-bottom z-1"
         >
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
@@ -529,7 +529,7 @@ export function ReplTerminal({
           >
             ？
           </button>
-        </div>
+        </WithAutoTooltipPosition>
         <div className="flex-1" />
         <MinMaxButton open={isModal} id={`repl-${terminalId}`} />
       </div>

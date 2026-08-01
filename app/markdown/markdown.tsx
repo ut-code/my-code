@@ -17,7 +17,7 @@ import {
   DaisyWarningIcon,
 } from "@/daisyAlertIcon";
 import { CSSProperties } from "react";
-import { updateTooltipPosition } from "./tooltipPosition";
+import { WithAutoTooltipPosition } from "./tooltipPosition";
 import Link from "next/link";
 
 export function StyledMarkdown(props: {
@@ -61,8 +61,8 @@ const baseComponents: Components = {
   li: ({ node, ...props }) => <li className="my-1" {...props} />,
   a: ({ node, href, ...props }) =>
     href?.startsWith("http") ? (
-      <a
-        ref={(node) => updateTooltipPosition(node)}
+      <WithAutoTooltipPosition
+        as="a"
         className="link link-info tooltip tooltip-info before:whitespace-pre"
         href={href}
         data-tip={`外部リンク\n${href}`}
