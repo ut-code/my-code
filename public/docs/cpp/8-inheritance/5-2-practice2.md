@@ -16,7 +16,7 @@ question:
 
 次に、`Employee` を継承して、`FullTimeEmployee`（月給制）と `PartTimeEmployee`（時給制）の2つのクラスを作成します。それぞれのクラスで `calculate_salary()` を具体的に実装してください。
 
-`main` 関数で、それぞれのクラスのインスタンスを作成し、給与が正しく計算されることを確認してください。
+[[`main` 関数]]で、それぞれのクラスのインスタンスを作成し、給与が正しく計算されることを確認してください。
 
 ```cpp:practice9_2.cpp
 #include <iostream>

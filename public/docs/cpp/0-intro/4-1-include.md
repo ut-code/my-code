@@ -7,6 +7,8 @@ question:
   - iostreamがないとstd::coutは使えないのですか？
   - ヘッダファイルとは何ですか？
   - '#includeを書き忘れたらどうなりますか？'
+term:
+  - インクルード
 ---
 
 ### `#include <iostream>` - ヘッダファイルのインクルード

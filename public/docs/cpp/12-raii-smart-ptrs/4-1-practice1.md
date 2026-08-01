@@ -11,7 +11,7 @@ question:
 
 `Employee` という名前のクラスを作成してください。このクラスは、コンストラクタで社員名を受け取って表示し、デストラクタで「(社員名) is leaving.」というメッセージを表示します。
 
-`main` 関数で、`"Alice"` という名前の `Employee` オブジェクトを `std::make_unique` で作成し、その `unique_ptr` を `promote_employee` という関数に渡してください。`promote_employee` 関数は `unique_ptr` を引数として受け取り（所有権が移動します）、「(社員名) has been promoted\!」というメッセージを表示します。
+[[`main` 関数]]で、`"Alice"` という名前の `Employee` オブジェクトを `std::make_unique` で作成し、その `unique_ptr` を `promote_employee` という関数に渡してください。`promote_employee` 関数は `unique_ptr` を引数として受け取り（所有権が移動します）、「(社員名) has been promoted\!」というメッセージを表示します。
 
 プログラムを実行し、コンストラクタとデストラクタのメッセージが期待通りに表示されることを確認してください。
 
