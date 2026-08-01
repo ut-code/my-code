@@ -466,7 +466,7 @@ export function ReplTerminal({
       open={isModal}
       setOpen={setIsModal}
     >
-      <div className="bg-base-200 w-full overflow-x-clip overflow-y-visible flex items-center rounded-t-box">
+      <div className="bg-base-200 w-full overflow-visible flex items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい

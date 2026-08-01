@@ -143,7 +143,7 @@ export function ExecFile(props: ExecProps) {
       open={isModal}
       setOpen={setIsModal}
     >
-      <div className="bg-base-200 flex w-full overflow-x-clip overflow-y-visible items-center rounded-t-box">
+      <div className="bg-base-200 flex w-full overflow-visible items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
