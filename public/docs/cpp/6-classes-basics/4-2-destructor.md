@@ -73,4 +73,4 @@ Destructor called for Kenji.
 --- Back in main ---
 ```
 
-実行結果を見ると、`kenji`オブジェクトが生成されたときにコンストラクタが、`create_person_scope`関数のスコープを抜けるときにデストラクタが自動的に呼び出されていることがわかります。動的に確保したメモリの解放など、クリーンアップ処理はデストラクタに書くのが定石です。この考え方は、今後の章で学ぶRAII（Resource Acquisition Is Initialization）という重要な概念に繋がります。
+実行結果を見ると、`kenji`オブジェクトが生成されたときにコンストラクタが、`create_person_scope`関数のスコープを抜けるときにデストラクタが自動的に呼び出されていることがわかります。動的に確保したメモリの解放など、クリーンアップ処理はデストラクタに書くのが定石です。この考え方は、[[./12]]で学ぶRAII（Resource Acquisition Is Initialization）という重要な概念に繋がります。
