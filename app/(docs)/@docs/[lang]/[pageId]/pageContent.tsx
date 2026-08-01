@@ -39,7 +39,7 @@ export function PageContent(props: PageContentProps) {
   const nextPage = langEntry?.pages[pageEntryIndex + 1];
 
   const [sectionInView, setSectionInView] = useState<boolean[]>([]);
-  const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const sectionRefs = useRef<Array<HTMLElement | null>>([]);
   useEffect(() => {
     const handleScroll = () => {
       setSectionInView((sectionInView) => {
@@ -154,7 +154,7 @@ export function PageContent(props: PageContentProps) {
         <div />
         {dynamicMdContent.map((section, index) => (
           <Fragment key={section.id}>
-            <div
+            <section
               className="min-w-1/2 max-w-docs text-justify"
               id={section.id} // 目次からaタグで飛ぶために必要
               ref={(el) => {
@@ -167,7 +167,7 @@ export function PageContent(props: PageContentProps) {
                 replacedRange={section.replacedRange}
                 interactive
               />
-            </div>
+            </section>
             <div>
               <ChatListForSection
                 sectionId={section.id}
