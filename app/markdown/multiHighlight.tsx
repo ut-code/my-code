@@ -106,7 +106,7 @@ export function MultiHighlightTag({
         // classNameにチャットidが入っている。
         // 選択しているチャットに対応するdiffのみ濃いハイライトにするなど (TODO)
         className,
-        "underline decoration-dashed underline-offset-[0.2rem] decoration-secondary/50",
+        "underline decoration-dashed decoration-secondary/50",
         currentChatId && thisChatIds.includes(currentChatId)
           ? "bg-secondary/10"
           : "",

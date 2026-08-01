@@ -21,6 +21,7 @@ import {
 } from "@floating-ui/react";
 import clsx from "clsx";
 import { usePagesListForLang } from "@/pagesListContext";
+import { updateTooltipPosition } from "./tooltipPosition";
 
 const TermDefinitionContext = createContext<{
   lang: LangId;
@@ -96,17 +97,14 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   const term = termDefinitions.find((t) => t.alias.includes(termText));
   if (!term) {
     const internalLink = (pageEntry: PageEntry) => (
-      <span
-        className="tooltip tooltip-info"
+      <Link
+        ref={(node) => updateTooltipPosition(node)}
+        className="link link-info decoration-dotted tooltip tooltip-info"
         data-tip={`${pageEntry.index}. ${pageEntry.name}`}
+        href={`/${lang}/${pageEntry.slug}`}
       >
-        <Link
-          href={`/${lang}/${pageEntry.slug}`}
-          className="link link-info decoration-dotted underline-offset-[0.2rem]"
-        >
-          第{pageEntry.index}章
-        </Link>
-      </span>
+        第{pageEntry.index}章
+      </Link>
     );
 
     // ./1, ./1-foo, ./next, ./prev →同じ言語のドキュメントへのリンクで、「第n章」
@@ -150,12 +148,11 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
     console.error(`'${termText}' という用語は定義されていません`);
     return (
       <span
-        className="tooltip tooltip-error"
+        ref={(node) => updateTooltipPosition(node)}
+        className="link link-error decoration-dotted tooltip tooltip-error"
         data-tip={`'${termText}' という用語は定義されていません`}
       >
-        <span className="link link-error decoration-dotted underline-offset-[0.2rem]">
-          {props.children}
-        </span>
+        {props.children}
       </span>
     );
   }
@@ -168,7 +165,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
         ref={refs.setReference}
         {...getReferenceProps()}
         href={`/${lang}/${term.page}#${term.id}`}
-        className="link link-info decoration-dotted underline-offset-[0.2rem]"
+        className="link link-info decoration-dotted"
       >
         {props.children}
       </Link>

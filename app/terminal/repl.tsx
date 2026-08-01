@@ -26,6 +26,7 @@ import {
 import { useRuntime } from "@my-code/runtime/context";
 import { MinMaxButton, Modal } from "./modal";
 import { StopButtonContent } from "./exec";
+import { updateTooltipPosition } from "@/markdown/tooltipPosition";
 
 function handleRuntimeError(error: unknown) {
   captureException(error);
@@ -462,7 +463,11 @@ export function ReplTerminal({
   return (
     <Modal
       id={"repl-" + terminalId}
-      className={clsx("bg-base-300 text-base-content", "flex flex-col", "isolate")}
+      className={clsx(
+        "bg-base-300 text-base-content",
+        "flex flex-col",
+        "isolate"
+      )}
       open={isModal}
       setOpen={setIsModal}
     >
@@ -494,7 +499,10 @@ export function ReplTerminal({
         <span className="text-sm my-1 ml-3 text-left">
           {runtimeInfo?.prettyLangName || language.runtime} 実行環境
         </span>
-        <div className="ml-1 tooltip tooltip-secondary tooltip-bottom z-1">
+        <div
+          ref={(node) => updateTooltipPosition(node)}
+          className="ml-1 tooltip tooltip-secondary tooltip-bottom z-1"
+        >
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">

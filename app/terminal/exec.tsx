@@ -15,6 +15,7 @@ import { LangConstants } from "@my-code/runtime/languages";
 import { useRuntime } from "@my-code/runtime/context";
 import { captureException } from "@sentry/nextjs";
 import { MinMaxButton, Modal } from "./modal";
+import { updateTooltipPosition } from "@/markdown/tooltipPosition";
 
 function handleRuntimeError(error: unknown) {
   captureException(error);
@@ -139,7 +140,12 @@ export function ExecFile(props: ExecProps) {
   return (
     <Modal
       id={`exec-${props.filenames.join("-")}`}
-      className={clsx("relative", "flex flex-col", "isolate", "text-base-content")}
+      className={clsx(
+        "relative",
+        "flex flex-col",
+        "isolate",
+        "text-base-content"
+      )}
       open={isModal}
       setOpen={setIsModal}
     >
@@ -188,7 +194,10 @@ export function ExecFile(props: ExecProps) {
         <code className="text-left break-all text-sm my-1 ml-4">
           {getCommandlineStr?.(props.filenames)}
         </code>
-        <div className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1">
+        <div
+          ref={(node) => updateTooltipPosition(node)}
+          className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1"
+        >
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">
