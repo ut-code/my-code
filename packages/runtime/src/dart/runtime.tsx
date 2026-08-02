@@ -26,6 +26,25 @@ interface DartVersionResponse {
   flutterVersion?: string;
 }
 
+interface AnalysisIssue {
+  kind: "error" | "warning" | "info";
+  message: string;
+  location: {
+    charStart: number;
+    charLength: number;
+    line: number;
+    column: number;
+  };
+  code?: string;
+  correction?: string;
+  url?: string;
+}
+
+interface AnalysisResponse {
+  issues: AnalysisIssue[];
+  imports?: unknown[];
+}
+
 const versionFetcher = async (url: string): Promise<DartVersionResponse> => {
   const res = await fetch(url);
   if (!res.ok) {
@@ -74,6 +93,41 @@ export function DartProvider({ children }: { children: ReactNode }) {
   );
 }
 
+async function performAnalysis(
+  source: string,
+  onOutput: (output: ReplOutput | UpdatedFile) => void
+): Promise<void> {
+  try {
+    const res = await fetch(`${DART_PAD_API_BASE}/analyze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ source }),
+    });
+
+    if (!res.ok) return;
+
+    const data: AnalysisResponse = await res.json();
+    if (Array.isArray(data.issues)) {
+      for (const issue of data.issues) {
+        const line = issue.location?.line ?? 1;
+        const column = issue.location?.column ?? 1;
+        const kindStr = (issue.kind || "info").toUpperCase();
+        const correctionStr = issue.correction ? ` (${issue.correction})` : "";
+        const formattedMsg = `[ANALYZER ${kindStr}] line ${line}:${column} - ${issue.message}${correctionStr}`;
+
+        onOutput({
+          type: issue.kind === "error" ? "error" : "stderr",
+          message: formattedMsg,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to perform Dart static analysis:", err);
+  }
+}
+
 export function useDart(): RuntimeContext {
   const { init: dartInit, ready, dartVersion } = useContext(DartContext);
   const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
@@ -109,13 +163,16 @@ export function useDart(): RuntimeContext {
       }
 
       try {
-        const response = await fetch(`${DART_PAD_API_BASE}/compileNewDDC`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ source }),
-        });
+        const [_, response] = await Promise.all([
+          performAnalysis(source, onOutput),
+          fetch(`${DART_PAD_API_BASE}/compileNewDDC`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ source }),
+          }),
+        ]);
 
         if (!response.ok) {
           const errorText = await response.text();
