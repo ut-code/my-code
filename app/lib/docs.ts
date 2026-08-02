@@ -6,6 +6,11 @@ import { isCloudflare } from "./detectCloudflare";
 import { notFound } from "next/navigation";
 import crypto from "node:crypto";
 import { z } from "zod";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
+import { remove } from "unist-util-remove";
+import removeComments from "remark-remove-comments";
 
 /*
 Branded Types
@@ -415,8 +420,6 @@ export async function getTermDefinitions(
     }
     const terms: TermDefinition[] = [];
     const langEntry = await getPagesListForLang(langId);
-    const headingRegex = /^#+(.*)$/m;
-    const codeBlockRegex = /^(`{3,})(.*)\n([\s\S]*?)\n^\1/gm;
     for (const page of langEntry.pages) {
       const sections = await getMarkdownSections(langId, page.slug);
       for (const section of sections) {
@@ -426,13 +429,30 @@ export async function getTermDefinitions(
             page: page.slug,
             id: section.id,
             title: section.title,
-            rawContentWithoutCode: section.rawContent
-              .replace(codeBlockRegex, "")
-              .replace(headingRegex, ""),
+            rawContentWithoutCode: stripForTermDefinition(section.rawContent),
           });
         }
       }
     }
     return terms;
   }
+}
+
+function stripForTermDefinition(markdownText: string) {
+  const processed = unified()
+    .use(remarkParse)
+    .use(removeComments)
+    .use(() => (tree) => {
+      remove(tree, (node) => {
+        return (
+          node.type === "heading" || // 見出し
+          node.type === "code" || // コードブロック
+          node.type === "blockquote" // 引用
+        );
+      });
+    })
+    .use(remarkStringify) // ASTをMarkdown文字列に変換
+    .processSync(markdownText);
+
+  return String(processed).trim();
 }

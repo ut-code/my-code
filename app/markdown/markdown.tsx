@@ -77,7 +77,13 @@ const baseComponents: Components = {
     <strong className="text-primary" {...props} />
   ),
   table: ({ node, ...props }) => (
-    <div className="w-max max-w-full overflow-x-auto mx-auto my-2 rounded-box border border-current/20 shadow-sm">
+    <div
+      className={clsx(
+        "w-max max-w-full overflow-x-auto mx-auto my-2",
+        "rounded-box border border-current/20 shadow-sm",
+        "bg-base-100/60", // 通常は元の背景がbase-100なので見た目変わらないが、Term内部に表示された際に効果がある
+      )}
+    >
       <table className="table w-max" {...props} />
     </div>
   ),

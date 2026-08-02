@@ -99,7 +99,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
     const internalLink = (pageEntry: PageEntry) => (
       <WithAutoTooltipPosition
         as={Link}
-        className="link link-info decoration-dotted tooltip tooltip-info"
+        className="link link-info decoration-dotted tooltip tooltip-info before:z-100"
         data-tip={`${pageEntry.index}. ${pageEntry.name}`}
         href={`/${lang}/${pageEntry.slug}`}
       >
@@ -149,7 +149,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
     return (
       <WithAutoTooltipPosition
         as="span"
-        className="link link-error decoration-dotted tooltip tooltip-error"
+        className="link link-error decoration-dotted tooltip tooltip-error before:z-100"
         data-tip={`'${termText}' という用語は定義されていません`}
       >
         {props.children}
@@ -178,19 +178,27 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
             {...getFloatingProps()}
             className={clsx(
               "max-w-sm rounded-box bg-base-100/60 border border-info text-base-content",
-              "p-1 shadow-xl backdrop-blur-xs z-50",
-              "text-justify"
+              "p-1 shadow-xl backdrop-blur-xs z-100",
+              "text-justify text-sm"
             )}
           >
-            <h6 className="breadcrumbs text-info font-bold flex justify-center text-base wrap-none py-2">
-              <ul className="flex-wrap justify-center">
-                <li>
-                  {pageEntry?.index}. {pageEntry?.name}
-                </li>
-                <li>{term.title}</li>
-              </ul>
-            </h6>
-            <StyledMarkdown content={term.rawContentWithoutCode} />
+            <div
+              className={clsx(
+                // 内容がはみ出る場合、フェードアウトする
+                "max-h-(--container-sm) overflow-clip",
+                "mask-b-from-[calc(var(--container-sm)*0.85)] mask-b-to-[calc(var(--container-sm)*1.0)]"
+              )}
+            >
+              <h6 className="breadcrumbs text-info font-bold flex justify-center text-sm wrap-none py-2">
+                <ul className="flex-wrap justify-center">
+                  <li>
+                    {pageEntry?.index}. {pageEntry?.name}
+                  </li>
+                  <li>{term.title}</li>
+                </ul>
+              </h6>
+              <StyledMarkdown content={term.rawContentWithoutCode} />
+            </div>
           </div>
         </FloatingPortal>
       )}

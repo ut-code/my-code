@@ -53,6 +53,7 @@
     "remark-gfm": "^4.0.1",
     "remark-remove-comments": "^1.1.1",
     "swr": "^2.3.6",
+    "unist-util-remove": "^4.0.0",
     "unist-util-visit": "^5.1.0",
     "zod": "^4.0.17"
   },
