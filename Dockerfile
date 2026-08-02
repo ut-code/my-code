@@ -5,30 +5,37 @@
 
 FROM node:lts-slim AS dependencies
 
+# Install pnpm
+RUN npm install -g pnpm
+
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/jsEval/package.json ./packages/jsEval/
 COPY packages/runtime/package.json ./packages/runtime/
 
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --no-audit --no-fund
+RUN pnpm install --frozen-lockfile
 
 # これだけ時間かかるので先に実行する
 WORKDIR /app
 COPY ./scripts ./scripts
-RUN mkdir app && npx tsx ./scripts/removeHinting.ts
+RUN mkdir app && pnpm exec tsx ./scripts/removeHinting.ts
 
 FROM node:lts-slim AS builder
 
 # ビルド中にsentryでソースマップをアップロードするのに必要
 RUN apt-get update && apt-get install -y ca-certificates
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Set working directory
 WORKDIR /app
 
 # Copy project dependencies from dependencies stage
 COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/packages/jsEval/node_modules ./packages/jsEval/node_modules
+COPY --from=dependencies /app/packages/runtime/node_modules ./packages/runtime/node_modules
 
 # Copy application source code
 COPY . .
@@ -36,7 +43,7 @@ COPY . .
 COPY --from=dependencies /app/app/m-plus-rounded-1c-nohint ./app/m-plus-rounded-1c-nohint
 
 # Stop if documentation has any change that is not reflected to revisions.yml and database.
-RUN npx tsx ./scripts/checkDocs.ts --check-diff
+RUN pnpm exec tsx ./scripts/checkDocs.ts --check-diff
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -45,7 +52,7 @@ RUN npx tsx ./scripts/checkDocs.ts --check-diff
 
 # Build Next.js application
 RUN --mount=type=cache,target=/app/.next/cache \
-    npm run build
+    pnpm run build
 
 FROM node:lts-slim AS runner
 
