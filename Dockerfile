@@ -14,7 +14,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/jsEval/package.json ./packages/jsEval/
 COPY packages/runtime/package.json ./packages/runtime/
 
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # これだけ時間かかるので先に実行する
 WORKDIR /app
@@ -23,11 +24,11 @@ RUN mkdir app && pnpm exec tsx ./scripts/removeHinting.ts
 
 FROM node:lts-slim AS builder
 
-# ビルド中にsentryでソースマップをアップロードするのに必要
-RUN apt-get update && apt-get install -y ca-certificates
-
 # Install pnpm
 RUN npm install -g pnpm
+
+# ビルド中にsentryでソースマップをアップロードするのに必要
+RUN apt-get update && apt-get install -y ca-certificates
 
 # Set working directory
 WORKDIR /app
