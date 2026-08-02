@@ -131,6 +131,7 @@ async function performAnalysis(
 export function useDart(): RuntimeContext {
   const { init: dartInit, ready, dartVersion } = useContext(DartContext);
   const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+  const activeIframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const init = useCallback(
     (onError?: RuntimeErrorHandler) => {
@@ -139,6 +140,15 @@ export function useDart(): RuntimeContext {
     },
     [dartInit]
   );
+
+  const interrupt = useCallback(() => {
+    if (activeIframeRef.current) {
+      if (activeIframeRef.current.parentNode) {
+        activeIframeRef.current.parentNode.removeChild(activeIframeRef.current);
+      }
+      activeIframeRef.current = null;
+    }
+  }, []);
 
   const runFiles = useCallback(
     async (
@@ -201,12 +211,16 @@ export function useDart(): RuntimeContext {
           const iframe = document.createElement("iframe");
           iframe.style.display = "none";
           document.body.appendChild(iframe);
+          activeIframeRef.current = iframe;
 
           let resolved = false;
           const cleanup = () => {
             if (resolved) return;
             resolved = true;
             window.removeEventListener("message", handleMessage);
+            if (activeIframeRef.current === iframe) {
+              activeIframeRef.current = null;
+            }
             if (iframe.parentNode) {
               iframe.parentNode.removeChild(iframe);
             }
@@ -346,6 +360,7 @@ export function useDart(): RuntimeContext {
     init,
     ready,
     runFiles,
+    interrupt,
     getCommandlineStr,
     runtimeInfo,
   };
