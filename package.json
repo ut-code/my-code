@@ -34,6 +34,7 @@
     "@google/genai": "^1.21.0",
     "@opennextjs/cloudflare": "^1.19.9",
     "@sentry/nextjs": "^10.47.0",
+    "@sentry/vercel-edge": "^10.47.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.1.0-beta.168",
     "ace-builds": "^1.43.2",
@@ -63,6 +64,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@my-code/runtime": "workspace:*",
     "@pyodide/webpack-plugin": "^1.4.0",
     "@tailwindcss/postcss": "^4",
     "@types/js-yaml": "^4.0.9",
@@ -75,6 +77,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@typescript/vfs": "^1.6.2",
     "daisyui": "^5.7.13",
     "drizzle-kit": "^0.31.5",
     "eslint": "^9",
@@ -93,8 +96,6 @@
     "typescript": "5.9.3",
     "unified": "^11.0.5",
     "webpack-license-plugin": "^4.5.1",
-    "wrangler": "^4.27.0",
-    "@typescript/vfs": "^1.6.2",
-    "@my-code/runtime": "workspace:*"
+    "wrangler": "^4.27.0"
   }
 }
