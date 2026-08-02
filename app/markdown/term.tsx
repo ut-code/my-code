@@ -108,8 +108,8 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
     );
 
     // ./1, ./1-foo, ./next, ./prev →同じ言語のドキュメントへのリンクで、「第n章」
-    const pageIndexMatch = termText.match(/^.\/(\d+)$/);
-    const pageSlugMatch = termText.match(/^.\/([0-9a-zA-Z_-]+)$/);
+    const pageIndexMatch = termText.match(/^\.\/(\d+)$/);
+    const pageSlugMatch = termText.match(/^\.\/([0-9a-zA-Z_-]+)$/);
     if (
       pageIndexMatch &&
       langEntry &&
@@ -125,12 +125,13 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
         langEntry.pages.find((p) => p.slug === pageSlugMatch[1])!
       );
     }
-    const currentPageIndex = langEntry?.pages.findIndex((p) => p.slug === page);
+    const currentPageIndex =
+      langEntry?.pages.findIndex((p) => p.slug === page) ?? -1;
     if (
       pageSlugMatch &&
       langEntry &&
       pageSlugMatch[1] === "prev" &&
-      currentPageIndex !== undefined
+      currentPageIndex > 0
     ) {
       // ./prev → 前のページ
       return internalLink(langEntry.pages[currentPageIndex - 1]);
@@ -139,7 +140,8 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
       pageSlugMatch &&
       langEntry &&
       pageSlugMatch[1] === "next" &&
-      currentPageIndex !== undefined
+      currentPageIndex >= 0 &&
+      currentPageIndex < langEntry.pages.length - 1
     ) {
       // ./next → 次のページ
       return internalLink(langEntry.pages[currentPageIndex + 1]);
