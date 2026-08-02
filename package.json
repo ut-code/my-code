@@ -11,12 +11,12 @@
     }
   },
   "scripts": {
-    "prebuild": "npm run cf-typegen && tsx ./scripts/checkDocs.ts && tsx ./scripts/generateDocsMeta.ts && tsx ./scripts/copyAllDTSFiles.ts && tsx ./scripts/removeHinting.ts",
-    "dev": "npm run prebuild && next dev --webpack",
+    "prebuild": "pnpm run cf-typegen && tsx ./scripts/checkDocs.ts && tsx ./scripts/generateDocsMeta.ts && tsx ./scripts/copyAllDTSFiles.ts && tsx ./scripts/removeHinting.ts",
+    "dev": "pnpm run prebuild && next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "npm run cf-typegen && eslint .",
-    "tsc": "npm run cf-typegen && tsc",
+    "lint": "pnpm run cf-typegen && eslint .",
+    "tsc": "pnpm run cf-typegen && tsc",
     "format": "prettier --write app/ packages/",
     "db-migrate": "drizzle-kit migrate",
     "db-generate": "drizzle-kit generate",
