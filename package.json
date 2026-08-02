@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": ">=11.0.0 <12.0.0",
+      "onFail": "download"
+    }
+  },
   "scripts": {
     "prebuild": "npm run cf-typegen && tsx ./scripts/checkDocs.ts && tsx ./scripts/generateDocsMeta.ts && tsx ./scripts/copyAllDTSFiles.ts && tsx ./scripts/removeHinting.ts",
     "dev": "npm run prebuild && next dev --webpack",

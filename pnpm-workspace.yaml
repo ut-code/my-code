@@ -1,0 +1,27 @@
+packages:
+  - packages/jsEval
+  - packages/runtime
+
+dedupePeers: true
+
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+minimumReleaseAgeExclude:
+  - daisyui@5.7.13
+
+strictDepBuilds: true
+strictPeerDependencies: true
+
+verifyDepsBeforeRun: warn
+
+allowBuilds:
+  '@prisma/engines': true
+  '@sentry/cli': true
+  edgedriver: true
+  esbuild: true
+  geckodriver: true
+  prisma: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+  workerd: true
