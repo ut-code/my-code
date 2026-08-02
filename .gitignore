@@ -5,6 +5,7 @@
 
 # documentation
 /public/docs/**/sections.*
+/public/docs/**/termDefinitions.*
 /public/docs/languages.*
 /public/docs/revisions-dev.yml
 /public/docs/commits-dev.yml

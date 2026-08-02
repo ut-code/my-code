@@ -128,7 +128,7 @@ export default async function Home() {
           my.code();
           ならあなたがまだ触ったことがない言語を気軽に体験することができます。
         </p>
-        <div className="alert alert-info alert-dash mb-4 w-max max-w-full mx-auto">
+        <div className="alert alert-info alert-soft shadow-xs mb-4 w-max max-w-full mx-auto">
           <DaisyInfoIcon />
           <span>
             プログラミング未経験の方、何から始めればいいかわからない...という方は、

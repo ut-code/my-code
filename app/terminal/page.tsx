@@ -308,7 +308,7 @@ function MochaTest() {
         </div>
       ) : (
         <div className="alert mt-16 sm:mt-4 w-80">
-          <DaisyInfoIcon />
+          <DaisyInfoIcon className="text-info" />
           テストが完了しました
         </div>
       )}

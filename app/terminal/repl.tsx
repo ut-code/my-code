@@ -26,6 +26,7 @@ import {
 import { useRuntime } from "@my-code/runtime/context";
 import { MinMaxButton, Modal } from "./modal";
 import { StopButtonContent } from "./exec";
+import { WithAutoTooltipPosition } from "@/markdown/tooltipPosition";
 
 function handleRuntimeError(error: unknown) {
   captureException(error);
@@ -462,11 +463,15 @@ export function ReplTerminal({
   return (
     <Modal
       id={"repl-" + terminalId}
-      className={clsx("bg-base-300", "flex flex-col", "isolate")}
+      className={clsx(
+        "bg-base-300 text-base-content",
+        "flex flex-col",
+        "isolate"
+      )}
       open={isModal}
       setOpen={setIsModal}
     >
-      <div className="bg-base-200 w-full overflow-x-clip overflow-y-visible flex items-center rounded-t-box">
+      <div className="bg-base-200 w-full overflow-visible flex items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
@@ -494,7 +499,10 @@ export function ReplTerminal({
         <span className="text-sm my-1 ml-3 text-left">
           {runtimeInfo?.prettyLangName || language.runtime} 実行環境
         </span>
-        <div className="ml-1 tooltip tooltip-secondary tooltip-bottom z-1">
+        <WithAutoTooltipPosition
+          as="div"
+          className="ml-1 tooltip tooltip-secondary tooltip-bottom z-1"
+        >
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">
@@ -521,7 +529,7 @@ export function ReplTerminal({
           >
             ？
           </button>
-        </div>
+        </WithAutoTooltipPosition>
         <div className="flex-1" />
         <MinMaxButton open={isModal} id={`repl-${terminalId}`} />
       </div>

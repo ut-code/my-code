@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.6.23",
+    "@floating-ui/react": "^0.27.20",
     "@fontsource-variable/inconsolata": "^5.2.7",
     "@fontsource/m-plus-rounded-1c": "^5.2.9",
     "@google/genai": "^1.21.0",
@@ -44,6 +45,7 @@
     "prismjs": "^1.30.0",
     "react": "^19",
     "react-ace": "^14.0.1",
+    "react-children-utilities": "^2.10.0",
     "react-dom": "^19",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.0",
@@ -51,6 +53,7 @@
     "remark-gfm": "^4.0.1",
     "remark-remove-comments": "^1.1.1",
     "swr": "^2.3.6",
+    "unist-util-remove": "^4.0.0",
     "unist-util-visit": "^5.1.0",
     "zod": "^4.0.17"
   },
@@ -67,7 +70,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "daisyui": "^5.5.5",
+    "daisyui": "^5.7.13",
     "drizzle-kit": "^0.31.5",
     "eslint": "^9",
     "eslint-config-next": "^16.2.6",

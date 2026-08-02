@@ -8,32 +8,38 @@ import clsx from "clsx";
 import { PageTransition } from "./pageTransition";
 import {
   DynamicMarkdownSection,
-  LanguageEntry,
+  LangId,
   MarkdownSection,
-  PageEntry,
   PagePath,
+  PageSlug,
   SectionId,
 } from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
 import { ChatWithMessages } from "@/lib/chatHistory";
+import { usePagesListForLang } from "@/pagesListContext";
 
 interface PageContentProps {
   splitMdContent: MarkdownSection[];
-  langEntry: LanguageEntry;
-  pageEntry: PageEntry;
-  prevPage?: PageEntry;
-  nextPage?: PageEntry;
+  langId: LangId;
+  pageSlug: PageSlug;
   path: PagePath;
   chatHistories: ChatWithMessages[];
 }
 export function PageContent(props: PageContentProps) {
   const { setSidebarMdContent } = useSidebarMdContext();
-  const { splitMdContent, pageEntry, path, chatHistories } = props;
+  const { splitMdContent, langId, pageSlug, path, chatHistories } = props;
+
+  const langEntry = usePagesListForLang(langId);
+  const pageEntryIndex =
+    langEntry?.pages.findIndex((p) => p.slug === pageSlug) ?? -1;
+  const pageEntry = langEntry?.pages[pageEntryIndex];
+  const prevPage = langEntry?.pages[pageEntryIndex - 1];
+  const nextPage = langEntry?.pages[pageEntryIndex + 1];
 
   const [sectionInView, setSectionInView] = useState<boolean[]>([]);
-  const sectionRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const sectionRefs = useRef<Array<HTMLElement | null>>([]);
   useEffect(() => {
     const handleScroll = () => {
       setSectionInView((sectionInView) => {
@@ -143,12 +149,12 @@ export function PageContent(props: PageContentProps) {
         }}
       >
         <Heading className="max-w-docs" level={1}>
-          第{pageEntry.index}章: {pageEntry.title}
+          第{pageEntry?.index}章: {pageEntry?.title}
         </Heading>
         <div />
         {dynamicMdContent.map((section, index) => (
           <Fragment key={section.id}>
-            <div
+            <section
               className="min-w-1/2 max-w-docs text-justify"
               id={section.id} // 目次からaタグで飛ぶために必要
               ref={(el) => {
@@ -159,8 +165,9 @@ export function PageContent(props: PageContentProps) {
               <StyledMarkdown
                 content={section.replacedContent}
                 replacedRange={section.replacedRange}
+                interactive
               />
-            </div>
+            </section>
             <div>
               <ChatListForSection
                 sectionId={section.id}
@@ -172,8 +179,8 @@ export function PageContent(props: PageContentProps) {
         ))}
         <PageTransition
           lang={path.lang}
-          prevPage={props.prevPage}
-          nextPage={props.nextPage}
+          prevPage={prevPage}
+          nextPage={nextPage}
         />
         <div />
       </div>
@@ -183,7 +190,7 @@ export function PageContent(props: PageContentProps) {
         <div className="fixed bottom-4 right-4 left-4 has-sidebar:left-[calc(var(--container-sidebar)+1rem)] z-40">
           <ChatForm
             path={path}
-            langName={props.langEntry.name}
+            langName={langEntry?.name ?? ""}
             sectionContent={dynamicMdContent}
             close={() => setIsFormVisible(false)}
           />

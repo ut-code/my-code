@@ -124,7 +124,9 @@ mycdark:
 
 body {
   /* mocha.css がbodyに背景色などを設定してしまうので、それを上書きしている */
-  @apply bg-transparent! text-inherit! m-0!
+  @apply bg-transparent! text-inherit! m-0!;
+
+  @apply underline-offset-[0.2rem];
 }
 
 /* CDNからダウンロードするURLを指定したらなんかエラー出るので、npmでインストールしてlayout.tsxでimportすることにした */

@@ -9,7 +9,8 @@ import {
 } from "@/lib/chatHistory";
 import {
   getMarkdownSections,
-  getPagesList,
+  getPagesListForLang,
+  getTermDefinitions,
   LangId,
   PagePath,
   PageSlug,
@@ -18,6 +19,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
 import { DocsAutoRedirect } from "./autoRedirect";
 import { dateReviver } from "@/lib/dateReviver";
+import { TermDefinitionProvider } from "@/markdown/term";
 
 export async function generateMetadata({
   params,
@@ -25,8 +27,7 @@ export async function generateMetadata({
   params: Promise<{ lang: LangId; pageId: PageSlug }>;
 }): Promise<Metadata> {
   const { lang, pageId } = await params;
-  const pagesList = await getPagesList();
-  const langEntry = pagesList.find((l) => l.id === lang);
+  const langEntry = await getPagesListForLang(lang);
   const pageEntry = langEntry?.pages.find((p) => p.slug === pageId);
   if (!langEntry || !pageEntry) notFound();
 
@@ -45,15 +46,6 @@ export default async function Page({
   params: Promise<{ lang: LangId; pageId: PageSlug }>;
 }) {
   const { lang, pageId } = await params;
-  const pagesList = await getPagesList();
-  const langEntry = pagesList.find((l) => l.id === lang);
-  const pageEntryIndex =
-    langEntry?.pages.findIndex((p) => p.slug === pageId) ?? -1;
-  const pageEntry = langEntry?.pages[pageEntryIndex];
-  if (!langEntry || !pageEntry) notFound();
-
-  const prevPage = langEntry.pages[pageEntryIndex - 1];
-  const nextPage = langEntry.pages[pageEntryIndex + 1];
 
   // server componentなのでuseMemoいらない
   const path = { lang: lang, page: pageId };
@@ -62,17 +54,23 @@ export default async function Page({
   const context = await initContext();
   const chatHistories = await getChatFromCache(path, context.userId);
 
+  const termDefinitions = await getTermDefinitions(lang);
+
   return (
     <>
-      <PageContent
-        chatHistories={chatHistories}
-        splitMdContent={sections}
-        langEntry={langEntry}
-        pageEntry={pageEntry}
-        prevPage={prevPage}
-        nextPage={nextPage}
-        path={path}
-      />
+      <TermDefinitionProvider
+        termDefinitions={termDefinitions}
+        lang={lang}
+        page={pageId}
+      >
+        <PageContent
+          chatHistories={chatHistories}
+          splitMdContent={sections}
+          langId={lang}
+          pageSlug={pageId}
+          path={path}
+        />
+      </TermDefinitionProvider>
       <DocsAutoRedirect path={path} />
     </>
   );

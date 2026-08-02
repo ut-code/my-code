@@ -6,6 +6,11 @@ import { isCloudflare } from "./detectCloudflare";
 import { notFound } from "next/navigation";
 import crypto from "node:crypto";
 import { z } from "zod";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
+import { remove } from "unist-util-remove";
+import removeComments from "remark-remove-comments";
 
 /*
 Branded Types
@@ -43,6 +48,10 @@ export const SectionFrontMatterSchema = z.object({
    * scripts/questionExample.ts で生成する
    */
   question: z.array(z.string()).optional(),
+  /**
+   * 他のページで [[キーワード]] と書いた場合に、このセクションの内容がポップアップで表示される。
+   */
+  term: z.array(z.string()).optional(),
 });
 export type SectionFrontMatter = z.output<typeof SectionFrontMatterSchema>;
 export const MarkdownSectionSchema = SectionFrontMatterSchema.extend({
@@ -60,6 +69,14 @@ export const MarkdownSectionSchema = SectionFrontMatterSchema.extend({
   md5: z.string(),
 });
 export type MarkdownSection = z.output<typeof MarkdownSectionSchema>;
+
+export interface TermDefinition {
+  alias: string[];
+  page: PageSlug;
+  id: SectionId;
+  title: string;
+  rawContentWithoutCode: string;
+}
 
 export const ReplacedRangeSchema = z.object({
   start: z.number(),
@@ -85,6 +102,9 @@ export type DynamicMarkdownSection = z.output<
 
 /**
  * 各言語のindex.ymlから読み込んだデータにid,index等を追加したデータ型
+ *
+ * getPagesList() で取得できるが、クライアントコンポーネントで頻繁に使うので、
+ * layout.tsxでcontextを初期化しておりusePagesList()で取得することもできる (pagesListContext.tsx)
  */
 export interface LanguageEntry {
   /**
@@ -197,22 +217,27 @@ async function getLanguageIds(): Promise<LangId[]> {
 
 export async function getPagesList(): Promise<LanguageEntry[]> {
   const langIds = await getLanguageIds();
-  return await Promise.all(
-    langIds.map(async (langId) => {
-      const raw = await readPublicFile(`docs/${langId}/index.yml`);
-      const data = yaml.load(raw) as IndexYml;
-      return {
-        id: langId,
-        name: data.name as LangName,
-        description: data.description,
-        pages: data.pages.map((p, index) => ({
-          ...p,
-          slug: p.slug as PageSlug,
-          index,
-        })),
-      };
-    })
-  );
+  return await Promise.all(langIds.map(getPagesListForLang));
+}
+export async function getPagesListForLang(
+  langId: LangId
+): Promise<LanguageEntry> {
+  if (!(await getLanguageIds()).includes(langId)) {
+    notFound();
+  }
+
+  const raw = await readPublicFile(`docs/${langId}/index.yml`);
+  const data = yaml.load(raw) as IndexYml;
+  return {
+    id: langId,
+    name: data.name as LangName,
+    description: data.description,
+    pages: data.pages.map((p, index) => ({
+      ...p,
+      slug: p.slug as PageSlug,
+      index,
+    })),
+  };
 }
 
 export async function getRevisions(
@@ -254,6 +279,13 @@ export async function getMarkdownSections(
   lang: LangId,
   page: PageSlug
 ): Promise<MarkdownSection[]> {
+  if (
+    /*!(await getLanguageIds()).includes(lang) || // getPagesListForLangのなかでチェック */
+    !(await getPagesListForLang(lang)).pages.some((p) => p.slug === page)
+  ) {
+    notFound();
+  }
+
   if (isCloudflare()) {
     const sectionsJson = await readPublicFile(
       `docs/${lang}/${page}/sections.json`
@@ -328,6 +360,7 @@ function parseFrontmatter(content: string, file: string): MarkdownSection {
     title: fm.title,
     level: fm.level,
     question: fm.question,
+    term: fm.term,
     rawContent,
     md5: crypto.createHash("md5").update(rawContent).digest("base64"),
   };
@@ -359,4 +392,67 @@ export async function getRevisionOfMarkdownSection(
       `Revision for sectionId=${sectionId}, md5=${md5} not found`
     );
   }
+}
+
+export async function getTermDefinitions(
+  langId: LangId
+): Promise<TermDefinition[]> {
+  if (!(await getLanguageIds()).includes(langId)) {
+    notFound();
+  }
+
+  if (isCloudflare()) {
+    const termsJson = await readPublicFile(
+      `docs/${langId}/termDefinitions.json`
+    );
+    return JSON.parse(termsJson) as TermDefinition[];
+  } else {
+    // これに関しては<Term>の表示のたびに毎回全ファイルを読むのは非効率なので、
+    // cloudflareでない場合でも事前生成済みファイルがあれば利用
+    try {
+      const termsJson = await readPublicFile(
+        `docs/${langId}/termDefinitions.json`
+      );
+      return JSON.parse(termsJson) as TermDefinition[];
+    } catch (e) {
+      // not found?
+      console.warn(`failed to read docs/${langId}/termDefinitions.json:`, e);
+    }
+    const terms: TermDefinition[] = [];
+    const langEntry = await getPagesListForLang(langId);
+    for (const page of langEntry.pages) {
+      const sections = await getMarkdownSections(langId, page.slug);
+      for (const section of sections) {
+        if (section.term && section.term.length >= 1) {
+          terms.push({
+            alias: section.term,
+            page: page.slug,
+            id: section.id,
+            title: section.title,
+            rawContentWithoutCode: stripForTermDefinition(section.rawContent),
+          });
+        }
+      }
+    }
+    return terms;
+  }
+}
+
+function stripForTermDefinition(markdownText: string) {
+  const processed = unified()
+    .use(remarkParse)
+    .use(removeComments)
+    .use(() => (tree) => {
+      remove(tree, (node) => {
+        return (
+          node.type === "heading" || // 見出し
+          node.type === "code" || // コードブロック
+          node.type === "blockquote" // 引用
+        );
+      });
+    })
+    .use(remarkStringify) // ASTをMarkdown文字列に変換
+    .processSync(markdownText);
+
+  return String(processed).trim();
 }

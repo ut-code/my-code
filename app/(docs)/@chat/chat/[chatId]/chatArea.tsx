@@ -4,9 +4,10 @@ import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
 import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
 import { deleteChatAction } from "@/actions/deleteChat";
 import { ChatWithMessages } from "@/lib/chatHistory";
-import { LanguageEntry, MarkdownSection, PageEntry } from "@/lib/docs";
+import { LangId, MarkdownSection, PageSlug } from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import { StyledMarkdown } from "@/markdown/markdown";
+import { usePagesListForLang } from "@/pagesListContext";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,12 +71,15 @@ export function ChatAreaContainer(props: {
 interface Props {
   chatId: string;
   chatData: ChatWithMessages;
-  targetLang: LanguageEntry | undefined;
-  targetPage: PageEntry | undefined;
+  langId: LangId;
+  pageSlug: PageSlug;
   targetSection: MarkdownSection | undefined;
 }
 export function ChatAreaContent(props: Props) {
-  const { chatId, chatData, targetLang, targetPage, targetSection } = props;
+  const { chatId, chatData, langId, pageSlug, targetSection } = props;
+
+  const langEntry = usePagesListForLang(langId);
+  const pageEntry = langEntry?.pages.find((p) => p.slug === pageSlug);
 
   const messagesAndDiffs = [
     ...chatData.messages.map((msg) => ({ type: "message" as const, ...msg })),
@@ -97,13 +101,13 @@ export function ChatAreaContent(props: Props) {
       <div className="flex-none breadcrumbs text-sm">
         <ul className="flex-wrap">
           <li>
-            <Link href={`/${targetLang?.id}/${targetLang?.pages[0].slug}`}>
-              {targetLang?.name}
+            <Link href={`/${langId}/${langEntry?.pages[0].slug}`}>
+              {langEntry?.name}
             </Link>
           </li>
           <li>
             <Link href={`/${chatData.section.pagePath}`}>
-              {targetPage?.index}. {targetPage?.name}
+              {pageEntry?.index}. {pageEntry?.name}
             </Link>
           </li>
           <li>

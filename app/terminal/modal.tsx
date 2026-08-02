@@ -64,6 +64,7 @@ export function Modal(props: Props) {
           open
             ? clsx(
                 "modal-box",
+                "overflow-visible",
                 "max-w-300 p-0",
                 "size-full",
                 "md:border-2 border-accent",

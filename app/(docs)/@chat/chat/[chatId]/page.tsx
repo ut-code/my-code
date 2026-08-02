@@ -4,7 +4,11 @@ import {
   getChatOne,
   initContext,
 } from "@/lib/chatHistory";
-import { getMarkdownSections, getPagesList } from "@/lib/docs";
+import {
+  getMarkdownSections,
+  LangId,
+  PageSlug,
+} from "@/lib/docs";
 import { ChatAreaContainer, ChatAreaContent } from "./chatArea";
 import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";
@@ -29,17 +33,11 @@ export default async function ChatPage({
     );
   }
 
-  const pagesList = await getPagesList();
-  const targetLang = pagesList.find(
-    (lang) => lang.id === chatData.section.pagePath.split("/")[0]
-  );
-  const targetPage = targetLang?.pages.find(
-    (page) => page.slug === chatData.section.pagePath.split("/")[1]
-  );
-  const sections =
-    targetLang && targetPage
-      ? await getMarkdownSections(targetLang.id, targetPage.slug)
-      : [];
+  const [langId, pageSlug] = chatData.section.pagePath.split("/") as [
+    LangId,
+    PageSlug,
+  ];
+  const sections = await getMarkdownSections(langId, pageSlug);
   const targetSection = sections.find((sec) => sec.id === chatData.sectionId);
 
   return (
@@ -47,8 +45,8 @@ export default async function ChatPage({
       <ChatAreaContent
         chatId={chatId}
         chatData={chatData}
-        targetLang={targetLang}
-        targetPage={targetPage}
+        langId={langId}
+        pageSlug={pageSlug}
         targetSection={targetSection}
       />
     </ChatAreaContainer>

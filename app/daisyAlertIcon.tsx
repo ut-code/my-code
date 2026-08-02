@@ -1,12 +1,17 @@
+import clsx from "clsx";
+
 // https://daisyui.com/components/alert/ のコード例のsvgのコピペ
 
-export function DaisyInfoIcon() {
+/**
+ * 色を変える場合は <DaisyInfoIcon className="text-info" /> のように使う
+ */
+export function DaisyInfoIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={clsx("h-6 w-6 shrink-0 stroke-current", className)}
       fill="none"
       viewBox="0 0 24 24"
-      className="stroke-info h-6 w-6 shrink-0"
     >
       <path
         strokeLinecap="round"
@@ -18,11 +23,11 @@ export function DaisyInfoIcon() {
   );
 }
 
-export function DaisySuccessIcon() {
+export function DaisySuccessIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6 shrink-0 stroke-current"
+      className={clsx("h-6 w-6 shrink-0 stroke-current", className)}
       fill="none"
       viewBox="0 0 24 24"
     >
@@ -36,11 +41,11 @@ export function DaisySuccessIcon() {
   );
 }
 
-export function DaisyWarningIcon() {
+export function DaisyWarningIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6 shrink-0 stroke-current"
+      className={clsx("h-6 w-6 shrink-0 stroke-current", className)}
       fill="none"
       viewBox="0 0 24 24"
     >
@@ -54,11 +59,11 @@ export function DaisyWarningIcon() {
   );
 }
 
-export function DaisyErrorIcon() {
+export function DaisyErrorIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6 shrink-0 stroke-current"
+      className={clsx("h-6 w-6 shrink-0 stroke-current", className)}
       fill="none"
       viewBox="0 0 24 24"
     >

@@ -9,7 +9,7 @@ import {
 import {
   DynamicMarkdownSectionSchema,
   getMarkdownSections,
-  getPagesList,
+  getPagesListForLang,
   introSectionId,
   PagePathSchema,
   SectionId,
@@ -57,8 +57,7 @@ export async function POST(request: NextRequest) {
     execResults,
   } = parseResult.data;
 
-  const pagesList = await getPagesList();
-  const langEntry = pagesList.find((lang) => lang.id === path.lang);
+  const langEntry = await getPagesListForLang(path.lang);
   const langName = langEntry?.name ?? path.lang;
   let targetPath = path;
   let targetSectionContent = sectionContent;

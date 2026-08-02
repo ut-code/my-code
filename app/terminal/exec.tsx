@@ -15,6 +15,7 @@ import { LangConstants } from "@my-code/runtime/languages";
 import { useRuntime } from "@my-code/runtime/context";
 import { captureException } from "@sentry/nextjs";
 import { MinMaxButton, Modal } from "./modal";
+import { WithAutoTooltipPosition } from "@/markdown/tooltipPosition";
 
 function handleRuntimeError(error: unknown) {
   captureException(error);
@@ -139,11 +140,16 @@ export function ExecFile(props: ExecProps) {
   return (
     <Modal
       id={`exec-${props.filenames.join("-")}`}
-      className={clsx("relative", "flex flex-col", "isolate")}
+      className={clsx(
+        "relative",
+        "flex flex-col",
+        "isolate",
+        "text-base-content"
+      )}
       open={isModal}
       setOpen={setIsModal}
     >
-      <div className="bg-base-200 flex w-full overflow-x-clip overflow-y-visible items-center rounded-t-box">
+      <div className="bg-base-200 flex w-full overflow-visible items-center rounded-t-box">
         <button
           /* daisyuiのbtnはheightがvar(--size)で固定。
           ここでは最小でそのサイズ、ただし親コンテナがそれより大きい場合に大きくしたい
@@ -188,7 +194,10 @@ export function ExecFile(props: ExecProps) {
         <code className="text-left break-all text-sm my-1 ml-4">
           {getCommandlineStr?.(props.filenames)}
         </code>
-        <div className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1">
+        <WithAutoTooltipPosition
+          as="div"
+          className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1"
+        >
           <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
             ブラウザ上で動作する
             <span className="mx-0.5">
@@ -214,7 +223,7 @@ export function ExecFile(props: ExecProps) {
           >
             ？
           </button>
-        </div>
+        </WithAutoTooltipPosition>
         <div className="flex-1" />
         <MinMaxButton open={isModal} id={`exec-${props.filenames.join("-")}`} />
       </div>

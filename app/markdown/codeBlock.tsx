@@ -9,18 +9,19 @@ import { ExtraProps } from "react-markdown";
 import { StyledSyntaxHighlighter } from "./styledSyntaxHighlighter";
 
 export function AutoCodeBlock({
+  interactive,
   node,
   className,
   ref,
   style,
   ...props
-}: JSX.IntrinsicElements["code"] & ExtraProps) {
+}: JSX.IntrinsicElements["code"] & ExtraProps & { interactive: boolean }) {
   const match = /^language-(\w+)(-repl|-exec|-readonly)?\:?(.+)?$/.exec(
     className || ""
   );
   if (match) {
     const language = langConstants(match[1] as MarkdownLang | undefined);
-    if (match[2] === "-exec" && match[3]) {
+    if (interactive && match[2] === "-exec" && match[3]) {
       /*
       ```python-exec:main.py
       hello, world!
@@ -40,7 +41,7 @@ export function AutoCodeBlock({
           />
         );
       }
-    } else if (match[2] === "-repl") {
+    } else if (interactive && match[2] === "-repl") {
       // repl付きの言語指定
       if (!match[3]) {
         console.error(
@@ -56,7 +57,7 @@ export function AutoCodeBlock({
           />
         );
       }
-    } else if (match[3]) {
+    } else if (interactive && match[3]) {
       // ファイル名指定がある場合、ファイルエディター
       return (
         <EditorComponent

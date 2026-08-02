@@ -1,13 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  DynamicMarkdownSection,
-  LangId,
-  LanguageEntry,
-  PagePath,
-  PageSlug,
-} from "@/lib/docs";
+import { DynamicMarkdownSection, LangId, PagePath, PageSlug } from "@/lib/docs";
 import { AccountMenu } from "./accountMenu";
 import { ThemeToggle } from "./themeToggle";
 import {
@@ -20,6 +14,7 @@ import {
 import clsx from "clsx";
 import { LanguageIcon } from "@/terminal/icons";
 import { RuntimeLang } from "@my-code/runtime/languages";
+import { usePagesList } from "./pagesListContext";
 
 export interface ISidebarMdContext {
   loadedPath: PagePath | null;
@@ -78,11 +73,12 @@ export function SidebarMdProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function Sidebar({ pagesList }: { pagesList: LanguageEntry[] }) {
+export function Sidebar() {
   const pathname = usePathname();
   const pathnameMatch = pathname.match(/^\/([\w-_]+)\/([\w-_]+).*?/);
   const currentLang = pathnameMatch?.[1] as LangId;
   const currentPageId = pathnameMatch?.[2] as PageSlug;
+  const pagesList = usePagesList();
   const sidebarContext = useSidebarMdContext();
   // sidebarMdContextの情報が古かったら使わない
   const sidebarMdContent =
