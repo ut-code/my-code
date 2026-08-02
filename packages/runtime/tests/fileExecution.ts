@@ -20,6 +20,7 @@ export const fileExecutionTests: Record<
         rust: ["test.rs", `fn main() {\n    println!("${msg}");\n}\n`],
         javascript: ["test.js", `console.log("${msg}")`],
         typescript: ["test.ts", `console.log("${msg}")`],
+        dart: ["main.dart", `void main() {\n  print("${msg}");\n}\n`],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;
@@ -53,6 +54,10 @@ export const fileExecutionTests: Record<
         rust: ["test_error.rs", `fn main() {\n    panic!("${errorMsg}");\n}\n`],
         javascript: ["test_error.js", `throw new Error("${errorMsg}");\n`],
         typescript: ["test_error.ts", `throw new Error("${errorMsg}");\n`],
+        dart: [
+          "test_error.dart",
+          `void main() {\n  throw Exception("${errorMsg}");\n}\n`,
+        ],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;
@@ -114,6 +119,7 @@ export const fileExecutionTests: Record<
         ],
         javascript: [null, null],
         typescript: [null, null],
+        dart: [null, null],
       } satisfies Record<
         RuntimeLang,
         [Record<string, string>, string[]] | [null, null]
@@ -148,6 +154,7 @@ export const fileExecutionTests: Record<
         rust: [null, null],
         javascript: [null, null],
         typescript: [null, null],
+        dart: [null, null],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;

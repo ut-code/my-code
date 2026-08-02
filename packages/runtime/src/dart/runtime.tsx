@@ -1,0 +1,299 @@
+"use client";
+
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
+import useSWR from "swr";
+import {
+  ReplOutput,
+  RuntimeContext,
+  RuntimeErrorHandler,
+  RuntimeInfo,
+  UpdatedFile,
+} from "../interface";
+
+const DART_PAD_API_BASE = "https://stable.api.dartpad.dev/api/v3";
+const DART_PAD_ARTIFACTS_BASE = "https://stable.api.dartpad.dev/artifacts";
+
+interface DartVersionResponse {
+  dartVersion?: string;
+  flutterVersion?: string;
+}
+
+const versionFetcher = async (url: string): Promise<DartVersionResponse> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Dart version: ${res.statusText}`);
+  }
+  return res.json();
+};
+
+const DartContext = createContext<{
+  init: (onError?: RuntimeErrorHandler) => void;
+  ready: boolean;
+  dartVersion?: string;
+}>({
+  init: () => undefined,
+  ready: true,
+});
+
+export function DartProvider({ children }: { children: ReactNode }) {
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+  const init = useCallback((onError?: RuntimeErrorHandler) => {
+    onErrorRef.current = onError;
+  }, []);
+
+  const { data, error } = useSWR<DartVersionResponse>(
+    `${DART_PAD_API_BASE}/version`,
+    versionFetcher
+  );
+
+  useEffect(() => {
+    if (error) {
+      console.error("Failed to fetch Dart version info:", error);
+      onErrorRef.current?.(error);
+    }
+  }, [error]);
+
+  return (
+    <DartContext.Provider
+      value={{
+        init,
+        ready: true,
+        dartVersion: data?.dartVersion,
+      }}
+    >
+      {children}
+    </DartContext.Provider>
+  );
+}
+
+export function useDart(): RuntimeContext {
+  const { init: dartInit, ready, dartVersion } = useContext(DartContext);
+  const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
+
+  const init = useCallback(
+    (onError?: RuntimeErrorHandler) => {
+      onErrorRef.current = onError;
+      dartInit(onError);
+    },
+    [dartInit]
+  );
+
+  const runFiles = useCallback(
+    async (
+      filenames: string[],
+      files: Readonly<Record<string, string>>,
+      onOutput: (output: ReplOutput | UpdatedFile) => void
+    ) => {
+      if (typeof window === "undefined") {
+        onOutput({
+          type: "error",
+          message: "Dart runtime requires browser environment.",
+        });
+        return;
+      }
+
+      const filename = filenames[0] ?? Object.keys(files)[0];
+      const source = files[filename] ?? Object.values(files)[0];
+
+      if (!source) {
+        onOutput({ type: "error", message: "No source code provided to run." });
+        return;
+      }
+
+      try {
+        const response = await fetch(`${DART_PAD_API_BASE}/compileNewDDC`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ source }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          onOutput({
+            type: "error",
+            message:
+              errorText ||
+              `Compilation failed with status ${response.status}`,
+          });
+          return;
+        }
+
+        const data = await response.json();
+        if (!data.result) {
+          onOutput({
+            type: "error",
+            message: "Compilation returned empty result.",
+          });
+          return;
+        }
+
+        const jsCode: string = data.result;
+
+        // Execute compiled JS inside a temporary iframe
+        await new Promise<void>((resolve) => {
+          const iframe = document.createElement("iframe");
+          iframe.style.display = "none";
+          document.body.appendChild(iframe);
+
+          let resolved = false;
+          const cleanup = () => {
+            if (resolved) return;
+            resolved = true;
+            window.removeEventListener("message", handleMessage);
+            if (iframe.parentNode) {
+              iframe.parentNode.removeChild(iframe);
+            }
+            resolve();
+          };
+
+          const handleMessage = (event: MessageEvent) => {
+            if (event.source !== iframe.contentWindow) return;
+            const msgData = event.data;
+            if (!msgData || msgData.sender !== "dart_frame") return;
+
+            if (msgData.type === "stdout") {
+              onOutput({ type: "stdout", message: String(msgData.message) });
+            } else if (msgData.type === "stderr") {
+              onOutput({ type: "stderr", message: String(msgData.message) });
+            } else if (msgData.type === "done") {
+              cleanup();
+            } else if (msgData.type === "error") {
+              onOutput({ type: "error", message: String(msgData.message) });
+              cleanup();
+            }
+          };
+
+          window.addEventListener("message", handleMessage);
+
+          const iframeDoc = iframe.contentDocument;
+          if (!iframeDoc) {
+            onOutput({
+              type: "error",
+              message: "Failed to access iframe document.",
+            });
+            cleanup();
+            return;
+          }
+
+          const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://dartpad.dev/require.js"></script>
+</head>
+<body>
+  <script>
+    window.dartPrint = function(message) {
+      window.parent.postMessage({
+        sender: 'dart_frame',
+        type: 'stdout',
+        message: message == null ? '' : message.toString()
+      }, '*');
+    };
+
+    window.onerror = function(message, url, line, column, error) {
+      var msg = message;
+      if (error) {
+        var errStr = String(error);
+        var errStack = error.stack || '';
+        msg = errStr + (errStack ? '\\n' + errStack : '');
+      }
+      window.parent.postMessage({
+        sender: 'dart_frame',
+        type: 'stderr',
+        message: msg
+      }, '*');
+    };
+
+    require.config({
+      baseUrl: "${DART_PAD_ARTIFACTS_BASE}/",
+      waitSeconds: 60,
+      onNodeCreated: function(node, config, id, url) {
+        node.setAttribute('crossorigin', 'anonymous');
+      }
+    });
+
+    {
+      let __ddcInitCode = function() {
+        ${jsCode}
+      };
+
+      function contextLoaded() {
+        try {
+          __ddcInitCode();
+          dartDevEmbedder.runMain('package:dartpad_sample/bootstrap.dart', {});
+        } catch (err) {
+          var msg = String(err) + (err && err.stack ? '\\n' + err.stack : '');
+          window.parent.postMessage({
+            sender: 'dart_frame',
+            type: 'stderr',
+            message: msg
+          }, '*');
+        } finally {
+          setTimeout(function() {
+            window.parent.postMessage({
+              sender: 'dart_frame',
+              type: 'done'
+            }, '*');
+          }, 100);
+        }
+      }
+
+      function moduleLoaderLoaded() {
+        require(["dart_sdk_new"], contextLoaded);
+      }
+
+      require(["ddc_module_loader"], moduleLoaderLoaded);
+    }
+  </script>
+</body>
+</html>`;
+
+          iframeDoc.open();
+          iframeDoc.write(htmlContent);
+          iframeDoc.close();
+
+          setTimeout(() => {
+            cleanup();
+          }, 15000);
+        });
+      } catch (error) {
+        onErrorRef.current?.(error);
+        onOutput({
+          type: "fatalError",
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+    []
+  );
+
+  const runtimeInfo = useMemo<RuntimeInfo>(
+    () => ({
+      prettyLangName: "Dart",
+      version: dartVersion,
+    }),
+    [dartVersion]
+  );
+
+  return {
+    init,
+    ready,
+    runFiles,
+    getCommandlineStr,
+    runtimeInfo,
+  };
+}
+
+function getCommandlineStr(filenames: string[]) {
+  return `dart run ${filenames[0] ?? "main.dart"}`;
+}
