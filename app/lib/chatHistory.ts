@@ -93,6 +93,16 @@ export async function addChat(
   if (!userId) {
     throw new Error("Not authenticated");
   }
+  await drizzle
+    .insert(section)
+    .values({
+      sectionId,
+      pagePath: `${path.lang}/${path.page}`,
+    })
+    .onConflictDoUpdate({
+      target: section.sectionId,
+      set: { pagePath: `${path.lang}/${path.page}` },
+    });
   const [newChat] = await drizzle
     .insert(chat)
     .values({
