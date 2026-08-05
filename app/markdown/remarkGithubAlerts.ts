@@ -3,29 +3,8 @@ import type { Plugin } from "unified";
 import type { Root, PhrasingContent } from "mdast";
 
 /*
-https://github.com/jaywcjlove/remark-github-blockquote-alert のコピペ、改変
-
-MIT License
-
-Copyright (c) 2025 Kenny Wang(小弟调调™) <kennyiseeyou@gmail.com> (https://github.com/jaywcjlove)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+https://github.com/jaywcjlove/remark-github-blockquote-alert/blob/8d1cf0c5af82e6d94ed71cc814c1eb5e8819f268/src/index.ts
+のコピペ、改変
 */
 
 const alertRegex = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i;
