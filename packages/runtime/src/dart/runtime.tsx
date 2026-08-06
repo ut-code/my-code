@@ -17,9 +17,9 @@ import {
   RuntimeInfo,
   UpdatedFile,
 } from "../interface";
+import dartRunnerHtml from "./dart-runner.html?raw";
 
 const DART_PAD_API_BASE = "https://stable.api.dartpad.dev/api/v3";
-const DART_PAD_ARTIFACTS_BASE = "https://stable.api.dartpad.dev/artifacts";
 
 interface DartVersionResponse {
   dartVersion?: string;
@@ -189,8 +189,7 @@ export function useDart(): RuntimeContext {
           onOutput({
             type: "error",
             message:
-              errorText ||
-              `Compilation failed with status ${response.status}`,
+              errorText || `Compilation failed with status ${response.status}`,
           });
           return;
         }
@@ -210,6 +209,7 @@ export function useDart(): RuntimeContext {
         await new Promise<void>((resolve) => {
           const iframe = document.createElement("iframe");
           iframe.style.display = "none";
+          iframe.srcdoc = dartRunnerHtml;
           document.body.appendChild(iframe);
           activeIframeRef.current = iframe;
 
@@ -234,11 +234,9 @@ export function useDart(): RuntimeContext {
 
             if (msgData.type === "stdout") {
               onOutput({ type: "stdout", message: String(msgData.message) });
-            } else if (msgData.type === "stderr") {
-              onOutput({ type: "stderr", message: String(msgData.message) });
             } else if (msgData.type === "done") {
               cleanup();
-            } else if (msgData.type === "error") {
+            } else if (msgData.type === "jserr") {
               onOutput({ type: "error", message: String(msgData.message) });
               cleanup();
             }
@@ -246,96 +244,16 @@ export function useDart(): RuntimeContext {
 
           window.addEventListener("message", handleMessage);
 
-          const iframeDoc = iframe.contentDocument;
-          if (!iframeDoc) {
-            onOutput({
-              type: "error",
-              message: "Failed to access iframe document.",
-            });
-            cleanup();
-            return;
-          }
-
-          const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-  <script src="https://dartpad.dev/require.js"></script>
-</head>
-<body>
-  <script>
-    window.dartPrint = function(message) {
-      window.parent.postMessage({
-        sender: 'dart_frame',
-        type: 'stdout',
-        message: message == null ? '' : message.toString()
-      }, '*');
-    };
-
-    window.onerror = function(message, url, line, column, error) {
-      var msg = message;
-      if (error) {
-        var errStr = String(error);
-        var errStack = error.stack || '';
-        msg = errStr + (errStack ? '\\n' + errStack : '');
-      }
-      window.parent.postMessage({
-        sender: 'dart_frame',
-        type: 'stderr',
-        message: msg
-      }, '*');
-    };
-
-    require.config({
-      baseUrl: "${DART_PAD_ARTIFACTS_BASE}/",
-      waitSeconds: 60,
-      onNodeCreated: function(node, config, id, url) {
-        node.setAttribute('crossorigin', 'anonymous');
-      }
-    });
-
-    {
-      let __ddcInitCode = function() {
-        ${jsCode}
-      };
-
-      function contextLoaded() {
-        try {
-          __ddcInitCode();
-          dartDevEmbedder.runMain('package:dartpad_sample/bootstrap.dart', {});
-        } catch (err) {
-          var msg = String(err) + (err && err.stack ? '\\n' + err.stack : '');
-          window.parent.postMessage({
-            sender: 'dart_frame',
-            type: 'stderr',
-            message: msg
-          }, '*');
-        } finally {
-          setTimeout(function() {
-            window.parent.postMessage({
-              sender: 'dart_frame',
-              type: 'done'
-            }, '*');
-          }, 100);
-        }
-      }
-
-      function moduleLoaderLoaded() {
-        require(["dart_sdk_new"], contextLoaded);
-      }
-
-      require(["ddc_module_loader"], moduleLoaderLoaded);
-    }
-  </script>
-</body>
-</html>`;
-
-          iframeDoc.open();
-          iframeDoc.write(htmlContent);
-          iframeDoc.close();
-
-          setTimeout(() => {
-            cleanup();
-          }, 15000);
+          // iframeが読み込まれたら、コンパイル済みのコードを送信して実行させる
+          iframe.onload = () => {
+            iframe.contentWindow?.postMessage(
+              {
+                type: "EXECUTE_DART",
+                code: jsCode,
+              },
+              "*"
+            );
+          };
         });
       } catch (error) {
         onErrorRef.current?.(error);
