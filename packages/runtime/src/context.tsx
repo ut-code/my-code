@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { RuntimeContext } from "./interface";
 import { RuntimeLang } from "./languages";
+import { DartProvider, useDart } from "./dart/runtime";
 import { TypeScriptProvider, useTypeScript } from "./typescript/runtime";
 import { useWandbox, WandboxProvider } from "./wandbox/runtime";
 import { JSEvalContext, useJSEval } from "./worker/jsEval";
@@ -34,6 +35,7 @@ export function useRuntimeAll(): Record<RuntimeLang, RuntimeContext> {
   const typescript = useTypeScript(jsEval);
   const wandboxCpp = useWandbox("cpp");
   const wandboxRust = useWandbox("rust");
+  const dart = useDart();
 
   // initはしない。呼び出し側でする必要がある
   return {
@@ -43,6 +45,7 @@ export function useRuntimeAll(): Record<RuntimeLang, RuntimeContext> {
     typescript: typescript,
     cpp: wandboxCpp,
     rust: wandboxRust,
+    dart: dart,
   };
 }
 export function RuntimeProvider({ children }: { children: ReactNode }) {
@@ -51,10 +54,13 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
       <WorkerProvider context={RubyContext} lang="ruby">
         <WorkerProvider context={JSEvalContext} lang="javascript">
           <WandboxProvider>
-            <TypeScriptProvider>{children}</TypeScriptProvider>
+            <TypeScriptProvider>
+              <DartProvider>{children}</DartProvider>
+            </TypeScriptProvider>
           </WandboxProvider>
         </WorkerProvider>
       </WorkerProvider>
     </WorkerProvider>
   );
 }
+

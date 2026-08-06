@@ -22,7 +22,8 @@ export type MarkdownLang =
   | "makefile"
   | "cmake"
   | "text"
-  | "txt";
+  | "txt"
+  | "dart";
 
 export type RuntimeLang =
   | "python"
@@ -30,7 +31,8 @@ export type RuntimeLang =
   | "cpp"
   | "rust"
   | "javascript"
-  | "typescript";
+  | "typescript"
+  | "dart";
 
 export type LangConstants = {
   originalLang: MarkdownLang | undefined;
@@ -50,7 +52,8 @@ export type LangConstants = {
     | "json"
     | "ini"
     | "makefile"
-    | "cmake";
+    | "cmake"
+    | "dart";
 } & (
   | {
       // terminal/editor.tsx でimportする mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値と対応する
@@ -63,7 +66,8 @@ export type LangConstants = {
         | "typescript"
         | "json"
         | "csv"
-        | "text";
+        | "text"
+        | "dart";
       tabSize: number;
     }
   | {
@@ -158,6 +162,14 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         tabSize: 4,
         runtime: "rust",
       };
+    case "dart":
+      return {
+        originalLang: lang,
+        rsh: "dart",
+        ace: "dart",
+        tabSize: 2,
+        runtime: "dart",
+      };
     case "bash":
     case "sh":
       return { originalLang: lang, rsh: "bash" };
@@ -198,3 +210,4 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
       return { originalLang: lang };
   }
 }
+

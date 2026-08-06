@@ -26,6 +26,7 @@ import sub_h from "./samples/sub.h?raw";
 import sub_cpp from "./samples/sub.cpp?raw";
 import main2_rs from "./samples/main2.rs?raw";
 import sub_rs from "./samples/sub.rs?raw";
+import main_dart from "./samples/main.dart?raw";
 import { DaisyInfoIcon } from "@/daisyAlertIcon";
 
 export default function RuntimeTestPage() {
@@ -126,6 +127,13 @@ const sampleConfig: Record<RuntimeLang, SampleConfig> = {
       "sub.rs": sub_rs,
     },
     exec: ["main2.rs"],
+  },
+  dart: {
+    repl: false,
+    editor: {
+      "main.dart": main_dart,
+    },
+    exec: ["main.dart"],
   },
 };
 function RuntimeSample({
