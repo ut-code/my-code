@@ -4,8 +4,6 @@ import {
   useState,
   FormEvent,
   useEffect,
-  useRef,
-  useCallback,
   useMemo,
 } from "react";
 // import useSWR from "swr";
@@ -14,13 +12,8 @@ import {
 //   QuestionExampleParams,
 // } from "../actions/questionExample";
 // import { getLanguageName } from "../pagesList";
-import { useEmbedContext } from "@/terminal/embedContext";
 import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
-import { usePathname, useRouter } from "next/navigation";
-import { ChatStreamEvent } from "@/api/chat/route";
-import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
-import { revalidateChatAction } from "@/actions/revalidateChat";
-import { captureException } from "@sentry/nextjs";
+import { useSendChat } from "@/(docs)/useSendChat";
 
 interface ChatFormProps {
   path: PagePath;
@@ -35,44 +28,8 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
   const [questionScope, setQuestionScope] = useState<"page" | "language">(
     "page"
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { files, replOutputs, execResults } = useEmbedContext();
-
-  const router = useRouter();
-  const streamingChatContext = useStreamingChatContext();
-
-  const pathname = usePathname();
-  const pendingRouterPushTarget = useRef<null | string>(null);
-  const pendingRouterPushResolver = useRef<null | (() => void)>(null);
-  // router.pushの完了を待つ関数。pathnameの変化でページ遷移の完了を検知し、解決する。
-  const asyncRouterPush = useCallback(
-    (url: string, options?: { scroll?: boolean }) => {
-      if (pendingRouterPushTarget.current) {
-        console.error(
-          "Already navigating to",
-          pendingRouterPushTarget.current,
-          "can't navigate to",
-          url
-        );
-        return;
-      }
-      pendingRouterPushTarget.current = url;
-      return new Promise<void>((resolve) => {
-        pendingRouterPushResolver.current = resolve;
-        router.push(url, options);
-      });
-    },
-    [router]
-  );
-  useEffect(() => {
-    if (pendingRouterPushTarget.current === pathname) {
-      pendingRouterPushResolver.current?.();
-      pendingRouterPushTarget.current = null;
-      pendingRouterPushResolver.current = null;
-    }
-  }, [pathname]);
+  const { sendChat, isLoading, errorMessage } = useSendChat();
 
   const exampleData = useMemo(
     () =>
@@ -96,6 +53,7 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
   }, [exampleChoice]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     let userQuestion = inputValue;
     if (!userQuestion && exampleData.length > 0 && exampleChoice) {
       // 質問が空欄なら、質問例を使用
@@ -107,117 +65,16 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
       return;
     }
 
-    e.preventDefault();
-    setIsLoading(true);
-    setErrorMessage(null); // Clear previous error message
-
-    let response: Response;
-    try {
-      response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          path,
-          userQuestion,
-          questionScope,
-          sectionContent,
-          replOutputs,
-          files,
-          execResults,
-        }),
-      });
-    } catch (e) {
-      captureException(e);
-      setErrorMessage("AIへの接続に失敗しました");
-      setIsLoading(false);
-      return;
-    }
-
-    if (!response.ok) {
-      setErrorMessage(`エラーが発生しました (${response.status})`);
-      setIsLoading(false);
-      return;
-    }
-
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    let chatId: string | null = null;
-    let chatPagePath: string | PagePath = path;
-    let navigated = false;
-
-    // ストリームを非同期で読み続ける（ナビゲーション後もバックグラウンドで継続）
-    void (async () => {
-      try {
-        while (true) {
-          const result = await reader.read();
-          const { done, value } = result;
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-
-          for (const line of lines) {
-            if (!line.trim()) continue;
-            try {
-              const event = JSON.parse(line) as ChatStreamEvent;
-
-              if (event.type === "chat") {
-                chatPagePath = event.pagePath;
-                // revalidateChatは/api/chatの中では呼ばず、別のServerActionとして呼び出す
-                await revalidateChatAction(event.chatId, event.pagePath);
-                chatId = event.chatId;
-                streamingChatContext.startStreaming(event.chatId);
-                if (event.pagePath === `${path.lang}/${path.page}`) {
-                  document.getElementById(event.sectionId)?.scrollIntoView({
-                    behavior: "smooth",
-                  });
-                }
-                await asyncRouterPush(`/chat/${event.chatId}`, {
-                  scroll: false,
-                });
-                router.refresh();
-                navigated = true;
-                setIsLoading(false);
-                setInputValue("");
-                close();
-              } else if (event.type === "chunk") {
-                streamingChatContext.appendChunk(event.text);
-              } else if (event.type === "done") {
-                if (chatId) {
-                  await revalidateChatAction(chatId, chatPagePath);
-                }
-                streamingChatContext.finishStreaming();
-                router.refresh();
-              } else if (event.type === "error") {
-                if (!navigated) {
-                  setErrorMessage(event.message);
-                  setIsLoading(false);
-                }
-                if (chatId) {
-                  await revalidateChatAction(chatId, chatPagePath);
-                }
-                streamingChatContext.finishStreaming();
-                router.refresh();
-              }
-            } catch (e) {
-              captureException(e);
-              // ignore JSON parse errors
-            }
-          }
-        }
-      } catch (err) {
-        captureException(err);
-        console.error("Stream reading failed:", err);
-        // ナビゲーション後のエラーはストリーミングを終了してローディングを止める
-        if (!navigated) {
-          setErrorMessage(String(err));
-          setIsLoading(false);
-        }
-        streamingChatContext.finishStreaming();
-      }
-    })();
+    await sendChat({
+      path,
+      userQuestion,
+      questionScope,
+      sectionContent,
+      onSuccess: () => {
+        setInputValue("");
+        close();
+      },
+    });
   };
 
   return (

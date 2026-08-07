@@ -2,12 +2,14 @@
 
 import { ChatAreaStateUpdater } from "@/(docs)/chatAreaState";
 import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
+import { useSendChat } from "@/(docs)/useSendChat";
 import { deleteChatAction } from "@/actions/deleteChat";
 import { ChatWithMessages } from "@/lib/chatHistory";
-import { LangId, MarkdownSection, PageSlug } from "@/lib/docs";
+import { DynamicMarkdownSection, LangId, MarkdownSection, PageSlug } from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import { StyledMarkdown } from "@/markdown/markdown";
 import { usePagesListForLang } from "@/pagesListContext";
+import { useSidebarMdContextOptional } from "@/sidebar";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -92,6 +94,41 @@ export function ChatAreaContent(props: Props) {
   const router = useRouter();
   const streamingChatContext = useStreamingChatContext();
   const isStreamingThis = streamingChatContext.chatId === chatId;
+  const { sendChat, isLoading: isRegenerating } = useSendChat();
+  const sidebarContext = useSidebarMdContextOptional();
+
+  const handleRegenerate = async () => {
+    if (!confirm("このチャットを削除して再生成してもよろしいですか?")) {
+      return;
+    }
+    const firstUserMsg = chatData.messages.find((m) => m.role === "user");
+    const userQuestion = firstUserMsg ? firstUserMsg.content : chatData.title;
+
+    const sectionContent: DynamicMarkdownSection[] =
+      sidebarContext?.loadedPath?.lang === langId &&
+      sidebarContext?.loadedPath?.page === pageSlug &&
+      sidebarContext?.sidebarMdContent &&
+      sidebarContext.sidebarMdContent.length > 0
+        ? sidebarContext.sidebarMdContent
+        : targetSection
+        ? [
+            {
+              ...targetSection,
+              inView: true,
+              replacedContent: targetSection.rawContent,
+              replacedRange: [],
+            },
+          ]
+        : [];
+
+    await sendChat({
+      path: { lang: langId, page: pageSlug },
+      userQuestion,
+      questionScope: "page",
+      sectionContent,
+      deleteChatOnCreated: chatId,
+    });
+  };
 
   return (
     <>
@@ -117,12 +154,55 @@ export function ChatAreaContent(props: Props) {
           </li>
         </ul>
       </div>
-      <div className="flex flex-wrap items-center">
+      <div className="flex flex-wrap items-center gap-2">
         <div className="flex-1 text-sm opacity-40" suppressHydrationWarning>
           {chatData.createdAt.toLocaleString()}
         </div>
         <button
+          className="btn btn-secondary btn-soft btn-sm"
+          disabled={isStreamingThis || isRegenerating}
+          onClick={handleRegenerate}
+        >
+          <svg
+            className={clsx("w-4 h-4", isRegenerating && "animate-spin")}
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4.06189 13C4.55399 16.944 7.92083 20 12 20C15.5463 20 18.5721 17.7719 19.5714 14.619"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M19.9381 11C19.446 7.05601 16.0792 4 12 4C8.45371 4 5.42788 6.22811 4.42857 9.38095"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M14 14.619H19.5714V20"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 9.38095H4.42857V4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          再生成
+        </button>
+        <button
           className="btn btn-error btn-soft btn-sm"
+          disabled={isStreamingThis || isRegenerating}
           onClick={async () => {
             if (confirm("このチャットを削除してもよろしいですか?")) {
               await deleteChatAction(chatId);
