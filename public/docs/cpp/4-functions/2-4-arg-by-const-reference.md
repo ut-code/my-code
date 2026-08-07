@@ -45,6 +45,6 @@ Message: This is a potentially very large string...
 
 > **ガイドライン:**
 >
->   * `int` や `double` などの基本型 → **値渡し** でOK。
+>   * `int` や `double` などの[[基本型]] → **値渡し** でOK。
 >   * 変更させたいデータ → **参照渡し** (`T&`)。
 >   * 変更しないがサイズが大きいデータ（string, vectorなど） → **const参照渡し** (`const T&`)。

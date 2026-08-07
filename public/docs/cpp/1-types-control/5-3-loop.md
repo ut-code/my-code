@@ -8,11 +8,12 @@ question:
   - whileループの具体的な使い方の例も見てみたいです。
   - 無限ループを防ぐためにはどうすれば良いですか？
   - ループを途中で抜け出す方法や、次のイテレーションに進む方法はC++にもありますか？
+term:
+  - while
+  - for
 ---
 
 ### ループ構文
-
-`while`, `for` も標準的です。
 
 ```cpp:control-loop.cpp
 #include <iostream>

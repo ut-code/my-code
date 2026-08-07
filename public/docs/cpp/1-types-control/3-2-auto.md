@@ -7,6 +7,8 @@ question:
   - autoを使いすぎるとコードが読みにくくなることはありませんか？
   - auto z = "hello"; がconst char* になるのはなぜですか？std::stringにはならないのですか？
   - autoを使うことで、プログラムの実行速度に影響はありますか？
+term:
+  - auto
 ---
 
 ### `auto`による型推論
