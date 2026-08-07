@@ -99,6 +99,7 @@ export const DynamicMarkdownSectionSchema = MarkdownSectionSchema.extend({
 export type DynamicMarkdownSection = z.output<
   typeof DynamicMarkdownSectionSchema
 >;
+export type SectionWithDiff = Omit<DynamicMarkdownSection, "inView">;
 
 /**
  * 各言語のindex.ymlから読み込んだデータにid,index等を追加したデータ型

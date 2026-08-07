@@ -9,10 +9,10 @@ import { PageTransition } from "./pageTransition";
 import {
   DynamicMarkdownSection,
   LangId,
-  MarkdownSection,
   PagePath,
   PageSlug,
   SectionId,
+  SectionWithDiff,
 } from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import Link from "next/link";
@@ -21,7 +21,7 @@ import { ChatWithMessages } from "@/lib/chatHistory";
 import { usePagesListForLang } from "@/pagesListContext";
 
 interface PageContentProps {
-  splitMdContent: MarkdownSection[];
+  splitMdContent: SectionWithDiff[];
   langId: LangId;
   pageSlug: PageSlug;
   path: PagePath;
@@ -69,68 +69,11 @@ export function PageContent(props: PageContentProps) {
   }, []);
 
   const dynamicMdContent = useMemo(() => {
-    const newContent: DynamicMarkdownSection[] = splitMdContent.map(
-      (section, i) => ({
-        ...section,
-        inView: sectionInView[i],
-        replacedContent: section.rawContent,
-        replacedRange: [],
-      })
-    );
-    const chatDiffs = chatHistories.map((chat) => chat.diff).flat();
-    chatDiffs.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-    for (const diff of chatDiffs) {
-      const targetSection = newContent.find((s) => s.id === diff.sectionId);
-      if (targetSection) {
-        const startIndex = targetSection.replacedContent.indexOf(diff.search);
-        if (startIndex !== -1) {
-          const endIndex = startIndex + diff.search.length;
-          const replaceLen = diff.replace.length;
-          const diffLen = replaceLen - diff.search.length; // 文字列長の増減分
-
-          // 1. 文字列の置換
-          targetSection.replacedContent =
-            targetSection.replacedContent.slice(0, startIndex) +
-            diff.replace +
-            targetSection.replacedContent.slice(endIndex);
-
-          // 2. 既存のハイライト範囲のズレを補正（今回の置換箇所より後ろにあるものをシフト）
-          targetSection.replacedRange = targetSection.replacedRange.map((h) => {
-            if (h.start >= endIndex) {
-              // 完全に後ろにある場合は単純にシフト
-              return {
-                start: h.start + diffLen,
-                end: h.end + diffLen,
-                id: h.id,
-              };
-            }
-            if (h.end >= endIndex) {
-              return { start: h.start, end: h.end + diffLen, id: h.id };
-            }
-            return h;
-          });
-
-          // 3. 今回の置換箇所を新たなハイライト範囲として追加
-          targetSection.replacedRange.push({
-            start: startIndex,
-            end: startIndex + replaceLen,
-            id: diff.chatId,
-          });
-        } else {
-          // TODO: md5ハッシュを参照し過去バージョンのドキュメントへ適用を試みる
-          console.error(
-            `Failed to apply diff: search string "${diff.search}" not found in section ${targetSection.id}`
-          );
-        }
-      } else {
-        console.error(
-          `Failed to apply diff: section with id "${diff.sectionId}" not found`
-        );
-      }
-    }
-
-    return newContent;
-  }, [splitMdContent, chatHistories, sectionInView]);
+    return splitMdContent.map((section, i) => ({
+      ...section,
+      inView: sectionInView[i] ?? false,
+    }));
+  }, [splitMdContent, sectionInView]);
 
   useEffect(() => {
     // props.splitMdContentが変わったとき, チャットのdiffが変わった時に
