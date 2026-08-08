@@ -11,7 +11,7 @@ question:
 
 `Project` という名前のクラスを作成してください。コンストラクタでプロジェクト名を受け取り、デストラクタで「Project (プロジェクト名) is finished.」と表示します。
 
-`main` 関数で、`"Project Phoenix"` という名前の `Project` オブジェクトを `std::make_shared` で作成してください。
+[[`main` 関数]]で、`"Project Phoenix"` という名前の `Project` オブジェクトを `std::make_shared` で作成してください。
 次に、`std::vector<std::shared_ptr<Project>>` を作成し、作成した `shared_ptr` を2回 `push_back` してください。
 その後、`shared_ptr` の参照カウント (`use_count()`) を表示してください。
 最後に、`vector` を `clear()` して、再度参照カウントを表示してください。

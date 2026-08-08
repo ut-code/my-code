@@ -33,7 +33,7 @@ irb(main):016:0> numbers.select { |n| n.odd? } # select が使える
 => [1, 3]
 ```
 
-これは、自分で新しいコレクションクラスを作った場合でも同様です。（`include` については後の「モジュールとMix-in」の章で詳しく学びます）
+これは、自分で新しいコレクションクラスを作った場合でも同様です。（`include` については[[./7]]で詳しく学びます）
 
 ```ruby:my_collection.rb
 # Enumerableモジュールを include する

@@ -35,6 +35,6 @@ question:
     };
     ```
 
-    `Pair<int, std::string>`と`Pair<std::string, double>`は、コンパイルされると全く別のクラスとして扱われることに注意してください。
+    `Pair<int, std::string>`と`Pair<std::string, double>`は、[[コンパイル]]されると全く別のクラスとして扱われることに注意してください。
 
-クラステンプレートは、C++の強力なライブラリである**STL (Standard Template Library)**の根幹をなす技術です。次章で学ぶ`vector`や`map`といった便利なコンテナは、すべてクラステンプレートで実装されています。
+クラステンプレートは、C++の強力なライブラリである**STL (Standard Template Library)**の根幹をなす技術です。[[./next]]で学ぶ`vector`や`map`といった便利なコンテナは、すべてクラステンプレートで実装されています。

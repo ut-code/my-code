@@ -10,10 +10,13 @@ question:
 
 ## 文字列リテラルと `char*`
 
-`std::string` が登場する前、文字列は単なる `char` 型の配列でした。これを「Cスタイル文字列」と呼びます。
+[[`std::string`]] が登場する前、文字列は単なる [[`char`]] 型の配列でした。これを「Cスタイル文字列」と呼びます。
 現在でも、ライブラリとの連携などで頻繁に目にします。
 
 Cスタイル文字列は、文字の並びの最後に「終端文字 `\0`（ヌル文字）」を置くことで終わりを表します。
+
+> [!IMPORTANT]
+> モダンC++では基本的に [[`std::string`]] を使いましょう。`char*` は参照用やAPI互換のために使います。
 
 ```cpp:legacy_string.cpp
 #include <iostream>
@@ -44,4 +47,3 @@ C++ String: World
 Converted to C-Style: World
 ```
 
-**重要:** モダンC++では基本的に `std::string` を使いましょう。`char*` は参照用やAPI互換のために使います。

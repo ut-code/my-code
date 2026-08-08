@@ -32,7 +32,7 @@ int add(int a, int b) {
 }
 ```
 
-最後に、`main`関数を含むメインのソースファイルから、この`add`関数を呼び出します。
+最後に、[[`main`関数]]を含むメインのソースファイルから、この`add`関数を呼び出します。
 
 ```cpp:math_app.cpp
 #include <iostream>
