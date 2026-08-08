@@ -9,7 +9,6 @@ import { DynamicMarkdownSection, LangId, MarkdownSection, PageSlug } from "@/lib
 import { Heading } from "@/markdown/heading";
 import { StyledMarkdown } from "@/markdown/markdown";
 import { usePagesListForLang } from "@/pagesListContext";
-import { useSidebarMdContextOptional } from "@/sidebar";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -76,9 +75,17 @@ interface Props {
   langId: LangId;
   pageSlug: PageSlug;
   targetSection: MarkdownSection | undefined;
+  priorSectionContent: DynamicMarkdownSection[];
 }
 export function ChatAreaContent(props: Props) {
-  const { chatId, chatData, langId, pageSlug, targetSection } = props;
+  const {
+    chatId,
+    chatData,
+    langId,
+    pageSlug,
+    targetSection,
+    priorSectionContent,
+  } = props;
 
   const langEntry = usePagesListForLang(langId);
   const pageEntry = langEntry?.pages.find((p) => p.slug === pageSlug);
@@ -95,7 +102,6 @@ export function ChatAreaContent(props: Props) {
   const streamingChatContext = useStreamingChatContext();
   const isStreamingThis = streamingChatContext.chatId === chatId;
   const { sendChat, isLoading: isRegenerating } = useSendChat();
-  const sidebarContext = useSidebarMdContextOptional();
 
   const handleRegenerate = async () => {
     if (!confirm("このチャットを削除して再生成してもよろしいですか?")) {
@@ -104,28 +110,11 @@ export function ChatAreaContent(props: Props) {
     const firstUserMsg = chatData.messages.find((m) => m.role === "user");
     const userQuestion = firstUserMsg ? firstUserMsg.content : chatData.title;
 
-    const sectionContent: DynamicMarkdownSection[] =
-      sidebarContext?.loadedPath?.lang === langId &&
-      sidebarContext?.loadedPath?.page === pageSlug &&
-      sidebarContext?.sidebarMdContent &&
-      sidebarContext.sidebarMdContent.length > 0
-        ? sidebarContext.sidebarMdContent
-        : targetSection
-        ? [
-            {
-              ...targetSection,
-              inView: true,
-              replacedContent: targetSection.rawContent,
-              replacedRange: [],
-            },
-          ]
-        : [];
-
     await sendChat({
       path: { lang: langId, page: pageSlug },
       userQuestion,
       questionScope: "page",
-      sectionContent,
+      sectionContent: priorSectionContent,
       deleteChatOnCreated: chatId,
     });
   };
