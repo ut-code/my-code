@@ -18,7 +18,7 @@ question:
   * `T pop()`: スタックの先頭から要素を取り出す
   * `bool is_empty()`: スタックが空かどうかを返す
 
-`std::vector`を内部のデータ格納場所として利用して構いません。`int`型と`char`型で動作を確認してください。
+[[`std::vector`]]を内部のデータ格納場所として利用して構いません。`int`型と`char`型で動作を確認してください。
 
 ```cpp:practice10_2.cpp
 #include <iostream>

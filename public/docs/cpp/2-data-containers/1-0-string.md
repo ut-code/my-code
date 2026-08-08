@@ -8,6 +8,9 @@ question:
   - 文字列を結合する際に、+演算子をたくさん使うとパフォーマンスに影響はありますか？
   - std::stringを使うためには必ず#include <string>が必要ですか？
   - std::stringの.size()メソッドは、半角英数字以外の文字（日本語など）でも正しく文字数を数えられますか？
+term:
+  - 文字列
+  - std::string
 ---
 
 ## 文字列の扱い：`std::string`
@@ -22,7 +25,8 @@ C++では、標準ライブラリの `std::string` クラスを使用します�
   * **比較**: `==`, `!=` などで中身の文字列比較が可能（C言語の `strcmp` は不要）。
   * **サイズ取得**: `.size()` または `.length()` メソッドを使用。
 
-<!-- end list -->
+> [!NOTE]
+> `std::string` は必要に応じて自動的にメモリを拡張します。プログラマがメモリ確保（malloc/free）を気にする必要はありません。
 
 ```cpp:string_demo.cpp
 #include <iostream>
@@ -61,5 +65,3 @@ Length: 13
 Greeting matches 'Hello'.
 Modified: hello, World!
 ```
-
-> **Note:** `std::string` は必要に応じて自動的にメモリを拡張します。プログラマがメモリ確保（malloc/free）を気にする必要はありません。

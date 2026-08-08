@@ -9,7 +9,9 @@ question:
 ### 練習問題2: 単語のフィルタリング
 
 以下の単語リスト `words` の中から、**文字数（長さ）が5文字より大きい単語だけ**を選んで表示するプログラムを作成してください。
-（ヒント：`std::string` の `.size()` または `.length()` メソッドと [[`if`]] 文を使用します）
+
+> [!TIP]
+> [[`std::string`]] の `.size()` または `.length()` メソッドと [[`if`]] 文を使用します）
 
 ```cpp:practice3_2.cpp
 #include <iostream>
