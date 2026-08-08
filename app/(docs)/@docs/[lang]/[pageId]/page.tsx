@@ -51,7 +51,7 @@ export default async function Page({
 
   const termDefinitions = await getTermDefinitions(lang);
 
-  const splitMdContent = applyChatDiff(sections, chatHistories);
+  const splitMdContent = await applyChatDiff(sections, chatHistories);
 
   return (
     <>

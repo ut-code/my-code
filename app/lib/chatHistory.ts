@@ -6,6 +6,7 @@ import { and, asc, eq, exists } from "drizzle-orm";
 import { cacheLife, cacheTag, updateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
 import {
+  getRevisionOfMarkdownSection,
   LangId,
   MarkdownSection,
   PagePath,
@@ -289,66 +290,167 @@ export async function migrateChatUser(oldUserId: string, newUserId: string) {
     .where(eq(chat.userId, oldUserId));
 }
 
-export function applyChatDiff(
+export async function updateDiffTargetMD5(
+  diffId: string,
+  targetMD5: string,
+  context: Context
+) {
+  const { drizzle, userId } = context;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+  await drizzle
+    .update(diff)
+    .set({ targetMD5 })
+    .where(eq(diff.id, diffId));
+}
+
+export function applySingleDiffToSection<T extends SectionWithDiff>(
+  targetSection: T,
+  diffItem: { search: string; replace: string; chatId: string }
+): boolean {
+  const startIndex = targetSection.replacedContent.indexOf(diffItem.search);
+  if (startIndex === -1) {
+    return false;
+  }
+  const endIndex = startIndex + diffItem.search.length;
+  const replaceLen = diffItem.replace.length;
+  const diffLen = replaceLen - diffItem.search.length; // 文字列長の増減分
+
+  // 1. 文字列の置換
+  targetSection.replacedContent =
+    targetSection.replacedContent.slice(0, startIndex) +
+    diffItem.replace +
+    targetSection.replacedContent.slice(endIndex);
+
+  // 2. 既存のハイライト範囲のズレを補正（今回の置換箇所より後ろにあるものをシフト）
+  targetSection.replacedRange = targetSection.replacedRange.map((h) => {
+    if (h.start >= endIndex) {
+      // 完全に後ろにある場合は単純にシフト
+      return {
+        start: h.start + diffLen,
+        end: h.end + diffLen,
+        id: h.id,
+      };
+    }
+    if (h.end >= endIndex) {
+      return { start: h.start, end: h.end + diffLen, id: h.id };
+    }
+    return h;
+  });
+
+  // 3. 今回の置換箇所を新たなハイライト範囲として追加
+  targetSection.replacedRange.push({
+    start: startIndex,
+    end: startIndex + replaceLen,
+    id: diffItem.chatId,
+  });
+
+  return true;
+}
+
+export interface ApplyChatDiffOptions {
+  fallbackToPastVersion?: boolean;
+}
+
+export async function applyChatDiff(
   splitMdContent: MarkdownSection[],
-  chatHistories: ChatWithMessages[]
-): SectionWithDiff[] {
+  chatHistories: ChatWithMessages[],
+  options: ApplyChatDiffOptions = { fallbackToPastVersion: true }
+): Promise<SectionWithDiff[]> {
+  const fallbackToPastVersion = options.fallbackToPastVersion ?? true;
+
   const newContent: SectionWithDiff[] = splitMdContent.map((section) => ({
     ...section,
     replacedContent: section.rawContent,
     replacedRange: [] as ReplacedRange[],
+    isOutdated: false,
+    outdatedDiffsToUpdate: [],
   }));
-  const chatDiffs = chatHistories.map((chat) => chat.diff).flat();
+
+  const chatDiffs = chatHistories.flatMap((chat) => chat.diff);
   chatDiffs.sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
-  for (const diff of chatDiffs) {
-    const targetSection = newContent.find((s) => s.id === diff.sectionId);
-    if (targetSection) {
-      const startIndex = targetSection.replacedContent.indexOf(diff.search);
-      if (startIndex !== -1) {
-        const endIndex = startIndex + diff.search.length;
-        const replaceLen = diff.replace.length;
-        const diffLen = replaceLen - diff.search.length; // 文字列長の増減分
 
-        // 1. 文字列の置換
-        targetSection.replacedContent =
-          targetSection.replacedContent.slice(0, startIndex) +
-          diff.replace +
-          targetSection.replacedContent.slice(endIndex);
+  const fallbackHandledSections = new Set<string>();
 
-        // 2. 既存のハイライト範囲のズレを補正（今回の置換箇所より後ろにあるものをシフト）
-        targetSection.replacedRange = targetSection.replacedRange.map((h) => {
-          if (h.start >= endIndex) {
-            // 完全に後ろにある場合は単純にシフト
-            return {
-              start: h.start + diffLen,
-              end: h.end + diffLen,
-              id: h.id,
-            };
-          }
-          if (h.end >= endIndex) {
-            return { start: h.start, end: h.end + diffLen, id: h.id };
-          }
-          return h;
+  for (const diffItem of chatDiffs) {
+    const targetSection = newContent.find((s) => s.id === diffItem.sectionId);
+    if (!targetSection) {
+      console.error(
+        `Failed to apply diff: section with id "${diffItem.sectionId}" not found`
+      );
+      continue;
+    }
+
+    if (fallbackHandledSections.has(targetSection.id)) {
+      // すでに過去バージョンへのフォールバック時にこのセクションの全diffが再適用されている
+      continue;
+    }
+
+    const success = applySingleDiffToSection(targetSection, diffItem);
+
+    if (success) {
+      // section.md5とtargetMD5が違うのにdiffの適用に成功したら、
+      // それ以降も現在のバージョンを対象にすることができるので、diff.targetMD5を現在のバージョンに更新します。
+      if (
+        !targetSection.isOutdated &&
+        targetSection.md5 &&
+        diffItem.targetMD5 &&
+        targetSection.md5 !== diffItem.targetMD5
+      ) {
+        if (!targetSection.outdatedDiffsToUpdate) {
+          targetSection.outdatedDiffsToUpdate = [];
+        }
+        targetSection.outdatedDiffsToUpdate.push({
+          chatId: diffItem.chatId,
+          diffId: diffItem.id,
+          targetMD5: targetSection.md5,
         });
-
-        // 3. 今回の置換箇所を新たなハイライト範囲として追加
-        targetSection.replacedRange.push({
-          start: startIndex,
-          end: startIndex + replaceLen,
-          id: diff.chatId,
-        });
-      } else {
-        // TODO: md5ハッシュを参照し過去バージョンのドキュメントへ適用を試みる
-        console.error(
-          `Failed to apply diff: search string "${diff.search}" not found in section ${targetSection.id}`
-        );
       }
     } else {
-      console.error(
-        `Failed to apply diff: section with id "${diff.sectionId}" not found`
-      );
+      if (targetSection.md5 === diffItem.targetMD5) {
+        // section.md5とtargetMD5が同じなのにdiffの適用に失敗したら、諦めます。
+        console.error(
+          `Failed to apply diff: search string "${diffItem.search}" not found in section ${targetSection.id}`
+        );
+      } else {
+        // もしあるdiffの適用に失敗し、かつsection.md5とdiff.targetMD5が異なる場合、
+        // targetMD5が指す当時のセクションをgetRevisionOfMarkdownSection()で取得し、
+        // それに対してchatDiff全体を再度適用します。
+        if (!fallbackToPastVersion) {
+          console.error(
+            `Failed to apply diff (fallback disabled): search string "${diffItem.search}" not found in section ${targetSection.id}`
+          );
+          continue;
+        }
+
+        try {
+          const pastSection = await getRevisionOfMarkdownSection(
+            targetSection.id as SectionId,
+            diffItem.targetMD5
+          );
+
+          targetSection.isOutdated = true;
+          targetSection.outdatedDiffsToUpdate = [];
+          targetSection.replacedContent = pastSection.rawContent;
+          targetSection.replacedRange = [];
+
+          const sectionDiffs = chatDiffs.filter(
+            (d) => d.sectionId === targetSection.id
+          );
+          for (const sDiff of sectionDiffs) {
+            applySingleDiffToSection(targetSection, sDiff);
+          }
+          fallbackHandledSections.add(targetSection.id);
+        } catch (error) {
+          console.error(
+            `Failed to fetch revision for section ${targetSection.id} (md5: ${diffItem.targetMD5}):`,
+            error
+          );
+        }
+      }
     }
   }
 

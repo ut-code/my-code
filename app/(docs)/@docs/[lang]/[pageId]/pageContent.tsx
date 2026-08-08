@@ -17,8 +17,16 @@ import {
 import { Heading } from "@/markdown/heading";
 import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
-import { ChatWithMessages } from "@/lib/chatHistory";
+import { applySingleDiffToSection, ChatWithMessages } from "@/lib/chatHistory";
 import { usePagesListForLang } from "@/pagesListContext";
+import { DaisyWarningIcon } from "@/daisyAlertIcon";
+import { useEmbedContext } from "@/terminal/embedContext";
+import { useRouter } from "next/navigation";
+import { deleteChatAction } from "@/actions/deleteChat";
+import { updateChatDiffTargetMD5Action } from "@/actions/updateChatDiffTargetMD5";
+import { getChatOneAction } from "@/actions/getChat";
+import { ChatStreamEvent } from "@/api/chat/route";
+import { captureException } from "@sentry/nextjs";
 
 interface PageContentProps {
   splitMdContent: SectionWithDiff[];
@@ -81,6 +89,28 @@ export function PageContent(props: PageContentProps) {
     setSidebarMdContent(path, dynamicMdContent);
   }, [dynamicMdContent, path, setSidebarMdContent]);
 
+  const updatedDiffIds = useRef(new Set<string>());
+  useEffect(() => {
+    for (const section of splitMdContent) {
+      if (
+        section.outdatedDiffsToUpdate &&
+        section.outdatedDiffsToUpdate.length > 0
+      ) {
+        for (const item of section.outdatedDiffsToUpdate) {
+          if (!updatedDiffIds.current.has(item.diffId)) {
+            updatedDiffIds.current.add(item.diffId);
+            void updateChatDiffTargetMD5Action(
+              item.chatId,
+              item.diffId,
+              item.targetMD5,
+              path
+            );
+          }
+        }
+      }
+    }
+  }, [splitMdContent, path]);
+
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   return (
@@ -104,6 +134,14 @@ export function PageContent(props: PageContentProps) {
                 sectionRefs.current[index] = el;
               }}
             >
+              {section.isOutdated && (
+                <OutdatedSectionAlert
+                  sectionId={section.id}
+                  splitMdContent={splitMdContent}
+                  chatHistories={chatHistories}
+                  path={path}
+                />
+              )}
               {/* ドキュメントのコンテンツ */}
               <StyledMarkdown
                 content={section.replacedContent}
@@ -269,5 +307,161 @@ function ChatIcon() {
         />
       </svg>
     </>
+  );
+}
+
+function OutdatedSectionAlert(props: {
+  sectionId: SectionId;
+  splitMdContent: SectionWithDiff[];
+  chatHistories: ChatWithMessages[];
+  path: PagePath;
+}) {
+  const { sectionId, splitMdContent, chatHistories, path } = props;
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [progress, setProgress] = useState<{ current: number; total: number }>({
+    current: 0,
+    total: 0,
+  });
+
+  const { files, replOutputs, execResults } = useEmbedContext();
+  const router = useRouter();
+
+  const handleRegenerateSection = async () => {
+    const targetChats = chatHistories.filter(
+      (c) =>
+        c.sectionId === sectionId ||
+        (splitMdContent[0].id === sectionId &&
+          splitMdContent.every((sec) => c.sectionId !== sec.id))
+    );
+
+    targetChats.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+    if (targetChats.length === 0) return;
+
+    if (
+      !confirm(
+        "このセクションの全チャットを最新のドキュメントに対して再生成しますか？"
+      )
+    ) {
+      return;
+    }
+
+    setIsRegenerating(true);
+    setProgress({ current: 0, total: targetChats.length });
+
+    try {
+      let currentSectionContent: DynamicMarkdownSection[] = splitMdContent.map(
+        (s) => ({
+          ...s,
+          inView: false,
+          replacedContent: s.rawContent,
+          replacedRange: [],
+          isOutdated: false,
+        })
+      );
+
+      for (let i = 0; i < targetChats.length; i++) {
+        const oldChat = targetChats[i];
+        setProgress({ current: i + 1, total: targetChats.length });
+
+        const firstUserMsg = oldChat.messages.find((m) => m.role === "user");
+        const userQuestion = firstUserMsg ? firstUserMsg.content : oldChat.title;
+
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path,
+            userQuestion,
+            questionScope: "page",
+            sectionContent: currentSectionContent,
+            replOutputs,
+            files,
+            execResults,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Chat generation failed: ${response.status}`);
+        }
+
+        const reader = response.body!.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let newChatId: string | null = null;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const event = JSON.parse(line) as ChatStreamEvent;
+              if (event.type === "chat") {
+                newChatId = event.chatId;
+                await deleteChatAction(oldChat.chatId);
+              }
+            } catch (e) {
+              captureException(e);
+            }
+          }
+        }
+
+        if (newChatId) {
+          const newChatData = await getChatOneAction(newChatId);
+          if (newChatData && newChatData.diff.length > 0) {
+            for (const d of newChatData.diff) {
+              const targetSec = currentSectionContent.find(
+                (sec) => sec.id === d.sectionId
+              );
+              if (targetSec) {
+                applySingleDiffToSection(targetSec, d);
+              }
+            }
+          }
+        }
+      }
+
+      router.refresh();
+    } catch (err) {
+      captureException(err);
+      console.error("Failed to regenerate section chats:", err);
+      alert("チャットの再生成中にエラーが発生しました。");
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  return (
+    <div className="alert alert-warning alert-soft shadow-xs mb-4 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <DaisyWarningIcon className="text-warning" />
+        <span>
+          このドキュメントは最新ではない、最新にするにはチャットを再生成してください
+        </span>
+      </div>
+      <button
+        className="btn btn-warning btn-sm shrink-0"
+        onClick={handleRegenerateSection}
+        disabled={isRegenerating}
+      >
+        {isRegenerating ? (
+          <>
+            <span className="loading loading-spinner loading-xs"></span>
+            再生成中 ({progress.current}/{progress.total})
+          </>
+        ) : (
+          "再生成"
+        )}
+      </button>
+    </div>
   );
 }

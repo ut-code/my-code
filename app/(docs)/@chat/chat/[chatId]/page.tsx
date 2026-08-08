@@ -48,12 +48,14 @@ export default async function ChatPage({
   const priorChatHistories = chatHistories.filter(
     (c) => new Date(c.createdAt).getTime() < targetCreatedAt
   );
-  const priorSectionContent = applyChatDiff(sections, priorChatHistories).map(
-    (sec) => ({
-      ...sec,
-      inView: sec.id === chatData.sectionId,
+  const priorSectionContent = (
+    await applyChatDiff(sections, priorChatHistories, {
+      fallbackToPastVersion: false,
     })
-  );
+  ).map((sec) => ({
+    ...sec,
+    inView: sec.id === chatData.sectionId,
+  }));
 
   return (
     <ChatAreaContainer chatId={chatId}>
