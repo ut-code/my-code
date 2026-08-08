@@ -2,9 +2,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageContent } from "./pageContent";
 import {
-  cacheKeyForPage,
-  ChatWithMessages,
-  getAllChat,
+  applyChatDiff,
+  getChatFromCache,
   initContext,
 } from "@/lib/chatHistory";
 import {
@@ -12,13 +11,9 @@ import {
   getPagesListForLang,
   getTermDefinitions,
   LangId,
-  PagePath,
   PageSlug,
 } from "@/lib/docs";
-import { cacheLife, cacheTag } from "next/cache";
-import { isCloudflare } from "@/lib/detectCloudflare";
 import { DocsAutoRedirect } from "./autoRedirect";
-import { dateReviver } from "@/lib/dateReviver";
 import { TermDefinitionProvider } from "@/markdown/term";
 
 export async function generateMetadata({
@@ -56,6 +51,8 @@ export default async function Page({
 
   const termDefinitions = await getTermDefinitions(lang);
 
+  const splitMdContent = await applyChatDiff(sections, chatHistories);
+
   return (
     <>
       <TermDefinitionProvider
@@ -65,7 +62,7 @@ export default async function Page({
       >
         <PageContent
           chatHistories={chatHistories}
-          splitMdContent={sections}
+          splitMdContent={splitMdContent}
           langId={lang}
           pageSlug={pageId}
           path={path}
@@ -76,33 +73,3 @@ export default async function Page({
   );
 }
 
-async function getChatFromCache(path: PagePath, userId?: string) {
-  // チャットの取得をキャッシュする。
-  // use cacheの仕様で、drizzleオブジェクトとauthオブジェクトは引数に渡せない。
-  // 一方、use cacheの関数内でheaders()にはアクセスできない。
-  // したがって、外でheaders()を使ってuserIdを取得した後、関数の中で再度drizzleを初期化しないといけない。
-  "use cache";
-  cacheLife("days");
-
-  if (!userId) {
-    return [];
-  }
-  cacheTag(cacheKeyForPage(path, userId));
-
-  if (isCloudflare()) {
-    const cache = await caches.open("chatHistory");
-    const cachedResponse = await cache.match(cacheKeyForPage(path, userId));
-    if (cachedResponse) {
-      // console.log("Cache hit for chatHistory/getChat");
-      const data = JSON.parse(
-        await cachedResponse.text(),
-        dateReviver
-      ) as ChatWithMessages[];
-      return data;
-    } else {
-      // console.log("Cache miss for chatHistory/getChat");
-    }
-  }
-  const ctx = await initContext({ userId });
-  return await getAllChat(path, ctx);
-}
