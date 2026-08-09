@@ -316,7 +316,7 @@ function OutdatedSectionAlert(props: {
   chatHistories: ChatWithMessages[];
   path: PagePath;
 }) {
-  const { sectionId, splitMdContent, chatHistories, path } = props;
+  const { sectionId, path } = props;
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [progress, setProgress] = useState<{ current: number; total: number }>({
     current: 0,
@@ -327,20 +327,6 @@ function OutdatedSectionAlert(props: {
   const router = useRouter();
 
   const handleRegenerateSection = async () => {
-    const targetChats = chatHistories.filter(
-      (c) =>
-        c.sectionId === sectionId ||
-        (splitMdContent[0].id === sectionId &&
-          splitMdContent.every((sec) => c.sectionId !== sec.id))
-    );
-
-    targetChats.sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-
-    if (targetChats.length === 0) return;
-
     if (
       !confirm(
         "このセクションの全チャットを最新のドキュメントに対して再生成しますか？"
@@ -350,82 +336,55 @@ function OutdatedSectionAlert(props: {
     }
 
     setIsRegenerating(true);
-    setProgress({ current: 0, total: targetChats.length });
+    setProgress({ current: 0, total: 0 });
 
     try {
-      let currentSectionContent: DynamicMarkdownSection[] = splitMdContent.map(
-        (s) => ({
-          ...s,
-          inView: false,
-          replacedContent: s.rawContent,
-          replacedRange: [],
-          isOutdated: false,
-        })
-      );
+      const response = await fetch("/api/chat/regenerate-section", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          path,
+          sectionId,
+          replOutputs,
+          files,
+          execResults,
+        }),
+      });
 
-      for (let i = 0; i < targetChats.length; i++) {
-        const oldChat = targetChats[i];
-        setProgress({ current: i + 1, total: targetChats.length });
+      if (!response.ok) {
+        throw new Error(`API route error: ${response.status}`);
+      }
 
-        const firstUserMsg = oldChat.messages.find((m) => m.role === "user");
-        const userQuestion = firstUserMsg ? firstUserMsg.content : oldChat.title;
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
 
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            path,
-            userQuestion,
-            questionScope: "page",
-            sectionContent: currentSectionContent,
-            replOutputs,
-            files,
-            execResults,
-          }),
-        });
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-        if (!response.ok) {
-          throw new Error(`Chat generation failed: ${response.status}`);
-        }
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
 
-        const reader = response.body!.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let newChatId: string | null = null;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-
-          for (const line of lines) {
-            if (!line.trim()) continue;
-            try {
-              const event = JSON.parse(line) as ChatStreamEvent;
-              if (event.type === "chat") {
-                newChatId = event.chatId;
-                await deleteChatAction(oldChat.chatId);
-              }
-            } catch (e) {
-              captureException(e);
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const event = JSON.parse(line) as {
+              type: "progress" | "done" | "error";
+              current?: number;
+              total?: number;
+              message?: string;
+            };
+            if (event.type === "progress" && event.current && event.total) {
+              setProgress({ current: event.current, total: event.total });
+            } else if (event.type === "done") {
+              router.refresh();
+            } else if (event.type === "error") {
+              throw new Error(event.message ?? "Error occurred during regeneration");
             }
-          }
-        }
-
-        if (newChatId) {
-          const newChatData = await getChatOneAction(newChatId);
-          if (newChatData && newChatData.diff.length > 0) {
-            for (const d of newChatData.diff) {
-              const targetSec = currentSectionContent.find(
-                (sec) => sec.id === d.sectionId
-              );
-              if (targetSec) {
-                applySingleDiffToSection(targetSec, d);
-              }
-            }
+          } catch (e) {
+            captureException(e);
           }
         }
       }
@@ -456,7 +415,7 @@ function OutdatedSectionAlert(props: {
         {isRegenerating ? (
           <>
             <span className="loading loading-spinner loading-xs"></span>
-            再生成中 ({progress.current}/{progress.total})
+            再生成中 {progress.total > 0 ? `(${progress.current}/${progress.total})` : ""}
           </>
         ) : (
           "再生成"

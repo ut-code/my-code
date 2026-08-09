@@ -8,7 +8,6 @@ import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { useStreamingChatContext } from "./streamingChatContext";
-import { deleteChatAction } from "@/actions/deleteChat";
 
 export interface SendChatParams {
   path: PagePath;
@@ -102,12 +101,7 @@ export function useSendChat() {
                   // 2. 新チャットの再検証
                   await revalidateChatAction(event.chatId, event.pagePath);
 
-                  // 3. 旧チャットの削除（指定されている場合）
-                  if (deleteChatOnCreated) {
-                    await deleteChatAction(deleteChatOnCreated);
-                  }
-
-                  // 4. セクションのスクロール
+                  // 3. セクションのスクロール
                   if (event.pagePath === `${path.lang}/${path.page}`) {
                     document.getElementById(event.sectionId)?.scrollIntoView({
                       behavior: "smooth",

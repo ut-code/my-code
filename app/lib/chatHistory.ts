@@ -58,7 +58,7 @@ export async function revalidateChat(
   }
 }
 
-interface Context {
+export interface Context {
   drizzle: Awaited<ReturnType<typeof getDrizzle>>;
   auth: Awaited<ReturnType<typeof getAuthServer>>;
   userId?: string;
