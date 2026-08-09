@@ -100,6 +100,9 @@ export function useSendChat() {
 
                   // 2. 新チャットの再検証
                   await revalidateChatAction(event.chatId, event.pagePath);
+                  if (deleteChatOnCreated) {
+                    await revalidateChatAction(deleteChatOnCreated, event.pagePath);
+                  }
 
                   // 3. セクションのスクロール
                   if (event.pagePath === `${path.lang}/${path.page}`) {
@@ -122,6 +125,9 @@ export function useSendChat() {
                 } else if (event.type === "done") {
                   if (chatId) {
                     await revalidateChatAction(chatId, chatPagePath);
+                  }
+                  if (deleteChatOnCreated) {
+                    await revalidateChatAction(deleteChatOnCreated, chatPagePath);
                   }
                   streamingChatContext.finishStreaming();
                   router.refresh();

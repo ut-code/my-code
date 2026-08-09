@@ -22,10 +22,11 @@ import { usePagesListForLang } from "@/pagesListContext";
 import { DaisyWarningIcon } from "@/daisyAlertIcon";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useRouter } from "next/navigation";
-import { deleteChatAction } from "@/actions/deleteChat";
+import { revalidateChatAction } from "@/actions/revalidateChat";
 import { updateChatDiffTargetMD5Action } from "@/actions/updateChatDiffTargetMD5";
 import { getChatOneAction } from "@/actions/getChat";
 import { ChatStreamEvent } from "@/api/chat/route";
+import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
 import { captureException } from "@sentry/nextjs";
 
 interface PageContentProps {
@@ -370,18 +371,22 @@ function OutdatedSectionAlert(props: {
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
-            const event = JSON.parse(line) as {
-              type: "progress" | "done" | "error";
-              current?: number;
-              total?: number;
-              message?: string;
-            };
-            if (event.type === "progress" && event.current && event.total) {
+            const event = JSON.parse(line) as RegenerateStreamEvent;
+            if (event.type === "progress") {
               setProgress({ current: event.current, total: event.total });
             } else if (event.type === "done") {
+              const allChatIds = [
+                ...(event.deletedChatIds ?? []),
+                ...(event.createdChatIds ?? []),
+              ];
+              for (const chatId of allChatIds) {
+                await revalidateChatAction(chatId, path);
+              }
               router.refresh();
             } else if (event.type === "error") {
-              throw new Error(event.message ?? "Error occurred during regeneration");
+              throw new Error(
+                event.message ?? "Error occurred during regeneration"
+              );
             }
           } catch (e) {
             captureException(e);

@@ -4,7 +4,6 @@ import {
   deleteChat,
   getAllChat,
   initContext,
-  revalidateChat,
 } from "@/lib/chatHistory";
 import {
   DynamicMarkdownSection,
@@ -29,7 +28,7 @@ const RegenerateSectionSchema = z.object({
 
 export type RegenerateStreamEvent =
   | { type: "progress"; current: number; total: number }
-  | { type: "done" }
+  | { type: "done"; deletedChatIds: string[]; createdChatIds: string[] }
   | { type: "error"; message: string };
 
 export async function POST(request: NextRequest) {
@@ -37,7 +36,6 @@ export async function POST(request: NextRequest) {
   if (!context.userId) {
     return new Response("Unauthorized", { status: 401 });
   }
-  const userId = context.userId;
 
   const parseResult = RegenerateSectionSchema.safeParse(await request.json());
   if (!parseResult.success) {
@@ -70,7 +68,7 @@ export async function POST(request: NextRequest) {
         );
 
         if (targetChats.length === 0) {
-          send({ type: "done" });
+          send({ type: "done", deletedChatIds: [], createdChatIds: [] });
           controller.close();
           return;
         }
@@ -85,8 +83,12 @@ export async function POST(request: NextRequest) {
           })
         );
 
+        const deletedChatIds: string[] = [];
+        const createdChatIds: string[] = [];
+
         for (let i = 0; i < targetChats.length; i++) {
           const oldChat = targetChats[i];
+          deletedChatIds.push(oldChat.chatId);
           send({ type: "progress", current: i + 1, total: targetChats.length });
 
           const firstUserMsg = oldChat.messages.find((m) => m.role === "user");
@@ -102,6 +104,7 @@ export async function POST(request: NextRequest) {
             execResults,
             context,
           });
+          createdChatIds.push(result.chatId);
 
           // 2. Delete old chat from DB
           await deleteChat(oldChat.chatId, context);
@@ -121,11 +124,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Revalidate cache for the page
-        const firstChatId = targetChats[0]?.chatId ?? "";
-        await revalidateChat(firstChatId, userId, path);
-
-        send({ type: "done" });
+        send({ type: "done", deletedChatIds, createdChatIds });
         controller.close();
       } catch (error: unknown) {
         captureException(error);
