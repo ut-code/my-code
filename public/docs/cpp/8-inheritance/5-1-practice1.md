@@ -11,7 +11,7 @@ question:
 
 `Vehicle` という親クラスを作成し、`move()` というメンバ関数を持たせましょう。次に、`Vehicle` を継承して `Car` クラスと `Motorcycle` クラスを作成し、それぞれが独自の `move()` の振る舞いをするようにオーバーライドしてください。
 
-[[`main` 関数]]では、`Vehicle` のポインタの配列を作成し、`Car` と `Motorcycle` のオブジェクトを格納して、ループでそれぞれの `move()` を呼び出してください。
+[[`main` 関数]]では、`Vehicle` の[[ポインタ]]の配列を作成し、`Car` と `Motorcycle` のオブジェクトを格納して、ループでそれぞれの `move()` を呼び出してください。
 
 ```cpp:practice9_1.cpp
 #include <iostream>

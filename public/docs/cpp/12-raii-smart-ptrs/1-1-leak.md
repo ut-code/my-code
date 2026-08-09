@@ -11,7 +11,7 @@ question:
 
 ### 例外とリソースリーク
 
-ここで、`new` と `delete` を使った手動のメモリ管理と例外処理が組み合わさると、問題が発生します。
+ここで、[[`new`]] と [[`delete`]] を使った手動のメモリ管理と例外処理が組み合わさると、問題が発生します。
 
 ```cpp:raw_pointer_problem.cpp
 #include <iostream>
@@ -48,6 +48,6 @@ Data allocated.
 Error: Something went wrong during processing!
 ```
 
-この例では、`process_data` 関数内で `throw` が実行されると、関数の実行が中断され `catch` ブロックにジャンプします。その結果、`delete[] data;` の行が実行されず、確保されたメモリが解放されない**メモリリーク**が発生します。
+この例では、`process_data` 関数内で `throw` が実行されると、関数の実行が中断され `catch` ブロックにジャンプします。その結果、`delete[] data;` の行が実行されず、確保されたメモリが解放されない**[[メモリリーク]]**が発生します。
 
 この問題を解決するのが、C++の最も重要な設計思想の一つである **RAII** です。
