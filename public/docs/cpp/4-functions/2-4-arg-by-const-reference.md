@@ -6,6 +6,8 @@ question:
   - '`const`参照渡しがC++で最も頻繁に使われるパターンとされるのはなぜですか？'
   - '`const`参照渡しで関数内で値を変更しようとするとコンパイルエラーになるのは、具体的にどのような仕組みですか？'
   - '`int`や`double`のような基本型では値渡しで良いとのことですが、なぜ`const`参照渡しを使う必要がないのですか？'
+term:
+  - const 参照渡し
 ---
 
 ### 4\. const 参照渡し (Pass by const Reference)
@@ -16,6 +18,9 @@ question:
   * **用途:** [[`std::string`]]、[[`std::vector`]]、クラスのオブジェクトなど、サイズが大きくなる可能性があるデータ。
 
 <!-- end list -->
+
+> [!TIP]
+> 変更しないがサイズが大きいデータ（[[`std::string`]], [[`std::vector`]]など） → **const参照渡し** (`const T&`)。
 
 ```cpp:const_ref.cpp
 #include <iostream>
@@ -42,9 +47,3 @@ int main() {
 ```cpp-exec:const_ref.cpp
 Message: This is a potentially very large string...
 ```
-
-> **ガイドライン:**
->
->   * `int` や `double` などの[[基本型]] → **値渡し** でOK。
->   * 変更させたいデータ → **参照渡し** (`T&`)。
->   * 変更しないがサイズが大きいデータ（[[`std::string`]], [[`std::vector`]]など） → **const参照渡し** (`const T&`)。
