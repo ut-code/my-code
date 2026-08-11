@@ -22,8 +22,6 @@ import { usePagesListForLang } from "@/pagesListContext";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useRouter } from "next/navigation";
 import { revalidateChatAction } from "@/actions/revalidateChat";
-import { getChatOneAction } from "@/actions/getChat";
-import { ChatStreamEvent } from "@/api/chat/route";
 import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
 import { captureException } from "@sentry/nextjs";
 
