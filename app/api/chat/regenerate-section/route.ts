@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
           return;
         }
 
-        let currentSectionContent: DynamicMarkdownSection[] = rawSections.map(
+        const currentSectionContent: DynamicMarkdownSection[] = rawSections.map(
           (s) => ({
             ...s,
             inView: false,

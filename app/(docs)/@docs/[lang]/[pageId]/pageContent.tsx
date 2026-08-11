@@ -17,15 +17,12 @@ import {
 import { Heading } from "@/markdown/heading";
 import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
-import { applySingleDiffToSection, ChatWithMessages } from "@/lib/chatHistory";
+import { ChatWithMessages } from "@/lib/chatHistory";
 import { usePagesListForLang } from "@/pagesListContext";
-import { DaisyWarningIcon } from "@/daisyAlertIcon";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useRouter } from "next/navigation";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { updateChatDiffTargetMD5Action } from "@/actions/updateChatDiffTargetMD5";
-import { getChatOneAction } from "@/actions/getChat";
-import { ChatStreamEvent } from "@/api/chat/route";
 import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
 import { captureException } from "@sentry/nextjs";
 
