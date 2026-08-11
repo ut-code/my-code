@@ -390,6 +390,25 @@ export interface ApplyChatDiffOptions {
   fallbackToPastVersion?: boolean;
 }
 
+/**
+ * それぞれのセクションはmd5ハッシュでバージョン管理されており、
+ * 現在のsectionデータのハッシュがsection.md5, それぞれのdiffが作られた当時のハッシュがdiff.targetMD5で得られるはずです。
+ * 
+ * もしあるdiffの適用に失敗し、かつsection.md5とdiff.targetMD5が異なる場合、
+ * targetMD5が指す当時のセクションをgetRevisionOfMarkdownSection()で取得し、
+ * それに対してchatDiff全体を再度適用します。
+ * その場合は、そのセクションの内容の前に このドキュメントは最新ではない、最新にするにはチャットを再生成してください、
+ * というalertと、再生成ボタンを表示します
+ * 
+ * section.md5とtargetMD5が同じなのにdiffの適用に失敗したら、諦めます。
+ * 
+ * section.md5とtargetMD5が違うのにdiffの適用に成功したら、
+ * それ以降も現在のバージョンを対象にすることができるので、
+ * diff.targetMD5を現在のバージョンに更新します。
+ * 
+ * この関数はchatAreaからも呼び出されており、
+ * そちらでは現在のドキュメントに対するチャット再生成の用途なので過去バージョンのドキュメントへのフォールバックは不要
+ */
 export async function applyChatDiff(
   splitMdContent: MarkdownSection[],
   chatHistories: ChatWithMessages[],

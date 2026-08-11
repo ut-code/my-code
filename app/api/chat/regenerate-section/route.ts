@@ -32,6 +32,14 @@ export type RegenerateStreamEvent =
   | { type: "done"; deletedChatIds: string[]; createdChatIds: string[] }
   | { type: "error"; message: string };
 
+/**
+ * そのセクションの全chatを作成日順に再作成&削除します。
+ * 
+ * 既存のchatのdiffを無視して最新のcontentを渡して1つ目のchatを生成
+ *   →そのdiffを適用したcontentに対して2つ目のchatを作成
+ *   →その2つのdiffを適用したcontentに対して3つ目のchat...
+ * というように順番に作成する必要があります。
+ */
 export async function POST(request: NextRequest) {
   const context = await initContext();
   if (!context.userId) {

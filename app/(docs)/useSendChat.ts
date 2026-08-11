@@ -18,6 +18,9 @@ export interface SendChatParams {
   onSuccess?: () => void;
 }
 
+/**
+ * チャットの作成・既存チャットの再生成で使う、クライアント側のチャットストリーミング描画・revalidate・ルーティングの関数
+ */
 export function useSendChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
