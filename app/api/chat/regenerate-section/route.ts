@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
 import {
+  applyChatDiff,
   applySingleDiffToSection,
   deleteChat,
   getAllChat,
@@ -82,13 +82,19 @@ export async function POST(request: NextRequest) {
           return;
         }
 
-        const currentSectionContent: DynamicMarkdownSection[] = rawSections.map(
+        const targetChatIds = new Set(targetChats.map((c) => c.chatId));
+        const nonTargetChats = chatHistories.filter(
+          (c) => !targetChatIds.has(c.chatId)
+        );
+
+        const baseSections = await applyChatDiff(rawSections, nonTargetChats, {
+          fallbackToPastVersion: false,
+        });
+
+        const currentSectionContent: DynamicMarkdownSection[] = baseSections.map(
           (s) => ({
             ...s,
             inView: false,
-            replacedContent: s.rawContent,
-            replacedRange: [],
-            isOutdated: false,
           })
         );
 
