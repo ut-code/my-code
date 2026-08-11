@@ -23,7 +23,6 @@ import { DaisyWarningIcon } from "@/daisyAlertIcon";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useRouter } from "next/navigation";
 import { revalidateChatAction } from "@/actions/revalidateChat";
-import { updateChatDiffTargetMD5Action } from "@/actions/updateChatDiffTargetMD5";
 import { getChatOneAction } from "@/actions/getChat";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
@@ -89,28 +88,6 @@ export function PageContent(props: PageContentProps) {
     // sidebarのcontextを更新
     setSidebarMdContent(path, dynamicMdContent);
   }, [dynamicMdContent, path, setSidebarMdContent]);
-
-  const updatedDiffIds = useRef(new Set<string>());
-  useEffect(() => {
-    for (const section of splitMdContent) {
-      if (
-        section.outdatedDiffsToUpdate &&
-        section.outdatedDiffsToUpdate.length > 0
-      ) {
-        for (const item of section.outdatedDiffsToUpdate) {
-          if (!updatedDiffIds.current.has(item.diffId)) {
-            updatedDiffIds.current.add(item.diffId);
-            void updateChatDiffTargetMD5Action(
-              item.chatId,
-              item.diffId,
-              item.targetMD5,
-              path
-            );
-          }
-        }
-      }
-    }
-  }, [splitMdContent, path]);
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 

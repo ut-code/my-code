@@ -3,7 +3,7 @@ import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
 import { chat, diff, message, section } from "@/schema/chat";
 import { and, asc, eq, exists } from "drizzle-orm";
-import { cacheLife, cacheTag, updateTag } from "next/cache";
+import { cacheLife, cacheTag, revalidateTag, updateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
 import {
   getRevisionOfMarkdownSection,
@@ -51,6 +51,32 @@ export async function revalidateChat(
   }
   updateTag(cacheKeyForChat(chatId));
   updateTag(cacheKeyForPage(pagePath, userId));
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    await cache.delete(cacheKeyForChat(chatId));
+    await cache.delete(cacheKeyForPage(pagePath, userId));
+  }
+}
+
+/**
+ * 指定したチャットに関連するキャッシュを削除する。
+ *
+ * Next.js 16 のrevalidateTag()を使用する。
+ * Next.js 15 のrevalidateTag()とは挙動が異なるので注意。
+ *
+ * 反映タイミングは次のレンダリング時になる。即座に反映したい時は上にあるrevalidateChat()を使用
+ */
+export async function revalidateChatOnDemand(
+  chatId: string,
+  userId: string,
+  pagePath: string | PagePath
+) {
+  if (typeof pagePath === "string") {
+    const [lang, page] = pagePath.split("/") as [LangId, PageSlug];
+    pagePath = { lang, page };
+  }
+  revalidateTag(cacheKeyForChat(chatId), "max");
+  revalidateTag(cacheKeyForPage(pagePath, userId), "max");
   if (isCloudflare()) {
     const cache = await caches.open("chatHistory");
     await cache.delete(cacheKeyForChat(chatId));

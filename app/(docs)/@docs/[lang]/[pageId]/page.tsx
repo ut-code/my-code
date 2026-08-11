@@ -5,6 +5,8 @@ import {
   applyChatDiff,
   getChatFromCache,
   initContext,
+  revalidateChatOnDemand,
+  updateDiffTargetMD5,
 } from "@/lib/chatHistory";
 import {
   getMarkdownSections,
@@ -52,6 +54,17 @@ export default async function Page({
   const termDefinitions = await getTermDefinitions(lang);
 
   const splitMdContent = await applyChatDiff(sections, chatHistories);
+
+  if (context.userId) {
+    for (const sec of splitMdContent) {
+      if (sec.outdatedDiffsToUpdate && sec.outdatedDiffsToUpdate.length > 0) {
+        for (const item of sec.outdatedDiffsToUpdate) {
+          await updateDiffTargetMD5(item.diffId, item.targetMD5, context);
+          await revalidateChatOnDemand(item.chatId, context.userId, path);
+        }
+      }
+    }
+  }
 
   return (
     <>
