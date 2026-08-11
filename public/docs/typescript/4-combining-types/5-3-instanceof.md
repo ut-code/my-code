@@ -8,7 +8,7 @@ question:
 
 ### `instanceof` 演算子
 
-クラスのインスタンスかどうかを判定します（第7章のクラスで詳しく扱いますが、Dateなどの組み込みオブジェクトでも有効です）。
+クラスのインスタンスかどうかを判定します（[[./6]]のクラスで詳しく扱いますが、Dateなどの組み込みオブジェクトでも有効です）。
 
 ```ts:type-guard-instanceof.ts
 function logDate(value: string | Date) {
