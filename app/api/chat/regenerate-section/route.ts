@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         for (let i = 0; i < targetChats.length; i++) {
           const oldChat = targetChats[i];
           deletedChatIds.push(oldChat.chatId);
-          send({ type: "progress", current: i + 1, total: targetChats.length });
+          send({ type: "progress", current: i, total: targetChats.length });
 
           const firstUserMsg = oldChat.messages.find((m) => m.role === "user");
           const userQuestion = firstUserMsg ? firstUserMsg.content : oldChat.title;
