@@ -37,9 +37,20 @@ export function cacheKeyForChat(chatId: string) {
   return `${CACHE_KEY_BASE}/getChatOne?chatId=${chatId}`;
 }
 
-// nextjsのキャッシュのrevalidateはRouteHandlerではなくServerActionから呼ばないと正しく動作しないらしい。
-// https://github.com/vercel/next.js/issues/69064
-// そのためlib/以下の関数では直接revalidateChatを呼ばず、ServerActionの関数から呼ぶようにする。
+/**
+ * 指定したチャットに関連するキャッシュを即座に削除する。
+ * 
+ * 重要: nextjsのキャッシュの即時revalidate (updateTag) はServerActionでしか動作しない。
+ * ServerComponentのレンダリング中や、Route Handlerの中から呼び出しても無効。
+ * https://github.com/vercel/next.js/issues/69064
+ * そのためこの関数の呼び出しは lib/以下の関数、route/以下のRoute Handlerの中からは行わず、
+ * ServerActionの関数からのみ呼ぶようにする。
+ * 
+ * ServerAction以外でキャッシュを削除したい場面がある場合は、
+ * 後述のrevalidateChatOnDemandを用いる(即座には反映されない)か、
+ * クライアントに結果を返してからクライアント側で改めてrevalidateChatAction()を呼ぶか、
+ * またはその両方を行う。
+ */
 export async function revalidateChat(
   chatId: string,
   userId: string,
@@ -57,14 +68,14 @@ export async function revalidateChat(
     await cache.delete(cacheKeyForPage(pagePath, userId));
   }
 }
-
 /**
  * 指定したチャットに関連するキャッシュを削除する。
- *
+ * 
  * Next.js 16 のrevalidateTag()を使用する。
  * Next.js 15 のrevalidateTag()とは挙動が異なるので注意。
- *
- * 反映タイミングは次のレンダリング時になる。即座に反映したい時は上にあるrevalidateChat()を使用
+ * 
+ * 次のレンダリング時にstale-while-revalidateとなり、さらにその次のレンダリングから最新の内容になる?
+ * 即座に反映したい時は上にあるrevalidateChat()を使用
  */
 export async function revalidateChatOnDemand(
   chatId: string,

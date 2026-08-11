@@ -4,6 +4,7 @@ import {
   deleteChat,
   getAllChat,
   initContext,
+  revalidateChatOnDemand,
 } from "@/lib/chatHistory";
 import {
   DynamicMarkdownSection,
@@ -122,6 +123,10 @@ export async function POST(request: NextRequest) {
               });
             }
           }
+
+          // クライアントでもrevalidateChatActionを呼ぶが、一応こちらでもrevalidateしておく
+          await revalidateChatOnDemand(oldChat.chatId, context.userId!, path);
+          await revalidateChatOnDemand(result.chatId, context.userId!, path);
         }
 
         send({ type: "done", deletedChatIds, createdChatIds });
