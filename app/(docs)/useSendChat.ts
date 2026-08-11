@@ -53,6 +53,7 @@ export function useSendChat() {
             replOutputs,
             files,
             execResults,
+            deleteChatOnCreated,
           }),
         });
       } catch (e) {

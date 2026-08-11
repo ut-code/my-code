@@ -17,9 +17,8 @@ import {
 import { Heading } from "@/markdown/heading";
 import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
-import { applySingleDiffToSection, ChatWithMessages } from "@/lib/chatHistory";
+import { ChatWithMessages } from "@/lib/chatHistory";
 import { usePagesListForLang } from "@/pagesListContext";
-import { DaisyWarningIcon } from "@/daisyAlertIcon";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useRouter } from "next/navigation";
 import { revalidateChatAction } from "@/actions/revalidateChat";
@@ -106,7 +105,11 @@ export function PageContent(props: PageContentProps) {
         {dynamicMdContent.map((section, index) => (
           <Fragment key={section.id}>
             <section
-              className="min-w-1/2 max-w-docs text-justify"
+              className={clsx(
+                "min-w-1/2 max-w-docs text-justify",
+                section.isOutdated &&
+                  "rounded-box border border-secondary/20 bg-secondary/3 p-1.5 shadow-xs"
+              )}
               id={section.id} // 目次からaタグで飛ぶために必要
               ref={(el) => {
                 sectionRefs.current[index] = el;
@@ -382,27 +385,61 @@ function OutdatedSectionAlert(props: {
   };
 
   return (
-    <div className="alert alert-warning alert-soft shadow-xs mb-4 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <DaisyWarningIcon className="text-warning" />
-        <span>
-          このドキュメントは最新ではない、最新にするにはチャットを再生成してください
-        </span>
+    <div className="alert flex flex-col items-stretch gap-2">
+      <div className="flex items-center justify-between">
+        <div className="">
+          新しいバージョンのドキュメントがあります。更新するにはチャットを再生成する必要があります。
+        </div>
+        <button
+          className="btn btn-secondary shrink-0"
+          onClick={handleRegenerateSection}
+          disabled={isRegenerating}
+        >
+          <svg
+            className={clsx("w-4 h-4", isRegenerating && "animate-spin")}
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4.06189 13C4.55399 16.944 7.92083 20 12 20C15.5463 20 18.5721 17.7719 19.5714 14.619"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M19.9381 11C19.446 7.05601 16.0792 4 12 4C8.45371 4 5.42788 6.22811 4.42857 9.38095"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M14 14.619H19.5714V20"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 9.38095H4.42857V4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          再生成
+        </button>
       </div>
-      <button
-        className="btn btn-warning btn-sm shrink-0"
-        onClick={handleRegenerateSection}
-        disabled={isRegenerating}
-      >
-        {isRegenerating ? (
-          <>
-            <span className="loading loading-spinner loading-xs"></span>
-            再生成中 {progress.total > 0 ? `(${progress.current}/${progress.total})` : ""}
-          </>
-        ) : (
-          "再生成"
-        )}
-      </button>
+      {isRegenerating && (
+        <progress
+          className="progress progress-secondary"
+          value={progress.current}
+          max={Math.max(1, progress.total)}
+        />
+      )}
     </div>
   );
 }
