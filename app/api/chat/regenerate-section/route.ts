@@ -103,44 +103,49 @@ export async function POST(request: NextRequest) {
 
         for (let i = 0; i < targetChats.length; i++) {
           const oldChat = targetChats[i];
-          deletedChatIds.push(oldChat.chatId);
           send({ type: "progress", current: i, total: targetChats.length });
 
-          const firstUserMsg = oldChat.messages.find((m) => m.role === "user");
-          const userQuestion = firstUserMsg ? firstUserMsg.content : oldChat.title;
+          try {
+            const firstUserMsg = oldChat.messages.find((m) => m.role === "user");
+            const userQuestion = firstUserMsg ? firstUserMsg.content : oldChat.title;
 
-          // 1. Generate new chat on server
-          const result = await generateSingleChat({
-            path,
-            userQuestion,
-            sectionContent: currentSectionContent,
-            replOutputs,
-            files,
-            execResults,
-            context,
-          });
-          createdChatIds.push(result.chatId);
+            // 1. Generate new chat on server
+            const result = await generateSingleChat({
+              path,
+              userQuestion,
+              sectionContent: currentSectionContent,
+              replOutputs,
+              files,
+              execResults,
+              context,
+            });
+            createdChatIds.push(result.chatId);
 
-          // 2. Delete old chat from DB
-          await deleteChat(oldChat.chatId, context);
+            // 2. Delete old chat from DB
+            await deleteChat(oldChat.chatId, context);
+            deletedChatIds.push(oldChat.chatId);
 
-          // 3. Apply newly generated diffs to currentSectionContent on server
-          for (const d of result.diffRaw) {
-            const targetSec = currentSectionContent.find(
-              (sec) => sec.id === d.sectionId
-            );
-            if (targetSec) {
-              applySingleDiffToSection(targetSec, {
-                search: d.search,
-                replace: d.replace,
-                chatId: result.chatId,
-              });
+            // 3. Apply newly generated diffs to currentSectionContent on server
+            for (const d of result.diffRaw) {
+              const targetSec = currentSectionContent.find(
+                (sec) => sec.id === d.sectionId
+              );
+              if (targetSec) {
+                applySingleDiffToSection(targetSec, {
+                  search: d.search,
+                  replace: d.replace,
+                  chatId: result.chatId,
+                });
+              }
             }
-          }
 
-          // クライアントでもrevalidateChatActionを呼ぶが、一応こちらでもrevalidateしておく
-          await revalidateChatOnDemand(oldChat.chatId, context.userId!, path);
-          await revalidateChatOnDemand(result.chatId, context.userId!, path);
+            // クライアントでもrevalidateChatActionを呼ぶが、一応こちらでもrevalidateしておく
+            await revalidateChatOnDemand(oldChat.chatId, context.userId!, path);
+            await revalidateChatOnDemand(result.chatId, context.userId!, path);
+          } catch (err) {
+            captureException(err);
+            console.error(`Failed to regenerate chat ${oldChat.chatId}:`, err);
+          }
         }
 
         send({ type: "done", deletedChatIds, createdChatIds });
