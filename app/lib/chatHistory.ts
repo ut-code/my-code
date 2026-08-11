@@ -3,9 +3,19 @@ import { getAuthServer } from "./auth";
 import { getDrizzle } from "./drizzle";
 import { chat, diff, message, section } from "@/schema/chat";
 import { and, asc, eq, exists } from "drizzle-orm";
-import { updateTag } from "next/cache";
+import { cacheLife, cacheTag, revalidateTag, updateTag } from "next/cache";
 import { isCloudflare } from "./detectCloudflare";
-import { LangId, PagePath, PageSlug, SectionId } from "./docs";
+import {
+  getRevisionOfMarkdownSection,
+  LangId,
+  MarkdownSection,
+  PagePath,
+  PageSlug,
+  ReplacedRange,
+  SectionId,
+  SectionWithDiff,
+} from "./docs";
+import { dateReviver } from "./dateReviver";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -27,9 +37,20 @@ export function cacheKeyForChat(chatId: string) {
   return `${CACHE_KEY_BASE}/getChatOne?chatId=${chatId}`;
 }
 
-// nextjsのキャッシュのrevalidateはRouteHandlerではなくServerActionから呼ばないと正しく動作しないらしい。
-// https://github.com/vercel/next.js/issues/69064
-// そのためlib/以下の関数では直接revalidateChatを呼ばず、ServerActionの関数から呼ぶようにする。
+/**
+ * 指定したチャットに関連するキャッシュを即座に削除する。
+ * 
+ * 重要: nextjsのキャッシュの即時revalidate (updateTag) はServerActionでしか動作しない。
+ * ServerComponentのレンダリング中や、Route Handlerの中から呼び出しても無効。
+ * https://github.com/vercel/next.js/issues/69064
+ * そのためこの関数の呼び出しは lib/以下の関数、route/以下のRoute Handlerの中からは行わず、
+ * ServerActionの関数からのみ呼ぶようにする。
+ * 
+ * ServerAction以外でキャッシュを削除したい場面がある場合は、
+ * 後述のrevalidateChatOnDemandを用いる(即座には反映されない)か、
+ * クライアントに結果を返してからクライアント側で改めてrevalidateChatAction()を呼ぶか、
+ * またはその両方を行う。
+ */
 export async function revalidateChat(
   chatId: string,
   userId: string,
@@ -47,8 +68,34 @@ export async function revalidateChat(
     await cache.delete(cacheKeyForPage(pagePath, userId));
   }
 }
+/**
+ * 指定したチャットに関連するキャッシュを削除する。
+ * 
+ * Next.js 16 のrevalidateTag()を使用する。
+ * Next.js 15 のrevalidateTag()とは挙動が異なるので注意。
+ * 
+ * 次のレンダリング時にstale-while-revalidateとなり、さらにその次のレンダリングから最新の内容になる?
+ * 即座に反映したい時は上にあるrevalidateChat()を使用
+ */
+export async function revalidateChatOnDemand(
+  chatId: string,
+  userId: string,
+  pagePath: string | PagePath
+) {
+  if (typeof pagePath === "string") {
+    const [lang, page] = pagePath.split("/") as [LangId, PageSlug];
+    pagePath = { lang, page };
+  }
+  revalidateTag(cacheKeyForChat(chatId), "max");
+  revalidateTag(cacheKeyForPage(pagePath, userId), "max");
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    await cache.delete(cacheKeyForChat(chatId));
+    await cache.delete(cacheKeyForPage(pagePath, userId));
+  }
+}
 
-interface Context {
+export interface Context {
   drizzle: Awaited<ReturnType<typeof getDrizzle>>;
   auth: Awaited<ReturnType<typeof getAuthServer>>;
   userId?: string;
@@ -278,4 +325,223 @@ export async function migrateChatUser(oldUserId: string, newUserId: string) {
     .update(chat)
     .set({ userId: newUserId })
     .where(eq(chat.userId, oldUserId));
+}
+
+export async function updateDiffTargetMD5(
+  diffId: string,
+  targetMD5: string,
+  context: Context
+) {
+  const { drizzle, userId } = context;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+  await drizzle
+    .update(diff)
+    .set({ targetMD5 })
+    .where(eq(diff.id, diffId));
+}
+
+export function applySingleDiffToSection<T extends SectionWithDiff>(
+  targetSection: T,
+  diffItem: { search: string; replace: string; chatId: string }
+): boolean {
+  const startIndex = targetSection.replacedContent.indexOf(diffItem.search);
+  if (startIndex === -1) {
+    return false;
+  }
+  const endIndex = startIndex + diffItem.search.length;
+  const replaceLen = diffItem.replace.length;
+  const diffLen = replaceLen - diffItem.search.length; // 文字列長の増減分
+
+  // 1. 文字列の置換
+  targetSection.replacedContent =
+    targetSection.replacedContent.slice(0, startIndex) +
+    diffItem.replace +
+    targetSection.replacedContent.slice(endIndex);
+
+  // 2. 既存のハイライト範囲のズレを補正（今回の置換箇所より後ろにあるものをシフト）
+  targetSection.replacedRange = targetSection.replacedRange.map((h) => {
+    if (h.start >= endIndex) {
+      // 完全に後ろにある場合は単純にシフト
+      return {
+        start: h.start + diffLen,
+        end: h.end + diffLen,
+        id: h.id,
+      };
+    }
+    if (h.end >= endIndex) {
+      return { start: h.start, end: h.end + diffLen, id: h.id };
+    }
+    return h;
+  });
+
+  // 3. 今回の置換箇所を新たなハイライト範囲として追加
+  targetSection.replacedRange.push({
+    start: startIndex,
+    end: startIndex + replaceLen,
+    id: diffItem.chatId,
+  });
+
+  return true;
+}
+
+export interface ApplyChatDiffOptions {
+  fallbackToPastVersion?: boolean;
+}
+
+/**
+ * それぞれのセクションはmd5ハッシュでバージョン管理されており、
+ * 現在のsectionデータのハッシュがsection.md5, それぞれのdiffが作られた当時のハッシュがdiff.targetMD5で得られるはずです。
+ * 
+ * もしあるdiffの適用に失敗し、かつsection.md5とdiff.targetMD5が異なる場合、
+ * targetMD5が指す当時のセクションをgetRevisionOfMarkdownSection()で取得し、
+ * それに対してchatDiff全体を再度適用します。
+ * その場合は、そのセクションの内容の前に このドキュメントは最新ではない、最新にするにはチャットを再生成してください、
+ * というalertと、再生成ボタンを表示します
+ * 
+ * section.md5とtargetMD5が同じなのにdiffの適用に失敗したら、諦めます。
+ * 
+ * section.md5とtargetMD5が違うのにdiffの適用に成功したら、
+ * それ以降も現在のバージョンを対象にすることができるので、
+ * diff.targetMD5を現在のバージョンに更新します。
+ * 
+ * この関数はchatAreaからも呼び出されており、
+ * そちらでは現在のドキュメントに対するチャット再生成の用途なので過去バージョンのドキュメントへのフォールバックは不要
+ */
+export async function applyChatDiff(
+  splitMdContent: MarkdownSection[],
+  chatHistories: ChatWithMessages[],
+  options: ApplyChatDiffOptions = { fallbackToPastVersion: true }
+): Promise<SectionWithDiff[]> {
+  const fallbackToPastVersion = options.fallbackToPastVersion ?? true;
+
+  const newContent: SectionWithDiff[] = splitMdContent.map((section) => ({
+    ...section,
+    replacedContent: section.rawContent,
+    replacedRange: [] as ReplacedRange[],
+    isOutdated: false,
+    outdatedDiffsToUpdate: [],
+  }));
+
+  const chatDiffs = chatHistories.flatMap((chat) => chat.diff);
+  chatDiffs.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
+
+  const fallbackHandledSections = new Set<string>();
+
+  for (const diffItem of chatDiffs) {
+    const targetSection = newContent.find((s) => s.id === diffItem.sectionId);
+    if (!targetSection) {
+      console.error(
+        `Failed to apply diff: section with id "${diffItem.sectionId}" not found`
+      );
+      continue;
+    }
+
+    if (fallbackHandledSections.has(targetSection.id)) {
+      // すでに過去バージョンへのフォールバック時にこのセクションの全diffが再適用されている
+      continue;
+    }
+
+    const success = applySingleDiffToSection(targetSection, diffItem);
+
+    if (success) {
+      // section.md5とtargetMD5が違うのにdiffの適用に成功したら、
+      // それ以降も現在のバージョンを対象にすることができるので、diff.targetMD5を現在のバージョンに更新します。
+      if (
+        !targetSection.isOutdated &&
+        targetSection.md5 &&
+        diffItem.targetMD5 &&
+        targetSection.md5 !== diffItem.targetMD5
+      ) {
+        if (!targetSection.outdatedDiffsToUpdate) {
+          targetSection.outdatedDiffsToUpdate = [];
+        }
+        targetSection.outdatedDiffsToUpdate.push({
+          chatId: diffItem.chatId,
+          diffId: diffItem.id,
+          targetMD5: targetSection.md5,
+        });
+      }
+    } else {
+      if (targetSection.md5 === diffItem.targetMD5) {
+        // section.md5とtargetMD5が同じなのにdiffの適用に失敗したら、諦めます。
+        console.error(
+          `Failed to apply diff: search string "${diffItem.search}" not found in section ${targetSection.id}`
+        );
+      } else {
+        // もしあるdiffの適用に失敗し、かつsection.md5とdiff.targetMD5が異なる場合、
+        // targetMD5が指す当時のセクションをgetRevisionOfMarkdownSection()で取得し、
+        // それに対してchatDiff全体を再度適用します。
+        if (!fallbackToPastVersion) {
+          console.error(
+            `Failed to apply diff (fallback disabled): search string "${diffItem.search}" not found in section ${targetSection.id}`
+          );
+          continue;
+        }
+
+        try {
+          const pastSection = await getRevisionOfMarkdownSection(
+            targetSection.id as SectionId,
+            diffItem.targetMD5
+          );
+
+          targetSection.isOutdated = true;
+          targetSection.outdatedDiffsToUpdate = [];
+          targetSection.replacedContent = pastSection.rawContent;
+          targetSection.replacedRange = [];
+
+          const sectionDiffs = chatDiffs.filter(
+            (d) => d.sectionId === targetSection.id
+          );
+          for (const sDiff of sectionDiffs) {
+            applySingleDiffToSection(targetSection, sDiff);
+          }
+          fallbackHandledSections.add(targetSection.id);
+        } catch (error) {
+          console.error(
+            `Failed to fetch revision for section ${targetSection.id} (md5: ${diffItem.targetMD5}):`,
+            error
+          );
+        }
+      }
+    }
+  }
+
+  return newContent;
+}
+
+/**
+ * チャットの取得をキャッシュする。
+ *
+ * use cacheの仕様で、drizzleオブジェクトとauthオブジェクトは引数に渡せない。
+ * 一方、use cacheの関数内でheaders()にはアクセスできない。
+ * したがって、外でheaders()を使ってuserIdを取得した後、関数の中で再度drizzleを初期化しないといけない。
+ *
+ * docsとchatの2箇所のサーバーコンポーネントで使用。ServerActionやrouteではこれではなく直接getAllChat()を呼んだ方が確実なはずです。
+ */
+export async function getChatFromCache(path: PagePath, userId?: string) {
+  "use cache";
+  cacheLife("days");
+
+  if (!userId) {
+    return [];
+  }
+  cacheTag(cacheKeyForPage(path, userId));
+
+  if (isCloudflare()) {
+    const cache = await caches.open("chatHistory");
+    const cachedResponse = await cache.match(cacheKeyForPage(path, userId));
+    if (cachedResponse) {
+      const data = JSON.parse(
+        await cachedResponse.text(),
+        dateReviver
+      ) as ChatWithMessages[];
+      return data;
+    }
+  }
+  const ctx = await initContext({ userId });
+  return await getAllChat(path, ctx);
 }

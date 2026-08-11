@@ -95,10 +95,27 @@ export const DynamicMarkdownSectionSchema = MarkdownSectionSchema.extend({
    */
   replacedContent: z.string(),
   replacedRange: z.array(ReplacedRangeSchema),
+  /**
+   * セクションのMD5ハッシュが不一致で過去バージョンへの適用が行われたかどうか
+   */
+  isOutdated: z.boolean().optional(),
+  /**
+   * 適用に成功したがtargetMD5が最新のセクションMD5と異なるため更新が必要なDiff一覧
+   */
+  outdatedDiffsToUpdate: z
+    .array(
+      z.object({
+        chatId: z.string(),
+        diffId: z.string(),
+        targetMD5: z.string(),
+      })
+    )
+    .optional(),
 });
 export type DynamicMarkdownSection = z.output<
   typeof DynamicMarkdownSectionSchema
 >;
+export type SectionWithDiff = Omit<DynamicMarkdownSection, "inView">;
 
 /**
  * 各言語のindex.ymlから読み込んだデータにid,index等を追加したデータ型

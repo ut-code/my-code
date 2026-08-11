@@ -1,6 +1,8 @@
 import {
+  applyChatDiff,
   cacheKeyForChat,
   ChatWithMessages,
+  getChatFromCache,
   getChatOne,
   initContext,
 } from "@/lib/chatHistory";
@@ -37,8 +39,23 @@ export default async function ChatPage({
     LangId,
     PageSlug,
   ];
+  const path = { lang: langId, page: pageSlug };
   const sections = await getMarkdownSections(langId, pageSlug);
   const targetSection = sections.find((sec) => sec.id === chatData.sectionId);
+
+  const chatHistories = await getChatFromCache(path, context.userId);
+  const targetCreatedAt = new Date(chatData.createdAt).getTime();
+  const priorChatHistories = chatHistories.filter(
+    (c) => new Date(c.createdAt).getTime() < targetCreatedAt
+  );
+  const priorSectionContent = (
+    await applyChatDiff(sections, priorChatHistories, {
+      fallbackToPastVersion: false,
+    })
+  ).map((sec) => ({
+    ...sec,
+    inView: sec.id === chatData.sectionId,
+  }));
 
   return (
     <ChatAreaContainer chatId={chatId}>
@@ -48,6 +65,7 @@ export default async function ChatPage({
         langId={langId}
         pageSlug={pageSlug}
         targetSection={targetSection}
+        priorSectionContent={priorSectionContent}
       />
     </ChatAreaContainer>
   );
