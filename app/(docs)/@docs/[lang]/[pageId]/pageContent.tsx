@@ -167,7 +167,7 @@ export function PageContent(props: PageContentProps) {
   );
 }
 
-function ChatListForSection(props: {
+export function ChatListForSection(props: {
   dynamicMdContent: DynamicMarkdownSection[];
   sectionId: SectionId;
   chatHistories: ChatWithMessages[];

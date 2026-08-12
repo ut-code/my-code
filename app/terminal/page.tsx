@@ -17,15 +17,7 @@ import { fileExecutionTests } from "@my-code/runtime/tests/fileExecution";
 import { useRuntimeAll } from "@my-code/runtime/context";
 import { captureException } from "@sentry/nextjs";
 
-import main_py from "./samples/main.py?raw";
-import main_rb from "./samples/main.rb?raw";
-import main_js from "./samples/main.js?raw";
-import main2_ts from "./samples/main2.ts?raw";
-import main_cpp from "./samples/main.cpp?raw";
-import sub_h from "./samples/sub.h?raw";
-import sub_cpp from "./samples/sub.cpp?raw";
-import main2_rs from "./samples/main2.rs?raw";
-import sub_rs from "./samples/sub.rs?raw";
+import { sampleConfig, SampleConfig } from "./sampleConfig";
 import { DaisyInfoIcon } from "@/daisyAlertIcon";
 
 export default function RuntimeTestPage() {
@@ -69,65 +61,6 @@ export default function RuntimeTestPage() {
   );
 }
 
-interface SampleConfig {
-  repl: boolean;
-  replInitContent?: string; // ReplOutput[] ではない。stringのパースはruntimeが行う
-  editor: Record<string, string> | false;
-  exec: string[] | false;
-  readonlyFiles?: string[];
-}
-const sampleConfig: Record<RuntimeLang, SampleConfig> = {
-  python: {
-    repl: true,
-    replInitContent: '>>> print("Hello, World!")\nHello, World!',
-    editor: {
-      "main.py": main_py,
-    },
-    exec: ["main.py"],
-  },
-  ruby: {
-    repl: true,
-    replInitContent: 'irb(main):001:0> puts "Hello, World!"\nHello, World!',
-    editor: {
-      "main.rb": main_rb,
-    },
-    exec: ["main.rb"],
-  },
-  javascript: {
-    repl: true,
-    replInitContent: '> console.log("Hello, World!");\nHello, World!',
-    editor: {
-      "main.js": main_js,
-    },
-    exec: ["main.js"],
-  },
-  typescript: {
-    repl: false,
-    editor: {
-      // main.tsにすると出力ファイルがjavascriptのサンプルと被る
-      "main2.ts": main2_ts,
-    },
-    exec: ["main2.ts"],
-    readonlyFiles: ["main2.js"],
-  },
-  cpp: {
-    repl: false,
-    editor: {
-      "main.cpp": main_cpp,
-      "sub.h": sub_h,
-      "sub.cpp": sub_cpp,
-    },
-    exec: ["main.cpp", "sub.cpp"],
-  },
-  rust: {
-    repl: false,
-    editor: {
-      "main2.rs": main2_rs,
-      "sub.rs": sub_rs,
-    },
-    exec: ["main2.rs"],
-  },
-};
 function RuntimeSample({
   lang,
   config,

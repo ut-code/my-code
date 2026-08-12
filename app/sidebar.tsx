@@ -225,6 +225,20 @@ export function Sidebar() {
                       )}
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href={`/${group.id}/sandbox`}
+                    className={clsx(
+                      "text-wrap text-justify",
+                      group.id === currentLang &&
+                        currentPageId === ("sandbox" as PageSlug) &&
+                        "menu-active"
+                    )}
+                  >
+                    <span className="w-5 text-right font-mono">⚡</span>
+                    Sandbox
+                  </Link>
+                </li>
               </ul>
             </details>
           </li>

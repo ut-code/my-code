@@ -127,20 +127,28 @@ export function ChatAreaContent(props: Props) {
       <div className="flex-none breadcrumbs text-sm">
         <ul className="flex-wrap">
           <li>
-            <Link href={`/${langId}/${langEntry?.pages[0].slug}`}>
-              {langEntry?.name}
+            <Link
+              href={
+                langEntry?.pages[0]
+                  ? `/${langId}/${langEntry.pages[0].slug}`
+                  : `/${langId}/sandbox`
+              }
+            >
+              {langEntry?.name ?? langId}
             </Link>
           </li>
           <li>
             <Link href={`/${chatData.section.pagePath}`}>
-              {pageEntry?.index}. {pageEntry?.name}
+              {pageEntry ? `${pageEntry.index}. ${pageEntry.name}` : "Sandbox"}
             </Link>
           </li>
-          <li>
-            <Link href={`/${chatData.section.pagePath}#${chatData.sectionId}`}>
-              {targetSection?.title}
-            </Link>
-          </li>
+          {targetSection?.title && targetSection.title !== "sandbox" && (
+            <li>
+              <Link href={`/${chatData.section.pagePath}#${chatData.sectionId}`}>
+                {targetSection.title}
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
       <div className="flex flex-wrap items-center gap-2">
