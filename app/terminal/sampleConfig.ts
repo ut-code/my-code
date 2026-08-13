@@ -16,6 +16,7 @@ export interface SampleConfig {
   editor: Record<string, string> | false;
   exec: string[] | false;
   readonlyFiles?: string[];
+  supportsMultiFile?: boolean;
 }
 
 export const sampleConfig: Record<RuntimeLang, SampleConfig> = {
@@ -26,6 +27,7 @@ export const sampleConfig: Record<RuntimeLang, SampleConfig> = {
       "main.py": main_py,
     },
     exec: ["main.py"],
+    supportsMultiFile: true,
   },
   ruby: {
     repl: true,
@@ -34,6 +36,7 @@ export const sampleConfig: Record<RuntimeLang, SampleConfig> = {
       "main.rb": main_rb,
     },
     exec: ["main.rb"],
+    supportsMultiFile: true,
   },
   javascript: {
     repl: true,
@@ -42,6 +45,7 @@ export const sampleConfig: Record<RuntimeLang, SampleConfig> = {
       "main.js": main_js,
     },
     exec: ["main.js"],
+    supportsMultiFile: false,
   },
   typescript: {
     repl: false,
@@ -51,6 +55,7 @@ export const sampleConfig: Record<RuntimeLang, SampleConfig> = {
     },
     exec: ["main2.ts"],
     readonlyFiles: ["main2.js"],
+    supportsMultiFile: false,
   },
   cpp: {
     repl: false,
@@ -60,6 +65,7 @@ export const sampleConfig: Record<RuntimeLang, SampleConfig> = {
       "sub.cpp": sub_cpp,
     },
     exec: ["main.cpp", "sub.cpp"],
+    supportsMultiFile: true,
   },
   rust: {
     repl: false,
@@ -68,5 +74,6 @@ export const sampleConfig: Record<RuntimeLang, SampleConfig> = {
       "sub.rs": sub_rs,
     },
     exec: ["main2.rs"],
+    supportsMultiFile: true,
   },
 };
