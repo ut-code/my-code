@@ -90,7 +90,10 @@ export function Sidebar() {
 
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
   const currentSectionId = sidebarMdContent.find(
-    (section, i) => i >= 1 && section.inView
+    (section, i) =>
+      Boolean(section.title) &&
+      (currentPageId === ("sandbox" as PageSlug) || i >= 1) &&
+      section.inView
   )?.id;
 
   // 目次の開閉状態
@@ -181,6 +184,46 @@ export function Sidebar() {
                 {group.name}
               </summary>
               <ul>
+                <li>
+                  <Link
+                    href={`/${group.id}/sandbox`}
+                    className={clsx(
+                      "text-wrap text-justify",
+                      group.id === currentLang &&
+                        currentPageId === ("sandbox" as PageSlug) &&
+                        "menu-active"
+                    )}
+                  >
+                    <span className="w-5 text-right font-mono">⚡</span>
+                    Sandbox
+                  </Link>
+                  {group.id === currentLang &&
+                    currentPageId === ("sandbox" as PageSlug) &&
+                    sidebarMdContent.length > 0 && (
+                      <ul className="ml-4 text-sm">
+                        {sidebarMdContent.map((section) => (
+                          <li
+                            key={section.id}
+                            style={{
+                              marginLeft: `${Math.max(0, section.level - 2)}em`,
+                            }}
+                          >
+                            <Link
+                              href={`#${section.id}`}
+                              className={clsx(
+                                "text-wrap text-justify",
+                                currentSectionId === section.id
+                                  ? "font-bold"
+                                  : ""
+                              )}
+                            >
+                              {section.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                </li>
                 {group.pages.map((page) => (
                   <li key={page.slug}>
                     <Link
@@ -225,20 +268,6 @@ export function Sidebar() {
                       )}
                   </li>
                 ))}
-                <li>
-                  <Link
-                    href={`/${group.id}/sandbox`}
-                    className={clsx(
-                      "text-wrap text-justify",
-                      group.id === currentLang &&
-                        currentPageId === ("sandbox" as PageSlug) &&
-                        "menu-active"
-                    )}
-                  >
-                    <span className="w-5 text-right font-mono">⚡</span>
-                    Sandbox
-                  </Link>
-                </li>
               </ul>
             </details>
           </li>
