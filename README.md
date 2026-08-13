@@ -4,14 +4,16 @@ https://my-code.utcode.net
 
 ## インストール
 
+Node.js に加えて [pnpm 11](https://pnpm.io/ja/installation) をインストールしてください。
+
 ```bash
-npm ci
+pnpm install --frozen-lockfile
 ```
 
 ## 開発環境
 
 ```bash
-npx prisma dev
+pnpm exec prisma dev
 ```
 を実行し、`t` キーを押して表示される DATABASE_URL をコピー
 
@@ -44,37 +46,37 @@ SENTRY_DSN=
 
 別のターミナルで、
 ```bash
-npm run db-migrate
+pnpm run db-migrate
 ```
 でデータベースを初期化
 
 ```bash
-npm run db-docs
+pnpm run db-docs
 ```
 でデータベースにドキュメントのページ情報を挿入します。
 (public/docs/以下にmarkdownを追加・削除したら再度実行する必要があります)
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 [http://localhost:3000](http://localhost:3000) で開きます。
 
 ```bash
-npm run format
+pnpm run format
 ```
 でコードを整形します。
 
 ```bash
-npm run lint
+pnpm run lint
 ```
 でコードをチェックします。出てくるwarningやerrorはできるだけ直しましょう。
 
 ### データベースのスキーマ
 
-* データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `npm run db-generate` (`npx drizzle-kit generate`) でmigrationファイルを作成し、 `npm run db-migrate` (`npx drizzle-kit migrate`) でデータベースに反映します。
+* データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `pnpm run db-generate` (`pnpm exec drizzle-kit generate`) でmigrationファイルを作成し、 `pnpm run db-migrate` (`pnpm exec drizzle-kit migrate`) でデータベースに反映します。
     * 本番環境のデータベースのmigrateはmainにpushされた際にGitHub Actionで実行されます
 * スキーマのファイルを追加した場合は app/lib/drizzle.ts でimportを追加する必要があります(たぶん)
-* `npx prisma dev` で立ち上げたデータベースは `npx prisma dev ls` でデータベース名の確認・ `npx prisma dev rm default` で削除ができるらしい
+* `pnpm exec prisma dev` で立ち上げたデータベースは `pnpm exec prisma dev ls` でデータベース名の確認・ `pnpm exec prisma dev rm default` で削除ができるらしい
 
 ### 本番環境の場合
 
@@ -136,7 +138,7 @@ Cloudflare Worker のビルドログとステータス表示が見れますが�
 * REPLのコード例は1セクションに最大1つまで。
     * コードエディターとコード実行ブロックはいくつでも置けます。
 * ページ0以外の各ページの最後はレベル2見出し「この章のまとめ」と、レベル3見出し「練習問題n」を置く
-* 編集したドキュメントにローカルの開発環境でアクセスする際は `npm run db-docs` を実行してください。これにより `public/docs/revisions-dev.yml` が更新・作成され、チャットが正しく動作するようになります。
+* 編集したドキュメントにローカルの開発環境でアクセスする際は `pnpm run db-docs` を実行してください。これにより `public/docs/revisions-dev.yml` が更新・作成され、チャットが正しく動作するようになります。
     * 本番環境用の `revisions.yml` は、main ブランチに push された際に GitHub Action によって自動的に更新されます。
 
 ### ベースとなるドキュメントの作り方

@@ -63,7 +63,7 @@ const baseComponents: Components = {
     href?.startsWith("http") ? (
       <WithAutoTooltipPosition
         as="a"
-        className="link link-info tooltip tooltip-info before:whitespace-pre"
+        className="link link-info tooltip tooltip-info before:whitespace-pre-wrap before:break-all"
         href={href}
         data-tip={`外部リンク\n${href}`}
         target="_blank"
