@@ -4,14 +4,12 @@ title: Mixin（mixin、with）による機能の注入
 level: 2
 question:
   - Mixinと継承の違いは何ですか？
-  - onキーワードを使ってMixinを特定の基底クラスに限定する方法は？
-  - 複数のMixinを with で組み合わせた場合のメソッド解決順序はどうなりますか？
+  - 複数のMixinを with で組み合わせる方法を教えてください。
 term:
   - Mixin
   - mixin
   - with
   - 機能の注入
-  - on
 ---
 
 ## Mixin（`mixin`、`with`）による機能の注入
@@ -57,6 +55,3 @@ void main() {
 [LOG 5:20] ユーザー Alice がログインしました
 JSON: {name: Alice}
 ```
-
-> [!TIP]
-> Mixin内で特定のクラスの機能を利用したい場合は、`mixin MyMixin on SomeBaseClass` のように `on` 節を指定して制約をかけることができます。

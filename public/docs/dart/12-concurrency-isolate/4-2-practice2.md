@@ -1,20 +1,21 @@
 ---
-id: dart-concurrency-isolate-practice2
+id: dart-isolate-practice2
 title: '練習問題2: ポートを使った双方向ワーカーの作成'
 level: 3
 question:
-  - Isolateでエラーが発生したときにメインスレッドに通知する onError ポートの設定方法は？
-  - 複数のワーカーをプールして管理する設計のポイントは何ですか？
+  - Isolate間のメッセージパッシングで送信できるオブジェクトの制限は何ですか？
+  - バックグラウンドIsolateで例外が発生した場合のハンドリング方法は？
 ---
 
 ### 練習問題2: ポートを使った双方向ワーカーの作成
 
-メインスレッドから渡された文字列を逆順にして返信するワーカーIsolateを作成してください。
+文字列を反転して大文字にするワーカースレッドを作成し、メッセージを送受信してください。
 
-1. `void echoWorker(SendPort mainSendPort)` を作成する。
-   * 自身の `ReceivePort` を作成し、その `sendPort` を `mainSendPort` に送信する。
-   * 受信したメッセージが `String` であれば、文字列を逆順（`message.split('').reversed.join()`）にして `mainSendPort` に返信する。
-2. `main()` で `Isolate.spawn(echoWorker, mainReceivePort.sendPort)` を起動し、`'Flutter & Dart'` という文字列を送信して逆順になった文字列を受信・出力する。
+1. `void textProcessor(SendPort mainSendPort)` を定義する。
+   * 自身の `ReceivePort` を作成し、その `sendPort` を `mainSendPort` に送る。
+   * 送られてきた文字列を逆順（`split('').reversed.join()`）かつ大文字（`toUpperCase()`）にして送り返す。
+2. `main()` で `Isolate.spawn(textProcessor, receivePort.sendPort)` を起動する。
+3. `'hello dart'` を送信し、ワーカーから `'TRAD OLLEH'` が返ってくることを確認してポートを閉じる。
 
 ```dart:practice12_2.dart
 import 'dart:isolate';

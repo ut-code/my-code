@@ -1,51 +1,42 @@
 ---
-id: dart-stream-generator
+id: dart-streams-async-generator
 title: async* と yield（非同期ジェネレータ関数）
 level: 2
 question:
-  - async* 関数と通常の async 関数の違いは何ですか？
-  - yield と yield* の使い分けはどうなりますか？
-  - 定期的に値を送信するストリームを async* で書く方法は？
+  - sync* と async* の違いは何ですか？
+  - yield* の使いどころを教えてください。
 term:
-  - 'async*'
+  - async*
   - yield
   - yield*
   - 非同期ジェネレータ
+  - sync*
 ---
 
 ## `async*` と `yield`（非同期ジェネレータ関数）
 
-**非同期ジェネレータ関数（`async*`）** を使用すると、複数の値を時間をかけて順番に生成・配信する `Stream` を手軽に構築できます。
-
-* 関数宣言に `async*` を付け、戻り値型を `Stream<T>` にします。
-* **`yield 値`**: データを1つストリームへ送出します。
-* **`yield* 別のStream`**: 別のストリームの全イベントをそのまま中継して送出します。
+**`async*`（非同期ジェネレータ）** を使うと、関数の内部から時間の経過とともに複数の値を `yield` で順次ストリームへ送り出すことができます。
 
 ```dart:async_generator.dart
-// 1からcountまで1秒おきにカウントアップする非同期ジェネレータ
-Stream<int> countStream(int max) async* {
-  for (int i = 1; i <= max; i++) {
+Stream<String> tickStream(int count) async* {
+  for (int i = 1; i <= count; i++) {
     await Future.delayed(const Duration(milliseconds: 50));
-    yield i; // データを1件送出
+    yield 'Tick #$i';
   }
 }
 
 void main() async {
-  print('カウントダウン開始');
-  await for (final number in countStream(3)) {
-    print('カウント: $number');
+  await for (final tick in tickStream(3)) {
+    print(tick);
   }
-  print('完了！');
 }
 ```
 
 ```dart-exec:async_generator.dart
-カウントダウン開始
-カウント: 1
-カウント: 2
-カウント: 3
-完了！
+Tick #1
+Tick #2
+Tick #3
 ```
 
 > [!TIP]
-> `StreamController` を手動で用意して `close()` を呼ぶ必要がないため、データの生成フローが明確な場合は `async*` と `yield` を使うのが最も安全でシンプルです。
+> 別のStream全体をそのまま委譲して流したい場合は、**`yield* otherStream;`** を使用します。

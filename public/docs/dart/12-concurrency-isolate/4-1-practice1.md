@@ -1,22 +1,24 @@
 ---
-id: dart-concurrency-isolate-practice1
+id: dart-isolate-practice1
 title: '練習問題1: Isolate.run()による重い計算の並行実行'
 level: 3
 question:
-  - Isolate.run() 内で例外が発生した場合、呼び出し側はどう処理すべきですか？
-  - 引数としてクロージャを渡す場合の変数キャプチャの注意点は何ですか？
+  - Isolate.run() で返せる戻り値の型にはどのような制約がありますか？
+  - クロージャを Isolate.run() に渡す場合の注意点を教えてください。
 ---
 
 ### 練習問題1: Isolate.run()による重い計算の並行実行
 
-素数の個数を数える計算を `Isolate.run()` を使って別スレッドで実行してください。
+巨大なリストのソートと集計処理を `Isolate.run()` を使って別スレッドで実行するプログラムを作成してください。
 
-1. `bool isPrime(int n)` 関数を作成する（2以上の整数に対し素数判定を行う）。
-2. `int countPrimes(int max)` 関数を作成し、`1` から `max` までの素数の総数をカウントする。
-3. `main()` で `Isolate.run(() => countPrimes(50000))` を呼び出して非同期に結果を待機し、計算された素数の個数を出力する。
+1. `List<int> generateAndSortNumbers(int size)` 関数を定義する。
+   * 要素数 `size` のランダムな整数リストを生成し、降順ソートして先頭10件を返す。
+2. `main()` で `await Isolate.run(() => generateAndSortNumbers(500000))` を呼び出す。
+3. 取得した上位10件のリストを出力する。
 
 ```dart:practice12_1.dart
 import 'dart:isolate';
+import 'dart:math';
 
 // ここに関数を定義してください
 

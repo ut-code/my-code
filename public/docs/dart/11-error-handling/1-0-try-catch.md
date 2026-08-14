@@ -1,65 +1,59 @@
 ---
 id: dart-error-try-catch
-title: try、catch、on、finally とカスタム例外
+title: 'try、catch、on、finally とカスタム例外'
 level: 2
 question:
-  - Exception と Error の違いは何ですか？
-  - onキーワードを使って特定の例外だけをキャッチする方法は？
-  - rethrowキーワードはどのような場合に使われますか？
+  - catch 節の第2引数（StackTrace）の使い方は？
+  - rethrow キーワードはどのような場面で使用しますか？
 term:
-  - try-catch
+  - 例外処理
+  - 'on'
+  - rethrow
   - Exception
   - Error
-  - on
-  - rethrow
-  - スタックトレース
+  - StackTrace
 ---
 
 ## `try`、`catch`、`on`、`finally` とカスタム例外
 
-[[Dart]]の例外システムでは、`Exception`（プログラムで回復可能なエラー）と `Error`（プログラミングミスなどの重大な欠陥）が区別されています。
+[[Dart]]では、任意のオブジェクトを例外として `throw` できますが、通常は `Exception` または `Error` を実装したクラスをスローします。
 
-### 1. `on` による型指定キャッチと `rethrow`
+* **`on ExceptionType`**: 特定の例外型だけを指定してキャッチします。
+* **`catch (e, stackTrace)`**: 例外オブジェクトとスタックトレースを取得します。
+* **`rethrow`**: キャッチした例外を処理した後、再度上位の呼び出し元へ再スローします。
+* **`finally`**: 例外の有無にかかわらず、最後に必ず実行されるクリーンアップブロックです。
 
-* **`on 例外型`**: 特定の例外クラスのみを捕捉します。
-* **`catch (e, stackTrace)`**: 例外オブジェクトとスタックトレースを受け取ります。
-* **`rethrow`**: キャッチした例外をそのまま上位の呼び出し元へ再スローします。
-
-```dart:exception_handling.dart
-// 1. カスタム例外クラスの定義 (implements Exception)
-class InsufficientFundsException implements Exception {
-  final int currentBalance;
-  final int requestedAmount;
-  InsufficientFundsException(this.currentBalance, this.requestedAmount);
+```dart:custom_exception_demo.dart
+class ValidationException implements Exception {
+  final String message;
+  ValidationException(this.message);
 
   @override
-  String toString() =>
-      '残高不足エラー: 現在残高 $currentBalance 円 に対し、$requestedAmount 円 の引き落とし要求がありました。';
+  String toString() => 'ValidationException: $message';
 }
 
-void processWithdrawal(int balance, int amount) {
-  if (amount > balance) {
-    throw InsufficientFundsException(balance, amount);
+void validateAge(int age) {
+  if (age < 0) {
+    throw ValidationException('年齢は0以上である必要があります');
   }
-  print('引き落とし成功: $amount 円');
 }
 
 void main() {
   try {
-    processWithdrawal(3000, 5000);
-  } on InsufficientFundsException catch (e) {
-    // 特定のカスタム例外を処理
-    print('捕捉: $e');
+    print('年齢チェック開始');
+    validateAge(-5);
+  } on ValidationException catch (e) {
+    print('検証エラーをキャッチ: $e');
   } catch (e, stack) {
-    // その他の未知の例外
-    print('予期せぬエラー: $e');
+    print('予期せぬエラー: $e\n$stack');
   } finally {
-    print('トランザクション終了');
+    print('検証処理終了（finallyブロック実行）');
   }
 }
 ```
 
-```dart-exec:exception_handling.dart
-捕捉: 残高不足エラー: 現在残高 3000 円 に対し、$5000 円 の引き落とし要求がありました。
-トランザクション終了
+```dart-exec:custom_exception_demo.dart
+年齢チェック開始
+検証エラーをキャッチ: ValidationException: 年齢は0以上である必要があります
+検証処理終了（finallyブロック実行）
 ```

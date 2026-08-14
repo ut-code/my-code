@@ -1,67 +1,44 @@
 ---
-id: dart-stream-await-for
+id: dart-streams-await-for
 title: await for によるStreamの購読
 level: 2
 question:
+  - await for 文を使うとどのようなメリットがありますか？
   - await for ループはいつ終了しますか？
-  - await for の中で break や return を使うとストリームはどうなりますか？
-  - Streamの高階メソッド（map, where, take）と組み合わせる方法は？
 term:
   - await for
-  - Stream購読
-  - take
+  - Stream.fromIterable
 ---
 
 ## `await for` によるStreamの購読
 
-`async` 関数内では、**`await for` ループ** を使うことで、ストリームからデータが流れてくるたびに同期的な `for-in` ループのように直感的に処理できます。
+`async` 関数内では、**`await for`** ループを使って `Stream` から送られてくるデータを同期ループのように1件ずつ順次処理できます。
 
-ストリームが `onDone`（完了）を発行するまでループが継続します。
+ストリームが完了（Done）するまでループが継続します。
 
 ```dart:await_for_demo.dart
-Future<void> processStream(Stream<int> stream) async {
-  print('--- 処理開始 ---');
-  await for (final value in stream) {
-    print('受信値: $value (2倍: ${value * 2})');
+Stream<int> countStream(int max) async* {
+  for (int i = 1; i <= max; i++) {
+    yield i;
   }
-  print('--- 全データ受信完了 ---');
 }
 
 void main() async {
-  // 10, 20, 30 を流すストリーム
-  final dataStream = Stream.fromIterable([10, 20, 30]);
-  await processStream(dataStream);
+  print('Stream受信開始');
+
+  // await for による順次受信
+  await for (final number in countStream(3)) {
+    print('受信データ: $number');
+  }
+
+  print('Stream完了');
 }
 ```
 
 ```dart-exec:await_for_demo.dart
---- 処理開始 ---
-受信値: 10 (2倍: 20)
-受信値: 20 (2倍: 40)
-受信値: 30 (2倍: 60)
---- 全データ受信完了 ---
-```
-
-### Streamの変換オペレータ
-
-Streamも `List` と同様に `map` や `where`、`take` などのオペレータでパイプライン処理が可能です。
-
-```dart:stream_operators.dart
-void main() async {
-  final stream = Stream.fromIterable([1, 2, 3, 4, 5, 6]);
-
-  final filtered = stream
-      .where((n) => n.isEven)
-      .map((n) => '偶数: $n');
-
-  await for (final item in filtered) {
-    print(item);
-  }
-}
-```
-
-```dart-exec:stream_operators.dart
-偶数: 2
-偶数: 4
-偶数: 6
+Stream受信開始
+受信データ: 1
+受信データ: 2
+受信データ: 3
+Stream完了
 ```

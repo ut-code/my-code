@@ -5,13 +5,10 @@ level: 2
 question:
   - asyncキーワードを付けた関数の戻り値型は何になりますか？
   - awaitキーワードはどこで使用できますか？
-  - Future.waitを使って複数の非同期タスクを並行実行する方法を教えてください。
 term:
   - async
   - await
   - async/await
-  - Future.wait
-  - 並行実行
 ---
 
 ## `async` / `await` による可読性の高い非同期コード
@@ -47,29 +44,4 @@ void main() async {
 ```dart-exec:async_await_demo.dart
 ユーザー情報を取得中...
 取得完了: Alice (ID: 42)
-```
-
-### 複数の非同期処理を並行実行する (`Future.wait`)
-
-互いに依存しない複数の非同期処理を同時に実行したい場合は、`Future.wait` を使います。
-
-```dart:future_wait.dart
-Future<String> fetchPostTitle() async => 'Dart 3の紹介';
-Future<int> fetchLikeCount() async => 128;
-
-void main() async {
-  // 並行して実行し、両方の完了を待つ
-  final results = await Future.wait([
-    fetchPostTitle(),
-    fetchLikeCount(),
-  ]);
-
-  print('タイトル: ${results[0]}');
-  print('いいね数: ${results[1]}');
-}
-```
-
-```dart-exec:future_wait.dart
-タイトル: Dart 3の紹介
-いいね数: 128
 ```

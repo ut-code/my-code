@@ -5,13 +5,11 @@ level: 2
 question:
   - 通常のenumとEnhanced Enumの違いは何ですか？
   - Enumにフィールドやメソッド、コンストラクタを持たせるにはどう書きますか？
-  - Enhanced Enumとswitch式を組み合わせるメリットは何ですか？
 term:
   - Enum
   - 列挙型
   - Enhanced Enum
   - enum
-  - enumコンストラクタ
 ---
 
 ## 高機能な列挙型（Enhanced Enum）

@@ -5,9 +5,7 @@ level: 3
 question:
   - dynamicとObjectの違いは何ですか？
   - dynamic型を使うべきシチュエーションはどのようなときですか？
-  - varで宣言した変数を初期化しなかった場合はどうなりますか？
 term:
-  - var
   - dynamic
   - Object
   - 動的型
@@ -27,15 +25,14 @@ Dartには一見似ているように思える `var`, `dynamic`, `Object` とい
 void main() {
   // 1. dynamic: 静的型チェックを完全にバイパスする
   dynamic value = 'Hello';
-  print('dynamic: ${value.length}'); // 実行可能
-  value = 123;                      // 異なる型の再代入もOK
+  print('dynamic: ${value.length}');
+  value = 123; // 異なる型の再代入もOK
   print('dynamic(int): $value');
 
   // 2. Object: すべての非Nullオブジェクトの基底クラス (型安全)
   Object obj = 'World';
-  // print(obj.length); // コンパイルエラー: Object型には length プロパティがない
   if (obj is String) {
-    // 型チェック (is) を通すとスマートキャストされる
+    // is チェックでスマートキャストされる
     print('Object(String): ${obj.length}');
   }
 }
@@ -48,4 +45,4 @@ Object(String): 5
 ```
 
 > [!WARNING]
-> `dynamic` は実行時までエラーが発覚しないため、JSONのデコードなど型が未知の境界領域以外では極力使用を避け、型安全なコードを心がけましょう。
+> `dynamic` は実行時までエラーが発覚しないため、JSONのデコードなど型が未知の境界領域以外では極力使用を避けましょう。

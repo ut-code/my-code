@@ -3,18 +3,17 @@ id: dart-async-stream-practice1
 title: '練習問題1: async*を使ったカウントダウンストリーム'
 level: 3
 question:
-  - async* 関数の中でループや条件分岐を組み合わせる方法を教えてください。
-  - ストリームの途中でエラーを発生させたい場合はどう書きますか？
+  - async* 関数内で例外をスローするとストリームはどうなりますか？
+  - await for ループを途中で break した場合の挙動を教えてください。
 ---
 
 ### 練習問題1: async*を使ったカウントダウンストリーム
 
-指定された秒数から0までカウントダウンし、最後に `'発射！'` という文字列を通知するストリームを作成してください。
+指定された秒数からゼロまでカウントダウンするストリーム関数を作成してください。
 
-1. `Stream<String> countdown(int from)` を `async*` で定義する。
-2. `from` から `1` までの数値をループし、50ミリ秒待機しながら `'$i...'` を `yield` する。
-3. ループ終了後に `'発射！'` を `yield` する。
-4. `main()` で `await for` を使って `countdown(3)` を購読し、結果を出力する。
+1. `Stream<int> countdown(int from)` を `async*` で定義する。
+2. `from` から `0` まで1ずつ減らしながら `yield` する（各ステップで `Future.delayed(Duration(milliseconds: 50))` を待つ）。
+3. `main()` で `countdown(3)` を呼び出し、`await for` で受け取って `'残り: X秒'`、最後に `'カウントダウン終了！'` と出力する。
 
 ```dart:practice10_1.dart
 // ここに関数を定義してください

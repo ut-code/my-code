@@ -5,7 +5,6 @@ level: 2
 question:
   - 拡張メソッドを使うと標準ライブラリのクラス（Stringやintなど）にメソッドを追加できますか？
   - 拡張メソッドの定義構文はどう書きますか？
-  - ジェネリクスやゲッターをExtensionで定義することはできますか？
 term:
   - Extension
   - 拡張メソッド
@@ -32,25 +31,16 @@ extension StringExtensions on String {
   int? toIntOrNull() => int.tryParse(this);
 }
 
-// List<int> に特化した拡張
-extension NumberListExtension on List<int> {
-  int get sum => fold(0, (a, b) => a + b);
-}
-
 void main() {
   String word = 'flutter';
   print('capitalize: ${word.capitalize}');
 
   String numStr = '42';
   print('toIntOrNull: ${numStr.toIntOrNull()}');
-
-  List<int> numbers = [10, 20, 30];
-  print('sum: ${numbers.sum}');
 }
 ```
 
 ```dart-exec:extension_methods.dart
 capitalize: Flutter
 toIntOrNull: 42
-sum: 60
 ```

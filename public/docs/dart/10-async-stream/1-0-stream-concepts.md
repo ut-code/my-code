@@ -1,51 +1,32 @@
 ---
-id: dart-stream-concepts
+id: dart-streams-concepts
 title: Stream の概念（Push型のデータフロー）
 level: 2
 question:
-  - 単一購読ストリームとブロードキャストストリームの違いは何ですか？
-  - Streamはどのようにデータを送信側に要求する（または受信する）のですか？
-  - Streamのリスナー（listen）はどう使いますか？
+  - FutureとStreamの最も重要な違いは何ですか？
+  - Streamから流れてくる3種類の通知とは何ですか？
 term:
   - Stream
   - ストリーム
-  - 単一購読ストリーム
-  - ブロードキャストストリーム
-  - listen
+  - Push型
+  - リアクティブ
 ---
 
 ## `Stream` の概念（Push型のデータフロー）
 
-**`Stream<T>`** は、非同期に連続して流れてくる一連のデータ（データパイプライン）です。
+**`Stream<T>`** は、非同期に次々と発生するデータ（またはエラー）のパイプラインです。
 
-### 1. 単一購読ストリーム（Single-subscription Stream）
+購読者（リスナー）はデータが準備できたタイミングで通知を受け取ります（**Push型**）。
 
-* デフォルトのStream。
-* ライフサイクルの中で**1つのリスナーだけ**が購読できます（例: ファイル読み込み）。
-* 2回以上 `listen()` しようとするとエラーになります。
-
-### 2. ブロードキャストストリーム（Broadcast Stream）
-
-* **複数のリスナー**が同時に購読できます（例: UIのクリックイベント、マウス移動）。
-* `stream.asBroadcastStream()` または `StreamController.broadcast()` で作成します。
-
-```dart:stream_listen.dart
-void main() {
-  // 1から3までのデータを順番に流す Stream
-  final stream = Stream.fromIterable([1, 2, 3]);
-
-  // listen でイベントを購読
-  final subscription = stream.listen(
-    (data) => print('データ受信: $data'),
-    onError: (error) => print('エラー: $error'),
-    onDone: () => print('ストリーム終了 (Done)'),
-  );
-}
+```
++--------------------------------------------------------+
+|                      Stream<int>                       |
+|   ---[ 1 ]-----[ 2 ]------[ 3 ]------| (完了 / Done)    |
+|        1秒後    2秒後      3秒後                        |
++--------------------------------------------------------+
 ```
 
-```dart-exec:stream_listen.dart
-データ受信: 1
-データ受信: 2
-データ受信: 3
-ストリーム終了 (Done)
-```
+Streamは以下の3つの通知をリスナーへ送信します。
+1. **データイベント（Data Event）**: 送信された値（`T`）。
+2. **エラーイベント（Error Event）**: 発生した例外。
+3. **完了イベント（Done Event）**: ストリームが終了し、これ以上データが来ない通知。

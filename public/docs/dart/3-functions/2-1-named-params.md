@@ -1,22 +1,18 @@
 ---
 id: dart-functions-named-positional
-title: '名前付き引数（{}）と位置指定引数（[]）'
+title: '名前付き引数（{}）と required'
 level: 3
 question:
   - Flutterで名前付き引数が多用される理由は何ですか？
   - requiredキーワードを付けるとどうなりますか？
-  - 名前付き引数にデフォルト値を設定する方法を教えてください。
 term:
   - 名前付き引数
-  - 位置指定引数
   - optional parameter
   - required
-  - デフォルト値
+  - デフォルト引数
 ---
 
-### 名前付き引数（`{}`）と位置指定引数（`[]`）
-
-### 1. 名前付き引数（Named Parameters）
+### 名前付き引数（`{}`）と `required`
 
 引数を `{}` で囲むと、呼び出し側で引数名を明示して渡すことができるようになります。引数の順番は自由です。
 
@@ -34,7 +30,6 @@ void createUser({
 }
 
 void main() {
-  // 引数名を指定して呼び出す（順番は自由）
   createUser(username: 'Alice');
   createUser(role: 'admin', username: 'Bob', age: 30);
 }
@@ -46,24 +41,4 @@ void main() {
 ```
 
 > [!TIP]
-> [[Flutter]]のWidgetコンストラクタはほぼすべて名前付き引数で設計されています。設定項目が多くなってもコードの可読性が損なわれません。
-
-### 2. オプショナルな位置指定引数（Optional Positional Parameters）
-
-引数を `[]` で囲むと、順番通りのオプショナル引数を定義できます。
-
-```dart:optional_positional.dart
-String formatMessage(String from, String msg, [String? appName = 'MyChat']) {
-  return '[$appName] $from: $msg';
-}
-
-void main() {
-  print(formatMessage('Alice', 'Hello'));
-  print(formatMessage('Bob', 'Hi', 'FlutterApp'));
-}
-```
-
-```dart-exec:optional_positional.dart
-[MyChat] Alice: Hello
-[FlutterApp] Bob: Hi
-```
+> [[Flutter]]のWidgetコンストラクタはほぼすべて名前付き引数で設計されています。

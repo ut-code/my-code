@@ -3,47 +3,35 @@ id: dart-error-assert
 title: assert による開発時のバグ検知
 level: 2
 question:
-  - assert 文は本番リリース時（プロダクションビルド）にも実行されますか？
-  - assert と if-throw の使い分け基準は何ですか？
-  - Flutterでassertが多用されている理由は何ですか？
+  - assert 文は本番リリースビルド時にも実行されますか？
+  - assert と通常の例外スローの使い分けは何ですか？
 term:
   - assert
   - アサーション
-  - デバッグ
+  - デバッグモード
 ---
 
 ## `assert` による開発時のバグ検知
 
-**`assert(条件式, 'エラーメッセージ');`** は、開発・デバッグ時（Debug Mode）にのみ実行されるアサーション（前提条件チェック）文です。
+**`assert(条件, メッセージ)`** は、開発中（デバッグモード）にプログラムの不変条件や関数の前提条件を検証するための文です。
 
-* 条件が `true` であれば何も起きません。
-* 条件が `false` の場合、`AssertionError` がスローされ、即座に実行が中断します。
-* **リリースビルド（AOTコンパイルや本番モード）では自動的に完全に無視（コードから削除）される**ため、実行時パフォーマンスに一切影響を与えません。
+**リリース（AOTコンパイルや本番ビルド）時にはコード自体が完全に無視（除去）される** ため、本番環境の実行速度に影響を与えません。
 
 ```dart:assert_demo.dart
-class User {
-  final String name;
-  final int age;
-
-  User(this.name, this.age)
-      : assert(name.isNotEmpty, 'ユーザー名は空にできません'),
-        assert(age >= 0, '年齢は0歳以上である必要があります');
+void setPercentage(double rate) {
+  // 開発時のみチェックされ、不正なら AssertionError を発生させる
+  assert(rate >= 0.0 && rate <= 1.0, 'rate は 0.0 〜 1.0 の間である必要があります');
+  print('設定されたレート: ${(rate * 100).toStringAsFixed(1)}%');
 }
 
 void main() {
-  final validUser = User('Alice', 20);
-  print('ユーザー作成成功: ${validUser.name}');
-
-  // デバッグ実行時、条件を満たさないと AssertionError が発生
-  // final invalidUser = User('', -5);
+  setPercentage(0.75);
 }
 ```
 
 ```dart-exec:assert_demo.dart
-ユーザー作成成功: Alice
+設定されたレート: 75.0%
 ```
 
-> [!NOTE]
-> **使い分けの基準**:
-> * `assert`: プログラマ自身の内部的なミスやAPIの不正利用を開発中に防ぐ目的。
-> * `if-throw`（例外スロー）: ユーザー入力エラーやネットワーク遮断など、本番環境でも発生し得る外部要因のエラー処理。
+> [!TIP]
+> ユーザーの入力不正など本番でも検知・回復すべきエラーには `throw Exception` を使い、プログラマの実装ミスや前提条件の違反検知には `assert` を使い分けます。

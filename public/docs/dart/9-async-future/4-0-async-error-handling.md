@@ -5,10 +5,8 @@ level: 2
 question:
   - async/await でのエラーハンドリングは通常の try-catch と同じですか？
   - 非同期例外を確実に捕捉するための注意点は何ですか？
-  - finally ブロックはどのような場面で活用されますか？
 term:
   - 非同期エラーハンドリング
-  - catchError
   - try-catch-finally
   - try
   - catch
@@ -17,7 +15,7 @@ term:
 
 ## 非同期処理のエラーハンドリング（`try-catch-finally`）
 
-`async` / `await` を使った非同期処理では、同期コードと全く同じ **`try-catch-finally`** 構文でエラーを捕捉できます。
+`async` / `await` を使った非同期処理では、同期コードと全く同じ **`try-catch-finally`** 構文で例外を捕捉できます。
 
 ```dart:async_try_catch.dart
 Future<String> loadDataFromServer({required bool shouldFail}) async {
@@ -57,4 +55,4 @@ void main() async {
 ```
 
 > [!TIP]
-> `await` を付け忘れた `Future` で例外が発生すると、`try-catch` ブロックをすり抜けて未処理の非同期例外（Uncaught asynchronous error）となるため注意してください。
+> `await` を付け忘れた `Future` で例外が発生すると、`try-catch` ブロックをすり抜けて未処理の非同期例外となるため注意してください。

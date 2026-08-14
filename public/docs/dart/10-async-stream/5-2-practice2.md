@@ -3,24 +3,29 @@ id: dart-async-stream-practice2
 title: '練習問題2: StreamControllerを使ったイベント通知'
 level: 3
 question:
-  - StreamControllerでエラーを流す sink.addError の使い方を教えてください。
-  - listen の onError コールバックでエラーを処理する方法を復習したいです。
+  - ブロードキャストストリームにするための .asBroadcastStream() の使い方を教えてください。
+  - 購読リスナーが誰もいない状態でsinkにデータを送るとどうなりますか？
 ---
 
 ### 練習問題2: StreamControllerを使ったイベント通知
 
-タスクの進行状況（進捗率: 0〜100%）を通知する進捗トラッカーを実装してください。
+メッセージ通知システムを `StreamController` を使って構築してください。
 
-1. `StreamController<int>` を作成する。
-2. コントローラのストリームを `listen` し、`'進捗: $percent%'` と出力するリスナーを登録する。
-3. `sink.add` を使って、`25`, `50`, `75`, `100` を順番に送信する。
-4. 送信完了後に `await controller.close()` を呼び出し、ストリームを終了する。
+1. `class NotificationHub` を作成する。
+   * 内部に `StreamController<String>` を保持する。
+   * メソッド `void sendNotification(String message)` でイベントを送信する。
+   * ゲッター `Stream<String> get onNotification` でストリームを公開する。
+   * メソッド `Future<void> dispose()` でコントローラを閉じる。
+2. `main()` でインスタンスを作成し、`onNotification` を `listen` して受信ログを出力する。
+3. 2件のメッセージを送信後、`dispose()` を呼ぶ。
 
 ```dart:practice10_2.dart
 import 'dart:async';
 
+// ここにクラスを定義してください
+
 void main() async {
-  // ここにコードを書いてください
+  // ここで動作確認を行ってください
 }
 ```
 
