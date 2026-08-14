@@ -33,7 +33,7 @@ export function ThirdPartyLicenses({ licenses }: { licenses: LicenseEntry[] }) {
                   {pkg.author}
                 </p>
               )}
-              {pkg.repository && (
+              {pkg.repository ? (
                 <p className="mb-1">
                   <span className="opacity-60">Repository: </span>
                   <a
@@ -44,6 +44,19 @@ export function ThirdPartyLicenses({ licenses }: { licenses: LicenseEntry[] }) {
                     {pkg.repository}
                   </a>
                 </p>
+              ) : (
+                pkg.source && (
+                  <p className="mb-1">
+                    <span className="opacity-60">Source: </span>
+                    <a
+                      className="link link-info break-all"
+                      href={pkg.source}
+                      target="_blank"
+                    >
+                      {pkg.source}
+                    </a>
+                  </p>
+                )
               )}
               {pkg.licenseText && (
                 <FallbackPre className="text-sm">{pkg.licenseText}</FallbackPre>

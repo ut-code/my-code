@@ -9,19 +9,24 @@ import { PageTransition } from "./pageTransition";
 import {
   DynamicMarkdownSection,
   LangId,
-  MarkdownSection,
   PagePath,
   PageSlug,
   SectionId,
+  SectionWithDiff,
 } from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
 import { ChatWithMessages } from "@/lib/chatHistory";
 import { usePagesListForLang } from "@/pagesListContext";
+import { useEmbedContext } from "@/terminal/embedContext";
+import { useRouter } from "next/navigation";
+import { revalidateChatAction } from "@/actions/revalidateChat";
+import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
+import { captureException } from "@sentry/nextjs";
 
 interface PageContentProps {
-  splitMdContent: MarkdownSection[];
+  splitMdContent: SectionWithDiff[];
   langId: LangId;
   pageSlug: PageSlug;
   path: PagePath;
@@ -69,68 +74,11 @@ export function PageContent(props: PageContentProps) {
   }, []);
 
   const dynamicMdContent = useMemo(() => {
-    const newContent: DynamicMarkdownSection[] = splitMdContent.map(
-      (section, i) => ({
-        ...section,
-        inView: sectionInView[i],
-        replacedContent: section.rawContent,
-        replacedRange: [],
-      })
-    );
-    const chatDiffs = chatHistories.map((chat) => chat.diff).flat();
-    chatDiffs.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-    for (const diff of chatDiffs) {
-      const targetSection = newContent.find((s) => s.id === diff.sectionId);
-      if (targetSection) {
-        const startIndex = targetSection.replacedContent.indexOf(diff.search);
-        if (startIndex !== -1) {
-          const endIndex = startIndex + diff.search.length;
-          const replaceLen = diff.replace.length;
-          const diffLen = replaceLen - diff.search.length; // 文字列長の増減分
-
-          // 1. 文字列の置換
-          targetSection.replacedContent =
-            targetSection.replacedContent.slice(0, startIndex) +
-            diff.replace +
-            targetSection.replacedContent.slice(endIndex);
-
-          // 2. 既存のハイライト範囲のズレを補正（今回の置換箇所より後ろにあるものをシフト）
-          targetSection.replacedRange = targetSection.replacedRange.map((h) => {
-            if (h.start >= endIndex) {
-              // 完全に後ろにある場合は単純にシフト
-              return {
-                start: h.start + diffLen,
-                end: h.end + diffLen,
-                id: h.id,
-              };
-            }
-            if (h.end >= endIndex) {
-              return { start: h.start, end: h.end + diffLen, id: h.id };
-            }
-            return h;
-          });
-
-          // 3. 今回の置換箇所を新たなハイライト範囲として追加
-          targetSection.replacedRange.push({
-            start: startIndex,
-            end: startIndex + replaceLen,
-            id: diff.chatId,
-          });
-        } else {
-          // TODO: md5ハッシュを参照し過去バージョンのドキュメントへ適用を試みる
-          console.error(
-            `Failed to apply diff: search string "${diff.search}" not found in section ${targetSection.id}`
-          );
-        }
-      } else {
-        console.error(
-          `Failed to apply diff: section with id "${diff.sectionId}" not found`
-        );
-      }
-    }
-
-    return newContent;
-  }, [splitMdContent, chatHistories, sectionInView]);
+    return splitMdContent.map((section, i) => ({
+      ...section,
+      inView: sectionInView[i] ?? false,
+    }));
+  }, [splitMdContent, sectionInView]);
 
   useEffect(() => {
     // props.splitMdContentが変わったとき, チャットのdiffが変わった時に
@@ -155,12 +103,24 @@ export function PageContent(props: PageContentProps) {
         {dynamicMdContent.map((section, index) => (
           <Fragment key={section.id}>
             <section
-              className="min-w-1/2 max-w-docs text-justify"
+              className={clsx(
+                "min-w-1/2 max-w-docs text-justify",
+                section.isOutdated &&
+                  "rounded-box border border-secondary/20 bg-secondary/3 p-1.5 shadow-xs"
+              )}
               id={section.id} // 目次からaタグで飛ぶために必要
               ref={(el) => {
                 sectionRefs.current[index] = el;
               }}
             >
+              {section.isOutdated && (
+                <OutdatedSectionAlert
+                  sectionId={section.id}
+                  splitMdContent={splitMdContent}
+                  chatHistories={chatHistories}
+                  path={path}
+                />
+              )}
               {/* ドキュメントのコンテンツ */}
               <StyledMarkdown
                 content={section.replacedContent}
@@ -326,5 +286,158 @@ function ChatIcon() {
         />
       </svg>
     </>
+  );
+}
+
+function OutdatedSectionAlert(props: {
+  sectionId: SectionId;
+  splitMdContent: SectionWithDiff[];
+  chatHistories: ChatWithMessages[];
+  path: PagePath;
+}) {
+  const { sectionId, path } = props;
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [progress, setProgress] = useState<{ current: number; total: number }>({
+    current: 0,
+    total: 0,
+  });
+
+  const { files, replOutputs, execResults } = useEmbedContext();
+  const router = useRouter();
+
+  const handleRegenerateSection = async () => {
+    if (
+      !confirm(
+        "このセクションの全チャットを最新のドキュメントに対して再生成しますか？"
+      )
+    ) {
+      return;
+    }
+
+    setIsRegenerating(true);
+    setProgress({ current: 0, total: 0 });
+
+    try {
+      const response = await fetch("/api/chat/regenerate-section", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          path,
+          sectionId,
+          replOutputs,
+          files,
+          execResults,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API route error: ${response.status}`);
+      }
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const event = JSON.parse(line) as RegenerateStreamEvent;
+            if (event.type === "progress") {
+              setProgress({ current: event.current, total: event.total });
+            } else if (event.type === "done") {
+              const allChatIds = [
+                ...(event.deletedChatIds ?? []),
+                ...(event.createdChatIds ?? []),
+              ];
+              for (const chatId of allChatIds) {
+                await revalidateChatAction(chatId, path);
+              }
+              router.refresh();
+            } else if (event.type === "error") {
+              throw new Error(
+                event.message ?? "Error occurred during regeneration"
+              );
+            }
+          } catch (e) {
+            captureException(e);
+          }
+        }
+      }
+
+      router.refresh();
+    } catch (err) {
+      captureException(err);
+      console.error("Failed to regenerate section chats:", err);
+      alert("チャットの再生成中にエラーが発生しました。");
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  return (
+    <div className="alert flex flex-col items-stretch gap-2">
+      <div className="flex items-center justify-between">
+        <div className="">
+          新しいバージョンのドキュメントがあります。更新するにはチャットを再生成する必要があります。
+        </div>
+        <button
+          className="btn btn-secondary shrink-0"
+          onClick={handleRegenerateSection}
+          disabled={isRegenerating}
+        >
+          <svg
+            className={clsx("w-4 h-4", isRegenerating && "animate-spin")}
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4.06189 13C4.55399 16.944 7.92083 20 12 20C15.5463 20 18.5721 17.7719 19.5714 14.619"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M19.9381 11C19.446 7.05601 16.0792 4 12 4C8.45371 4 5.42788 6.22811 4.42857 9.38095"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M14 14.619H19.5714V20"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 9.38095H4.42857V4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          再生成
+        </button>
+      </div>
+      {isRegenerating && (
+        <progress
+          className="progress progress-secondary"
+          value={progress.current}
+          max={Math.max(1, progress.total)}
+        />
+      )}
+    </div>
   );
 }

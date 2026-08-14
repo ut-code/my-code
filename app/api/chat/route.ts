@@ -4,7 +4,9 @@ import {
   addChat,
   addMessagesAndDiffs,
   CreateChatDiff,
+  deleteChat,
   initContext,
+  revalidateChatOnDemand,
 } from "@/lib/chatHistory";
 import {
   DynamicMarkdownSectionSchema,
@@ -26,6 +28,7 @@ const ChatParamsSchema = z.object({
   userQuestion: z.string().min(1),
   questionScope: z.enum(["page", "language"]).default("page"),
   sectionContent: z.array(DynamicMarkdownSectionSchema),
+  deleteChatOnCreated: z.string().optional(),
   replOutputs: z.record(z.string(), z.array(ReplCommandSchema)),
   files: z.record(z.string(), z.string()),
   execResults: z.record(z.string(), z.array(ReplOutputSchema)),
@@ -52,6 +55,7 @@ export async function POST(request: NextRequest) {
     userQuestion,
     questionScope,
     sectionContent,
+    deleteChatOnCreated,
     replOutputs,
     files,
     execResults,
@@ -403,6 +407,23 @@ export async function POST(request: NextRequest) {
           diffRaw,
           context
         );
+
+        if (deleteChatOnCreated) {
+          try {
+            await deleteChat(deleteChatOnCreated, context);
+          } catch (e) {
+            console.error(
+              `Failed to delete old chat ${deleteChatOnCreated}:`,
+              e
+            );
+          }
+        }
+
+        // クライアントでもrevalidateChatActionを呼ぶが、一応こちらでもrevalidateしておく
+        if (deleteChatOnCreated) {
+          await revalidateChatOnDemand(deleteChatOnCreated, context.userId!, path);
+        }
+        await revalidateChatOnDemand(chatId, context.userId!, path);
 
         send({ type: "done" });
         controller.close();
