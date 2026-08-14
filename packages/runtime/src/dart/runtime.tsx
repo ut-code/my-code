@@ -173,7 +173,7 @@ export function useDart(): RuntimeContext {
       }
 
       try {
-        const [_, response] = await Promise.all([
+        const [, response] = await Promise.all([
           performAnalysis(source, onOutput),
           fetch(`${DART_PAD_API_BASE}/compileNewDDC`, {
             method: "POST",
