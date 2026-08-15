@@ -12,7 +12,7 @@ question:
 
 ### 問題2: 従業員の給与計算
 
-`Employee` という抽象クラスを定義してください。このクラスは、従業員の名前を保持し、給与を計算するための純粋仮想関数 `calculate_salary()` を持ちます。
+`Employee` という[[抽象クラス]]を定義してください。このクラスは、従業員の名前を保持し、給与を計算するための[[純粋仮想関数]] `calculate_salary()` を持ちます。
 
 次に、`Employee` を継承して、`FullTimeEmployee`（月給制）と `PartTimeEmployee`（時給制）の2つの[[クラス]]を作成します。それぞれのクラスで `calculate_salary()` を具体的に実装してください。
 
