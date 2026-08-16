@@ -171,6 +171,7 @@ export function ChatListForSection(props: {
   sectionId: SectionId;
   chatHistories: ChatWithMessages[];
   fullWidth?: boolean;
+  className?: string;
 }) {
   const { dynamicMdContent, sectionId, chatHistories } = props;
   const filteredChatHistories = chatHistories.filter(
@@ -195,8 +196,9 @@ export function ChatListForSection(props: {
       */}
       <ul
         className={clsx(
+          props.className,
           props.fullWidth
-            ? "block m-2"
+            ? ""
             : clsx(
                 chatId === null
                   ? "hidden has-chat-1:block"
@@ -227,44 +229,42 @@ export function ChatListForSection(props: {
         ))}
       </ul>
       {/*xl未満 or xl以上でチャットを表示している → 小さいボタンを表示*/}
-      <details
-        className={clsx(
-          props.fullWidth
-            ? "hidden"
-            : clsx(
-                chatId === null
-                  ? "block has-chat-1:hidden"
-                  : "block has-chat-2:hidden",
-                "mt-2 ml-2"
-              ),
-          "dropdown dropdown-end"
-        )}
-      >
-        <summary className="btn btn-outline btn-secondary btn-sm">
-          <ChatIcon />
-          {filteredChatHistories.length}
-        </summary>
-        <ul
+      {!props.fullWidth && (
+        <details
           className={clsx(
-            "menu menu-sm dropdown-content",
-            "w-max max-w-[75vw]",
-            "z-30",
-            "rounded-lg shadow-sm bg-base-200/60 backdrop-blur-xs"
+            chatId === null
+              ? "block has-chat-1:hidden"
+              : "block has-chat-2:hidden",
+            "mt-2 ml-2",
+            "dropdown dropdown-end"
           )}
         >
-          {filteredChatHistories.map(({ title, chatId }) => (
-            <li key={chatId}>
-              <Link
-                className="text-wrap text-justify"
-                href={`/chat/${chatId}`}
-                scroll={false}
-              >
-                {title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </details>
+          <summary className="btn btn-outline btn-secondary btn-sm">
+            <ChatIcon />
+            {filteredChatHistories.length}
+          </summary>
+          <ul
+            className={clsx(
+              "menu menu-sm dropdown-content",
+              "w-max max-w-[75vw]",
+              "z-30",
+              "rounded-lg shadow-sm bg-base-200/60 backdrop-blur-xs"
+            )}
+          >
+            {filteredChatHistories.map(({ title, chatId }) => (
+              <li key={chatId}>
+                <Link
+                  className="text-wrap text-justify"
+                  href={`/chat/${chatId}`}
+                  scroll={false}
+                >
+                  {title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </>
   );
 }
