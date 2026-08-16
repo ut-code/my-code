@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SandboxContent } from "./sandboxContent";
 import { getChatFromCache, initContext } from "@/lib/chatHistory";
-import { getPagesListForLang, getTermDefinitions, LangId, PageSlug } from "@/lib/docs";
-import { TermDefinitionProvider } from "@/markdown/term";
+import { getPagesListForLang, LangId, PageSlug } from "@/lib/docs";
+import { EmbedContextProvider } from "@/terminal/embedContext";
 import { DocsAutoRedirect } from "../[pageId]/autoRedirect";
 
 export async function generateMetadata({
@@ -34,21 +34,16 @@ export default async function Page({
   const path = { lang, page: "sandbox" as PageSlug };
   const context = await initContext();
   const chatHistories = await getChatFromCache(path, context.userId);
-  const termDefinitions = await getTermDefinitions(lang);
 
   return (
     <>
-      <TermDefinitionProvider
-        termDefinitions={termDefinitions}
-        lang={lang}
-        page={"sandbox" as PageSlug}
-      >
+      <EmbedContextProvider lang={lang} pageId="sandbox">
         <SandboxContent
           langId={lang}
           path={path}
           chatHistories={chatHistories}
         />
-      </TermDefinitionProvider>
+      </EmbedContextProvider>
       <DocsAutoRedirect path={path} />
     </>
   );

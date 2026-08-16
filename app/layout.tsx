@@ -8,7 +8,6 @@ import "./globals.css";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
 import { ReactNode } from "react";
-import { EmbedContextProvider } from "@/terminal/embedContext";
 import { AutoAnonymousLogin } from "./accountMenu";
 import { SidebarMdProvider } from "./sidebar";
 import { RuntimeProvider } from "@my-code/runtime/context";
@@ -52,9 +51,7 @@ export default async function RootLayout({
             />
             <div className="drawer-content flex flex-col">
               <Navbar pagesList={pagesList} />
-              <EmbedContextProvider>
-                <RuntimeProvider>{children}</RuntimeProvider>
-              </EmbedContextProvider>
+              <RuntimeProvider>{children}</RuntimeProvider>
             </div>
             <div className="drawer-side shadow-md z-50">
               <label

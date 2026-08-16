@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { captureException } from "@sentry/nextjs";
-import { useEmbedContext } from "@/terminal/embedContext";
+import { useOptionalEmbedContext } from "@/terminal/embedContext";
 import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { revalidateChatAction } from "@/actions/revalidateChat";
@@ -32,7 +32,7 @@ export function useSendChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { files, replOutputs, execResults } = useEmbedContext();
+  const embedContext = useOptionalEmbedContext();
   const router = useRouter();
   const streamingChatContext = useStreamingChatContext();
 
@@ -63,9 +63,9 @@ export function useSendChat() {
             userQuestion,
             questionScope,
             sectionContent,
-            replOutputs: customReplOutputs ?? replOutputs,
-            files: customFiles ?? files,
-            execResults: customExecResults ?? execResults,
+            replOutputs: customReplOutputs ?? embedContext?.replOutputs ?? {},
+            files: customFiles ?? embedContext?.files ?? {},
+            execResults: customExecResults ?? embedContext?.execResults ?? {},
             deleteChatOnCreated,
           }),
         });
@@ -173,9 +173,9 @@ export function useSendChat() {
       })();
     },
     [
-      execResults,
-      files,
-      replOutputs,
+      embedContext?.execResults,
+      embedContext?.files,
+      embedContext?.replOutputs,
       router,
       streamingChatContext,
     ]

@@ -1,7 +1,6 @@
 "use client";
 
 import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
-import { usePathname } from "next/navigation";
 import {
   createContext,
   ReactNode,
@@ -13,12 +12,12 @@ import {
 /*
 ファイルの内容や埋め込みターミナルのログを1箇所でまとめて管理し、書き込み・読み込みできるようにする
 
-ファイルはページのURLごとに独立して管理し、常にすべて保持している。
+ファイルはページ(lang/pageId)ごとに独立して管理し、常にすべて保持している。
 ターミナルのログもページごとに独立だが、ページが切り替わるたびに消す。
 */
 
 // 全部stringだけどわかりやすくするために名前をつけている
-type PagePathname = string;
+type PageKey = string;
 type Filename = string;
 type TerminalId = string;
 
@@ -42,7 +41,11 @@ interface IEmbedContext {
   clearExecResult: (filename: Filename) => void;
   addExecOutput: (filename: Filename, output: ReplOutput) => void;
 }
-const EmbedContext = createContext<IEmbedContext>(null!);
+const EmbedContext = createContext<IEmbedContext | null>(null);
+
+export function useOptionalEmbedContext() {
+  return useContext(EmbedContext);
+}
 
 export function useEmbedContext() {
   const context = useContext(EmbedContext);
@@ -54,12 +57,22 @@ export function useEmbedContext() {
   return context;
 }
 
-export function EmbedContextProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
+export interface EmbedContextProviderProps {
+  lang: string;
+  pageId: string;
+  children: ReactNode;
+}
 
-  const [prevPathname, setPrevPathname] = useState<PagePathname>("");
+export function EmbedContextProvider({
+  lang,
+  pageId,
+  children,
+}: EmbedContextProviderProps) {
+  const pageKey: PageKey = `${lang}/${pageId}`;
+
+  const [prevPageKey, setPrevPageKey] = useState<PageKey>(pageKey);
   const [files, setFiles] = useState<
-    Record<PagePathname, Record<Filename, string>>
+    Record<PageKey, Record<Filename, string>>
   >({});
   const [replOutputs, setReplOutputs] = useState<
     Record<TerminalId, ReplCommand[]>
@@ -71,8 +84,8 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   const [execResults, setExecResults] = useState<
     Record<Filename, ReplOutput[]>
   >({});
-  if (pathname && pathname !== prevPathname) {
-    setPrevPathname(pathname);
+  if (pageKey && pageKey !== prevPageKey) {
+    setPrevPageKey(pageKey);
     setReplOutputs({});
     setCommandIdCounters({});
     setExecResults({});
@@ -84,24 +97,24 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
         setFiles((files) => {
           let changed = false;
           const newFiles = { ...files };
-          newFiles[pathname] = { ...(newFiles[pathname] ?? {}) };
+          newFiles[pageKey] = { ...(newFiles[pageKey] ?? {}) };
           for (const [name, content] of Object.entries(updatedFiles)) {
-            if (newFiles[pathname][name] !== content) {
+            if (newFiles[pageKey][name] !== content) {
               changed = true;
-              newFiles[pathname][name] = content;
+              newFiles[pageKey][name] = content;
             }
           }
           if (changed) {
-            resolve(newFiles[pathname]);
+            resolve(newFiles[pageKey]);
             return newFiles;
           } else {
-            resolve(files[pathname] || {});
+            resolve(files[pageKey] || {});
             return files;
           }
         });
       });
     },
-    [pathname]
+    [pageKey]
   );
   const addReplCommand = useCallback(
     (terminalId: TerminalId, command: string): string => {
@@ -175,7 +188,7 @@ export function EmbedContextProvider({ children }: { children: ReactNode }) {
   return (
     <EmbedContext.Provider
       value={{
-        files: files[pathname] || {},
+        files: files[pageKey] || {},
         writeFile,
         replOutputs,
         addReplCommand,
