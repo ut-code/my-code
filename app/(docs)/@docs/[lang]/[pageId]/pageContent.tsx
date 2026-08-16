@@ -19,7 +19,6 @@ import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
 import { ChatWithMessages } from "@/lib/chatHistory";
 import { usePagesListForLang } from "@/pagesListContext";
-import { useEmbedContext } from "@/terminal/embedContext";
 import { useRouter } from "next/navigation";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
@@ -311,7 +310,6 @@ function OutdatedSectionAlert(props: {
     total: 0,
   });
 
-  const { files, replOutputs, execResults } = useEmbedContext();
   const router = useRouter();
 
   const handleRegenerateSection = async () => {
@@ -333,9 +331,6 @@ function OutdatedSectionAlert(props: {
         body: JSON.stringify({
           path,
           sectionId,
-          replOutputs,
-          files,
-          execResults,
         }),
       });
 
