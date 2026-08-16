@@ -3,7 +3,6 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { captureException } from "@sentry/nextjs";
-import { useOptionalEmbedContext } from "@/terminal/embedContext";
 import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { revalidateChatAction } from "@/actions/revalidateChat";
@@ -32,7 +31,6 @@ export function useSendChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const embedContext = useOptionalEmbedContext();
   const router = useRouter();
   const streamingChatContext = useStreamingChatContext();
 
@@ -44,9 +42,9 @@ export function useSendChat() {
       sectionContent,
       deleteChatOnCreated,
       onSuccess,
-      replOutputs: customReplOutputs,
-      files: customFiles,
-      execResults: customExecResults,
+      replOutputs,
+      files,
+      execResults,
     }: SendChatParams) => {
       if (!userQuestion) return;
 
@@ -63,9 +61,9 @@ export function useSendChat() {
             userQuestion,
             questionScope,
             sectionContent,
-            replOutputs: customReplOutputs ?? embedContext?.replOutputs ?? {},
-            files: customFiles ?? embedContext?.files ?? {},
-            execResults: customExecResults ?? embedContext?.execResults ?? {},
+            replOutputs: replOutputs ?? {},
+            files: files ?? {},
+            execResults: execResults ?? {},
             deleteChatOnCreated,
           }),
         });
@@ -173,9 +171,6 @@ export function useSendChat() {
       })();
     },
     [
-      embedContext?.execResults,
-      embedContext?.files,
-      embedContext?.replOutputs,
       router,
       streamingChatContext,
     ]

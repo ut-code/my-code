@@ -41,11 +41,7 @@ interface IEmbedContext {
   clearExecResult: (filename: Filename) => void;
   addExecOutput: (filename: Filename, output: ReplOutput) => void;
 }
-const EmbedContext = createContext<IEmbedContext | null>(null);
-
-export function useOptionalEmbedContext() {
-  return useContext(EmbedContext);
-}
+const EmbedContext = createContext<IEmbedContext>(null!);
 
 export function useEmbedContext() {
   const context = useContext(EmbedContext);
