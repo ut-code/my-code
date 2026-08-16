@@ -239,7 +239,12 @@ export async function generateSingleChat(
           title,
           [{ role: "user", content: userQuestion }],
           [],
-          context
+          context,
+          {
+            replOutputs,
+            files,
+            execResults,
+          }
         );
         chatId = newChat.chatId;
 

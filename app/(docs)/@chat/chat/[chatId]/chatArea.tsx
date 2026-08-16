@@ -116,6 +116,9 @@ export function ChatAreaContent(props: Props) {
       questionScope: "page",
       sectionContent: priorSectionContent,
       deleteChatOnCreated: chatId,
+      replOutputs: chatData.replOutputs ?? {},
+      files: chatData.files ?? {},
+      execResults: chatData.execResults ?? {},
     });
   };
 

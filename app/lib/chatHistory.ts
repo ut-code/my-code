@@ -16,6 +16,10 @@ import {
   SectionWithDiff,
 } from "./docs";
 import { dateReviver } from "./dateReviver";
+import {
+  ReplCommand,
+  ReplOutput,
+} from "@my-code/runtime/interface";
 
 export interface CreateChatMessage {
   role: "user" | "ai" | "error";
@@ -128,13 +132,20 @@ export async function initContext(ctx?: Partial<Context>): Promise<Context> {
   return ctx as Context;
 }
 
+export interface CreateChatCodeContext {
+  replOutputs?: Record<string, ReplCommand[]>;
+  files?: Record<string, string>;
+  execResults?: Record<string, ReplOutput[]>;
+}
+
 export async function addChat(
   path: PagePath,
   sectionId: SectionId,
   title: string,
   messages: CreateChatMessage[],
   diffRaw: CreateChatDiff[],
-  context: Context
+  context: Context,
+  codeContext: CreateChatCodeContext = {}
 ) {
   const { drizzle, userId } = context;
   if (!userId) {
@@ -158,6 +169,9 @@ export async function addChat(
       userId,
       sectionId,
       title,
+      replOutputs: codeContext.replOutputs ?? {},
+      files: codeContext.files ?? {},
+      execResults: codeContext.execResults ?? {},
     })
     .returning();
 

@@ -373,7 +373,12 @@ export async function POST(request: NextRequest) {
                 title,
                 [{ role: "user", content: userQuestion }],
                 [],
-                context
+                context,
+                {
+                  replOutputs,
+                  files,
+                  execResults,
+                }
               );
               chatId = newChat.chatId;
 

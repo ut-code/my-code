@@ -23,9 +23,15 @@ import { captureException } from "@sentry/nextjs";
 const RegenerateSectionSchema = z.object({
   path: PagePathSchema,
   sectionId: z.string(),
-  replOutputs: z.record(z.string(), z.array(ReplCommandSchema)),
-  files: z.record(z.string(), z.string()),
-  execResults: z.record(z.string(), z.array(ReplOutputSchema)),
+  replOutputs: z
+    .record(z.string(), z.array(ReplCommandSchema))
+    .optional()
+    .default({}),
+  files: z.record(z.string(), z.string()).optional().default({}),
+  execResults: z
+    .record(z.string(), z.array(ReplOutputSchema))
+    .optional()
+    .default({}),
 });
 
 export type RegenerateStreamEvent =
@@ -115,9 +121,9 @@ export async function POST(request: NextRequest) {
               path,
               userQuestion,
               sectionContent: currentSectionContent,
-              replOutputs,
-              files,
-              execResults,
+              replOutputs: oldChat.replOutputs ?? replOutputs ?? {},
+              files: oldChat.files ?? files ?? {},
+              execResults: oldChat.execResults ?? execResults ?? {},
               context,
             });
             createdChatIds.push(result.chatId);

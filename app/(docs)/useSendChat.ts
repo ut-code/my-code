@@ -8,6 +8,10 @@ import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { useStreamingChatContext } from "./streamingChatContext";
+import {
+  ReplCommand,
+  ReplOutput,
+} from "@my-code/runtime/interface";
 
 export interface SendChatParams {
   path: PagePath;
@@ -16,6 +20,9 @@ export interface SendChatParams {
   sectionContent: DynamicMarkdownSection[];
   deleteChatOnCreated?: string;
   onSuccess?: () => void;
+  replOutputs?: Record<string, ReplCommand[]>;
+  files?: Record<string, string>;
+  execResults?: Record<string, ReplOutput[]>;
 }
 
 /**
@@ -37,6 +44,9 @@ export function useSendChat() {
       sectionContent,
       deleteChatOnCreated,
       onSuccess,
+      replOutputs: customReplOutputs,
+      files: customFiles,
+      execResults: customExecResults,
     }: SendChatParams) => {
       if (!userQuestion) return;
 
@@ -53,9 +63,9 @@ export function useSendChat() {
             userQuestion,
             questionScope,
             sectionContent,
-            replOutputs,
-            files,
-            execResults,
+            replOutputs: customReplOutputs ?? replOutputs,
+            files: customFiles ?? files,
+            execResults: customExecResults ?? execResults,
             deleteChatOnCreated,
           }),
         });
