@@ -112,7 +112,10 @@ export async function POST(request: NextRequest) {
       ?.replace(/^slug:/i, "")
       .replace(/^["'`]+|["'`.,:;]+$/g, "")
       .trim() as typeof path.page | undefined;
-    if (selectedPageSlug && langEntry.pages.some((page) => page.slug === selectedPageSlug)) {
+    if (
+      selectedPageSlug &&
+      langEntry.pages.some((page) => page.slug === selectedPageSlug)
+    ) {
       targetPath = {
         lang: path.lang,
         page: selectedPageSlug,
@@ -135,7 +138,9 @@ export async function POST(request: NextRequest) {
   const prompt: string[] = [];
 
   if (isSandbox) {
-    prompt.push(`あなたは${langName}プログラミングの学習者をサポートする講師AIアシスタントです。`);
+    prompt.push(
+      `あなたは${langName}プログラミングの学習者をサポートする講師AIアシスタントです。`
+    );
     prompt.push(
       `ユーザーからの質問に対して、初心者にも分かりやすく、丁寧な解説を提供してください。`
     );
@@ -180,12 +185,16 @@ export async function POST(request: NextRequest) {
       `# ターミナルのログ（ユーザーが入力したコマンドとその実行結果）`
     );
     prompt.push(``);
-    prompt.push(
-      "以下はドキュメント内で実行例を示した各コードブロックの内容に加えてユーザーが追加で実行したコマンドです。"
-    );
-    prompt.push(
-      "例えば ```python-repl:foo のコードブロックに対してユーザーが実行したログが ターミナル #foo です。"
-    );
+    if (isSandbox) {
+      prompt.push("以下はユーザーがREPLで実行したコマンドです。");
+    } else {
+      prompt.push(
+        "以下はドキュメント内で実行例を示した各コードブロックの内容に加えてユーザーが追加で実行したコマンドです。"
+      );
+      prompt.push(
+        "例えば ```python-repl:foo のコードブロックに対してユーザーが実行したログが ターミナル #foo です。"
+      );
+    }
     prompt.push(``);
     for (const [replId, replCommands] of Object.entries(replOutputs)) {
       prompt.push(`## ターミナル #${replId}`);
@@ -204,12 +213,16 @@ export async function POST(request: NextRequest) {
   if (Object.keys(files).length > 0) {
     prompt.push("# ファイルエディターの内容");
     prompt.push(``);
-    prompt.push(
-      "以下はドキュメント内でファイルの内容を示した各コードブロックの内容に加えてユーザーが編集を加えたものです。"
-    );
-    prompt.push(
-      "例えば ```python:foo.py のコードブロックに対してユーザーが編集した後の内容が ファイル: foo.py です。"
-    );
+    if (isSandbox) {
+      prompt.push("以下はユーザーが編集したファイルの内容です。");
+    } else {
+      prompt.push(
+        "以下はドキュメント内でファイルの内容を示した各コードブロックの内容に加えてユーザーが編集を加えたものです。"
+      );
+      prompt.push(
+        "例えば ```python:foo.py のコードブロックに対してユーザーが編集した後の内容が ファイル: foo.py です。"
+      );
+    }
     prompt.push(``);
     for (const [filename, content] of Object.entries(files)) {
       prompt.push(`## ファイル: ${filename}`);
@@ -443,7 +456,11 @@ export async function POST(request: NextRequest) {
 
         // クライアントでもrevalidateChatActionを呼ぶが、一応こちらでもrevalidateしておく
         if (deleteChatOnCreated) {
-          await revalidateChatOnDemand(deleteChatOnCreated, context.userId!, path);
+          await revalidateChatOnDemand(
+            deleteChatOnCreated,
+            context.userId!,
+            path
+          );
         }
         await revalidateChatOnDemand(chatId, context.userId!, path);
 

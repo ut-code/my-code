@@ -19,6 +19,7 @@ import { ChatListForSection } from "../[pageId]/pageContent";
 import { usePagesListForLang } from "@/pagesListContext";
 import { useEmbedContext } from "@/terminal/embedContext";
 import { useSidebarMdContext } from "@/sidebar";
+import clsx from "clsx";
 
 interface SandboxContentProps {
   langId: LangId;
@@ -135,11 +136,35 @@ export function SandboxContent(props: SandboxContentProps) {
 
   return (
     <div className="flex-1 p-4 pb-16 flex flex-col max-w-docs mx-auto w-full">
-      <div className="flex flex-row items-center justify-between mb-4">
-        <Heading level={1}>{langEntry?.name ?? langId} Sandbox</Heading>
-      </div>
+      <Heading level={1}>{langEntry?.name ?? langId} Sandbox</Heading>
+      <p className="mx-1">
+        ブラウザ上で動作する {langEntry?.name} の実行環境です。
+        このページでは自由にコードを書いて試したり、コードについてAIに質問することもできます。
+      </p>
 
-      <div className="flex flex-col gap-6">
+      <ul className="my-2 ml-2 text-sm">
+        <li className={clsx("my-1", !config.repl && "line-through text-base-content/50 decoration-current")}>
+          <span className={clsx("mr-1 status", config?.repl && "status-accent")} />
+          REPLでの実行
+        </li>
+        <li className={clsx("my-1", !config.exec && "line-through text-base-content/50 decoration-current")}>
+          <span className={clsx("mr-1 status", config?.exec && "status-accent")} />
+          ファイル実行
+        </li>
+        <li className={clsx("my-1", !config.supportsMultiFile && "line-through text-base-content/50 decoration-current")}>
+          <span className={clsx("mr-1 status", config?.supportsMultiFile && "status-accent")} />
+          複数ファイル対応
+        </li>
+      </ul>
+
+          <ChatListForSection
+            sectionId={"sandbox" as SectionId}
+            dynamicMdContent={dynamicSections}
+            chatHistories={chatHistories}
+            fullWidth
+          />
+
+
         {/* 1. REPL */}
         {config?.repl && (
           <section
@@ -187,19 +212,20 @@ export function SandboxContent(props: SandboxContentProps) {
             ))}
 
             {config?.supportsMultiFile && (
-              <div className="my-2">
-                <form onSubmit={handleAddFile} className="flex gap-2">
+              <div className="mx-2 my-2 mt-4">
+                <form onSubmit={handleAddFile} className="flex items-center gap-2">
+                  ファイルを追加:
                   <input
                     type="text"
                     className="input input-bordered input-sm flex-1 font-mono"
-                    placeholder="追加するファイル名を入力 (例: helper.py)"
+                    placeholder="追加するファイル名を入力"
                     value={newFilename}
                     onChange={(e) => {
                       setNewFilename(e.target.value);
                       setFilenameError(null);
                     }}
                   />
-                  <button type="submit" className="btn btn-sm btn-secondary">
+                  <button type="submit" className="btn btn-sm btn-accent">
                     ファイルを追加
                   </button>
                 </form>
@@ -248,15 +274,6 @@ export function SandboxContent(props: SandboxContentProps) {
             ))}
           </section>
         )}
-
-        <div className="mt-6">
-          <ChatListForSection
-            sectionId={"sandbox" as SectionId}
-            dynamicMdContent={dynamicSections}
-            chatHistories={chatHistories}
-          />
-        </div>
-      </div>
 
       {isFormVisible ? (
         <div className="fixed bottom-4 right-4 left-4 has-sidebar:left-[calc(var(--container-sidebar)+1rem)] z-40">

@@ -171,6 +171,7 @@ export function ChatListForSection(props: {
   dynamicMdContent: DynamicMarkdownSection[];
   sectionId: SectionId;
   chatHistories: ChatWithMessages[];
+  fullWidth?: boolean;
 }) {
   const { dynamicMdContent, sectionId, chatHistories } = props;
   const filteredChatHistories = chatHistories.filter(
@@ -195,10 +196,14 @@ export function ChatListForSection(props: {
       */}
       <ul
         className={clsx(
-          chatId === null
-            ? "hidden has-chat-1:block"
-            : "hidden has-chat-2:block",
-          "mt-2 ml-4 w-full max-w-chat-list",
+          props.fullWidth
+            ? "block m-2"
+            : clsx(
+                chatId === null
+                  ? "hidden has-chat-1:block"
+                  : "hidden has-chat-2:block",
+                "mt-2 ml-4 w-full max-w-chat-list"
+              ),
           "menu menu-sm",
           "rounded-lg shadow-sm bg-base-200"
         )}
@@ -225,11 +230,15 @@ export function ChatListForSection(props: {
       {/*xl未満 or xl以上でチャットを表示している → 小さいボタンを表示*/}
       <details
         className={clsx(
-          chatId === null
-            ? "block has-chat-1:hidden"
-            : "block has-chat-2:block",
-          "dropdown dropdown-end",
-          "mt-2 ml-2"
+          props.fullWidth
+            ? "hidden"
+            : clsx(
+                chatId === null
+                  ? "block has-chat-1:hidden"
+                  : "block has-chat-2:hidden",
+                "mt-2 ml-2"
+              ),
+          "dropdown dropdown-end"
         )}
       >
         <summary className="btn btn-outline btn-secondary btn-sm">
