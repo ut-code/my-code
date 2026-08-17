@@ -6,7 +6,6 @@ import { langConstants, RuntimeLang } from "@my-code/runtime/languages";
 import { ReplTerminal } from "@/terminal/repl";
 import { EditorComponent } from "@/terminal/editor";
 import { ExecFile } from "@/terminal/exec";
-import { sampleConfig } from "@/terminal/sampleConfig";
 import {
   DynamicMarkdownSection,
   LangId,
@@ -34,7 +33,7 @@ export function SandboxContent(props: SandboxContentProps) {
   const { writeFile } = useEmbedContext();
 
   const runtimeLang = langId as RuntimeLang;
-  const config = sampleConfig[runtimeLang];
+  const language = useMemo(() => langConstants(runtimeLang), [runtimeLang]);
 
   const [userFiles, setUserFiles] = useState<string[]>([]);
   const [newFilename, setNewFilename] = useState("");
@@ -44,20 +43,16 @@ export function SandboxContent(props: SandboxContentProps) {
   // サイドバーの目次用セクション定義
   const baseSections = useMemo(() => {
     const list: Array<{ id: SectionId; title: string; level: number }> = [];
-    if (config?.repl) {
+    if (language.repl) {
       list.push({ id: "sandbox-repl" as SectionId, title: "REPL", level: 2 });
     }
-    if (config?.editor || userFiles.length > 0) {
-      list.push({
-        id: "sandbox-editor" as SectionId,
-        title: "コード",
-        level: 2,
-      });
-    }
-    if (config?.exec) {
-      list.push({ id: "sandbox-exec" as SectionId, title: "実行", level: 2 });
-    }
-    if (config?.readonlyFiles && config.readonlyFiles.length > 0) {
+    list.push({
+      id: "sandbox-editor" as SectionId,
+      title: "コード",
+      level: 2,
+    });
+    list.push({ id: "sandbox-exec" as SectionId, title: "実行", level: 2 });
+    if (language.readonlyFiles && language.readonlyFiles.length > 0) {
       list.push({
         id: "sandbox-readonly" as SectionId,
         title: "出力ファイル",
@@ -65,7 +60,7 @@ export function SandboxContent(props: SandboxContentProps) {
       });
     }
     return list;
-  }, [config, userFiles.length]);
+  }, [language]);
 
   const [sectionInView, setSectionInView] = useState<boolean[]>([]);
   const sectionRefs = useRef<Map<string, HTMLElement | null>>(new Map());
@@ -117,8 +112,10 @@ export function SandboxContent(props: SandboxContentProps) {
     if (!name) return;
 
     // 既存ファイルチェック
-    const defaultFiles = config?.editor ? Object.keys(config.editor) : [];
-    const readonlyFiles = config?.readonlyFiles ?? [];
+    const defaultFiles = language.sampleFiles
+      ? Object.keys(language.sampleFiles)
+      : [];
+    const readonlyFiles = language.readonlyFiles ?? [];
     if (
       defaultFiles.includes(name) ||
       readonlyFiles.includes(name) ||
@@ -151,41 +148,53 @@ export function SandboxContent(props: SandboxContentProps) {
           <li
             className={clsx(
               "my-1",
-              !config.repl &&
+              !language.repl &&
                 "line-through text-base-content/50 decoration-current"
             )}
           >
             <span
-              className={clsx("mr-1 status", config?.repl && "status-accent")}
+              className={clsx("mr-1 status", language.repl && "status-accent")}
             />
             REPLでの実行
           </li>
           <li
             className={clsx(
               "my-1",
-              !config.exec &&
-                "line-through text-base-content/50 decoration-current"
+              !true && "line-through text-base-content/50 decoration-current"
             )}
           >
-            <span
-              className={clsx("mr-1 status", config?.exec && "status-accent")}
-            />
+            <span className={clsx("mr-1 status", true && "status-accent")} />
             ファイル実行
           </li>
           <li
             className={clsx(
               "my-1",
-              !config.supportsMultiFile &&
+              !language.supportsMultiFile &&
                 "line-through text-base-content/50 decoration-current"
             )}
           >
             <span
               className={clsx(
                 "mr-1 status",
-                config?.supportsMultiFile && "status-accent"
+                language.supportsMultiFile && "status-accent"
               )}
             />
             複数ファイル対応
+          </li>
+          <li
+            className={clsx(
+              "my-1",
+              !language.supportsFileOutput &&
+                "line-through text-base-content/50 decoration-current"
+            )}
+          >
+            <span
+              className={clsx(
+                "mr-1 status",
+                language.supportsFileOutput && "status-accent"
+              )}
+            />
+            ファイル出力対応
           </li>
         </ul>
 
@@ -199,7 +208,7 @@ export function SandboxContent(props: SandboxContentProps) {
       </div>
 
       {/* 1. REPL */}
-      {config?.repl && (
+      {language.repl && (
         <section
           id="sandbox-repl"
           ref={(el) => {
@@ -210,90 +219,86 @@ export function SandboxContent(props: SandboxContentProps) {
           <ReplTerminal
             terminalId={`sandbox-${langId}`}
             language={langConstants(runtimeLang)}
-            initContent={config.replInitContent}
+            initContent={language.sampleReplInit}
           />
         </section>
       )}
 
       {/* 2. エディター (既存ファイル + 追加ファイル + 追加ボタン) */}
-      {(config?.editor ||
-        userFiles.length > 0 ||
-        config?.supportsMultiFile) && (
-        <section
-          id="sandbox-editor"
-          ref={(el) => {
-            sectionRefs.current.set("sandbox-editor", el);
-          }}
-        >
-          <Heading level={2}>コード</Heading>
-          {config?.editor &&
-            Object.entries(config.editor).map(([filename, initContent]) => (
+      <section
+        id="sandbox-editor"
+        ref={(el) => {
+          sectionRefs.current.set("sandbox-editor", el);
+        }}
+      >
+        <Heading level={2}>コード</Heading>
+        {language.sampleFiles &&
+          Object.entries(language.sampleFiles).map(
+            ([filename, initContent]) => (
               <EditorComponent
                 key={filename}
                 language={langConstants(runtimeLang)}
                 filename={filename}
                 initContent={initContent}
               />
-            ))}
-
-          {userFiles.map((filename) => (
-            <EditorComponent
-              key={filename}
-              language={langConstants(runtimeLang)}
-              filename={filename}
-              initContent=""
-              onDelete={() => handleRemoveFile(filename)}
-            />
-          ))}
-
-          {config?.supportsMultiFile && (
-            <div className="mx-2 my-2 mt-4">
-              <form
-                onSubmit={handleAddFile}
-                className="flex items-center gap-2"
-              >
-                ファイルを追加:
-                <input
-                  type="text"
-                  className="input input-bordered input-sm flex-1 font-mono"
-                  placeholder="追加するファイル名を入力"
-                  value={newFilename}
-                  onChange={(e) => {
-                    setNewFilename(e.target.value);
-                    setFilenameError(null);
-                  }}
-                />
-                <button type="submit" className="btn btn-sm btn-accent">
-                  ファイルを追加
-                </button>
-              </form>
-              {filenameError && (
-                <p className="text-error text-sm mt-1">{filenameError}</p>
-              )}
-            </div>
+            )
           )}
-        </section>
-      )}
+
+        {userFiles.map((filename) => (
+          <EditorComponent
+            key={filename}
+            language={langConstants(runtimeLang)}
+            filename={filename}
+            initContent=""
+            onDelete={() => handleRemoveFile(filename)}
+          />
+        ))}
+
+        {language.supportsMultiFile && (
+          <div className="mx-2 my-2 mt-4">
+            <form onSubmit={handleAddFile} className="flex items-center gap-2">
+              ファイルを追加:
+              <input
+                type="text"
+                className="input input-bordered input-sm flex-1 font-mono"
+                placeholder="追加するファイル名を入力"
+                value={newFilename}
+                onChange={(e) => {
+                  setNewFilename(e.target.value);
+                  setFilenameError(null);
+                }}
+              />
+              <button type="submit" className="btn btn-sm btn-accent">
+                ファイルを追加
+              </button>
+            </form>
+            {filenameError && (
+              <p className="text-error text-sm mt-1">{filenameError}</p>
+            )}
+          </div>
+        )}
+      </section>
 
       {/* 3. 実行 */}
-      {config?.exec && (
-        <section
-          id="sandbox-exec"
-          ref={(el) => {
-            sectionRefs.current.set("sandbox-exec", el);
-          }}
-        >
-          <Heading level={2}>実行</Heading>
-          <ExecFile
-            filenames={config.exec}
-            language={langConstants(runtimeLang)}
-            content=""
-          />
-        </section>
-      )}
+      <section
+        id="sandbox-exec"
+        ref={(el) => {
+          sectionRefs.current.set("sandbox-exec", el);
+        }}
+      >
+        <Heading level={2}>実行</Heading>
+        <ExecFile
+          filenames={language.sampleExec!([
+            ...Object.keys(language.sampleFiles ?? []),
+            ...userFiles,
+          ])}
+          language={langConstants(runtimeLang)}
+          content=""
+        />
+      </section>
 
       {/* 4. 出力ファイル */}
-      {config?.readonlyFiles && config.readonlyFiles.length > 0 && (
+      {language.readonlyFiles && language.readonlyFiles.length > 0 && (
         <section
           id="sandbox-readonly"
           ref={(el) => {
@@ -301,7 +306,7 @@ export function SandboxContent(props: SandboxContentProps) {
           }}
         >
           <Heading level={2}>出力ファイル</Heading>
-          {config.readonlyFiles.map((filename) => (
+          {language.readonlyFiles.map((filename) => (
             <EditorComponent
               key={filename}
               language={langConstants(runtimeLang)}
