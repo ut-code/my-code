@@ -41,26 +41,37 @@ export function SandboxContent(props: SandboxContentProps) {
 
   const [userOutputFiles, setUserOutputFiles] = useState<string[]>([]);
   const [newOutputFilename, setNewOutputFilename] = useState("");
-  const [outputFilenameError, setOutputFilenameError] = useState<string | null>(null);
+  const [outputFilenameError, setOutputFilenameError] = useState<string | null>(
+    null
+  );
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   // サイドバーの目次用セクション定義
+  const hasRepl = language.repl;
+  const hasEditor = true;
+  const hasAddFile = language.supportsMultiFile;
+  const hasExec = true;
+  const hasOutputFile =
+    (language.readonlyFiles && language.readonlyFiles.length > 0) ||
+    language.supportsFileOutput;
+  const hasAddOutputFile = language.supportsFileOutput;
   const baseSections = useMemo(() => {
     const list: Array<{ id: SectionId; title: string; level: number }> = [];
-    if (language.repl) {
+    if (hasRepl) {
       list.push({ id: "sandbox-repl" as SectionId, title: "REPL", level: 2 });
     }
-    list.push({
-      id: "sandbox-editor" as SectionId,
-      title: "コード",
-      level: 2,
-    });
-    list.push({ id: "sandbox-exec" as SectionId, title: "実行", level: 2 });
-    if (
-      (language.readonlyFiles && language.readonlyFiles.length > 0) ||
-      language.supportsFileOutput
-    ) {
+    if (hasEditor) {
+      list.push({
+        id: "sandbox-editor" as SectionId,
+        title: "コード",
+        level: 2,
+      });
+    }
+    if (hasExec) {
+      list.push({ id: "sandbox-exec" as SectionId, title: "実行", level: 2 });
+    }
+    if (hasOutputFile) {
       list.push({
         id: "sandbox-readonly" as SectionId,
         title: "出力ファイル",
@@ -68,7 +79,7 @@ export function SandboxContent(props: SandboxContentProps) {
       });
     }
     return list;
-  }, [language]);
+  }, [hasRepl, hasEditor, hasExec, hasOutputFile]);
 
   const [sectionInView, setSectionInView] = useState<boolean[]>([]);
   const sectionRefs = useRef<Map<string, HTMLElement | null>>(new Map());
@@ -184,57 +195,28 @@ export function SandboxContent(props: SandboxContentProps) {
 
       <div className="flex flex-col sm:flex-row justify-between p-2 gap-2 w-full">
         <ul className="text-sm flex-none">
-          <li
-            className={clsx(
-              "my-1",
-              !language.repl &&
-                "line-through text-base-content/50 decoration-current"
-            )}
-          >
-            <span
-              className={clsx("mr-1 status", language.repl && "status-accent")}
-            />
-            REPLでの実行
-          </li>
-          <li
-            className={clsx(
-              "my-1",
-              !true && "line-through text-base-content/50 decoration-current"
-            )}
-          >
-            <span className={clsx("mr-1 status", true && "status-accent")} />
-            ファイル実行
-          </li>
-          <li
-            className={clsx(
-              "my-1",
-              !language.supportsMultiFile &&
-                "line-through text-base-content/50 decoration-current"
-            )}
-          >
-            <span
+          {(
+            [
+              [hasRepl, "REPLでの実行"],
+              [hasExec, "ファイル実行"],
+              [hasAddFile, "複数ファイル対応"],
+              [hasAddOutputFile, "ファイル出力対応"],
+            ] as const
+          ).map(([enabled, name]) => (
+            <li
+              key={name}
               className={clsx(
-                "mr-1 status",
-                language.supportsMultiFile && "status-accent"
+                "my-1",
+                !enabled &&
+                  "line-through text-base-content/50 decoration-current"
               )}
-            />
-            複数ファイル対応
-          </li>
-          <li
-            className={clsx(
-              "my-1",
-              !language.supportsFileOutput &&
-                "line-through text-base-content/50 decoration-current"
-            )}
-          >
-            <span
-              className={clsx(
-                "mr-1 status",
-                language.supportsFileOutput && "status-accent"
-              )}
-            />
-            ファイル出力対応
-          </li>
+            >
+              <span
+                className={clsx("mr-1 status", enabled && "status-accent")}
+              />
+              {name}
+            </li>
+          ))}
         </ul>
 
         <ChatListForSection
@@ -247,7 +229,7 @@ export function SandboxContent(props: SandboxContentProps) {
       </div>
 
       {/* 1. REPL */}
-      {language.repl && (
+      {hasRepl && (
         <section
           id="sandbox-repl"
           ref={(el) => {
@@ -293,7 +275,7 @@ export function SandboxContent(props: SandboxContentProps) {
           />
         ))}
 
-        {language.supportsMultiFile && (
+        {hasAddFile && (
           <div className="mx-2 my-2 mt-4">
             <form onSubmit={handleAddFile} className="flex items-center gap-2">
               ファイルを追加:
@@ -337,8 +319,7 @@ export function SandboxContent(props: SandboxContentProps) {
       </section>
 
       {/* 4. 出力ファイル */}
-      {((language.readonlyFiles && language.readonlyFiles.length > 0) ||
-        language.supportsFileOutput) && (
+      {hasOutputFile && (
         <section
           id="sandbox-readonly"
           ref={(el) => {
@@ -367,13 +348,13 @@ export function SandboxContent(props: SandboxContentProps) {
             />
           ))}
 
-          {language.supportsFileOutput && (
+          {hasAddOutputFile && (
             <div className="mx-2 my-2 mt-4">
               <form
                 onSubmit={handleAddOutputFile}
                 className="flex items-center gap-2"
               >
-                出力ファイルを追加:
+                出力を表示するファイルを追加:
                 <input
                   type="text"
                   className="input input-bordered input-sm flex-1 font-mono"
@@ -389,9 +370,7 @@ export function SandboxContent(props: SandboxContentProps) {
                 </button>
               </form>
               {outputFilenameError && (
-                <p className="text-error text-sm mt-1">
-                  {outputFilenameError}
-                </p>
+                <p className="text-error text-sm mt-1">{outputFilenameError}</p>
               )}
             </div>
           )}
