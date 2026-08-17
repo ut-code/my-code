@@ -12,12 +12,14 @@ import { fileExecutionTests } from "@my-code/runtime/tests/fileExecution";
 import { useRuntimeAll } from "@my-code/runtime/context";
 import { DaisyInfoIcon } from "@/daisyAlertIcon";
 import { captureException } from "@sentry/nextjs";
+import { usePathname } from "next/navigation";
 
 function handleRuntimeError(error: unknown) {
   captureException(error);
 }
 
 export function MochaTest() {
+  const pathname = usePathname();
   const runtimeAll = useRuntimeAll();
   const runtimeRef = useRef(runtimeAll);
   for (const lang of Object.keys(runtimeAll) as RuntimeLang[]) {
@@ -122,8 +124,8 @@ export function MochaTest() {
               {new URLSearchParams(searchParams).get("grep")}
             </code>
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a className="ml-4 link link-info" href="/terminal">
-              {/* aタグでページをリロードしないと動作しない。 */}
+            <a className="ml-4 link link-info" href={pathname}>
+              {/* クエリパラメータの削除。 aタグでページをリロードしないと動作しない。 */}
               フィルタを解除
             </a>
           </>

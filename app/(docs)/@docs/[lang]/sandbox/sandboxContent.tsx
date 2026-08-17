@@ -328,7 +328,7 @@ export function SandboxContent(props: SandboxContentProps) {
         <Heading level={2}>実行</Heading>
         <ExecFile
           filenames={language.sampleExec!([
-            ...Object.keys(language.sampleFiles ?? []),
+            ...Object.keys(language.sampleFiles ?? {}),
             ...userFiles,
           ])}
           language={langConstants(runtimeLang)}
