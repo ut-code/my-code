@@ -38,6 +38,11 @@ export function SandboxContent(props: SandboxContentProps) {
   const [userFiles, setUserFiles] = useState<string[]>([]);
   const [newFilename, setNewFilename] = useState("");
   const [filenameError, setFilenameError] = useState<string | null>(null);
+
+  const [userOutputFiles, setUserOutputFiles] = useState<string[]>([]);
+  const [newOutputFilename, setNewOutputFilename] = useState("");
+  const [outputFilenameError, setOutputFilenameError] = useState<string | null>(null);
+
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   // サイドバーの目次用セクション定義
@@ -52,7 +57,10 @@ export function SandboxContent(props: SandboxContentProps) {
       level: 2,
     });
     list.push({ id: "sandbox-exec" as SectionId, title: "実行", level: 2 });
-    if (language.readonlyFiles && language.readonlyFiles.length > 0) {
+    if (
+      (language.readonlyFiles && language.readonlyFiles.length > 0) ||
+      language.supportsFileOutput
+    ) {
       list.push({
         id: "sandbox-readonly" as SectionId,
         title: "出力ファイル",
@@ -119,7 +127,8 @@ export function SandboxContent(props: SandboxContentProps) {
     if (
       defaultFiles.includes(name) ||
       readonlyFiles.includes(name) ||
-      userFiles.includes(name)
+      userFiles.includes(name) ||
+      userOutputFiles.includes(name)
     ) {
       setFilenameError("同名のファイルがすでに存在します。");
       return;
@@ -133,6 +142,36 @@ export function SandboxContent(props: SandboxContentProps) {
 
   const handleRemoveFile = (filename: string) => {
     setUserFiles((prev) => prev.filter((f) => f !== filename));
+  };
+
+  const handleAddOutputFile = (e: FormEvent) => {
+    e.preventDefault();
+    const name = newOutputFilename.trim();
+    if (!name) return;
+
+    // 既存ファイルチェック
+    const defaultFiles = language.sampleFiles
+      ? Object.keys(language.sampleFiles)
+      : [];
+    const readonlyFiles = language.readonlyFiles ?? [];
+    if (
+      defaultFiles.includes(name) ||
+      readonlyFiles.includes(name) ||
+      userFiles.includes(name) ||
+      userOutputFiles.includes(name)
+    ) {
+      setOutputFilenameError("同名のファイルがすでに存在します。");
+      return;
+    }
+
+    setOutputFilenameError(null);
+    setUserOutputFiles((prev) => [...prev, name]);
+    writeFile({ [name]: "" });
+    setNewOutputFilename("");
+  };
+
+  const handleRemoveOutputFile = (filename: string) => {
+    setUserOutputFiles((prev) => prev.filter((f) => f !== filename));
   };
 
   return (
@@ -298,7 +337,8 @@ export function SandboxContent(props: SandboxContentProps) {
       </section>
 
       {/* 4. 出力ファイル */}
-      {language.readonlyFiles && language.readonlyFiles.length > 0 && (
+      {((language.readonlyFiles && language.readonlyFiles.length > 0) ||
+        language.supportsFileOutput) && (
         <section
           id="sandbox-readonly"
           ref={(el) => {
@@ -306,15 +346,55 @@ export function SandboxContent(props: SandboxContentProps) {
           }}
         >
           <Heading level={2}>出力ファイル</Heading>
-          {language.readonlyFiles.map((filename) => (
+          {language.readonlyFiles &&
+            language.readonlyFiles.map((filename) => (
+              <EditorComponent
+                key={filename}
+                language={langConstants(runtimeLang)}
+                filename={filename}
+                initContent=""
+                readonly
+              />
+            ))}
+          {userOutputFiles.map((filename) => (
             <EditorComponent
               key={filename}
               language={langConstants(runtimeLang)}
               filename={filename}
               initContent=""
               readonly
+              onDelete={() => handleRemoveOutputFile(filename)}
             />
           ))}
+
+          {language.supportsFileOutput && (
+            <div className="mx-2 my-2 mt-4">
+              <form
+                onSubmit={handleAddOutputFile}
+                className="flex items-center gap-2"
+              >
+                出力ファイルを追加:
+                <input
+                  type="text"
+                  className="input input-bordered input-sm flex-1 font-mono"
+                  placeholder="追加するファイル名を入力"
+                  value={newOutputFilename}
+                  onChange={(e) => {
+                    setNewOutputFilename(e.target.value);
+                    setOutputFilenameError(null);
+                  }}
+                />
+                <button type="submit" className="btn btn-sm btn-accent">
+                  出力ファイルを追加
+                </button>
+              </form>
+              {outputFilenameError && (
+                <p className="text-error text-sm mt-1">
+                  {outputFilenameError}
+                </p>
+              )}
+            </div>
+          )}
         </section>
       )}
 
