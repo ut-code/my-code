@@ -90,7 +90,10 @@ export function Sidebar() {
 
   // 現在表示中のセクション（最初にinViewがtrueのもの）を見つける
   const currentSectionId = sidebarMdContent.find(
-    (section, i) => i >= 1 && section.inView
+    (section, i) =>
+      Boolean(section.title) &&
+      (currentPageId === ("sandbox" as PageSlug) || i >= 1) &&
+      section.inView
   )?.id;
 
   // 目次の開閉状態
@@ -181,6 +184,54 @@ export function Sidebar() {
                 {group.name}
               </summary>
               <ul>
+                <li>
+                  <Link
+                    href={`/${group.id}/sandbox`}
+                    className={clsx(
+                      "text-wrap text-justify",
+                      group.id === currentLang &&
+                        currentPageId === ("sandbox" as PageSlug) &&
+                        "menu-active"
+                    )}
+                  >
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 256 256"
+                      className="w-5 h-5"
+                    >
+                      <g id="SVGRepo_iconCarrier">
+                        <path d="M215.51465,39.51465H40.48535a16.99025,16.99025,0,0,0-16.9707,16.9707v143.0293a16.99025,16.99025,0,0,0,16.9707,16.9707h175.0293a16.99025,16.99025,0,0,0,16.9707-16.9707V56.48535A16.99025,16.99025,0,0,0,215.51465,39.51465Zm-94.51758,94.73242-40,32a7.99979,7.99979,0,1,1-9.99414-12.49414L103.19336,128,71.00293,102.24707a7.99979,7.99979,0,1,1,9.99414-12.49414l40,32a7.99943,7.99943,0,0,1,0,12.49414ZM179.99414,168h-40a8,8,0,0,1,0-16h40a8,8,0,1,1,0,16Z"></path>
+                      </g>
+                    </svg>
+                    Sandbox
+                  </Link>
+                  {group.id === currentLang &&
+                    currentPageId === ("sandbox" as PageSlug) &&
+                    sidebarMdContent.length > 0 && (
+                      <ul className="ml-4 text-sm">
+                        {sidebarMdContent.map((section) => (
+                          <li
+                            key={section.id}
+                            style={{
+                              marginLeft: `${Math.max(0, section.level - 2)}em`,
+                            }}
+                          >
+                            <Link
+                              href={`#${section.id}`}
+                              className={clsx(
+                                "text-wrap text-justify",
+                                currentSectionId === section.id
+                                  ? "font-bold"
+                                  : ""
+                              )}
+                            >
+                              {section.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                </li>
                 {group.pages.map((page) => (
                   <li key={page.slug}>
                     <Link

@@ -296,6 +296,22 @@ export async function getMarkdownSections(
   lang: LangId,
   page: PageSlug
 ): Promise<MarkdownSection[]> {
+  if (page === ("sandbox" as PageSlug)) {
+    if (!(await getLanguageIds()).includes(lang)) {
+      notFound();
+    }
+    return [
+      {
+        file: "sandbox.md",
+        id: "sandbox" as SectionId,
+        level: 1,
+        title: "sandbox",
+        rawContent: "",
+        md5: "",
+      },
+    ];
+  }
+
   if (
     /*!(await getLanguageIds()).includes(lang) || // getPagesListForLangのなかでチェック */
     !(await getPagesListForLang(lang)).pages.some((p) => p.slug === page)

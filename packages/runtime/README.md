@@ -20,7 +20,7 @@
 ## tests
 
 * `pnpm run --filter @my-code/runtime test` でvitestを使ってテストを実行できます
-* my.code(); の /terminal ページでMochaを使ってテストを実行できます
+* my.code(); の /about/runtime ページでMochaを使ってテストを実行できます
 * どちらからでも実行できるようテスト本体は ./tests/repl.ts, ./tests/fileExecution.ts に記述しています。
 新しい言語の実行環境を追加した場合、ここにテストケースを追加してください。
 

@@ -23,7 +23,7 @@ export function Modal(props: Props) {
   const { id, open, setOpen } = props;
   useEffect(() => {
     const onHashChange = () => {
-      if (location.hash === `#${id}`) {
+      if (location.hash === "#" + encodeURIComponent(id)) {
         setOpen(true);
       } else {
         // アニメーションが終わった後にmodalモードを解除する
@@ -57,7 +57,7 @@ export function Modal(props: Props) {
       className={clsx(open && "modal h-dvh")}
       role={open ? "dialog" : undefined}
       ref={modalDivRef}
-      id={id}
+      id={encodeURIComponent(id)}
     >
       <div
         className={clsx(
@@ -100,7 +100,7 @@ export function MinMaxButton(props: { open: boolean; id: string }) {
           history.back();
         } else {
           // props.setOpen(true);
-          location.href = `#${props.id}`;
+          location.hash = encodeURIComponent(props.id);
         }
       }}
     >

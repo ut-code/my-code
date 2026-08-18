@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { StyledMarkdown } from "@/markdown/markdown";
 import content from "./content.md?raw";
+import { MochaTest } from "@/terminal/mochaTest";
 
 export const metadata: Metadata = {
   title: "コード実行環境について",
@@ -11,6 +12,7 @@ export default function RuntimePage() {
   return (
     <div className="p-4 pb-16 w-full max-w-docs mx-auto">
       <StyledMarkdown content={content} />
+      <MochaTest />
     </div>
   );
 }

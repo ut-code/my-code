@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
 
 export const chat = pgTable("chat", {
   chatId: uuid("chatId").primaryKey().defaultRandom(),
@@ -7,6 +8,18 @@ export const chat = pgTable("chat", {
   sectionId: text("sectionId").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   title: text("title").notNull().default("new chat"),
+  replOutputs: jsonb("replOutputs")
+    .$type<Record<string, ReplCommand[]>>()
+    .notNull()
+    .default({}),
+  files: jsonb("files")
+    .$type<Record<string, string>>()
+    .notNull()
+    .default({}),
+  execResults: jsonb("execResults")
+    .$type<Record<string, ReplOutput[]>>()
+    .notNull()
+    .default({}),
 });
 
 export const section = pgTable("section", {

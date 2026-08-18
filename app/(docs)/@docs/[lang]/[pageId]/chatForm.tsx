@@ -14,6 +14,7 @@ import {
 // import { getLanguageName } from "../pagesList";
 import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { useSendChat } from "@/(docs)/useSendChat";
+import { useEmbedContext } from "@/terminal/embedContext";
 
 interface ChatFormProps {
   path: PagePath;
@@ -30,6 +31,7 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
   );
 
   const { sendChat, isLoading, errorMessage } = useSendChat();
+  const { files, replOutputs, execResults } = useEmbedContext();
 
   const exampleData = useMemo(
     () =>
@@ -70,6 +72,9 @@ export function ChatForm({ path, langName, sectionContent, close }: ChatFormProp
       userQuestion,
       questionScope,
       sectionContent,
+      files,
+      replOutputs,
+      execResults,
       onSuccess: () => {
         setInputValue("");
         close();

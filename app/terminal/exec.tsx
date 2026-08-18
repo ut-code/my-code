@@ -196,9 +196,9 @@ export function ExecFile(props: ExecProps) {
         </code>
         <WithAutoTooltipPosition
           as="div"
-          className="ml-1 mr-1 tooltip tooltip-secondary tooltip-bottom z-1"
+          className="ml-1 mr-1 tooltip tooltip-primary tooltip-bottom z-1"
         >
-          <div className="tooltip-content bg-secondary/60 backdrop-blur-xs">
+          <div className="tooltip-content">
             ブラウザ上で動作する
             <span className="mx-0.5">
               {runtimeInfo?.prettyLangName || props.language.runtime}
@@ -218,7 +218,7 @@ export function ExecFile(props: ExecProps) {
           </div>
           <button
             className={clsx(
-              "btn btn-xs btn-soft btn-secondary rounded-full cursor-help"
+              "btn btn-xs btn-soft btn-primary rounded-full cursor-help"
             )}
           >
             ？

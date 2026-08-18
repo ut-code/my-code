@@ -147,6 +147,9 @@ describe("chatHistory lib (non-DB functions)", () => {
           title: "chat 1",
           section: { sectionId: "sec-1" as never, pagePath: "js/page1" },
           messages: [],
+          replOutputs: {},
+          files: {},
+          execResults: {},
           diff: [
             {
               id: "diff-1",
@@ -191,6 +194,9 @@ describe("chatHistory lib (non-DB functions)", () => {
           title: "chat 2",
           section: { sectionId: "sec-1" as never, pagePath: "js/page1" },
           messages: [],
+          replOutputs: {},
+          files: {},
+          execResults: {},
           diff: [
             {
               id: "diff-2",
@@ -211,6 +217,9 @@ describe("chatHistory lib (non-DB functions)", () => {
           title: "chat 1",
           section: { sectionId: "sec-1" as never, pagePath: "js/page1" },
           messages: [],
+          replOutputs: {},
+          files: {},
+          execResults: {},
           diff: [
             {
               id: "diff-1",
@@ -252,6 +261,9 @@ describe("chatHistory lib (non-DB functions)", () => {
           title: "chat 1",
           section: { sectionId: "sec-1" as never, pagePath: "js/page1" },
           messages: [],
+          replOutputs: {},
+          files: {},
+          execResults: {},
           diff: [
             {
               id: "diff-1",
@@ -301,6 +313,9 @@ describe("chatHistory lib (non-DB functions)", () => {
           title: "chat 1",
           section: { sectionId: "sec-1" as never, pagePath: "js/page1" },
           messages: [],
+          replOutputs: {},
+          files: {},
+          execResults: {},
           diff: [
             {
               id: "diff-1",
@@ -344,6 +359,9 @@ describe("chatHistory lib (non-DB functions)", () => {
           title: "chat 1",
           section: { sectionId: "sec-1" as never, pagePath: "js/page1" },
           messages: [],
+          replOutputs: {},
+          files: {},
+          execResults: {},
           diff: [
             {
               id: "diff-1",
@@ -392,6 +410,9 @@ describe("chatHistory lib (non-DB functions)", () => {
           title: "chat 1",
           section: { sectionId, pagePath: "cpp/0-intro" },
           messages: [],
+          replOutputs: {},
+          files: {},
+          execResults: {},
           diff: [
             {
               id: "diff-1",
