@@ -5,7 +5,8 @@ import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
-import type { ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
+import type { Diagnostic, ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
+import { parseRubyError } from "../diagnostics/ruby";
 
 import init_rb from "./ruby/init.rb?raw";
 
@@ -154,7 +155,8 @@ async function runCode(
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
+  onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
 ): Promise<void> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
@@ -195,6 +197,13 @@ async function runFile(
       type: isFatal ? "fatalError" : "error",
       message,
     });
+
+    if (!isFatal && onDiagnostic && e instanceof Error) {
+      const diagnostics = parseRubyError(e.message);
+      for (const diag of diagnostics) {
+        await onDiagnostic(diag);
+      }
+    }
   }
 
   const updatedFiles = readAllFiles();

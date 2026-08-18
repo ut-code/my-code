@@ -7,7 +7,8 @@ import { loadPyodide } from "pyodide";
 import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
-import type { ReplOutput, UpdatedFile } from "../interface";
+import type { Diagnostic, ReplOutput, UpdatedFile } from "../interface";
+import { parsePythonTraceback } from "../diagnostics/python";
 
 import execfile_py from "./pyodide/execfile.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";
@@ -136,7 +137,8 @@ async function runCode(
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
+  onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
 ): Promise<void> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
@@ -173,6 +175,12 @@ async function runFile(
             .join("\n")
             .trim(),
         });
+        if (onDiagnostic) {
+          const diagnostics = parsePythonTraceback(e.message, HOME);
+          for (const diag of diagnostics) {
+            await onDiagnostic(diag);
+          }
+        }
       } else {
         await onOutput({
           type: "fatalError",

@@ -114,6 +114,24 @@ mycdark:
 .ace_selected-word {
   @apply border-primary!;
 }
+.ace_error-marker {
+  position: absolute;
+  background-color: rgba(239, 68, 68, 0.2);
+  border-bottom: 2px wavy rgb(239, 68, 68);
+  z-index: 20;
+}
+.ace_warning-marker {
+  position: absolute;
+  background-color: rgba(245, 158, 11, 0.2);
+  border-bottom: 2px wavy rgb(245, 158, 11);
+  z-index: 20;
+}
+.ace_info-marker {
+  position: absolute;
+  background-color: rgba(59, 130, 246, 0.2);
+  border-bottom: 2px dotted rgb(59, 130, 246);
+  z-index: 20;
+}
 
 .rounded-box-modal {
   @apply rounded-box;

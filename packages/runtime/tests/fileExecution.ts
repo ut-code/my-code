@@ -1,6 +1,6 @@
 import { RuntimeLang } from "@my-code/runtime/languages";
 import { TestBody } from "./utils";
-import { ReplOutput, UpdatedFile } from "@my-code/runtime/interface";
+import { Diagnostic, ReplOutput, UpdatedFile } from "@my-code/runtime/interface";
 import { expect } from "chai";
 
 export const fileExecutionTests: Record<
@@ -168,6 +168,44 @@ export const fileExecutionTests: Record<
       expect(
         updatedFiles.find((f) => f.filename === targetFile)?.content
       ).to.equal(msg);
+    };
+  },
+
+  "should capture diagnostics on error": (lang) => {
+    const errorMsg = "This is a test error";
+    const [filename, code, expectedLine] = (
+      {
+        python: ["test_error.py", `raise Exception("${errorMsg}")\n`, 1],
+        ruby: ["test_error.rb", `raise "${errorMsg}"\n`, 1],
+        cpp: [null, null, null],
+        rust: [null, null, null],
+        javascript: [null, null, null],
+        typescript: ["test_error.ts", `const x: number = "${errorMsg}";\n`, 1],
+      } satisfies Record<
+        RuntimeLang,
+        [string, string, number] | [null, null, null]
+      >
+    )[lang];
+    if (!filename || !code) return null;
+
+    return async (runtimeRef) => {
+      const diagnostics: Diagnostic[] = [];
+      await runtimeRef.current![lang].runFiles(
+        [filename],
+        {
+          [filename]: code,
+        },
+        () => {},
+        (diagnostic) => {
+          diagnostics.push(diagnostic);
+        }
+      );
+      console.log(`${lang} single file diagnostic test: `, diagnostics);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(diagnostics).to.not.be.empty;
+      expect(diagnostics[0].filename).to.equal(filename);
+      expect(diagnostics[0].startLineNumber).to.equal(expectedLine);
+      expect(diagnostics[0].message).to.include(errorMsg);
     };
   },
 };

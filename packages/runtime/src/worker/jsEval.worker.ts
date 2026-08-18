@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { expose } from "comlink";
-import type { ReplOutput, UpdatedFile } from "../interface";
+import type { Diagnostic, ReplOutput, UpdatedFile } from "../interface";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
 import { replLikeEval, checkSyntax, createReplConsole } from "@my-code/js-eval";
@@ -38,10 +38,12 @@ async function runCode(
   try {
     const result = await replLikeEval(code);
     await Promise.all(pendingOutputPromise);
-    await onOutput({
-      type: "return",
-      message: inspect(result),
-    });
+    if (result !== undefined) {
+      await onOutput({
+        type: "return",
+        message: inspect(result),
+      });
+    }
   } catch (e) {
     originalConsole.log(e);
     await Promise.all(pendingOutputPromise);
@@ -63,7 +65,9 @@ async function runCode(
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
 ): Promise<void> {
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
   currentOutputCallback = onOutput;

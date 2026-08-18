@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
@@ -41,7 +41,59 @@ interface EditorProps {
 }
 export function EditorComponent(props: EditorProps) {
   const theme = useChangeTheme();
-  const { files, writeFile } = useEmbedContext();
+  const { files, writeFile, diagnostics } = useEmbedContext();
+  const fileDiagnostics = useMemo(
+    () => diagnostics[props.filename] ?? [],
+    [diagnostics, props.filename]
+  );
+
+  const annotations = useMemo(() => {
+    return fileDiagnostics.map((diag) => ({
+      row: Math.max(0, diag.startLineNumber - 1),
+      column: Math.max(0, (diag.startColumn ?? 1) - 1),
+      text: diag.message,
+      type: diag.severity ?? "error", // "error" | "warning" | "info"
+    }));
+  }, [fileDiagnostics]);
+
+  const markers = useMemo(() => {
+    return fileDiagnostics.map((diag) => {
+      const startRow = Math.max(0, diag.startLineNumber - 1);
+      const endRow = diag.endLineNumber
+        ? Math.max(0, diag.endLineNumber - 1)
+        : startRow;
+      const startCol =
+        diag.startColumn !== undefined ? Math.max(0, diag.startColumn - 1) : 0;
+      const endCol =
+        diag.endColumn !== undefined
+          ? Math.max(0, diag.endColumn - 1)
+          : Number.MAX_SAFE_INTEGER;
+
+      const isError = (diag.severity ?? "error") === "error";
+      const isWarning = diag.severity === "warning";
+      const className = isError
+        ? "ace_error-marker"
+        : isWarning
+        ? "ace_warning-marker"
+        : "ace_info-marker";
+
+      return {
+        startRow,
+        startCol,
+        endRow,
+        endCol,
+        className,
+        type:
+          diag.startColumn !== undefined &&
+          diag.endColumn !== undefined &&
+          startRow === endRow
+            ? ("text" as const)
+            : ("fullLine" as const),
+        inFront: false,
+      };
+    });
+  }, [fileDiagnostics]);
+
   const code = files[props.filename] || props.initContent;
   useEffect(() => {
     if (!files[props.filename] && props.initContent) {
@@ -202,6 +254,8 @@ export function EditorComponent(props: EditorProps) {
             value={code}
             onChange={(code: string) => writeFile({ [props.filename]: code })}
             setOptions={{ useWorker: false }}
+            annotations={annotations}
+            markers={markers}
           />
         </Suspense>
       ) : (
