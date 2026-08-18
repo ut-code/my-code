@@ -67,7 +67,7 @@ export function EditorComponent(props: EditorProps) {
   // 現在の内容の行数、最小8行、最大50vh
   const editorHeight = Math.max(
     Math.min(
-      code.split("\n").length,
+      code.split("\n").length + 1,
       Math.floor((windowHeight * 0.5) / ((fontSize || 16) + 1))
     ),
     8
@@ -87,11 +87,11 @@ export function EditorComponent(props: EditorProps) {
   return (
     <Modal
       id={`edit-${props.filename}`}
-      className={clsx("overflow-hidden", "flex flex-col", "text-base-content")}
+      className={clsx("flex flex-col", "text-base-content")}
       open={isModal}
       setOpen={setIsModal}
     >
-      <div className="flex flex-row items-center bg-base-200">
+      <div className="flex flex-row items-center bg-base-200 rounded-t-box">
         <span className="mt-2 mb-1 ml-3 mr-2 text-sm text-left">
           <span>
             {props.readonly
@@ -182,7 +182,9 @@ export function EditorComponent(props: EditorProps) {
       {fontSize !== undefined && initAce ? (
         <Suspense
           fallback={
-            <FallbackPre editorHeight={editorHeight}>{code}</FallbackPre>
+            <FallbackPre className="grow-1 rounded-b-box" editorHeight={editorHeight}>
+              {code}
+            </FallbackPre>
           }
         >
           <AceEditor
@@ -192,7 +194,7 @@ export function EditorComponent(props: EditorProps) {
             tabSize={props.language.tabSize ?? 4}
             width="100%"
             height={isModal ? "100%" : editorHeight * (fontSize + 1) + "px"}
-            className="font-mono!" // Aceのデフォルトフォントを上書き
+            className="font-mono! rounded-b-box" // Aceのデフォルトフォントを上書き
             readOnly={props.readonly}
             fontSize={fontSize}
             showPrintMargin={false}
@@ -205,7 +207,11 @@ export function EditorComponent(props: EditorProps) {
           />
         </Suspense>
       ) : (
-        <FallbackPre isModal={isModal} editorHeight={editorHeight}>
+        <FallbackPre
+          className="grow-1 rounded-b-box"
+          isModal={isModal}
+          editorHeight={editorHeight}
+        >
           {code}
         </FallbackPre>
       )}
@@ -217,16 +223,21 @@ function FallbackPre({
   children,
   editorHeight,
   isModal,
+  className,
 }: {
   children: string;
   editorHeight: number;
   isModal?: boolean;
+  className?: string;
 }) {
   // AceEditorはなぜかline-heightが小さい
   // fontSize + 1px になるっぽい?
   return (
     <pre
-      className="font-mono overflow-auto bg-base-300 px-2 cursor-wait"
+      className={clsx(
+        "font-mono overflow-auto bg-base-300 pl-4 py-0 cursor-wait",
+        className
+      )}
       style={{
         height: isModal ? "100%" : `calc((1em + 1px) * ${editorHeight})`,
         lineHeight: "calc(1em + 1px)",
