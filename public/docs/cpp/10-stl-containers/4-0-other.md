@@ -8,6 +8,12 @@ question:
   - std::unordered_mapはstd::mapより平均的に高速なら、常にunordered_mapを使うべきですか。
   - コンテナアダプタとは、通常のコンテナと何が違うのですか。
   - std::queueとstd::stackは、それぞれどのようなプログラムの場面で使うと便利ですか。
+term:
+  - std::list
+  - std::set
+  - std::unordered_map
+  - std::queue
+  - std::stack
 ---
 
 ## その他: 目的に応じたコンテナ

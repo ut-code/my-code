@@ -10,6 +10,9 @@ question:
   - '`scores["Alice"] = 95;`のように配列のように使うことができるのはなぜですか。'
   - '`count()`メソッドはキーが存在しない場合に何を返しますか？`if`文で使う意味は何ですか。'
   - '`auto& pair : scores`の`auto`と`pair.first`、`pair.second`は何を意味していますか。'
+term:
+  - std::map
+  - 連想配列
 ---
 
 ## `std::map`: キーと値のペアを管理する連想配列
@@ -87,5 +90,3 @@ After erasing Bob:
 - Charlie: 76
 - David: 100
 ```
-
-`std::map`は、キーと値のペアを効率的に管理したい場合に非常に強力なツールです。

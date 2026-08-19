@@ -22,6 +22,8 @@ question:
 
 `std::vector`を使うには、`<vector>`ヘッダを[[インクルード]]する必要があります。
 
+`std::vector`は、どのコンテナを使うか迷ったら、まず最初に検討すべきデフォルトの選択肢と言えるほど万能です。
+
 ```cpp:vector_example.cpp
 #include <iostream>
 #include <vector>
@@ -76,5 +78,3 @@ After pop_back:
 - Bob
 Current size: 2
 ```
-
-`std::vector`は、どのコンテナを使うか迷ったら、まず最初に検討すべきデフォルトの選択肢と言えるほど万能です。
