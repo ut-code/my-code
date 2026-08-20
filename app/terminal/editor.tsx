@@ -38,6 +38,7 @@ interface EditorProps {
   filename: string;
   initContent: string;
   readonly?: boolean;
+  onDelete?: () => void;
 }
 export function EditorComponent(props: EditorProps) {
   const theme = useChangeTheme();
@@ -67,7 +68,7 @@ export function EditorComponent(props: EditorProps) {
   // 現在の内容の行数、最小8行、最大50vh
   const editorHeight = Math.max(
     Math.min(
-      code.split("\n").length,
+      code.split("\n").length + 1,
       Math.floor((windowHeight * 0.5) / ((fontSize || 16) + 1))
     ),
     8
@@ -87,11 +88,11 @@ export function EditorComponent(props: EditorProps) {
   return (
     <Modal
       id={`edit-${props.filename}`}
-      className={clsx("overflow-hidden", "flex flex-col", "text-base-content")}
+      className={clsx("flex flex-col", "text-base-content")}
       open={isModal}
       setOpen={setIsModal}
     >
-      <div className="flex flex-row items-center bg-base-200">
+      <div className="flex flex-row items-center bg-base-200 rounded-t-box">
         <span className="mt-2 mb-1 ml-3 mr-2 text-sm text-left">
           <span>
             {props.readonly
@@ -130,12 +131,61 @@ export function EditorComponent(props: EditorProps) {
           <span className="hidden md:inline">元の内容に戻す</span>
         </button>
         <div className="flex-1" />
+        {props.onDelete && (
+          <button
+            className="btn btn-sm btn-soft btn-error my-1 mr-1"
+            onClick={props.onDelete}
+            title="ファイルを削除"
+          >
+            <svg
+              className="w-3 h-3"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 11V17"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M14 11V17"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 7H20"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="hidden md:inline">削除</span>
+          </button>
+        )}
         <MinMaxButton open={isModal} id={`edit-${props.filename}`} />
       </div>
       {fontSize !== undefined && initAce ? (
         <Suspense
           fallback={
-            <FallbackPre editorHeight={editorHeight}>{code}</FallbackPre>
+            <FallbackPre className="grow-1 rounded-b-box" editorHeight={editorHeight}>
+              {code}
+            </FallbackPre>
           }
         >
           <AceEditor
@@ -145,7 +195,7 @@ export function EditorComponent(props: EditorProps) {
             tabSize={props.language.tabSize ?? 4}
             width="100%"
             height={isModal ? "100%" : editorHeight * (fontSize + 1) + "px"}
-            className="font-mono!" // Aceのデフォルトフォントを上書き
+            className="font-mono! rounded-b-box" // Aceのデフォルトフォントを上書き
             readOnly={props.readonly}
             fontSize={fontSize}
             showPrintMargin={false}
@@ -158,7 +208,11 @@ export function EditorComponent(props: EditorProps) {
           />
         </Suspense>
       ) : (
-        <FallbackPre isModal={isModal} editorHeight={editorHeight}>
+        <FallbackPre
+          className="grow-1 rounded-b-box"
+          isModal={isModal}
+          editorHeight={editorHeight}
+        >
           {code}
         </FallbackPre>
       )}
@@ -170,16 +224,21 @@ function FallbackPre({
   children,
   editorHeight,
   isModal,
+  className,
 }: {
   children: string;
   editorHeight: number;
   isModal?: boolean;
+  className?: string;
 }) {
   // AceEditorはなぜかline-heightが小さい
   // fontSize + 1px になるっぽい?
   return (
     <pre
-      className="font-mono overflow-auto bg-base-300 px-2 cursor-wait"
+      className={clsx(
+        "font-mono overflow-auto bg-base-300 pl-4 py-0 cursor-wait",
+        className
+      )}
       style={{
         height: isModal ? "100%" : `calc((1em + 1px) * ${editorHeight})`,
         lineHeight: "calc(1em + 1px)",

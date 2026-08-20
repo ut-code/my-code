@@ -3,11 +3,14 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { captureException } from "@sentry/nextjs";
-import { useEmbedContext } from "@/terminal/embedContext";
 import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { useStreamingChatContext } from "./streamingChatContext";
+import {
+  ReplCommand,
+  ReplOutput,
+} from "@my-code/runtime/interface";
 
 export interface SendChatParams {
   path: PagePath;
@@ -16,6 +19,9 @@ export interface SendChatParams {
   sectionContent: DynamicMarkdownSection[];
   deleteChatOnCreated?: string;
   onSuccess?: () => void;
+  replOutputs?: Record<string, ReplCommand[]>;
+  files?: Record<string, string>;
+  execResults?: Record<string, ReplOutput[]>;
 }
 
 /**
@@ -25,7 +31,6 @@ export function useSendChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { files, replOutputs, execResults } = useEmbedContext();
   const router = useRouter();
   const streamingChatContext = useStreamingChatContext();
 
@@ -37,6 +42,9 @@ export function useSendChat() {
       sectionContent,
       deleteChatOnCreated,
       onSuccess,
+      replOutputs,
+      files,
+      execResults,
     }: SendChatParams) => {
       if (!userQuestion) return;
 
@@ -53,9 +61,9 @@ export function useSendChat() {
             userQuestion,
             questionScope,
             sectionContent,
-            replOutputs,
-            files,
-            execResults,
+            replOutputs: replOutputs ?? {},
+            files: files ?? {},
+            execResults: execResults ?? {},
             deleteChatOnCreated,
           }),
         });
@@ -163,9 +171,6 @@ export function useSendChat() {
       })();
     },
     [
-      execResults,
-      files,
-      replOutputs,
       router,
       streamingChatContext,
     ]

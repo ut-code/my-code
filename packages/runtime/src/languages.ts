@@ -1,3 +1,14 @@
+import main_py from "./samples/main.py?raw";
+import main_rb from "./samples/main.rb?raw";
+import main_js from "./samples/main.js?raw";
+import main2_ts from "./samples/main2.ts?raw";
+import main_cpp from "./samples/main.cpp?raw";
+import sub_h from "./samples/sub.h?raw";
+import sub_cpp from "./samples/sub.cpp?raw";
+import main2_rs from "./samples/main2.rs?raw";
+import sub_rs from "./samples/sub.rs?raw";
+import main_dart from "./samples/main.dart?raw";
+
 // Markdownで指定される可能性のある言語名を列挙
 export type MarkdownLang =
   | "python"
@@ -77,8 +88,10 @@ export type LangConstants = {
 ) &
   (
     | {
-        runtime: RuntimeLang;
         // REPLが実装されている言語の場合
+        repl: true;
+        // ReplOutput[] ではない。stringのパースはruntimeが行う
+        sampleReplInit: string;
         // terminal/highlight.ts でインポートするprismの言語定義と対応
         prism: "python" | "ruby" | "javascript";
         prompt: string;
@@ -86,11 +99,34 @@ export type LangConstants = {
         returnPrefix?: string;
       }
     | {
-        runtime?: RuntimeLang;
+        repl?: false;
+        sampleReplInit?: undefined;
         prism?: undefined;
         prompt?: undefined;
         promptMore?: undefined;
         returnPrefix?: undefined;
+      }
+  ) &
+  (
+    | {
+        runtime: RuntimeLang;
+        // Sandboxにデフォルトで用意するファイル
+        sampleFiles: Record<string, string>;
+        // C++のように実行時に全ソースファイルを指定する必要がある言語は、
+        // 現在のファイルリストを受け取って実行すべきファイルを返す関数を定義する
+        sampleExec: (files: string[]) => string[];
+        // Sandboxの実行ボタンの下に読み取り専用で表示されるファイル
+        readonlyFiles?: string[];
+        supportsMultiFile: boolean;
+        supportsFileOutput: boolean;
+      }
+    | {
+        runtime?: undefined;
+        sampleFiles?: undefined;
+        sampleExec?: undefined;
+        readonlyFiles?: undefined;
+        supportsMultiFile?: undefined;
+        supportsFileOutput?: undefined;
       }
   );
 
@@ -105,8 +141,16 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         tabSize: 4,
         runtime: "python",
         prism: "python",
+        repl: true,
+        sampleReplInit: '>>> print("Hello, World!")\nHello, World!',
         prompt: ">>> ",
         promptMore: "... ",
+        sampleFiles: {
+          "main.py": main_py,
+        },
+        sampleExec: () => ["main.py"],
+        supportsMultiFile: true,
+        supportsFileOutput: true,
       };
     case "ruby":
     case "rb":
@@ -117,10 +161,18 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         tabSize: 2,
         runtime: "ruby",
         prism: "ruby",
+        repl: true,
+        sampleReplInit: 'irb(main):001:0> puts "Hello, World!"\nHello, World!',
         // TODO: 実際のirbのプロンプトは静的でなく、(main)や番号などの動的な表示がある
         prompt: "irb> ",
         promptMore: "irb* ",
         returnPrefix: "=> ",
+        sampleFiles: {
+          "main.rb": main_rb,
+        },
+        sampleExec: () => ["main.rb"],
+        supportsMultiFile: true,
+        supportsFileOutput: true,
       };
     case "javascript":
     case "js":
@@ -131,8 +183,16 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         tabSize: 2,
         runtime: "javascript",
         prism: "javascript",
+        repl: true,
+        sampleReplInit: '> console.log("Hello, World!");\nHello, World!',
         prompt: "> ",
         promptMore: "... ",
+        sampleFiles: {
+          "main.js": main_js,
+        },
+        sampleExec: () => ["main.js"],
+        supportsMultiFile: false,
+        supportsFileOutput: false,
       };
     case "typescript":
     case "ts":
@@ -142,6 +202,15 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         ace: "typescript",
         tabSize: 2,
         runtime: "typescript",
+        repl: false,
+        sampleFiles: {
+          // main.tsにすると出力ファイルがjavascriptのサンプルと被る
+          "main2.ts": main2_ts,
+        },
+        sampleExec: () => ["main2.ts"],
+        readonlyFiles: ["main2.js"],
+        supportsMultiFile: false,
+        supportsFileOutput: false,
       };
     case "cpp":
     case "c++":
@@ -152,6 +221,18 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         // 2文字派と4文字派があるが、geminiが4文字で出力するので4でいいや
         tabSize: 4,
         runtime: "cpp",
+        repl: false,
+        sampleFiles: {
+          "main.cpp": main_cpp,
+          "sub.h": sub_h,
+          "sub.cpp": sub_cpp,
+        },
+        sampleExec: (files: string[]) =>
+          files.filter((f) =>
+            ["c", "cpp", "cc", "cxx"].includes(f.split(".").at(-1) ?? "")
+          ),
+        supportsMultiFile: true,
+        supportsFileOutput: false,
       };
     case "rust":
     case "rs":
@@ -161,6 +242,14 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         ace: "rust",
         tabSize: 4,
         runtime: "rust",
+        repl: false,
+        sampleFiles: {
+          "main2.rs": main2_rs,
+          "sub.rs": sub_rs,
+        },
+        sampleExec: () => ["main2.rs"],
+        supportsMultiFile: true,
+        supportsFileOutput: false,
       };
     case "dart":
       return {
@@ -169,6 +258,13 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         ace: "dart",
         tabSize: 2,
         runtime: "dart",
+        repl: false,
+        sampleFiles: {
+          "main.dart": main_dart,
+        },
+        sampleExec: () => ["main.dart"],
+        supportsMultiFile: false,
+        supportsFileOutput: false,
       };
     case "bash":
     case "sh":
