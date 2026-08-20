@@ -31,7 +31,17 @@ export async function* generateContentStream(
           "Content-Type": "application/json",
           Authorization: `Bearer ${openRouterApiKey}`,
         },
-        body: JSON.stringify({ models, messages, stream: true }),
+        body: JSON.stringify({
+          models,
+          messages,
+          stream: true,
+          provider: {
+            max_price: {
+              prompt: 0.1,
+              output: 0.3,
+            },
+          },
+        }),
       }
     );
 
@@ -59,9 +69,16 @@ export async function* generateContentStream(
         try {
           const parsed = JSON.parse(data) as {
             choices?: { delta?: { content?: string | null } }[];
+            usage?: {
+              completion_tokens?: number;
+              cost?: number;
+              prompt_tokens?: number;
+              total_tokens?: number;
+            };
           };
           const content = parsed.choices?.[0]?.delta?.content;
           if (content) yield content;
+          if (parsed.usage) console.log("usage:", parsed.usage);
         } catch {
           // ignore parse errors for malformed SSE lines
         }
