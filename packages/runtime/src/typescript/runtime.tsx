@@ -13,6 +13,8 @@ import {
   useState,
 } from "react";
 import {
+  Diagnostic,
+  DiagnosticSeverity,
   ReplOutput,
   RuntimeContext,
   RuntimeErrorHandler,
@@ -113,7 +115,8 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
     async (
       filenames: string[],
       files: Readonly<Record<string, string>>,
-      onOutput: (output: ReplOutput | UpdatedFile) => void
+      onOutput: (output: ReplOutput | UpdatedFile) => void,
+      onDiagnostic?: (diagnostic: Diagnostic) => void
     ) => {
       if (tsEnv === null || typeof window === "undefined") {
         onOutput({ type: "error", message: "TypeScript is not ready yet." });
@@ -126,6 +129,57 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
 
         const ts = await import("typescript");
 
+        const convertDiagnostic = (diag: import("typescript").Diagnostic): Diagnostic => {
+          let line = 0;
+          let character = 0;
+          let endLineNumber: number | undefined = undefined;
+          let endColumn: number | undefined = undefined;
+
+          if (diag.file && diag.start !== undefined) {
+            const pos = diag.file.getLineAndCharacterOfPosition(diag.start);
+            line = pos.line;
+            character = pos.character;
+
+            if (diag.length !== undefined) {
+              const endPos = diag.file.getLineAndCharacterOfPosition(
+                diag.start + diag.length
+              );
+              endLineNumber = endPos.line + 1;
+              endColumn = endPos.character + 1;
+            }
+          }
+
+          const message =
+            typeof diag.messageText === "string"
+              ? diag.messageText
+              : ts.flattenDiagnosticMessageText(diag.messageText, "\n");
+
+          let severity: DiagnosticSeverity = "error";
+          if (diag.category === ts.DiagnosticCategory.Warning) {
+            severity = "warning";
+          } else if (
+            diag.category === ts.DiagnosticCategory.Suggestion ||
+            diag.category === ts.DiagnosticCategory.Message
+          ) {
+            severity = "info";
+          }
+
+          const filename = (diag.file ? diag.file.fileName : filenames[0]).replace(
+            /^\//,
+            ""
+          );
+
+          return {
+            filename,
+            startLineNumber: line + 1,
+            startColumn: character + 1,
+            endLineNumber,
+            endColumn,
+            message,
+            severity,
+          };
+        };
+
         for (const diagnostic of tsEnv.languageService.getSyntacticDiagnostics(
           filenames[0]
         )) {
@@ -137,6 +191,7 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
               getNewLine: () => "\n",
             }),
           });
+          onDiagnostic?.(convertDiagnostic(diagnostic));
         }
 
         for (const diagnostic of tsEnv.languageService.getSemanticDiagnostics(
@@ -150,6 +205,7 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
               getNewLine: () => "\n",
             }),
           });
+          onDiagnostic?.(convertDiagnostic(diagnostic));
         }
 
         const emitOutput = tsEnv.languageService.getEmitOutput(filenames[0]);
@@ -168,7 +224,8 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
         await jsEval.runFiles(
           [emitOutput.outputFiles[0].name],
           { ...files, ...emittedFiles },
-          onOutput
+          onOutput,
+          onDiagnostic
         );
         } catch (error) {
           onErrorRef.current?.(error);

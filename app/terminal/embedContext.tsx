@@ -1,6 +1,6 @@
 "use client";
 
-import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import { Diagnostic, ReplCommand, ReplOutput } from "@my-code/runtime/interface";
 import {
   createContext,
   ReactNode,
@@ -40,6 +40,10 @@ interface IEmbedContext {
   execResults: Readonly<Record<Filename, ReplOutput[]>>;
   clearExecResult: (filename: Filename) => void;
   addExecOutput: (filename: Filename, output: ReplOutput) => void;
+
+  diagnostics: Readonly<Record<Filename, Diagnostic[]>>;
+  clearDiagnostics: (filename?: Filename) => void;
+  addDiagnostic: (filename: Filename, diagnostic: Diagnostic) => void;
 }
 const EmbedContext = createContext<IEmbedContext>(null!);
 
@@ -80,11 +84,15 @@ export function EmbedContextProvider({
   const [execResults, setExecResults] = useState<
     Record<Filename, ReplOutput[]>
   >({});
+  const [diagnostics, setDiagnostics] = useState<
+    Record<Filename, Diagnostic[]>
+  >({});
   if (pageKey && pageKey !== prevPageKey) {
     setPrevPageKey(pageKey);
     setReplOutputs({});
     setCommandIdCounters({});
     setExecResults({});
+    setDiagnostics({});
   }
 
   const writeFile = useCallback(
@@ -181,6 +189,30 @@ export function EmbedContextProvider({
     []
   );
 
+  const clearDiagnostics = useCallback(
+    (filename?: Filename) =>
+      setDiagnostics((diags) => {
+        if (filename !== undefined) {
+          const next = { ...diags };
+          delete next[filename];
+          return next;
+        }
+        return {};
+      }),
+    []
+  );
+  const addDiagnostic = useCallback(
+    (filename: Filename, diagnostic: Diagnostic) =>
+      setDiagnostics((diags) => {
+        const current = diags[filename] ? [...diags[filename]] : [];
+        return {
+          ...diags,
+          [filename]: [...current, diagnostic],
+        };
+      }),
+    []
+  );
+
   return (
     <EmbedContext.Provider
       value={{
@@ -192,6 +224,9 @@ export function EmbedContextProvider({
         execResults,
         clearExecResult,
         addExecOutput,
+        diagnostics,
+        clearDiagnostics,
+        addDiagnostic,
       }}
     >
       {children}

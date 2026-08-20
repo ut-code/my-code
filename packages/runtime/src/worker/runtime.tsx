@@ -13,6 +13,7 @@ import { wrap, Remote, proxy } from "comlink";
 import { RuntimeLang } from "../languages";
 import { Mutex, MutexInterface } from "async-mutex";
 import {
+  Diagnostic,
   ReplOutput,
   RuntimeErrorHandler,
   RuntimeContext,
@@ -38,7 +39,8 @@ export interface WorkerAPI {
   runFile(
     name: string,
     files: Record<string, string>,
-    onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+    onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
+    onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
   ): Promise<void>;
   checkSyntax(code: string): Promise<{ status: SyntaxStatus }>;
   restoreState(commands: string[]): Promise<object>;
@@ -283,7 +285,8 @@ export function WorkerProvider({
     async (
       filenames: string[],
       files: Readonly<Record<string, string>>,
-      onOutput: (output: ReplOutput | UpdatedFile) => void
+      onOutput: (output: ReplOutput | UpdatedFile) => void,
+      onDiagnostic?: (diagnostic: Diagnostic) => void
     ): Promise<void> => {
       if (filenames.length !== 1) {
         onOutput({
@@ -316,7 +319,12 @@ export function WorkerProvider({
                   onErrorRef.current?.(new Error(item.message));
                 }
                 onOutput(item);
-              })
+              }),
+              onDiagnostic
+                ? proxy(async (diag: Diagnostic) => {
+                    onDiagnostic(diag);
+                  })
+                : undefined
             )
           );
         });

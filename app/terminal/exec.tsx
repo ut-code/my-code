@@ -69,8 +69,14 @@ export function ExecFile(props: ExecProps) {
       }
     },
   });
-  const { files, clearExecResult, addExecOutput, writeFile } =
-    useEmbedContext();
+  const {
+    files,
+    clearExecResult,
+    addExecOutput,
+    writeFile,
+    clearDiagnostics,
+    addDiagnostic,
+  } = useEmbedContext();
 
   if (props.language.runtime === undefined) {
     throw new Error(
@@ -94,29 +100,39 @@ export function ExecFile(props: ExecProps) {
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
         const filenameKey = props.filenames.join(",");
         clearExecResult(filenameKey);
+        for (const fname of props.filenames) {
+          clearDiagnostics(fname);
+        }
         setContents("");
         let isFirstOutput = true;
-        await runFiles(props.filenames, files, (output) => {
-          if (output.type === "file") {
-            writeFile({ [output.filename]: output.content });
-            return;
+        await runFiles(
+          props.filenames,
+          files,
+          (output) => {
+            if (output.type === "file") {
+              writeFile({ [output.filename]: output.content });
+              return;
+            }
+            addExecOutput(filenameKey, output);
+            if (isFirstOutput) {
+              // Clear "実行中です..." message only on first output
+              clearTerminal(terminalInstanceRef.current!);
+              isFirstOutput = false;
+            }
+            // Append only the new output
+            writeOutput(
+              terminalInstanceRef.current!,
+              output,
+              undefined,
+              null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
+              props.language
+            );
+            setContents((prev) => prev + output.message + "\n");
+          },
+          (diagnostic) => {
+            addDiagnostic(diagnostic.filename, diagnostic);
           }
-          addExecOutput(filenameKey, output);
-          if (isFirstOutput) {
-            // Clear "実行中です..." message only on first output
-            clearTerminal(terminalInstanceRef.current!);
-            isFirstOutput = false;
-          }
-          // Append only the new output
-          writeOutput(
-            terminalInstanceRef.current!,
-            output,
-            undefined,
-            null, // ファイル実行で"return"メッセージが返ってくることはないはずなので、Prismを渡す必要はない
-            props.language
-          );
-          setContents((prev) => prev + output.message + "\n");
-        });
+        );
         setExecutionState("idle");
         if (isFirstOutput) {
           // If there was no output, clear the "実行中です..." message
@@ -132,6 +148,8 @@ export function ExecFile(props: ExecProps) {
     clearExecResult,
     addExecOutput,
     writeFile,
+    clearDiagnostics,
+    addDiagnostic,
     terminalInstanceRef,
     props.language,
     files,
