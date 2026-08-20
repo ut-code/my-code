@@ -6,6 +6,10 @@ question:
   - '`new int(10);`と`new int;`の違いは何か。'
   - '`delete pInt;`と`delete[] pArray;`で`[]`がある場合とない場合の違いは何か。間違えて使ったらどうなるのか。'
   - メモリを解放した後にポインタを`nullptr`に設定する理由は何か。設定しないとどうなるのか。
+term:
+  - ヒープ
+  - new
+  - delete
 ---
 
 ### ヒープ (Heap) 領域と `new`, `delete`

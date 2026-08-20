@@ -12,7 +12,7 @@ question:
 
 ### 練習問題1: 汎用的なprint関数
 
-任意の型の配列（ここでは`std::vector`を使いましょう）を受け取り、その要素をすべて画面に出力する関数テンプレート`print_elements`を作成してください。
+任意の型の配列（ここでは[[`std::vector`]]を使いましょう）を受け取り、その要素をすべて画面に出力する[[関数テンプレート]]`print_elements`を作成してください。
 
 ```cpp:practice10_1.cpp
 #include <iostream>
