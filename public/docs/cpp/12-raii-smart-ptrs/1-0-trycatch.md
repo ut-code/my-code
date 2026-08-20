@@ -10,6 +10,11 @@ question:
   - tryブロックの中で複数の種類の例外が投げられた場合、どのように処理されますか？
   - std::cerrとstd::coutの違いは何ですか？
   - static_cast<double>(a) / b;という記述は何をしていますか？
+term:
+  - try
+  - catch
+  - throw
+  - 例外
 ---
 
 ## 例外処理: `try`, `catch` を使ったエラーハンドリング
