@@ -6,6 +6,8 @@ question:
   - std::for_eachと通常のforループで要素を処理する場合、どちらを使うべきですか？
   - print_functionのような関数は、どこに定義すれば良いのですか？
   - std::for_eachを使ってコンテナの要素の値を変更することはできますか？
+term:
+  - std::for_each
 ---
 
 ### `std::for_each`: 各要素に処理を適用する
@@ -16,5 +18,3 @@ question:
 // 3番目の引数に関数を渡す
 std::for_each(numbers.begin(), numbers.end(), print_function);
 ```
-
-ここで「特定の処理」をその場で手軽に記述する方法が**ラムダ式**です。
