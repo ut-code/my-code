@@ -19,7 +19,6 @@ import Link from "next/link";
 import { useChatId } from "@/(docs)/chatAreaState";
 import { ChatWithMessages } from "@/lib/chatHistory";
 import { usePagesListForLang } from "@/pagesListContext";
-import { useEmbedContext } from "@/terminal/embedContext";
 import { useRouter } from "next/navigation";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
@@ -167,10 +166,12 @@ export function PageContent(props: PageContentProps) {
   );
 }
 
-function ChatListForSection(props: {
+export function ChatListForSection(props: {
   dynamicMdContent: DynamicMarkdownSection[];
   sectionId: SectionId;
   chatHistories: ChatWithMessages[];
+  fullWidth?: boolean;
+  className?: string;
 }) {
   const { dynamicMdContent, sectionId, chatHistories } = props;
   const filteredChatHistories = chatHistories.filter(
@@ -195,10 +196,15 @@ function ChatListForSection(props: {
       */}
       <ul
         className={clsx(
-          chatId === null
-            ? "hidden has-chat-1:block"
-            : "hidden has-chat-2:block",
-          "mt-2 ml-4 w-full max-w-chat-list",
+          props.className,
+          props.fullWidth
+            ? ""
+            : clsx(
+                chatId === null
+                  ? "hidden has-chat-1:block"
+                  : "hidden has-chat-2:block",
+                "mt-2 ml-4 w-full max-w-chat-list"
+              ),
           "menu menu-sm",
           "rounded-lg shadow-sm bg-base-200"
         )}
@@ -223,40 +229,42 @@ function ChatListForSection(props: {
         ))}
       </ul>
       {/*xl未満 or xl以上でチャットを表示している → 小さいボタンを表示*/}
-      <details
-        className={clsx(
-          chatId === null
-            ? "block has-chat-1:hidden"
-            : "block has-chat-2:block",
-          "dropdown dropdown-end",
-          "mt-2 ml-2"
-        )}
-      >
-        <summary className="btn btn-outline btn-secondary btn-sm">
-          <ChatIcon />
-          {filteredChatHistories.length}
-        </summary>
-        <ul
+      {!props.fullWidth && (
+        <details
           className={clsx(
-            "menu menu-sm dropdown-content",
-            "w-max max-w-[75vw]",
-            "z-30",
-            "rounded-lg shadow-sm bg-base-200/60 backdrop-blur-xs"
+            chatId === null
+              ? "block has-chat-1:hidden"
+              : "block has-chat-2:hidden",
+            "mt-2 ml-2",
+            "dropdown dropdown-end"
           )}
         >
-          {filteredChatHistories.map(({ title, chatId }) => (
-            <li key={chatId}>
-              <Link
-                className="text-wrap text-justify"
-                href={`/chat/${chatId}`}
-                scroll={false}
-              >
-                {title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </details>
+          <summary className="btn btn-outline btn-secondary btn-sm">
+            <ChatIcon />
+            {filteredChatHistories.length}
+          </summary>
+          <ul
+            className={clsx(
+              "menu menu-sm dropdown-content",
+              "w-max max-w-[75vw]",
+              "z-30",
+              "rounded-lg shadow-sm bg-base-200/60 backdrop-blur-xs"
+            )}
+          >
+            {filteredChatHistories.map(({ title, chatId }) => (
+              <li key={chatId}>
+                <Link
+                  className="text-wrap text-justify"
+                  href={`/chat/${chatId}`}
+                  scroll={false}
+                >
+                  {title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </>
   );
 }
@@ -302,7 +310,6 @@ function OutdatedSectionAlert(props: {
     total: 0,
   });
 
-  const { files, replOutputs, execResults } = useEmbedContext();
   const router = useRouter();
 
   const handleRegenerateSection = async () => {
@@ -324,9 +331,6 @@ function OutdatedSectionAlert(props: {
         body: JSON.stringify({
           path,
           sectionId,
-          replOutputs,
-          files,
-          execResults,
         }),
       });
 

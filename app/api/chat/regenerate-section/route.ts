@@ -13,19 +13,12 @@ import {
   PagePathSchema,
 } from "@/lib/docs";
 import { generateSingleChat } from "@/lib/chatGenerator";
-import {
-  ReplCommandSchema,
-  ReplOutputSchema,
-} from "@my-code/runtime/interface";
 import { z } from "zod";
 import { captureException } from "@sentry/nextjs";
 
 const RegenerateSectionSchema = z.object({
   path: PagePathSchema,
   sectionId: z.string(),
-  replOutputs: z.record(z.string(), z.array(ReplCommandSchema)),
-  files: z.record(z.string(), z.string()),
-  execResults: z.record(z.string(), z.array(ReplOutputSchema)),
 });
 
 export type RegenerateStreamEvent =
@@ -51,7 +44,7 @@ export async function POST(request: NextRequest) {
   if (!parseResult.success) {
     return new Response(JSON.stringify(parseResult.error), { status: 400 });
   }
-  const { path, sectionId, replOutputs, files, execResults } = parseResult.data;
+  const { path, sectionId } = parseResult.data;
 
   const encoder = new TextEncoder();
 
@@ -115,9 +108,9 @@ export async function POST(request: NextRequest) {
               path,
               userQuestion,
               sectionContent: currentSectionContent,
-              replOutputs,
-              files,
-              execResults,
+              replOutputs: oldChat.replOutputs ?? {},
+              files: oldChat.files ?? {},
+              execResults: oldChat.execResults ?? {},
               context,
             });
             createdChatIds.push(result.chatId);

@@ -17,6 +17,7 @@ import {
 } from "@/lib/docs";
 import { DocsAutoRedirect } from "./autoRedirect";
 import { TermDefinitionProvider } from "@/markdown/term";
+import { EmbedContextProvider } from "@/terminal/embedContext";
 
 export async function generateMetadata({
   params,
@@ -68,19 +69,21 @@ export default async function Page({
 
   return (
     <>
-      <TermDefinitionProvider
-        termDefinitions={termDefinitions}
-        lang={lang}
-        page={pageId}
-      >
-        <PageContent
-          chatHistories={chatHistories}
-          splitMdContent={splitMdContent}
-          langId={lang}
-          pageSlug={pageId}
-          path={path}
-        />
-      </TermDefinitionProvider>
+      <EmbedContextProvider lang={lang} pageId={pageId}>
+        <TermDefinitionProvider
+          termDefinitions={termDefinitions}
+          lang={lang}
+          page={pageId}
+        >
+          <PageContent
+            chatHistories={chatHistories}
+            splitMdContent={splitMdContent}
+            langId={lang}
+            pageSlug={pageId}
+            path={path}
+          />
+        </TermDefinitionProvider>
+      </EmbedContextProvider>
       <DocsAutoRedirect path={path} />
     </>
   );
