@@ -19,6 +19,7 @@ export const replTests: Record<string, (lang: RuntimeLang) => TestBody | null> =
           rust: null,
           javascript: `console.log("${msg}")`,
           typescript: null,
+          dart: null,
         } satisfies Record<RuntimeLang, string | null>
       )[lang];
       if (!printCode) return null;
@@ -49,6 +50,7 @@ export const replTests: Record<string, (lang: RuntimeLang) => TestBody | null> =
             `console.log(${varName})`,
           ],
           typescript: [null, null],
+          dart: [null, null],
         } satisfies Record<RuntimeLang, string[] | null[]>
       )[lang];
       if (!setIntVarCode || !printIntVarCode) return null;
@@ -87,6 +89,7 @@ export const replTests: Record<string, (lang: RuntimeLang) => TestBody | null> =
           rust: null,
           javascript: `throw new Error("${errorMsg}")`,
           typescript: null,
+          dart: null,
         } satisfies Record<RuntimeLang, string | null>
       )[lang];
       if (!errorCode) return null;
@@ -118,6 +121,7 @@ export const replTests: Record<string, (lang: RuntimeLang) => TestBody | null> =
             `console.log(testVar)`,
           ],
           typescript: [null, null, null],
+          dart: [null, null, null],
         } satisfies Record<RuntimeLang, (string | null)[]>
       )[lang];
       if (!setIntVarCode || !infLoopCode || !printIntVarCode) return null;
@@ -168,6 +172,7 @@ export const replTests: Record<string, (lang: RuntimeLang) => TestBody | null> =
           rust: null,
           javascript: null,
           typescript: null,
+          dart: null,
         } satisfies Record<RuntimeLang, string | null>
       )[lang];
       if (!writeCode) return null;
