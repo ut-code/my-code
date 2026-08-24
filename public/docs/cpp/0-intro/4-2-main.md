@@ -7,6 +7,9 @@ question:
   - main関数は必ずint型を返さなければなりませんか？
   - return 0;と書かないとどうなりますか？
   - 引数を取るmain関数はどのような場合に使うのですか？
+term:
+  - main関数
+  - main 関数
 ---
 
 ### `int main()` - main関数
