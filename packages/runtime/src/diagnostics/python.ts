@@ -1,11 +1,11 @@
-import { Diagnostic } from "../interface";
+import { Diagnostic, DiagnosticFrame } from "../interface";
 
 /**
- * Parses Python error/traceback string to extract diagnostic information.
+ * Parses Python error/traceback string into a single Diagnostic with multiple frames.
  *
  * @param traceback - The traceback string or error message from Python
  * @param homePrefix - The virtual home directory prefix to strip (default: "/home/pyodide/")
- * @returns Array of Diagnostic objects
+ * @returns Array of Diagnostic objects (at most 1 per error)
  */
 export function parsePythonTraceback(
   traceback: string,
@@ -17,7 +17,7 @@ export function parsePythonTraceback(
   if (lines.length === 0) return [];
 
   // Extract the last error message line (e.g., "Exception: This is a test error" or "SyntaxError: ...")
-  let errorMessage = lines[lines.length - 1].trim();
+  let errorMessage = "";
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i].trim();
     if (line && !line.startsWith("^") && !line.startsWith("File \"") && !line.startsWith("Traceback")) {
@@ -26,7 +26,7 @@ export function parsePythonTraceback(
     }
   }
 
-  const diagnostics: Diagnostic[] = [];
+  const frames: DiagnosticFrame[] = [];
   const fileLineRegex = /File "([^"]+)", line (\d+)(?:, in (.+))?/;
 
   for (let i = 0; i < lines.length; i++) {
@@ -65,17 +65,24 @@ export function parsePythonTraceback(
         }
       }
 
-      diagnostics.push({
+      frames.push({
         filename: rawFilename,
         startLineNumber: lineNum,
         startColumn,
         endLineNumber: lineNum,
         endColumn,
-        message: errorMessage,
-        severity: "error",
       });
     }
   }
 
-  return diagnostics;
+  if (frames.length === 0) return [];
+
+  // Return a single Diagnostic with all frames (1 error = 1 Diagnostic)
+  return [
+    {
+      frames,
+      message: errorMessage,
+      severity: "error",
+    },
+  ];
 }

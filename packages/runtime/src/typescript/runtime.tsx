@@ -22,6 +22,7 @@ import {
   UpdatedFile,
 } from "../interface";
 
+
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],
   target: 10 satisfies ScriptTarget.ES2023,
@@ -170,15 +171,20 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
           );
 
           return {
-            filename,
-            startLineNumber: line + 1,
-            startColumn: character + 1,
-            endLineNumber,
-            endColumn,
+            frames: [
+              {
+                filename,
+                startLineNumber: line + 1,
+                startColumn: character + 1,
+                endLineNumber,
+                endColumn,
+              },
+            ],
             message,
             severity,
           };
         };
+
 
         for (const diagnostic of tsEnv.languageService.getSyntacticDiagnostics(
           filenames[0]

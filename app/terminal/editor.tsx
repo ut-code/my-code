@@ -48,51 +48,60 @@ export function EditorComponent(props: EditorProps) {
   );
 
   const annotations = useMemo(() => {
-    return fileDiagnostics.map((diag) => ({
-      row: Math.max(0, diag.startLineNumber - 1),
-      column: Math.max(0, (diag.startColumn ?? 1) - 1),
-      text: diag.message,
-      type: diag.severity ?? "error", // "error" | "warning" | "info"
-    }));
-  }, [fileDiagnostics]);
+    return fileDiagnostics.flatMap((diag) =>
+      diag.frames
+        .filter((f) => f.filename === props.filename)
+        .map((f) => ({
+          row: Math.max(0, f.startLineNumber - 1),
+          column: Math.max(0, (f.startColumn ?? 1) - 1),
+          text: diag.message,
+          type: diag.severity ?? "error", // "error" | "warning" | "info"
+        }))
+    );
+  }, [fileDiagnostics, props.filename]);
 
   const markers = useMemo(() => {
-    return fileDiagnostics.map((diag) => {
-      const startRow = Math.max(0, diag.startLineNumber - 1);
-      const endRow = diag.endLineNumber
-        ? Math.max(0, diag.endLineNumber - 1)
-        : startRow;
-      const startCol =
-        diag.startColumn !== undefined ? Math.max(0, diag.startColumn - 1) : 0;
-      const endCol =
-        diag.endColumn !== undefined
-          ? Math.max(0, diag.endColumn - 1)
-          : Number.MAX_SAFE_INTEGER;
+    return fileDiagnostics.flatMap((diag) =>
+      diag.frames
+        .filter((f) => f.filename === props.filename)
+        .map((f) => {
+          const startRow = Math.max(0, f.startLineNumber - 1);
+          const endRow = f.endLineNumber
+            ? Math.max(0, f.endLineNumber - 1)
+            : startRow;
+          const startCol =
+            f.startColumn !== undefined ? Math.max(0, f.startColumn - 1) : 0;
+          const endCol =
+            f.endColumn !== undefined
+              ? Math.max(0, f.endColumn - 1)
+              : Number.MAX_SAFE_INTEGER;
 
-      const isError = (diag.severity ?? "error") === "error";
-      const isWarning = diag.severity === "warning";
-      const className = isError
-        ? "ace_error-marker"
-        : isWarning
-        ? "ace_warning-marker"
-        : "ace_info-marker";
+          const isError = (diag.severity ?? "error") === "error";
+          const isWarning = diag.severity === "warning";
+          const className = isError
+            ? "ace_error-marker"
+            : isWarning
+            ? "ace_warning-marker"
+            : "ace_info-marker";
 
-      return {
-        startRow,
-        startCol,
-        endRow,
-        endCol,
-        className,
-        type:
-          diag.startColumn !== undefined &&
-          diag.endColumn !== undefined &&
-          startRow === endRow
-            ? ("text" as const)
-            : ("fullLine" as const),
-        inFront: false,
-      };
-    });
-  }, [fileDiagnostics]);
+          return {
+            startRow,
+            startCol,
+            endRow,
+            endCol,
+            className,
+            type:
+              f.startColumn !== undefined &&
+              f.endColumn !== undefined &&
+              startRow === endRow
+                ? ("text" as const)
+                : ("fullLine" as const),
+            inFront: false,
+          };
+        })
+    );
+  }, [fileDiagnostics, props.filename]);
+
 
   const code = files[props.filename] || props.initContent;
   useEffect(() => {

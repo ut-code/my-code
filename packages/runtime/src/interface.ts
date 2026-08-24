@@ -155,12 +155,25 @@ export type RuntimeErrorHandler = (error: unknown) => void;
 export const DiagnosticSeveritySchema = z.enum(["error", "warning", "info"]);
 export type DiagnosticSeverity = z.output<typeof DiagnosticSeveritySchema>;
 
-export const DiagnosticSchema = z.object({
+/**
+ * エラーや警告の1つのスタックフレーム（ファイル・行・列情報）
+ */
+export const DiagnosticFrameSchema = z.object({
   filename: z.string(),
   startLineNumber: z.number(), // 1-indexed
   startColumn: z.number().optional(), // 1-indexed
   endLineNumber: z.number().optional(), // 1-indexed
   endColumn: z.number().optional(), // 1-indexed
+});
+export type DiagnosticFrame = z.output<typeof DiagnosticFrameSchema>;
+
+/**
+ * 1つのエラー・警告・情報メッセージ。
+ * 複数のスタックフレームが存在する場合、framesに複数の要素が含まれる。
+ * framesは順序通りで、最初の要素が主要フレーム（エラーが発生した場所）。
+ */
+export const DiagnosticSchema = z.object({
+  frames: z.array(DiagnosticFrameSchema).min(1),
   message: z.string(),
   severity: DiagnosticSeveritySchema.default("error"),
 });

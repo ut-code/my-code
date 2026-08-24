@@ -130,7 +130,11 @@ export function ExecFile(props: ExecProps) {
             setContents((prev) => prev + output.message + "\n");
           },
           (diagnostic) => {
-            addDiagnostic(diagnostic.filename, diagnostic);
+            // diagnosticを関連する全ファイルに登録する
+            const relatedFiles = new Set(diagnostic.frames.map((f) => f.filename));
+            for (const fname of relatedFiles) {
+              addDiagnostic(fname, diagnostic);
+            }
           }
         );
         setExecutionState("idle");

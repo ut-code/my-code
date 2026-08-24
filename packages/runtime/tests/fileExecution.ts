@@ -171,20 +171,28 @@ export const fileExecutionTests: Record<
     };
   },
 
+  /**
+   * 単純なエラーで診断情報が得られるかテスト
+   *
+   * Python/Ruby: `raise "UniqueError"` で1件のDiagnosticが返り、
+   *   frames[0].filename・startLineNumber・messageが正しいか確認
+   *
+   * TypeScript: 存在しない型名を使うことでエラーメッセージに型名が含まれるようにする
+   *   例: `const x: TestDiagUniqueType9876 = 1;`
+   *   → TSのエラーメッセージに "TestDiagUniqueType9876" が含まれる
+   */
   "should capture diagnostics on error": (lang) => {
-    const errorMsg = "This is a test error";
-    const [filename, code, expectedLine] = (
+    // TypeScript用: 型名をユニークな識別子にしてエラーメッセージに含める
+    const uniqueTypeName = "TestDiagUniqueType9876";
+    const [filename, code] = (
       {
-        python: ["test_error.py", `raise Exception("${errorMsg}")\n`, 1],
-        ruby: ["test_error.rb", `raise "${errorMsg}"\n`, 1],
-        cpp: [null, null, null],
-        rust: [null, null, null],
-        javascript: [null, null, null],
-        typescript: ["test_error.ts", `const x: number = "${errorMsg}";\n`, 1],
-      } satisfies Record<
-        RuntimeLang,
-        [string, string, number] | [null, null, null]
-      >
+        python: ["test_diag.py", `raise Exception("${uniqueTypeName}")\n`],
+        ruby: ["test_diag.rb", `raise "${uniqueTypeName}"\n`],
+        cpp: [null, null],
+        rust: [null, null],
+        javascript: [null, null],
+        typescript: ["test_diag.ts", `const x: ${uniqueTypeName} = 1;\n`],
+      } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;
 
@@ -200,12 +208,77 @@ export const fileExecutionTests: Record<
           diagnostics.push(diagnostic);
         }
       );
-      console.log(`${lang} single file diagnostic test: `, diagnostics);
+      console.log(`${lang} single file diagnostic test: `, JSON.stringify(diagnostics, null, 2));
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      expect(diagnostics).to.not.be.empty;
-      expect(diagnostics[0].filename).to.equal(filename);
-      expect(diagnostics[0].startLineNumber).to.equal(expectedLine);
-      expect(diagnostics[0].message).to.include(errorMsg);
+      expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
+      // 最初のDiagnosticの主要フレームが正しいファイル・行・メッセージを持つか確認
+      const firstDiag = diagnostics[0];
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
+      expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
+      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(1);
+      expect(firstDiag.message, "error message").to.include(uniqueTypeName);
+    };
+  },
+
+  /**
+   * 関数呼び出しを挟んだ複数フレームのエラーで1つのDiagnosticにまとめられるかテスト
+   *
+   * Python/Ruby: 関数呼び出し連鎖でスタックトレースを生成し、
+   *   - diagnosticsが1件だけ返ること
+   *   - framesが2件以上あること
+   *   - 全フレームがユーザーファイルを指すこと（<exec>等の内部フレームが含まれないこと）
+   *   を確認する
+   */
+  "should capture multi-frame diagnostics as single Diagnostic": (lang) => {
+    const uniqueTypeName = "TestMultiFrameError5678";
+    const [filename, code] = (
+      {
+        python: [
+          "test_multiframe.py",
+          // bar() -> foo() -> raise で3フレームのトレースバックを生成
+          `def foo():\n    raise Exception("${uniqueTypeName}")\n\ndef bar():\n    foo()\n\nbar()\n`,
+        ],
+        ruby: [
+          "test_multiframe.rb",
+          // bar -> foo -> raise で複数フレームのエラーを生成
+          `def foo\n  raise "${uniqueTypeName}"\nend\n\ndef bar\n  foo\nend\n\nbar\n`,
+        ],
+        cpp: [null, null],
+        rust: [null, null],
+        javascript: [null, null],
+        typescript: [null, null],
+      } satisfies Record<RuntimeLang, [string, string] | [null, null]>
+    )[lang];
+    if (!filename || !code) return null;
+
+    return async (runtimeRef) => {
+      const diagnostics: Diagnostic[] = [];
+      await runtimeRef.current![lang].runFiles(
+        [filename],
+        { [filename]: code },
+        () => {},
+        (diagnostic) => {
+          diagnostics.push(diagnostic);
+        }
+      );
+      console.log(`${lang} multi-frame diagnostic test: `, JSON.stringify(diagnostics, null, 2));
+
+      // 1エラー → 1 Diagnostic
+      expect(diagnostics, "should have exactly 1 diagnostic").to.have.lengthOf(1);
+      const diag = diagnostics[0];
+
+      // メッセージにユニーク文字列が含まれる
+      expect(diag.message, "error message should include unique string").to.include(uniqueTypeName);
+
+      // 複数フレームがあること
+      expect(diag.frames, "should have multiple frames").to.have.length.greaterThan(1);
+
+      // <exec>, <string> など内部フレームが含まれないこと
+      for (const frame of diag.frames) {
+        expect(frame.filename, "frame filename should not be internal").to.not.match(/^<.*>$/);
+        expect(frame.filename, "frame filename should be user file").to.equal(filename);
+      }
     };
   },
 };

@@ -1,10 +1,10 @@
-import { Diagnostic } from "../interface";
+import { Diagnostic, DiagnosticFrame } from "../interface";
 
 /**
- * Parses Ruby error/traceback string to extract diagnostic information.
+ * Parses Ruby error/traceback string into a single Diagnostic with multiple frames.
  *
  * @param errorMessage - The error message from Ruby VM
- * @returns Array of Diagnostic objects
+ * @returns Array of Diagnostic objects (at most 1 per error)
  */
 export function parseRubyError(errorMessage: string): Diagnostic[] {
   if (!errorMessage) return [];
@@ -12,13 +12,13 @@ export function parseRubyError(errorMessage: string): Diagnostic[] {
   const lines = errorMessage.trim().split("\n");
   if (lines.length === 0) return [];
 
-  const diagnostics: Diagnostic[] = [];
+  const frames: DiagnosticFrame[] = [];
 
   // Matches formats like:
   // "test_error.rb:1:in '<main>': This is a test error (RuntimeError)"
   // "/test_error.rb:2:in 'bar': This is a test error (RuntimeError)"
   // "test_syntax.rb:1: syntax error, unexpected end-of-input, expecting '}'"
-  // "	from /test_error.rb:5:in 'foo'"
+  // "\tfrom /test_error.rb:5:in 'foo'"
   const primaryErrorRegex = /^(\/?[^:\n\t]+):(\d+)(?::in [`']([^']+)['])?: (.*)$/;
   const stackFromRegex = /^\s*from (\/?[^:\n\t]+):(\d+)(?::in [`']([^']+)['])?/;
 
@@ -51,12 +51,10 @@ export function parseRubyError(errorMessage: string): Diagnostic[] {
         continue;
       }
 
-      diagnostics.push({
+      frames.push({
         filename: rawFilename,
         startLineNumber: lineNum,
         endLineNumber: lineNum,
-        message,
-        severity: "error",
       });
       continue;
     }
@@ -74,15 +72,22 @@ export function parseRubyError(errorMessage: string): Diagnostic[] {
         continue;
       }
 
-      diagnostics.push({
+      frames.push({
         filename: rawFilename,
         startLineNumber: lineNum,
         endLineNumber: lineNum,
-        message: mainErrorMsg || line,
-        severity: "error",
       });
     }
   }
 
-  return diagnostics;
+  if (frames.length === 0) return [];
+
+  // Return a single Diagnostic with all frames (1 error = 1 Diagnostic)
+  return [
+    {
+      frames,
+      message: mainErrorMsg || errorMessage,
+      severity: "error",
+    },
+  ];
 }
