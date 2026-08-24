@@ -38,8 +38,9 @@ export function parsePythonTraceback(
       // Normalize filename by removing homePrefix or leading slashes
       if (rawFilename.startsWith(homePrefix)) {
         rawFilename = rawFilename.slice(homePrefix.length);
-      } else if (rawFilename.startsWith("/")) {
-        rawFilename = rawFilename.slice(1);
+      }
+      if (rawFilename.startsWith("/")) {
+        rawFilename = rawFilename.replace(/^\/+/, "");
       }
 
       // Ignore internal names like <exec>, <string> if not matching normal files

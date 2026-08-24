@@ -13,7 +13,7 @@ import { parsePythonTraceback } from "../diagnostics/python";
 import execfile_py from "./pyodide/execfile.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";
 
-const HOME = `/home/pyodide/`;
+const HOME = `/home/pyodide`;
 
 let pyodide: PyodideInterface;
 let pendingOutputPromise: Promise<void>[] = [];
