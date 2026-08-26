@@ -9,7 +9,7 @@ question:
 
 ### デフォルト引数
 
-引数が渡されなかった場合（または `undefined` の場合）に使用される初期値を設定できます。
+引数が渡されなかった場合（または [[`undefined`]] の場合）に使用される初期値を設定できます。
 
 ```js:default_args.js
 const connect = (host = 'localhost', port = 8080) => {
