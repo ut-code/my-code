@@ -19,8 +19,8 @@ export function parseRubyError(errorMessage: string): Diagnostic[] {
   // "/test_error.rb:2:in 'bar': This is a test error (RuntimeError)"
   // "test_syntax.rb:1: syntax error, unexpected end-of-input, expecting '}'"
   // "\tfrom /test_error.rb:5:in 'foo'"
-  const primaryErrorRegex = /^(\/?[^:\n\t]+):(\d+)(?::in [`']([^']+)['])?: (.*)$/;
-  const stackFromRegex = /^\s*from (\/?[^:\n\t]+):(\d+)(?::in [`']([^']+)['])?/;
+  // "test_multiframe.rb:6:in 'bar'"
+  const stackLineRegex = /^\s*(?:from\s+)?(\/?[^:\n\t]+):(\d+)(?::in [`']([^']+)['])?(?::\s*(.*))?$/;
 
   let mainErrorMsg = "";
 
@@ -33,49 +33,56 @@ export function parseRubyError(errorMessage: string): Diagnostic[] {
       continue;
     }
 
-    const primaryMatch = primaryErrorRegex.exec(line);
-    if (primaryMatch) {
-      let rawFilename = primaryMatch[1];
-      const lineNum = parseInt(primaryMatch[2], 10);
-      const message = primaryMatch[4];
+    const match = stackLineRegex.exec(line);
+    if (match) {
+      let rawFilename = match[1];
+      const lineNum = parseInt(match[2], 10);
+      const message = match[4];
 
-      if (!mainErrorMsg) {
+      if (message && !mainErrorMsg) {
         mainErrorMsg = message;
       }
 
       if (rawFilename.startsWith("/")) {
-        rawFilename = rawFilename.slice(1);
+        rawFilename = rawFilename.replace(/^\/+/, "");
       }
 
-      if (rawFilename === "eval" || rawFilename === "-e" || rawFilename.startsWith("(eval)")) {
+      if (
+        rawFilename === "eval" ||
+        rawFilename === "eval_async" ||
+        rawFilename.startsWith("eval_async") ||
+        rawFilename === "-e" ||
+        rawFilename.startsWith("(eval)") ||
+        rawFilename.startsWith("bundle/") ||
+        rawFilename.includes("/bundle/") ||
+        (rawFilename.startsWith("<") && rawFilename.endsWith(">"))
+      ) {
         continue;
+      }
+
+      // Check if there is a column indicator on subsequent lines (e.g. for Ruby 3.1+ error highlight with ^)
+      let startColumn: number | undefined = undefined;
+      let endColumn: number | undefined = undefined;
+      for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+        const nextLine = lines[j];
+        if (stackLineRegex.test(nextLine)) break;
+        const caretIndex = nextLine.indexOf("^");
+        if (caretIndex !== -1) {
+          startColumn = caretIndex + 1;
+          const caretEnd = nextLine.lastIndexOf("^");
+          if (caretEnd > caretIndex) {
+            endColumn = caretEnd + 2;
+          }
+          break;
+        }
       }
 
       frames.push({
         filename: rawFilename,
         startLineNumber: lineNum,
+        startColumn,
         endLineNumber: lineNum,
-      });
-      continue;
-    }
-
-    const fromMatch = stackFromRegex.exec(line);
-    if (fromMatch) {
-      let rawFilename = fromMatch[1];
-      const lineNum = parseInt(fromMatch[2], 10);
-
-      if (rawFilename.startsWith("/")) {
-        rawFilename = rawFilename.slice(1);
-      }
-
-      if (rawFilename === "eval" || rawFilename === "-e" || rawFilename.startsWith("(eval)")) {
-        continue;
-      }
-
-      frames.push({
-        filename: rawFilename,
-        startLineNumber: lineNum,
-        endLineNumber: lineNum,
+        endColumn,
       });
     }
   }
