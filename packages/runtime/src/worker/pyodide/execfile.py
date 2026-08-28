@@ -39,7 +39,7 @@ def __execfile(filepath):
         else:
             tb = e.__traceback__
             extracted = traceback.extract_tb(tb)
-            for entry in extracted:
+            for entry in reversed(extracted):
                 raw_filename = entry.filename
                 if raw_filename in ("<exec>", "<string>") or (raw_filename.startswith("<") and raw_filename.endswith(">")):
                     continue

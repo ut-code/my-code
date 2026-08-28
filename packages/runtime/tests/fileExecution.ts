@@ -274,6 +274,30 @@ export const fileExecutionTests: Record<
       // 複数フレームがあること
       expect(diag.frames, "should have multiple frames").to.have.length.greaterThan(1);
 
+      // 最新のフレームが先頭に来ること（innermost frame first）
+      expect(
+        diag.frames[0].startLineNumber,
+        "first frame should be the innermost frame where error was raised"
+      ).to.equal(2);
+
+      // フレームの順序が最新（エラー発生箇所）から呼び出し元への順になっていること
+      const expectedLines = (
+        {
+          python: [2, 5, 7],
+          ruby: [2, 6, 9],
+          cpp: null,
+          rust: null,
+          javascript: null,
+          typescript: null,
+        } satisfies Record<RuntimeLang, number[] | null>
+      )[lang];
+      if (expectedLines) {
+        expect(
+          diag.frames.map((f) => f.startLineNumber),
+          "frames should be ordered from newest (innermost) to oldest (outermost)"
+        ).to.deep.equal(expectedLines);
+      }
+
       // <exec>, <string> など内部フレームが含まれないこと
       for (const frame of diag.frames) {
         expect(frame.filename, "frame filename should not be internal").to.not.match(/^<.*>$/);
