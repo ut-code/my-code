@@ -8,6 +8,9 @@ const localChrome = process.env.CHROME_BIN;
 const localChromeDriver = process.env.CHROMEDRIVER_PATH;
 
 export default defineConfig({
+  define: {
+    "process.env.WANDBOX_URL": JSON.stringify(process.env.WANDBOX_URL || ""),
+  },
   resolve: {
     alias: {
       "@my-code/js-eval": path.resolve(__dirname, "../jsEval/src"),

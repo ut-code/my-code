@@ -182,7 +182,10 @@ export function EditorComponent(props: EditorProps) {
       {fontSize !== undefined && initAce ? (
         <Suspense
           fallback={
-            <FallbackPre className="grow-1 rounded-b-box" editorHeight={editorHeight}>
+            <FallbackPre
+              className="grow-1 rounded-b-box"
+              editorHeight={editorHeight}
+            >
               {code}
             </FallbackPre>
           }

@@ -1,7 +1,9 @@
 import { type Fetcher } from "swr";
 import { type ReplOutput, RuntimeInfo } from "../interface";
 
-const WANDBOX = "https://wandbox.org";
+const WANDBOX =
+  (typeof process !== "undefined" && process.env.WANDBOX_URL) ||
+  "https://wandbox.org";
 // https://github.com/melpon/wandbox/blob/ajax/kennel2/API.rst  <- 古いけど、説明と例がある
 // https://github.com/melpon/wandbox/blob/master/feline/src/types.rs
 /* RustのVec<u8>はバイト配列ですが、serialize_with = "serialize_utf8"という指定があるため、
@@ -121,9 +123,9 @@ export async function compileAndRun(
       case "CompilerMessageS":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ 
-              ndjsonType: r.type, 
-              output: { type: "stdout", message: line } 
+            onOutput({
+              ndjsonType: r.type,
+              output: { type: "stdout", message: line },
             });
           }
         }
@@ -131,9 +133,9 @@ export async function compileAndRun(
       case "CompilerMessageE":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ 
-              ndjsonType: r.type, 
-              output: { type: "error", message: line } 
+            onOutput({
+              ndjsonType: r.type,
+              output: { type: "error", message: line },
             });
           }
         }
@@ -141,9 +143,9 @@ export async function compileAndRun(
       case "StdOut":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ 
-              ndjsonType: r.type, 
-              output: { type: "stdout", message: line } 
+            onOutput({
+              ndjsonType: r.type,
+              output: { type: "stdout", message: line },
             });
           }
         }
@@ -151,22 +153,22 @@ export async function compileAndRun(
       case "StdErr":
         if (r.data.trim()) {
           for (const line of r.data.trim().split("\n")) {
-            onOutput({ 
-              ndjsonType: r.type, 
-              output: { type: "stderr", message: line } 
+            onOutput({
+              ndjsonType: r.type,
+              output: { type: "stderr", message: line },
             });
           }
         }
         break;
       case "ExitCode":
-        if(r.data !== "0"){
-        onOutput({
-          ndjsonType: r.type,
-          output: {
-            type: "system",
-            message: `ステータス ${r.data} で異常終了しました`,
-          }
-        })
+        if (r.data !== "0") {
+          onOutput({
+            ndjsonType: r.type,
+            output: {
+              type: "system",
+              message: `ステータス ${r.data} で異常終了しました`,
+            },
+          });
         }
         break;
       case "Signal":

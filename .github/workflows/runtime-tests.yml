@@ -18,4 +18,20 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm install --frozen-lockfile
-    - run: pnpm run --filter @my-code/runtime test
+    - name: Install Boost
+      run: sudo apt-get update && sudo apt-get install -y libboost-dev
+    - name: Start unsandbox
+      run: |
+        pnpm exec unsandbox --port 3055 &
+        for i in {1..30}; do
+          if curl -s http://localhost:3055/api/list.json > /dev/null; then
+            echo "unsandbox is ready"
+            break
+          fi
+          echo "Waiting for unsandbox..."
+          sleep 1
+        done
+    - name: Run runtime tests
+      env:
+        WANDBOX_URL: http://localhost:3055
+      run: pnpm run --filter @my-code/runtime test

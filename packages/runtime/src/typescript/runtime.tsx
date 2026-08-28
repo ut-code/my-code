@@ -103,11 +103,14 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
   const { init: tsInit, tsEnv, tsVersion } = useContext(TypeScriptContext);
   const { init: jsInit } = jsEval;
   const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
-  const init = useCallback((onError?: RuntimeErrorHandler) => {
-    onErrorRef.current = onError;
-    tsInit(onError);
-    jsInit?.(onError);
-  }, [tsInit, jsInit]);
+  const init = useCallback(
+    (onError?: RuntimeErrorHandler) => {
+      onErrorRef.current = onError;
+      tsInit(onError);
+      jsInit?.(onError);
+    },
+    [tsInit, jsInit]
+  );
 
   const runFiles = useCallback(
     async (
@@ -120,56 +123,56 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
         return;
       } else {
         try {
-        for (const [filename, content] of Object.entries(files)) {
-          tsEnv.createFile(filename, content);
-        }
+          for (const [filename, content] of Object.entries(files)) {
+            tsEnv.createFile(filename, content);
+          }
 
-        const ts = await import("typescript");
+          const ts = await import("typescript");
 
-        for (const diagnostic of tsEnv.languageService.getSyntacticDiagnostics(
-          filenames[0]
-        )) {
-          onOutput({
-            type: "error",
-            message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
-              getCurrentDirectory: () => "",
-              getCanonicalFileName: (f) => f,
-              getNewLine: () => "\n",
-            }),
-          });
-        }
+          for (const diagnostic of tsEnv.languageService.getSyntacticDiagnostics(
+            filenames[0]
+          )) {
+            onOutput({
+              type: "error",
+              message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
+                getCurrentDirectory: () => "",
+                getCanonicalFileName: (f) => f,
+                getNewLine: () => "\n",
+              }),
+            });
+          }
 
-        for (const diagnostic of tsEnv.languageService.getSemanticDiagnostics(
-          filenames[0]
-        )) {
-          onOutput({
-            type: "error",
-            message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
-              getCurrentDirectory: () => "",
-              getCanonicalFileName: (f) => f,
-              getNewLine: () => "\n",
-            }),
-          });
-        }
+          for (const diagnostic of tsEnv.languageService.getSemanticDiagnostics(
+            filenames[0]
+          )) {
+            onOutput({
+              type: "error",
+              message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
+                getCurrentDirectory: () => "",
+                getCanonicalFileName: (f) => f,
+                getNewLine: () => "\n",
+              }),
+            });
+          }
 
-        const emitOutput = tsEnv.languageService.getEmitOutput(filenames[0]);
-        const emittedFiles: Record<string, string> = Object.fromEntries(
-          emitOutput.outputFiles.map((of) => [of.name, of.text])
-        );
-        for (const [filename, content] of Object.entries(emittedFiles)) {
-          onOutput({ type: "file", filename, content });
-        }
+          const emitOutput = tsEnv.languageService.getEmitOutput(filenames[0]);
+          const emittedFiles: Record<string, string> = Object.fromEntries(
+            emitOutput.outputFiles.map((of) => [of.name, of.text])
+          );
+          for (const [filename, content] of Object.entries(emittedFiles)) {
+            onOutput({ type: "file", filename, content });
+          }
 
-        for (const filename of Object.keys(emittedFiles)) {
-          tsEnv.deleteFile(filename);
-        }
+          for (const filename of Object.keys(emittedFiles)) {
+            tsEnv.deleteFile(filename);
+          }
 
-        console.log(emitOutput);
-        await jsEval.runFiles(
-          [emitOutput.outputFiles[0].name],
-          { ...files, ...emittedFiles },
-          onOutput
-        );
+          console.log(emitOutput);
+          await jsEval.runFiles(
+            [emitOutput.outputFiles[0].name],
+            { ...files, ...emittedFiles },
+            onOutput
+          );
         } catch (error) {
           onErrorRef.current?.(error);
           onOutput({

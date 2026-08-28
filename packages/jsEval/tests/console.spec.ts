@@ -14,7 +14,7 @@ describe("createReplConsole", () => {
       const { outputs, replConsole } = collect();
       replConsole.log("hello", 42, { a: 1 });
       assert.deepStrictEqual(outputs, [
-        { type: "stdout", message: 'hello 42 { a: 1 }' },
+        { type: "stdout", message: "hello 42 { a: 1 }" },
       ]);
     });
   });
@@ -31,9 +31,7 @@ describe("createReplConsole", () => {
     it("emits stderr", () => {
       const { outputs, replConsole } = collect();
       replConsole.warn("careful");
-      assert.deepStrictEqual(outputs, [
-        { type: "stderr", message: "careful" },
-      ]);
+      assert.deepStrictEqual(outputs, [{ type: "stderr", message: "careful" }]);
     });
   });
 
