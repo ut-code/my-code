@@ -9,12 +9,12 @@ import type { PyCallable } from "pyodide/ffi";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
 import type {
   Diagnostic,
-  DiagnosticFrame,
   ReplOutput,
   UpdatedFile,
 } from "../interface";
 
 import execfile_py from "./pyodide/execfile.py?raw";
+import eval_code_py from "./pyodide/eval_code.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";
 
 const HOME = `/home/pyodide`;
@@ -92,44 +92,32 @@ async function runCode(
   currentOutputCallback = onOutput;
   pendingOutputPromise = [];
   try {
-    const result = await pyodide.runPythonAsync(code);
+    const pyEvalCode = pyodide.runPython(eval_code_py) as PyCallable;
+    const resultJson = await pyEvalCode(code);
     await Promise.all(pendingOutputPromise);
-    if (result !== undefined) {
+
+    const result = JSON.parse(resultJson);
+    if (result.success) {
+      if (result.has_return && result.result !== null) {
+        await onOutput({
+          type: "return",
+          message: result.result,
+        });
+      }
+    } else {
       await onOutput({
-        type: "return",
-        message: String(result),
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
       });
     }
   } catch (e: unknown) {
     console.log(e);
     await Promise.all(pendingOutputPromise);
-    if (e instanceof Error) {
-      // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
-      if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
-        const lines = e.message.split("\n");
-        const execLineIndex = lines.findIndex((line) =>
-          line.includes("<exec>")
-        );
-        await onOutput({
-          type: "error",
-          message: lines
-            .slice(0, 1)
-            .concat(lines.slice(execLineIndex))
-            .join("\n")
-            .trim(),
-        });
-      } else {
-        await onOutput({
-          type: "fatalError",
-          message: `予期せぬエラー: ${e.message.trim()}`,
-        });
-      }
-    } else {
-      await onOutput({
-        type: "fatalError",
-        message: `予期せぬエラー: ${String(e).trim()}`,
-      });
-    }
+    const message = e instanceof Error ? e.message : String(e);
+    await onOutput({
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
+    });
   }
 
   const updatedFiles = readAllFiles();
@@ -158,45 +146,27 @@ async function runFile(
     }
 
     const pyExecFile = pyodide.runPython(execfile_py) as PyCallable;
-    pyExecFile(`${HOME}/${name}`);
+    const resultJson = pyExecFile(`${HOME}/${name}`);
     await Promise.all(pendingOutputPromise);
+
+    const result = JSON.parse(resultJson);
+    if (!result.success) {
+      await onOutput({
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
+      });
+      if (onDiagnostic && result.diagnostic) {
+        await onDiagnostic(result.diagnostic);
+      }
+    }
   } catch (e: unknown) {
     console.log(e);
     await Promise.all(pendingOutputPromise);
-    if (e instanceof Error) {
-      // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
-      // <exec> 自身も隠す
-      if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
-        const lines = e.message.split("\n");
-        const execLineIndex = lines.findLastIndex((line) =>
-          line.includes("<exec>")
-        );
-        await onOutput({
-          type: "error",
-          message: lines
-            .slice(0, 1)
-            .concat(lines.slice(execLineIndex + 1))
-            .join("\n")
-            .trim(),
-        });
-        if (onDiagnostic) {
-          const diagnostics = parsePythonTraceback(e.message);
-          for (const diag of diagnostics) {
-            await onDiagnostic(diag);
-          }
-        }
-      } else {
-        await onOutput({
-          type: "fatalError",
-          message: `予期せぬエラー: ${e.message.trim()}`,
-        });
-      }
-    } else {
-      await onOutput({
-        type: "fatalError",
-        message: `予期せぬエラー: ${String(e).trim()}`,
-      });
-    }
+    const message = e instanceof Error ? e.message : String(e);
+    await onOutput({
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
+    });
   }
 
   const updatedFiles = readAllFiles();
@@ -229,95 +199,6 @@ async function checkSyntax(
 
 async function restoreState(): Promise<object> {
   throw new Error("not implemented");
-}
-
-/**
- * Parses Python error/traceback string into a single Diagnostic with multiple frames.
- *
- * @param traceback - The traceback string or error message from Python
- * @returns Array of Diagnostic objects (at most 1 per error)
- */
-function parsePythonTraceback(traceback: string): Diagnostic[] {
-  if (!traceback) return [];
-
-  const lines = traceback.trim().split("\n");
-  if (lines.length === 0) return [];
-
-  // Extract the last error message line (e.g., "Exception: This is a test error" or "SyntaxError: ...")
-  let errorMessage = "";
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const line = lines[i].trim();
-    if (
-      line &&
-      !line.startsWith("^") &&
-      !line.startsWith('File "') &&
-      !line.startsWith("Traceback")
-    ) {
-      errorMessage = line;
-      break;
-    }
-  }
-
-  const frames: DiagnosticFrame[] = [];
-  const fileLineRegex = /File "([^"]+)", line (\d+)(?:, in (.+))?/;
-
-  for (let i = 0; i < lines.length; i++) {
-    const match = fileLineRegex.exec(lines[i]);
-    if (match) {
-      let rawFilename = match[1];
-      const lineNum = parseInt(match[2], 10);
-
-      // Normalize filename by removing homePrefix or leading slashes
-      if (rawFilename.startsWith(HOME)) {
-        rawFilename = rawFilename.slice(HOME.length);
-      }
-      if (rawFilename.startsWith("/")) {
-        rawFilename = rawFilename.replace(/^\/+/, "");
-      }
-
-      // Ignore internal names like <exec>, <string> if not matching normal files
-      if (rawFilename === "<exec>" || rawFilename === "<string>") {
-        continue;
-      }
-
-      // Check if there is a column indicator on subsequent lines (e.g. for SyntaxError with ^)
-      let startColumn: number | undefined = undefined;
-      let endColumn: number | undefined = undefined;
-      for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
-        const nextLine = lines[j];
-        if (fileLineRegex.test(nextLine)) break;
-        const caretIndex = nextLine.indexOf("^");
-        if (caretIndex !== -1) {
-          // In Python SyntaxError output, caret points to character (1-indexed)
-          startColumn = caretIndex + 1;
-          const caretEnd = nextLine.lastIndexOf("^");
-          if (caretEnd > caretIndex) {
-            endColumn = caretEnd + 2;
-          }
-          break;
-        }
-      }
-
-      frames.push({
-        filename: rawFilename,
-        startLineNumber: lineNum,
-        startColumn,
-        endLineNumber: lineNum,
-        endColumn,
-      });
-    }
-  }
-
-  if (frames.length === 0) return [];
-
-  // Return a single Diagnostic with all frames (1 error = 1 Diagnostic)
-  return [
-    {
-      frames,
-      message: errorMessage,
-      severity: "error",
-    },
-  ];
 }
 
 const api: WorkerAPI = {

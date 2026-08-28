@@ -5,9 +5,11 @@ import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
-import type { Diagnostic, DiagnosticFrame, ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
+import type { Diagnostic, ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
 
 import init_rb from "./ruby/init.rb?raw";
+import execfile_rb from "./ruby/execfile.rb?raw";
+import eval_code_rb from "./ruby/eval_code.rb?raw";
 
 let rubyVM: RubyVM | null = null;
 let currentOutputCallback: ((output: ReplOutput | UpdatedFile) => Promise<void>) | null = null;
@@ -61,6 +63,8 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
       rubyVM = vm;
 
       rubyVM.eval(init_rb);
+      rubyVM.eval(execfile_rb);
+      rubyVM.eval(eval_code_rb);
 
       return { capabilities: { interrupt: "restart" } };
     } catch (e: unknown) {
@@ -84,29 +88,6 @@ async function flushOutput() {
   stderrBuffer = "";
 }
 
-function formatRubyError(
-  error: unknown,
-  isFile: boolean
-): { message: string; isFatal: boolean } {
-  if (!(error instanceof Error)) {
-    return { message: `予期せぬエラー: ${String(error).trim()}`, isFatal: true };
-  }
-
-  let errorMessage = error.message;
-
-  // Clean up Ruby error messages by filtering out internal eval lines
-  if (errorMessage.includes("Traceback") || errorMessage.includes("Error")) {
-    let lines = errorMessage.split("\n");
-    lines = lines.filter((line) => line !== "-e:in 'Kernel.eval'");
-    if (isFile) {
-      lines = lines.filter((line) => !line.startsWith("eval:1:in"));
-    }
-    errorMessage = lines.join("\n");
-  }
-
-  return { message: errorMessage, isFatal: false };
-}
-
 async function runCode(
   code: string,
   onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
@@ -120,28 +101,35 @@ async function runCode(
     stdoutBuffer = "";
     stderrBuffer = "";
 
-    const result = await rubyVM.evalAsync(code);
-
-    const resultStr = await result.callAsync("inspect");
+    const resultVal = await rubyVM.evalAsync(
+      `__ruby_eval_code(${JSON.stringify(code)})`
+    );
 
     // Flush any buffered output
     await flushOutput();
 
-    // Add result to output if it's not nil and not empty
-    await onOutput({
-      type: "return",
-      message: resultStr.toString(),
-    });
+    const result = JSON.parse(resultVal.toString());
+    if (result.success) {
+      await onOutput({
+        type: "return",
+        message: result.result,
+      });
+    } else {
+      await onOutput({
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
+      });
+    }
   } catch (e) {
     console.log(e);
 
     // Flush any buffered output
     await flushOutput();
-    const { message, isFatal } = formatRubyError(e, false);
+    const message = e instanceof Error ? e.message : String(e);
 
     await onOutput({
-      type: isFatal ? "fatalError" : "error",
-      message,
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
     });
   }
 
@@ -177,32 +165,36 @@ async function runFile(
       }
     }
 
-    // clear LOADED_FEATURES so that `require` can reload files
-    rubyVM.eval(`$LOADED_FEATURES.reject! { |f| f =~ /^\\/[^\\/]*\\.rb$/ }`);
-
     // Run the specified file
-    await rubyVM.evalAsync(`load ${JSON.stringify(name)}`);
+    const resultVal = await rubyVM.evalAsync(
+      `__ruby_exec_file(${JSON.stringify(name)})`
+    );
 
     // Flush any buffered output
     await flushOutput();
+
+    const result = JSON.parse(resultVal.toString());
+    if (!result.success) {
+      await onOutput({
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
+      });
+
+      if (onDiagnostic && result.diagnostic) {
+        await onDiagnostic(result.diagnostic);
+      }
+    }
   } catch (e) {
     console.log(e);
 
     // Flush any buffered output
     await flushOutput();
-    const { message, isFatal } = formatRubyError(e, true);
+    const message = e instanceof Error ? e.message : String(e);
 
     await onOutput({
-      type: isFatal ? "fatalError" : "error",
-      message,
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
     });
-
-    if (!isFatal && onDiagnostic && e instanceof Error) {
-      const diagnostics = parseRubyError(e.message);
-      for (const diag of diagnostics) {
-        await onDiagnostic(diag);
-      }
-    }
   }
 
   const updatedFiles = readAllFiles();
@@ -290,7 +282,7 @@ async function restoreState(commands: string[]): Promise<object> {
 
   for (const command of commands) {
     try {
-      await rubyVM.evalAsync(command);
+      await rubyVM.evalAsync(`__ruby_eval_code(${JSON.stringify(command)})`);
     } catch (e) {
       // If restoration fails, we still continue with other commands
       console.error("Failed to restore command:", command, e);
@@ -302,105 +294,6 @@ async function restoreState(commands: string[]): Promise<object> {
   stderrBuffer = "";
 
   return {};
-}
-
-/**
- * Parses Ruby error/traceback string into a single Diagnostic with multiple frames.
- *
- * @param errorMessage - The error message from Ruby VM
- * @returns Array of Diagnostic objects (at most 1 per error)
- */
-function parseRubyError(errorMessage: string): Diagnostic[] {
-  if (!errorMessage) return [];
-
-  const lines = errorMessage.trim().split("\n");
-  if (lines.length === 0) return [];
-
-  const frames: DiagnosticFrame[] = [];
-
-  // Matches formats like:
-  // "test_error.rb:1:in '<main>': This is a test error (RuntimeError)"
-  // "/test_error.rb:2:in 'bar': This is a test error (RuntimeError)"
-  // "test_syntax.rb:1: syntax error, unexpected end-of-input, expecting '}'"
-  // "\tfrom /test_error.rb:5:in 'foo'"
-  // "test_multiframe.rb:6:in 'bar'"
-  const stackLineRegex = /^\s*(?:from\s+)?(\/?[^:\n\t]+):(\d+)(?::in [`']([^']+)['])?(?::\s*(.*))?$/;
-
-  let mainErrorMsg = "";
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-
-    // Skip internal evaluation files
-    if (line.includes("-e:in 'Kernel.eval'") || line.startsWith("eval:1:in") || line.startsWith("(eval)")) {
-      continue;
-    }
-
-    const match = stackLineRegex.exec(line);
-    if (match) {
-      let rawFilename = match[1];
-      const lineNum = parseInt(match[2], 10);
-      const message = match[4];
-
-      if (message && !mainErrorMsg) {
-        mainErrorMsg = message;
-      }
-
-      if (rawFilename.startsWith("/")) {
-        rawFilename = rawFilename.replace(/^\/+/, "");
-      }
-
-      if (
-        rawFilename === "eval" ||
-        rawFilename === "eval_async" ||
-        rawFilename.startsWith("eval_async") ||
-        rawFilename === "-e" ||
-        rawFilename.startsWith("(eval)") ||
-        rawFilename.startsWith("bundle/") ||
-        rawFilename.includes("/bundle/") ||
-        (rawFilename.startsWith("<") && rawFilename.endsWith(">"))
-      ) {
-        continue;
-      }
-
-      // Check if there is a column indicator on subsequent lines (e.g. for Ruby 3.1+ error highlight with ^)
-      let startColumn: number | undefined = undefined;
-      let endColumn: number | undefined = undefined;
-      for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
-        const nextLine = lines[j];
-        if (stackLineRegex.test(nextLine)) break;
-        const caretIndex = nextLine.indexOf("^");
-        if (caretIndex !== -1) {
-          startColumn = caretIndex + 1;
-          const caretEnd = nextLine.lastIndexOf("^");
-          if (caretEnd > caretIndex) {
-            endColumn = caretEnd + 2;
-          }
-          break;
-        }
-      }
-
-      frames.push({
-        filename: rawFilename,
-        startLineNumber: lineNum,
-        startColumn,
-        endLineNumber: lineNum,
-        endColumn,
-      });
-    }
-  }
-
-  if (frames.length === 0) return [];
-
-  // Return a single Diagnostic with all frames (1 error = 1 Diagnostic)
-  return [
-    {
-      frames,
-      message: mainErrorMsg || errorMessage,
-      severity: "error",
-    },
-  ];
 }
 
 const api: WorkerAPI = {
