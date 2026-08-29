@@ -20,6 +20,11 @@
 ## tests
 
 - `pnpm run --filter @my-code/runtime test` でvitestを使ってテストを実行できます
+- ルートまたはパッケージ内の `.env` / `.env.local` に `WANDBOX_URL` を記述しておくことで、ローカルで立ち上げた [unsandbox](https://github.com/ut-code/unsandbox) サーバーに自動で接続して高速にテストを実行できます（コマンドラインでの `WANDBOX_URL=...` 指定も可能です）。
+  ```bash
+  pnpm exec unsandbox --port 3055 &
+  pnpm run --filter @my-code/runtime test
+  ```
 - my.code(); の /about/runtime ページでMochaを使ってテストを実行できます
 - どちらからでも実行できるようテスト本体は ./tests/repl.ts, ./tests/fileExecution.ts に記述しています。
   新しい言語の実行環境を追加した場合、ここにテストケースを追加してください。
@@ -41,7 +46,7 @@ workerとの通信部分は言語によらず共通なので、それをworker/r
 
 ### Wandbox
 
-wandbox.org のAPIを利用してコードを実行します。
+wandbox.org のAPIを利用してコードを実行します（環境変数 `WANDBOX_URL` でローカルの unsandbox 等のエンドポイントに切り替え可能です）。
 
 APIから利用可能なコンパイラとオプションのリストが得られるので、言語ごとにそこからオプションを選択するロジックを実装しています。
 

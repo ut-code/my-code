@@ -35,6 +35,7 @@ SENTRY_PROJECT=
 SENTRY_URL=
 SENTRY_AUTH_TOKEN=
 SENTRY_DSN=
+# WANDBOX_URL=http://localhost:3055 # C++/Rustのローカル実行用(任意)
 ```
 
 - チャット用にGeminiのAPIキーまたはOpenRouterのAPIキーのいずれかが必要です。未設定の場合チャットが使えません
@@ -77,6 +78,27 @@ pnpm run lint
 ```
 
 でコードをチェックします。出てくるwarningやerrorはできるだけ直しましょう。
+
+### C++ / Rust のコード実行環境 (unsandbox)
+
+C++ および Rust のコード実行は、デフォルトでは [Wandbox](https://wandbox.org/) の公開 API を使用しますが、ローカルに [unsandbox](https://github.com/ut-code/unsandbox) を立ち上げて実行することも可能です（ローカル実行のほうが高速です）。
+
+```bash
+# unsandbox を起動（例: ポート 3055）
+pnpm exec unsandbox --port 3055
+```
+
+`.env` または `.env.local` に以下を設定すると、Next.js 開発サーバーやテスト実行時にローカルの unsandbox が自動で利用されます（dotenvによりテスト実行時も読み込まれます）。
+
+```dotenv
+WANDBOX_URL=http://localhost:3055
+```
+
+※ コマンドラインから直接指定して一時的に切り替えることも可能です。
+
+```bash
+WANDBOX_URL=http://localhost:3055 pnpm --filter @my-code/runtime test
+```
 
 ### データベースのスキーマ
 

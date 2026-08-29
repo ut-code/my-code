@@ -8,6 +8,7 @@ minimumReleaseAge: 1440
 minimumReleaseAgeStrict: true
 minimumReleaseAgeExclude:
   - daisyui@5.7.13
+  - unsandbox@1.0.0
 
 strictDepBuilds: true
 strictPeerDependencies: true
