@@ -1,9 +1,8 @@
 import { type Fetcher } from "swr";
 import { type ReplOutput, RuntimeInfo } from "../interface";
 
-const WANDBOX =
-  (typeof process !== "undefined" && process.env.WANDBOX_URL) ||
-  "https://wandbox.org";
+const WANDBOX = process.env.WANDBOX_URL || "https://wandbox.org";
+
 // https://github.com/melpon/wandbox/blob/ajax/kennel2/API.rst  <- 古いけど、説明と例がある
 // https://github.com/melpon/wandbox/blob/master/feline/src/types.rs
 /* RustのVec<u8>はバイト配列ですが、serialize_with = "serialize_utf8"という指定があるため、
