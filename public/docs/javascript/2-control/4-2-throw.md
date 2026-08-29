@@ -9,7 +9,7 @@ question:
 
 ### `throw` について
 
-JavaScriptでは `throw` で例外を投げることができます。`Error` オブジェクトを投げるのが一般的ですが、技術的には文字列や数値など、任意の値を投げることが可能です（ただし、スタックトレースが取れなくなるため推奨されません）。
+JavaScriptでは `throw` で例外を投げることができます。`Error` [[オブジェクト]]を投げるのが一般的ですが、技術的には[[文字列]]や[[数値]]など、任意の値を投げることが可能です（ただし、スタックトレースが取れなくなるため推奨されません）。
 
 ```js-repl
 > try { throw new Error("Something went wrong"); } catch (e) { console.log(e.message); }
