@@ -15,9 +15,11 @@ pnpm install --frozen-lockfile
 ```bash
 pnpm exec prisma dev
 ```
+
 を実行し、`t` キーを押して表示される DATABASE_URL をコピー
 
 ルートディレクトリに .env または .env.local という名前のファイルを作成し、以下の内容を記述
+
 ```dotenv
 API_KEY=GeminiAPIキー
 OPENROUTER_API_KEY=OpenRouterAPIキー
@@ -36,40 +38,45 @@ SENTRY_DSN=
 # WANDBOX_URL=http://localhost:3055 # C++/Rustのローカル実行用(任意)
 ```
 
-* チャット用にGeminiのAPIキーまたはOpenRouterのAPIキーのいずれかが必要です。未設定の場合チャットが使えません
-    * OpenRouterを使う場合は使用するモデルをセミコロン区切りで `OPENROUTER_MODEL` に設定してください (エラー時に2番目以降にフォールバックします)
-    * 両方設定されている場合はOpenRouterが使われます
-* `GITHUB_CLIENT_ID` `GITHUB_CLIENT_SECRET` はGitHub OAuthのクライアントIDとシークレットを設定します。未設定の場合「GitHubでログイン」が使えません。
-作り方については https://www.better-auth.com/docs/authentication/github を参照
-* `GOOGLE_CLIENT_ID` `GOOGLE_CLIENT_SECRET` はGoogle OAuthのクライアントIDとシークレットを設定します。未設定の場合「Googleでログイン」が使えません。
-作り方については https://www.better-auth.com/docs/authentication/google を参照 (GitHubのほうがかんたんかも)
-
+- チャット用にGeminiのAPIキーまたはOpenRouterのAPIキーのいずれかが必要です。未設定の場合チャットが使えません
+  - OpenRouterを使う場合は使用するモデルをセミコロン区切りで `OPENROUTER_MODEL` に設定してください (エラー時に2番目以降にフォールバックします)
+  - 両方設定されている場合はOpenRouterが使われます
+- `GITHUB_CLIENT_ID` `GITHUB_CLIENT_SECRET` はGitHub OAuthのクライアントIDとシークレットを設定します。未設定の場合「GitHubでログイン」が使えません。
+  作り方については https://www.better-auth.com/docs/authentication/github を参照
+- `GOOGLE_CLIENT_ID` `GOOGLE_CLIENT_SECRET` はGoogle OAuthのクライアントIDとシークレットを設定します。未設定の場合「Googleでログイン」が使えません。
+  作り方については https://www.better-auth.com/docs/authentication/google を参照 (GitHubのほうがかんたんかも)
 
 別のターミナルで、
+
 ```bash
 pnpm run db-migrate
 ```
+
 でデータベースを初期化
 
 ```bash
 pnpm run db-docs
 ```
+
 でデータベースにドキュメントのページ情報を挿入します。
 (public/docs/以下にmarkdownを追加・削除したら再度実行する必要があります)
 
 ```bash
 pnpm run dev
 ```
+
 [http://localhost:3000](http://localhost:3000) で開きます。
 
 ```bash
 pnpm run format
 ```
+
 でコードを整形します。
 
 ```bash
 pnpm run lint
 ```
+
 でコードをチェックします。出てくるwarningやerrorはできるだけ直しましょう。
 
 ### C++ / Rust のコード実行環境 (unsandbox)
@@ -94,16 +101,16 @@ WANDBOX_URL=http://localhost:3055 pnpm --filter @my-code/runtime test
 
 ### データベースのスキーマ
 
-* データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `pnpm run db-generate` (`pnpm exec drizzle-kit generate`) でmigrationファイルを作成し、 `pnpm run db-migrate` (`pnpm exec drizzle-kit migrate`) でデータベースに反映します。
-    * 本番環境のデータベースのmigrateはmainにpushされた際にGitHub Actionで実行されます
-* スキーマのファイルを追加した場合は app/lib/drizzle.ts でimportを追加する必要があります(たぶん)
-* `pnpm exec prisma dev` で立ち上げたデータベースは `pnpm exec prisma dev ls` でデータベース名の確認・ `pnpm exec prisma dev rm default` で削除ができるらしい
+- データベースのスキーマ(./app/schema/hoge.ts)を編集した場合、 `pnpm run db-generate` (`pnpm exec drizzle-kit generate`) でmigrationファイルを作成し、 `pnpm run db-migrate` (`pnpm exec drizzle-kit migrate`) でデータベースに反映します。
+  - 本番環境のデータベースのmigrateはmainにpushされた際にGitHub Actionで実行されます
+- スキーマのファイルを追加した場合は app/lib/drizzle.ts でimportを追加する必要があります(たぶん)
+- `pnpm exec prisma dev` で立ち上げたデータベースは `pnpm exec prisma dev ls` でデータベース名の確認・ `pnpm exec prisma dev rm default` で削除ができるらしい
 
 ### 本番環境の場合
 
 上記の環境変数以外に、
 
-* `BETTER_AUTH_SECRET` に任意の文字列
+- `BETTER_AUTH_SECRET` に任意の文字列
 
 が必要です。
 
@@ -112,105 +119,122 @@ Cloudflare Worker のビルドログとステータス表示が見れますが�
 
 ## ドキュメント
 
-* ドキュメントはセクション(見出し)ごとにわけ、 public/docs/言語id/ページid/並び替え用連番-セクション名.md に置く。
-* ページはディレクトリの名前によらず 言語id/index.yml に書かれている順で表示される。
-* セクションはセクションIDによらずファイル名順で表示される。
-* 各セクションのfrontmatter (各ページ最初のセクション(-intro.md)を除く)
-    ```yml
-    id: 一意なセクションID。ファイル名・ディレクトリ名と一致していなくても良い。バックエンドがこのセクションIDで識別するので、一度コミットしたら変更不可(ファイル名は何度変えても良い)
-    title: セクションタイトルと同じものをmd記法を使わずに書いた文字列
-    level: セクションの見出しレベル(2〜6が使用可)
-    question:
-      - このセクションに関連する、想定される質問例。
-      # question: 自体を省略すると、GitHub ActionがGeminiを呼び出して質問例を生成しpushします。
-      # 質問例が不要な場合は question: [] にしてください。
-    term:
-      - キーワード
-      - きーわーど
-      # 他のページで [[キーワード]] と書いた場合に、このセクションの内容がポップアップで表示される。
-    ```
-* コード例はそれが配置されているセクションの内容と関連するようにする。
-    ````md
-    ## 制御構文
-    ### if
-    if文の説明…
-    ### switch
-    switch文の説明…
+- ドキュメントはセクション(見出し)ごとにわけ、 public/docs/言語id/ページid/並び替え用連番-セクション名.md に置く。
+- ページはディレクトリの名前によらず 言語id/index.yml に書かれている順で表示される。
+- セクションはセクションIDによらずファイル名順で表示される。
+- 各セクションのfrontmatter (各ページ最初のセクション(-intro.md)を除く)
+  ```yml
+  id: 一意なセクションID。ファイル名・ディレクトリ名と一致していなくても良い。バックエンドがこのセクションIDで識別するので、一度コミットしたら変更不可(ファイル名は何度変えても良い)
+  title: セクションタイトルと同じものをmd記法を使わずに書いた文字列
+  level: セクションの見出しレベル(2〜6が使用可)
+  question:
+    - このセクションに関連する、想定される質問例。
+    # question: 自体を省略すると、GitHub ActionがGeminiを呼び出して質問例を生成しpushします。
+    # 質問例が不要な場合は question: [] にしてください。
+  term:
+    - キーワード
+    - きーわーど
+    # 他のページで [[キーワード]] と書いた場合に、このセクションの内容がポップアップで表示される。
+  ```
+- コード例はそれが配置されているセクションの内容と関連するようにする。
 
-    ifとswitch共通の注意事項... → ## 制御構文 に移す
-    ```
-    ifとswitchを使ったコード例… → 2つのコード例に分割する
-    (分割が難しい(かつ説明が短い)場合は、1つのセクションで全部説明してコード例を載せるのでもよい)
-    ```
-    ````
-* コード例や注意事項などを不必要に独立したセクションにするのは避ける
-    ````md
-    ## hoge
-    hogeの説明…
-    ### hogeの使用場面 →この見出しいらない
-    **hogeの使用場面** はok
-      - 説明
-      - 説明
-    ### hogeの使用例 →この見出しいらない
-    ```
-    hogeを使ったコード例…
-    ```
-    ````
-* REPLのコード例は1セクションに最大1つまで。
-    * コードエディターとコード実行ブロックはいくつでも置けます。
-* ページ0以外の各ページの最後はレベル2見出し「この章のまとめ」と、レベル3見出し「練習問題n」を置く
-* 編集したドキュメントにローカルの開発環境でアクセスする際は `pnpm run db-docs` を実行してください。これにより `public/docs/revisions-dev.yml` が更新・作成され、チャットが正しく動作するようになります。
-    * 本番環境用の `revisions.yml` は、main ブランチに push された際に GitHub Action によって自動的に更新されます。
+  ````md
+  ## 制御構文
+
+  ### if
+
+  if文の説明…
+
+  ### switch
+
+  switch文の説明…
+
+  ifとswitch共通の注意事項... → ## 制御構文 に移す
+
+  ```
+  ifとswitchを使ったコード例… → 2つのコード例に分割する
+  (分割が難しい(かつ説明が短い)場合は、1つのセクションで全部説明してコード例を載せるのでもよい)
+  ```
+  ````
+
+- コード例や注意事項などを不必要に独立したセクションにするのは避ける
+
+  ````md
+  ## hoge
+
+  hogeの説明…
+
+  ### hogeの使用場面 →この見出しいらない
+
+  **hogeの使用場面** はok
+
+  - 説明
+  - 説明
+
+  ### hogeの使用例 →この見出しいらない
+
+  ```
+  hogeを使ったコード例…
+  ```
+  ````
+
+- REPLのコード例は1セクションに最大1つまで。
+  - コードエディターとコード実行ブロックはいくつでも置けます。
+- ページ0以外の各ページの最後はレベル2見出し「この章のまとめ」と、レベル3見出し「練習問題n」を置く
+- 編集したドキュメントにローカルの開発環境でアクセスする際は `pnpm run db-docs` を実行してください。これにより `public/docs/revisions-dev.yml` が更新・作成され、チャットが正しく動作するようになります。
+  - 本番環境用の `revisions.yml` は、main ブランチに push された際に GitHub Action によって自動的に更新されます。
 
 ### ベースとなるドキュメントの作り方
 
 - web版の ~~Gemini2.5Pro~~ Gemini3Pro を用いる。
 - 以下のプロンプトで章立てを考えさせる
-    > `n`章前後から構成される`言語名`のチュートリアルを書こうと思います。章立てを考えてください。`言語名`以外の言語でのプログラミングはある程度やったことがある人を対象にします。
-    > 
+  > `n`章前後から構成される`言語名`のチュートリアルを書こうと思います。章立てを考えてください。`言語名`以外の言語でのプログラミングはある程度やったことがある人を対象にします。
 - nを8, 10, 12, 15 など変えて何回か出力させ、それを統合していい感じの章立てを決める
 - 実際にドキュメントを書かせる
-    > 以下の内容で`言語名`チュートリアルの第`n`章を書いてください。他の言語でのプログラミングは経験がある人を対象にします。  
-    > タイトルにはレベル1の見出し(#), それ以降の見出しにはレベル2以下(##)を使用してください。  
-    > canvasは使わずに出力してください。  
-    > REPLで動作可能なコード例はスクリプトではなくREPLの実行例として書いてください。  
-    > コード例はREPLの実行例では \`\`\``言語名`-repl 、ソースファイルの場合は \`\`\``言語名`:ファイル名`.拡張子` ではじまるコードブロックで示してください。ファイル名は被らないようにしてください。  
-    > また、ファイルの場合は \`\`\``言語名`-exec:ファイル名`.拡張子` のコードブロック内に実行結果例を記載してください。  
-    > また、最後には この章のまとめ セクションと、練習問題を2つほど書いてください。練習問題はこの章で学んだ内容を活用してコードを書かせるものにしてください。  
-    >
-    > 全体の構成  
-    > `1. hoge`  
-    > `2. fuga`  
-    > `3. piyo`  
-    > `4. ...`  
-    >
-    > `第n章: 第n章のタイトル`  
-    > `第n章内の見出し・内容の概要…`  
-    > 
+  > 以下の内容で`言語名`チュートリアルの第`n`章を書いてください。他の言語でのプログラミングは経験がある人を対象にします。  
+  > タイトルにはレベル1の見出し(#), それ以降の見出しにはレベル2以下(##)を使用してください。  
+  > canvasは使わずに出力してください。  
+  > REPLで動作可能なコード例はスクリプトではなくREPLの実行例として書いてください。  
+  > コード例はREPLの実行例では \`\`\``言語名`-repl 、ソースファイルの場合は \`\`\``言語名`:ファイル名`.拡張子` ではじまるコードブロックで示してください。ファイル名は被らないようにしてください。  
+  > また、ファイルの場合は \`\`\``言語名`-exec:ファイル名`.拡張子` のコードブロック内に実行結果例を記載してください。  
+  > また、最後には この章のまとめ セクションと、練習問題を2つほど書いてください。練習問題はこの章で学んだ内容を活用してコードを書かせるものにしてください。
+  >
+  > 全体の構成  
+  > `1. hoge`  
+  > `2. fuga`  
+  > `3. piyo`  
+  > `4. ...`
+  >
+  > `第n章: 第n章のタイトル`  
+  > `第n章内の見出し・内容の概要…`
 - Gemini出力の調整
-    - Canvasを使われた場合はやり直す。(Canvasはファイル名付きコードブロックで壊れる)
-    - 太字がなぜか `**キーワード**` の代わりに `\*\*キーワード\*\*` となっている場合がある。 `\*\*` → `**` の置き換えで対応
-    - 見出しの前に `-----` (水平線)が入る場合がある。my.code();は水平線の表示に対応しているが、消す方向で統一
-    - REPLの出力部分に書かれたコメントは消えるので修正する
-        - ダメな例
-        ````
-        ```js-repl
-        > console.log("Hello")
-        Hello  // 文字列を表示する
-        ```
-        ````
-        - 以下のようにすればok
-        ````
-        ```js-repl
-        > console.log("Hello")  // 文字列を表示する
-        Hello
+  - Canvasを使われた場合はやり直す。(Canvasはファイル名付きコードブロックで壊れる)
+  - 太字がなぜか `**キーワード**` の代わりに `\*\*キーワード\*\*` となっている場合がある。 `\*\*` → `**` の置き換えで対応
+  - 見出しの前に `-----` (水平線)が入る場合がある。my.code();は水平線の表示に対応しているが、消す方向で統一
+  - REPLの出力部分に書かれたコメントは消えるので修正する
+    - ダメな例
 
-        > // 文字列を表示する
-        > console.log("Hello")
-        Hello
-        ```
-        ````
-    - 練習問題のファイル名は不都合がなければ `practice(章番号)_(問題番号).拡張子` で統一。空でもよいのでファイルコードブロックとexecコードブロックを置く
+    ````
+    ```js-repl
+    > console.log("Hello")
+    Hello  // 文字列を表示する
+    ```
+    ````
+
+    - 以下のようにすればok
+
+    ````
+    ```js-repl
+    > console.log("Hello")  // 文字列を表示する
+    Hello
+
+    > // 文字列を表示する
+    > console.log("Hello")
+    Hello
+    ```
+    ````
+
+  - 練習問題のファイル名は不都合がなければ `practice(章番号)_(問題番号).拡張子` で統一。空でもよいのでファイルコードブロックとexecコードブロックを置く
 
 ### Alert
 
@@ -218,7 +242,7 @@ GitHubのalert記法の、`NOTE` `TIP` `WARNING` `CAUTION` が使えます。
 `IMPORTANT` はwarningに置き換えられます。
 
 ```
-> [!NOTE]  
+> [!NOTE]
 > Highlights information that users should take into account, even when skimming.
 ```
 
@@ -227,6 +251,7 @@ GitHubのalert記法の、`NOTE` `TIP` `WARNING` `CAUTION` が使えます。
 ```
 [[用語]]
 ```
+
 と書くと、`term: - 用語` が定義されている別のセクションへのリンクになり、ポップアップでその内容も表示されます。
 
 markdown書式も利用可能です。 `[[ほげ**ふが**]]` は `term: - ほげふが` へのリンクになり、表示は「<ins>ほげ**ふが**</ins>」になります。ただし `**[[ふが]]**` はリンクの色が優先されるのに対し `[[**ふが**]]` は強調の色が優先されます。
@@ -235,12 +260,14 @@ markdown書式も利用可能です。 `[[ほげ**ふが**]]` は `term: - ほ�
 [[./1-foo]]
 [[./1]]
 ```
+
 と書くと、同じ言語のページID `1-foo` またはindex `1` (ページのindexはindex.ymlの記述順で0-based) へのリンクになり、表示は「<ins>第1章</ins>」になります
 
 ```
 [[./prev]]
 [[./next]]
 ```
+
 と書くと、同じ言語の前のページ・次のページへのリンクになり、表示は「<ins>第1章</ins>」(実際の章番号)になります
 
 ### コード実行環境仕様
@@ -255,7 +282,8 @@ markdown書式も利用可能です。 `[[ほげ**ふが**]]` は `term: - ほ�
 ````
 
 でターミナルを埋め込む。
-* 実行結果はEmbedContextにも送られ、チャットフォームが参照できる
+
+- 実行結果はEmbedContextにも送られ、チャットフォームが参照できる
 
 ````
 ```言語名:ファイル名
@@ -264,12 +292,13 @@ markdown書式も利用可能です。 `[[ほげ**ふが**]]` は `term: - ほ�
 ````
 
 でテキストエディターを埋め込む。
-* app/terminal/editor.tsx内で `import "ace-builds/src-min-noconflict/mode-言語名";` を追加し、packages/runtime/src/languages.tsにも追加すればその言語に対応した色付けがされる。
-    * importできる言語の一覧は https://github.com/ajaxorg/ace-builds/tree/master/src-noconflict
-* 編集した内容は app/terminal/file.tsx のFileContextで管理される。
-    * 編集中のコードはFileContextに即時送られる
-    * FileContextが書き換えられたら即時すべてのエディターに反映される
-* 編集したファイルの一覧はEmbedContextにも送られ、チャットフォームが参照できる
+
+- app/terminal/editor.tsx内で `import "ace-builds/src-min-noconflict/mode-言語名";` を追加し、packages/runtime/src/languages.tsにも追加すればその言語に対応した色付けがされる。
+  - importできる言語の一覧は https://github.com/ajaxorg/ace-builds/tree/master/src-noconflict
+- 編集した内容は app/terminal/file.tsx のFileContextで管理される。
+  - 編集中のコードはFileContextに即時送られる
+  - FileContextが書き換えられたら即時すべてのエディターに反映される
+- 編集したファイルの一覧はEmbedContextにも送られ、チャットフォームが参照できる
 
 ````
 ```言語名-readonly:ファイル名
@@ -286,19 +315,19 @@ markdown書式も利用可能です。 `[[ほげ**ふが**]]` は `term: - ほ�
 ````
 
 で実行ボタンを表示する
-* 実行ボタンを押した際にFileContextからファイルを読み、実行し、結果を表示する
-* 実行結果はEmbedContextにも送られ、チャットフォームが参照できる
 
+- 実行ボタンを押した際にFileContextからファイルを読み、実行し、結果を表示する
+- 実行結果はEmbedContextにも送られ、チャットフォームが参照できる
 
 ## 技術スタック・ドキュメント・メモ
 
 - [Next.js](https://nextjs.org/docs)
-    - 検索する際は「App Router」を含めることで古い記事に惑わされることが少なくなります。
+  - 検索する際は「App Router」を含めることで古い記事に惑わされることが少なくなります。
 - [OpenNext](https://opennext.js.org/cloudflare)
 - [DaisyUI](https://daisyui.com/docs/use/) / [Tailwind CSS](https://tailwindcss.com/docs)
-    - buttonやinputやメニューなどの基本的なコンポーネントのデザインはDaisyUIにあるものを使うと楽です
-    - 細かくスタイルを調整したい場合はTailwind CSSを使います (CSS直接指定(`style={{...}}`)よりもちょっと楽に書ける)
-    - よくわからなかったらstyle直接指定でも良い
+  - buttonやinputやメニューなどの基本的なコンポーネントのデザインはDaisyUIにあるものを使うと楽です
+  - 細かくスタイルを調整したい場合はTailwind CSSを使います (CSS直接指定(`style={{...}}`)よりもちょっと楽に書ける)
+  - よくわからなかったらstyle直接指定でも良い
 - [SWR](https://swr.vercel.app/ja)
 - [react-markdown](https://www.npmjs.com/package/react-markdown)
 - REPL・実行結果表示: [xterm.js](https://xtermjs.org/)

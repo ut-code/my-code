@@ -1,7 +1,7 @@
 name: Update Docs Revision And Database
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 permissions:
   contents: write
 concurrency:
@@ -14,28 +14,28 @@ jobs:
       matrix:
         node-version: [22.x]
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v6
-    - uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm exec drizzle-kit migrate
-      env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-    - run: pnpm exec tsx ./scripts/checkDocs.ts --write
-      env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-    - name: Configure git for push
-      run: |
-        git remote set-url origin "https://github-actions:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
-        git config user.name  "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Commit build output
-      run: |
-        git add .
-        git diff --staged --exit-code || (git commit -m "[ci] update revisions.yml" && git push origin main)
-        # The `||` ensures the commit and push only happen if there are changes (git diff exits with non-zero)
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec drizzle-kit migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - run: pnpm exec tsx ./scripts/checkDocs.ts --write
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Configure git for push
+        run: |
+          git remote set-url origin "https://github-actions:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit build output
+        run: |
+          git add .
+          git diff --staged --exit-code || (git commit -m "[ci] update revisions.yml" && git push origin main)
+          # The `||` ensures the commit and push only happen if there are changes (git diff exits with non-zero)

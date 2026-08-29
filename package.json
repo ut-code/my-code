@@ -18,7 +18,7 @@
     "start": "next start",
     "lint": "pnpm run cf-typegen && eslint .",
     "tsc": "pnpm run cf-typegen && tsc",
-    "format": "prettier --write app/ packages/",
+    "format": "prettier --write .",
     "db-migrate": "drizzle-kit migrate",
     "db-generate": "drizzle-kit generate",
     "db-docs": "tsx ./scripts/checkDocs.ts --write",
