@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@my-code/js-eval": "workspace:*",
     "@ruby/wasm-wasi": "^2.7.2",
     "@typescript/vfs": "^1.6.2",
     "async-mutex": "^0.5.0",
@@ -21,8 +22,7 @@
     "react-dom": "^19",
     "swr": "^2",
     "typescript": "^5",
-    "zod": "^4.0.17",
-    "@my-code/js-eval": "workspace:*"
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.0.0",
@@ -33,6 +33,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.4",
     "@vitest/browser-webdriverio": "^4.1.10",
+    "dotenv": "^17.4.2",
     "vitest": "^4.1.10"
   }
 }

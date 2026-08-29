@@ -81,13 +81,13 @@ C++ および Rust のコード実行は、デフォルトでは [Wandbox](https
 pnpm exec unsandbox --port 3055
 ```
 
-`.env` または `.env.local` に以下を設定すると、Next.js 開発サーバーからローカルの unsandbox を利用できます。
+`.env` または `.env.local` に以下を設定すると、Next.js 開発サーバーやテスト実行時にローカルの unsandbox が自動で利用されます（dotenvによりテスト実行時も読み込まれます）。
 
 ```dotenv
 WANDBOX_URL=http://localhost:3055
 ```
 
-※ テスト実行時のみ切り替える場合は環境変数を直接指定して実行できます。
+※ コマンドラインから直接指定して一時的に切り替えることも可能です。
 ```bash
 WANDBOX_URL=http://localhost:3055 pnpm --filter @my-code/runtime test
 ```

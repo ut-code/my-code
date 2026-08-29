@@ -20,10 +20,10 @@
 ## tests
 
 - `pnpm run --filter @my-code/runtime test` でvitestを使ってテストを実行できます
-- 環境変数 `WANDBOX_URL` を指定することで、ローカルで立ち上げた [unsandbox](https://github.com/ut-code/unsandbox) サーバーに接続して高速にテストを実行できます。
+- ルートまたはパッケージ内の `.env` / `.env.local` に `WANDBOX_URL` を記述しておくことで、ローカルで立ち上げた [unsandbox](https://github.com/ut-code/unsandbox) サーバーに自動で接続して高速にテストを実行できます（コマンドラインでの `WANDBOX_URL=...` 指定も可能です）。
   ```bash
   pnpm exec unsandbox --port 3055 &
-  WANDBOX_URL=http://localhost:3055 pnpm run --filter @my-code/runtime test
+  pnpm run --filter @my-code/runtime test
   ```
 - my.code(); の /about/runtime ページでMochaを使ってテストを実行できます
 - どちらからでも実行できるようテスト本体は ./tests/repl.ts, ./tests/fileExecution.ts に記述しています。
