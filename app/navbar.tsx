@@ -12,23 +12,28 @@ function PageTitle({ pagesList }: { pagesList: LanguageEntry[] }) {
   const currentLang = pathnameMatch?.[1];
   const currentPageId = pathnameMatch?.[2];
 
-  if(pathname === "/"){
+  if (pathname === "/") {
     return <>へようこそ</>;
   }
 
   const currentGroup = pagesList.find((group) => group.id === currentLang);
-  const currentPage = currentGroup?.pages.find((page) => page.slug === currentPageId);
-  if(currentGroup && currentPage){
-    return <>
-      <span className="text-base mr-2">{currentGroup.name}-{currentPage.index}.</span>
-      <span>{currentPage.name}</span>
-    </>
+  const currentPage = currentGroup?.pages.find(
+    (page) => page.slug === currentPageId
+  );
+  if (currentGroup && currentPage) {
+    return (
+      <>
+        <span className="text-base mr-2">
+          {currentGroup.name}-{currentPage.index}.
+        </span>
+        <span>{currentPage.name}</span>
+      </>
+    );
   }
 
   return null;
 }
 export function Navbar({ pagesList }: { pagesList: LanguageEntry[] }) {
-
   return (
     <>
       {/* fixedのヘッダーの分だけスクロールするコンテンツを下に移動するためのdiv */}

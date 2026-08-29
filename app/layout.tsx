@@ -42,28 +42,28 @@ export default async function RootLayout({
       <body className="w-full min-h-screen">
         <AutoAnonymousLogin />
         <PagesListContextProvider pagesList={pagesList}>
-        <SidebarMdProvider>
-          <div className="drawer has-sidebar:drawer-open min-h-screen">
-            <input
-              id="drawer-toggle"
-              type="checkbox"
-              className="drawer-toggle"
-            />
-            <div className="drawer-content flex flex-col">
-              <Navbar pagesList={pagesList} />
-              <RuntimeProvider>{children}</RuntimeProvider>
-            </div>
-            <div className="drawer-side shadow-md z-50">
-              <label
-                htmlFor="drawer-toggle"
-                aria-label="close sidebar"
-                className="drawer-overlay"
+          <SidebarMdProvider>
+            <div className="drawer has-sidebar:drawer-open min-h-screen">
+              <input
+                id="drawer-toggle"
+                type="checkbox"
+                className="drawer-toggle"
               />
-              <Sidebar />
+              <div className="drawer-content flex flex-col">
+                <Navbar pagesList={pagesList} />
+                <RuntimeProvider>{children}</RuntimeProvider>
+              </div>
+              <div className="drawer-side shadow-md z-50">
+                <label
+                  htmlFor="drawer-toggle"
+                  aria-label="close sidebar"
+                  className="drawer-overlay"
+                />
+                <Sidebar />
+              </div>
             </div>
-          </div>
-        </SidebarMdProvider>
-      </PagesListContextProvider>
+          </SidebarMdProvider>
+        </PagesListContextProvider>
         <Footer />
       </body>
     </html>

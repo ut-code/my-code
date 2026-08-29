@@ -4,7 +4,7 @@ import { phrasing } from "mdast-util-phrasing";
 
 /**
  * `[[用語]]`を`<Term>用語</Term>`に変換するプラグイン。
- * 
+ *
  * https://github.com/ut-code/utcode-learn/blob/main/src/remark/remark-term.ts からコピペ
  * Copyright (c) 2023 ut.code();
  *

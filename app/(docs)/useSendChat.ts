@@ -7,10 +7,7 @@ import { DynamicMarkdownSection, PagePath } from "@/lib/docs";
 import { ChatStreamEvent } from "@/api/chat/route";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { useStreamingChatContext } from "./streamingChatContext";
-import {
-  ReplCommand,
-  ReplOutput,
-} from "@my-code/runtime/interface";
+import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
 
 export interface SendChatParams {
   path: PagePath;
@@ -113,7 +110,10 @@ export function useSendChat() {
                   // 2. 新チャットの再検証
                   await revalidateChatAction(event.chatId, event.pagePath);
                   if (deleteChatOnCreated) {
-                    await revalidateChatAction(deleteChatOnCreated, event.pagePath);
+                    await revalidateChatAction(
+                      deleteChatOnCreated,
+                      event.pagePath
+                    );
                   }
 
                   // 3. セクションのスクロール
@@ -139,7 +139,10 @@ export function useSendChat() {
                     await revalidateChatAction(chatId, chatPagePath);
                   }
                   if (deleteChatOnCreated) {
-                    await revalidateChatAction(deleteChatOnCreated, chatPagePath);
+                    await revalidateChatAction(
+                      deleteChatOnCreated,
+                      chatPagePath
+                    );
                   }
                   streamingChatContext.finishStreaming();
                   router.refresh();
@@ -170,10 +173,7 @@ export function useSendChat() {
         }
       })();
     },
-    [
-      router,
-      streamingChatContext,
-    ]
+    [router, streamingChatContext]
   );
 
   return {

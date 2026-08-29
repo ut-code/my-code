@@ -10,7 +10,9 @@ import type { ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
 import init_rb from "./ruby/init.rb?raw";
 
 let rubyVM: RubyVM | null = null;
-let currentOutputCallback: ((output: ReplOutput | UpdatedFile) => Promise<void>) | null = null;
+let currentOutputCallback:
+  | ((output: ReplOutput | UpdatedFile) => Promise<void>)
+  | null = null;
 let stdoutBuffer = "";
 let stderrBuffer = "";
 
@@ -33,7 +35,10 @@ self.stderr = {
     stderrBuffer = await handleBatchOutput(stderrBuffer, "stderr");
   },
 };
-async function handleBatchOutput(buffer: string, type: ReplOutputType): Promise<string> {
+async function handleBatchOutput(
+  buffer: string,
+  type: ReplOutputType
+): Promise<string> {
   // If buffer contains newlines, flush complete lines immediately
   if (buffer.includes("\n")) {
     const lines = buffer.split("\n");
@@ -89,7 +94,10 @@ function formatRubyError(
   isFile: boolean
 ): { message: string; isFatal: boolean } {
   if (!(error instanceof Error)) {
-    return { message: `予期せぬエラー: ${String(error).trim()}`, isFatal: true };
+    return {
+      message: `予期せぬエラー: ${String(error).trim()}`,
+      isFatal: true,
+    };
   }
 
   let errorMessage = error.message;
