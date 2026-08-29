@@ -7,11 +7,7 @@ import { loadPyodide } from "pyodide";
 import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
-import type {
-  Diagnostic,
-  ReplOutput,
-  UpdatedFile,
-} from "../interface";
+import type { Diagnostic, ReplOutput, UpdatedFile } from "../interface";
 
 import execfile_py from "./pyodide/execfile.py?raw";
 import eval_code_py from "./pyodide/eval_code.py?raw";

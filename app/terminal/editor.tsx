@@ -81,8 +81,8 @@ export function EditorComponent(props: EditorProps) {
           const className = isError
             ? "ace_error-marker"
             : isWarning
-            ? "ace_warning-marker"
-            : "ace_info-marker";
+              ? "ace_warning-marker"
+              : "ace_info-marker";
 
           return {
             startRow,
@@ -101,7 +101,6 @@ export function EditorComponent(props: EditorProps) {
         })
     );
   }, [fileDiagnostics, props.filename]);
-
 
   const code = files[props.filename] || props.initContent;
   useEffect(() => {
@@ -243,7 +242,10 @@ export function EditorComponent(props: EditorProps) {
       {fontSize !== undefined && initAce ? (
         <Suspense
           fallback={
-            <FallbackPre className="grow-1 rounded-b-box" editorHeight={editorHeight}>
+            <FallbackPre
+              className="grow-1 rounded-b-box"
+              editorHeight={editorHeight}
+            >
               {code}
             </FallbackPre>
           }

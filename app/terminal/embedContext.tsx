@@ -1,6 +1,10 @@
 "use client";
 
-import { Diagnostic, ReplCommand, ReplOutput } from "@my-code/runtime/interface";
+import {
+  Diagnostic,
+  ReplCommand,
+  ReplOutput,
+} from "@my-code/runtime/interface";
 import {
   createContext,
   ReactNode,
@@ -71,9 +75,9 @@ export function EmbedContextProvider({
   const pageKey: PageKey = `${lang}/${pageId}`;
 
   const [prevPageKey, setPrevPageKey] = useState<PageKey>(pageKey);
-  const [files, setFiles] = useState<
-    Record<PageKey, Record<Filename, string>>
-  >({});
+  const [files, setFiles] = useState<Record<PageKey, Record<Filename, string>>>(
+    {}
+  );
   const [replOutputs, setReplOutputs] = useState<
     Record<TerminalId, ReplCommand[]>
   >({});

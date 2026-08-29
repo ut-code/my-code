@@ -1,6 +1,10 @@
 import { RuntimeLang } from "@my-code/runtime/languages";
 import { TestBody } from "./utils";
-import { Diagnostic, ReplOutput, UpdatedFile } from "@my-code/runtime/interface";
+import {
+  Diagnostic,
+  ReplOutput,
+  UpdatedFile,
+} from "@my-code/runtime/interface";
 import { expect } from "chai";
 
 export const fileExecutionTests: Record<
@@ -208,7 +212,10 @@ export const fileExecutionTests: Record<
           diagnostics.push(diagnostic);
         }
       );
-      console.log(`${lang} single file diagnostic test: `, JSON.stringify(diagnostics, null, 2));
+      console.log(
+        `${lang} single file diagnostic test: `,
+        JSON.stringify(diagnostics, null, 2)
+      );
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
       // 最初のDiagnosticの主要フレームが正しいファイル・行・メッセージを持つか確認
@@ -216,7 +223,10 @@ export const fileExecutionTests: Record<
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
       expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
-      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(1);
+      expect(
+        firstDiag.frames[0].startLineNumber,
+        "frame startLineNumber"
+      ).to.equal(1);
       expect(firstDiag.message, "error message").to.include(uniqueTypeName);
     };
   },
@@ -262,17 +272,28 @@ export const fileExecutionTests: Record<
           diagnostics.push(diagnostic);
         }
       );
-      console.log(`${lang} multi-frame diagnostic test: `, JSON.stringify(diagnostics, null, 2));
+      console.log(
+        `${lang} multi-frame diagnostic test: `,
+        JSON.stringify(diagnostics, null, 2)
+      );
 
       // 1エラー → 1 Diagnostic
-      expect(diagnostics, "should have exactly 1 diagnostic").to.have.lengthOf(1);
+      expect(diagnostics, "should have exactly 1 diagnostic").to.have.lengthOf(
+        1
+      );
       const diag = diagnostics[0];
 
       // メッセージにユニーク文字列が含まれる
-      expect(diag.message, "error message should include unique string").to.include(uniqueTypeName);
+      expect(
+        diag.message,
+        "error message should include unique string"
+      ).to.include(uniqueTypeName);
 
       // 複数フレームがあること
-      expect(diag.frames, "should have multiple frames").to.have.length.greaterThan(1);
+      expect(
+        diag.frames,
+        "should have multiple frames"
+      ).to.have.length.greaterThan(1);
 
       // 最新のフレームが先頭に来ること（innermost frame first）
       expect(
@@ -300,8 +321,13 @@ export const fileExecutionTests: Record<
 
       // <exec>, <string> など内部フレームが含まれないこと
       for (const frame of diag.frames) {
-        expect(frame.filename, "frame filename should not be internal").to.not.match(/^<.*>$/);
-        expect(frame.filename, "frame filename should be user file").to.equal(filename);
+        expect(
+          frame.filename,
+          "frame filename should not be internal"
+        ).to.not.match(/^<.*>$/);
+        expect(frame.filename, "frame filename should be user file").to.equal(
+          filename
+        );
       }
     };
   },

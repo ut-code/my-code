@@ -2,12 +2,23 @@ import { defineConfig } from "vitest/config";
 import path from "path";
 import react from "@vitejs/plugin-react";
 import { webdriverio } from "@vitest/browser-webdriverio";
+import dotenv from "dotenv";
+
+// Load .env and .env.local from project root and package directory
+const rootDir = path.resolve(__dirname, "../..");
+dotenv.config({ path: path.resolve(rootDir, ".env") });
+dotenv.config({ path: path.resolve(rootDir, ".env.local"), override: true });
+dotenv.config({ path: path.resolve(__dirname, ".env"), override: true });
+dotenv.config({ path: path.resolve(__dirname, ".env.local"), override: true });
 
 // webdriverioは自動でchromeをダウンロードして起動するはずだが、もし何らかの理由でchromeが動作しない場合は、 @puppeteer/browsers を使用してchromeをダウンロードし、環境変数でバイナリのパスを指定してみる
 const localChrome = process.env.CHROME_BIN;
 const localChromeDriver = process.env.CHROMEDRIVER_PATH;
 
 export default defineConfig({
+  define: {
+    "process.env.WANDBOX_URL": JSON.stringify(process.env.WANDBOX_URL || ""),
+  },
   resolve: {
     alias: {
       "@my-code/js-eval": path.resolve(__dirname, "../jsEval/src"),

@@ -181,18 +181,20 @@ export function WorkerProvider({
         workerApiRef.current = null;
         setReady(false);
 
-        void mutex.runExclusive(async () => {
-          await initializeWorker();
-          if (
-            commandHistory.current.length > 0 &&
-            workerApiRef.current !== null
-          ) {
-            await workerApiRef.current.restoreState(commandHistory.current);
-          }
-          setReady(true);
-        }).catch((error) => {
-          onErrorRef.current?.(error);
-        });
+        void mutex
+          .runExclusive(async () => {
+            await initializeWorker();
+            if (
+              commandHistory.current.length > 0 &&
+              workerApiRef.current !== null
+            ) {
+              await workerApiRef.current.restoreState(commandHistory.current);
+            }
+            setReady(true);
+          })
+          .catch((error) => {
+            onErrorRef.current?.(error);
+          });
         break;
       }
       default:
@@ -251,8 +253,7 @@ export function WorkerProvider({
           }
         }
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : String(error);
+        const message = error instanceof Error ? error.message : String(error);
         const isExpectedControlError =
           message === "Worker interrupted" || message === "Worker terminated";
         if (!isExpectedControlError) {
@@ -329,8 +330,7 @@ export function WorkerProvider({
           );
         });
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : String(error);
+        const message = error instanceof Error ? error.message : String(error);
         const isExpectedControlError =
           message === "Worker interrupted" || message === "Worker terminated";
         if (!isExpectedControlError) {

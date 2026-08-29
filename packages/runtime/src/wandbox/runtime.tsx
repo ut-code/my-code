@@ -39,7 +39,7 @@ interface IWandboxContext {
     onOutput: (output: ReplOutput | UpdatedFile) => void,
     onDiagnostic?: (diagnostic: Diagnostic) => void
   ) => Promise<void>;
-  runtimeInfo: Record<WandboxLang, RuntimeInfo> | undefined,
+  runtimeInfo: Record<WandboxLang, RuntimeInfo> | undefined;
 }
 
 const WandboxContext = createContext<IWandboxContext>(null!);
@@ -99,7 +99,12 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         try {
           switch (lang) {
             case "cpp":
-              await cppRunFiles(selectedCompiler.cpp, files, filenames, onOutput);
+              await cppRunFiles(
+                selectedCompiler.cpp,
+                files,
+                filenames,
+                onOutput
+              );
               break;
             case "rust":
               await rustRunFiles(

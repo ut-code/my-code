@@ -131,7 +131,9 @@ export function ExecFile(props: ExecProps) {
           },
           (diagnostic) => {
             // diagnosticを関連する全ファイルに登録する
-            const relatedFiles = new Set(diagnostic.frames.map((f) => f.filename));
+            const relatedFiles = new Set(
+              diagnostic.frames.map((f) => f.filename)
+            );
             for (const fname of relatedFiles) {
               addDiagnostic(fname, diagnostic);
             }

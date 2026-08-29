@@ -22,7 +22,6 @@ import {
   UpdatedFile,
 } from "../interface";
 
-
 export const compilerOptions: CompilerOptions = {
   lib: ["ESNext", "WebWorker"],
   target: 10 satisfies ScriptTarget.ES2023,
@@ -106,11 +105,14 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
   const { init: tsInit, tsEnv, tsVersion } = useContext(TypeScriptContext);
   const { init: jsInit } = jsEval;
   const onErrorRef = useRef<RuntimeErrorHandler | undefined>(undefined);
-  const init = useCallback((onError?: RuntimeErrorHandler) => {
-    onErrorRef.current = onError;
-    tsInit(onError);
-    jsInit?.(onError);
-  }, [tsInit, jsInit]);
+  const init = useCallback(
+    (onError?: RuntimeErrorHandler) => {
+      onErrorRef.current = onError;
+      tsInit(onError);
+      jsInit?.(onError);
+    },
+    [tsInit, jsInit]
+  );
 
   const runFiles = useCallback(
     async (
@@ -124,115 +126,115 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
         return;
       } else {
         try {
-        for (const [filename, content] of Object.entries(files)) {
-          tsEnv.createFile(filename, content);
-        }
+          for (const [filename, content] of Object.entries(files)) {
+            tsEnv.createFile(filename, content);
+          }
 
-        const ts = await import("typescript");
+          const ts = await import("typescript");
 
-        const convertDiagnostic = (diag: import("typescript").Diagnostic): Diagnostic => {
-          let line = 0;
-          let character = 0;
-          let endLineNumber: number | undefined = undefined;
-          let endColumn: number | undefined = undefined;
+          const convertDiagnostic = (
+            diag: import("typescript").Diagnostic
+          ): Diagnostic => {
+            let line = 0;
+            let character = 0;
+            let endLineNumber: number | undefined = undefined;
+            let endColumn: number | undefined = undefined;
 
-          if (diag.file && diag.start !== undefined) {
-            const pos = diag.file.getLineAndCharacterOfPosition(diag.start);
-            line = pos.line;
-            character = pos.character;
+            if (diag.file && diag.start !== undefined) {
+              const pos = diag.file.getLineAndCharacterOfPosition(diag.start);
+              line = pos.line;
+              character = pos.character;
 
-            if (diag.length !== undefined) {
-              const endPos = diag.file.getLineAndCharacterOfPosition(
-                diag.start + diag.length
-              );
-              endLineNumber = endPos.line + 1;
-              endColumn = endPos.character + 1;
+              if (diag.length !== undefined) {
+                const endPos = diag.file.getLineAndCharacterOfPosition(
+                  diag.start + diag.length
+                );
+                endLineNumber = endPos.line + 1;
+                endColumn = endPos.character + 1;
+              }
             }
-          }
 
-          const message =
-            typeof diag.messageText === "string"
-              ? diag.messageText
-              : ts.flattenDiagnosticMessageText(diag.messageText, "\n");
+            const message =
+              typeof diag.messageText === "string"
+                ? diag.messageText
+                : ts.flattenDiagnosticMessageText(diag.messageText, "\n");
 
-          let severity: DiagnosticSeverity = "error";
-          if (diag.category === ts.DiagnosticCategory.Warning) {
-            severity = "warning";
-          } else if (
-            diag.category === ts.DiagnosticCategory.Suggestion ||
-            diag.category === ts.DiagnosticCategory.Message
-          ) {
-            severity = "info";
-          }
+            let severity: DiagnosticSeverity = "error";
+            if (diag.category === ts.DiagnosticCategory.Warning) {
+              severity = "warning";
+            } else if (
+              diag.category === ts.DiagnosticCategory.Suggestion ||
+              diag.category === ts.DiagnosticCategory.Message
+            ) {
+              severity = "info";
+            }
 
-          const filename = (diag.file ? diag.file.fileName : filenames[0]).replace(
-            /^\//,
-            ""
-          );
+            const filename = (
+              diag.file ? diag.file.fileName : filenames[0]
+            ).replace(/^\//, "");
 
-          return {
-            frames: [
-              {
-                filename,
-                startLineNumber: line + 1,
-                startColumn: character + 1,
-                endLineNumber,
-                endColumn,
-              },
-            ],
-            message,
-            severity,
+            return {
+              frames: [
+                {
+                  filename,
+                  startLineNumber: line + 1,
+                  startColumn: character + 1,
+                  endLineNumber,
+                  endColumn,
+                },
+              ],
+              message,
+              severity,
+            };
           };
-        };
 
+          for (const diagnostic of tsEnv.languageService.getSyntacticDiagnostics(
+            filenames[0]
+          )) {
+            onOutput({
+              type: "error",
+              message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
+                getCurrentDirectory: () => "",
+                getCanonicalFileName: (f) => f,
+                getNewLine: () => "\n",
+              }),
+            });
+            onDiagnostic?.(convertDiagnostic(diagnostic));
+          }
 
-        for (const diagnostic of tsEnv.languageService.getSyntacticDiagnostics(
-          filenames[0]
-        )) {
-          onOutput({
-            type: "error",
-            message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
-              getCurrentDirectory: () => "",
-              getCanonicalFileName: (f) => f,
-              getNewLine: () => "\n",
-            }),
-          });
-          onDiagnostic?.(convertDiagnostic(diagnostic));
-        }
+          for (const diagnostic of tsEnv.languageService.getSemanticDiagnostics(
+            filenames[0]
+          )) {
+            onOutput({
+              type: "error",
+              message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
+                getCurrentDirectory: () => "",
+                getCanonicalFileName: (f) => f,
+                getNewLine: () => "\n",
+              }),
+            });
+            onDiagnostic?.(convertDiagnostic(diagnostic));
+          }
 
-        for (const diagnostic of tsEnv.languageService.getSemanticDiagnostics(
-          filenames[0]
-        )) {
-          onOutput({
-            type: "error",
-            message: ts.formatDiagnosticsWithColorAndContext([diagnostic], {
-              getCurrentDirectory: () => "",
-              getCanonicalFileName: (f) => f,
-              getNewLine: () => "\n",
-            }),
-          });
-          onDiagnostic?.(convertDiagnostic(diagnostic));
-        }
+          const emitOutput = tsEnv.languageService.getEmitOutput(filenames[0]);
+          const emittedFiles: Record<string, string> = Object.fromEntries(
+            emitOutput.outputFiles.map((of) => [of.name, of.text])
+          );
+          for (const [filename, content] of Object.entries(emittedFiles)) {
+            onOutput({ type: "file", filename, content });
+          }
 
-        const emitOutput = tsEnv.languageService.getEmitOutput(filenames[0]);
-        const emittedFiles: Record<string, string> = Object.fromEntries(
-          emitOutput.outputFiles.map((of) => [of.name, of.text])
-        );
-        for (const [filename, content] of Object.entries(emittedFiles)) {
-          onOutput({ type: "file", filename, content });
-        }
+          for (const filename of Object.keys(emittedFiles)) {
+            tsEnv.deleteFile(filename);
+          }
 
-        for (const filename of Object.keys(emittedFiles)) {
-          tsEnv.deleteFile(filename);
-        }
-
-        console.log(emitOutput);
-        await jsEval.runFiles(
-          [emitOutput.outputFiles[0].name],
-          { ...files, ...emittedFiles },
-          onOutput,
-          onDiagnostic
-        );
+          console.log(emitOutput);
+          await jsEval.runFiles(
+            [emitOutput.outputFiles[0].name],
+            { ...files, ...emittedFiles },
+            onOutput,
+            onDiagnostic
+          );
         } catch (error) {
           onErrorRef.current?.(error);
           onOutput({

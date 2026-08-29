@@ -28,7 +28,7 @@ export type RegenerateStreamEvent =
 
 /**
  * そのセクションの全chatを作成日順に再作成&削除します。
- * 
+ *
  * 既存のchatのdiffを無視して最新のcontentを渡して1つ目のchatを生成
  *   →そのdiffを適用したcontentに対して2つ目のchatを作成
  *   →その2つのdiffを適用したcontentに対して3つ目のchat...
@@ -85,12 +85,11 @@ export async function POST(request: NextRequest) {
           fallbackToPastVersion: false,
         });
 
-        const currentSectionContent: DynamicMarkdownSection[] = baseSections.map(
-          (s) => ({
+        const currentSectionContent: DynamicMarkdownSection[] =
+          baseSections.map((s) => ({
             ...s,
             inView: false,
-          })
-        );
+          }));
 
         const deletedChatIds: string[] = [];
         const createdChatIds: string[] = [];
@@ -100,8 +99,12 @@ export async function POST(request: NextRequest) {
           send({ type: "progress", current: i, total: targetChats.length });
 
           try {
-            const firstUserMsg = oldChat.messages.find((m) => m.role === "user");
-            const userQuestion = firstUserMsg ? firstUserMsg.content : oldChat.title;
+            const firstUserMsg = oldChat.messages.find(
+              (m) => m.role === "user"
+            );
+            const userQuestion = firstUserMsg
+              ? firstUserMsg.content
+              : oldChat.title;
 
             // 1. Generate new chat on server
             const result = await generateSingleChat({

@@ -5,14 +5,21 @@ import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
-import type { Diagnostic, ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
+import type {
+  Diagnostic,
+  ReplOutput,
+  ReplOutputType,
+  UpdatedFile,
+} from "../interface";
 
 import init_rb from "./ruby/init.rb?raw";
 import execfile_rb from "./ruby/execfile.rb?raw";
 import eval_code_rb from "./ruby/eval_code.rb?raw";
 
 let rubyVM: RubyVM | null = null;
-let currentOutputCallback: ((output: ReplOutput | UpdatedFile) => Promise<void>) | null = null;
+let currentOutputCallback:
+  | ((output: ReplOutput | UpdatedFile) => Promise<void>)
+  | null = null;
 let stdoutBuffer = "";
 let stderrBuffer = "";
 
@@ -35,7 +42,10 @@ self.stderr = {
     stderrBuffer = await handleBatchOutput(stderrBuffer, "stderr");
   },
 };
-async function handleBatchOutput(buffer: string, type: ReplOutputType): Promise<string> {
+async function handleBatchOutput(
+  buffer: string,
+  type: ReplOutputType
+): Promise<string> {
   // If buffer contains newlines, flush complete lines immediately
   if (buffer.includes("\n")) {
     const lines = buffer.split("\n");
