@@ -89,8 +89,7 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
         filenames: string[],
         files: Readonly<Record<string, string>>,
         onOutput: (output: ReplOutput | UpdatedFile) => void,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _onDiagnostic?: (diagnostic: Diagnostic) => void
+        onDiagnostic?: (diagnostic: Diagnostic) => void
       ) => {
         if (!selectedCompiler) {
           onOutput({ type: "error", message: "Wandbox is not ready yet." });
@@ -103,7 +102,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
                 selectedCompiler.cpp,
                 files,
                 filenames,
-                onOutput
+                onOutput,
+                onDiagnostic
               );
               break;
             case "rust":
@@ -111,7 +111,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
                 selectedCompiler.rust,
                 files,
                 filenames,
-                onOutput
+                onOutput,
+                onDiagnostic
               );
               break;
             default:

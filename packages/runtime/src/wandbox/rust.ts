@@ -1,7 +1,16 @@
-import { ReplOutput } from "../interface";
+import {
+  Diagnostic,
+  DiagnosticFrame,
+  DiagnosticSeverity,
+  ReplOutput,
+} from "../interface";
 import { compileAndRun, CompilerInfo, SelectedCompiler } from "./api";
 
 import prog_rs from "./rust/prog.rs?raw";
+
+const RUSTC_HEADER_REGEX =
+  /^(error(?:\[[A-Z0-9]+\])?|warning(?:\[[A-Z0-9]+\])?|note(?:\[[A-Z0-9]+\])?):\s*(.*)$/;
+const RUSTC_SPAN_REGEX = /^\s*-->\s*([^:\n]+):(\d+):(\d+)/;
 
 export function selectRustCompiler(
   compilerList: CompilerInfo[]
@@ -33,7 +42,8 @@ export async function rustRunFiles(
   options: SelectedCompiler,
   files: Record<string, string | undefined>,
   filenames: string[],
-  onOutput: (output: ReplOutput) => void
+  onOutput: (output: ReplOutput) => void,
+  onDiagnostic?: (diagnostic: Diagnostic) => void
 ): Promise<void> {
   // Regular expressions for parsing stack traces
   const STACK_FRAME_PATTERN = /^\s*\d+:/;
@@ -43,7 +53,14 @@ export async function rustRunFiles(
   // Track state for processing panic traces
   let inPanicHook = false;
   let foundBacktraceHeader = false;
+  let panicLoc: DiagnosticFrame | null = null;
+  const panicMessages: string[] = [];
+  const runtimeFrames: DiagnosticFrame[] = [];
   const traceLines: string[] = [];
+
+  // Track state for processing compile diagnostics
+  let currentHeader: { level: DiagnosticSeverity; message: string } | null =
+    null;
 
   const mainModule = filenames[0].replace(/\.rs$/, "");
   await compileAndRun(
@@ -68,6 +85,52 @@ export async function rustRunFiles(
     (event) => {
       const { ndjsonType, output } = event;
 
+      // Parse compiler messages for diagnostics
+      if (ndjsonType === "CompilerMessageE") {
+        const headerMatch = RUSTC_HEADER_REGEX.exec(output.message);
+        if (headerMatch) {
+          const level = headerMatch[1];
+          const msg = headerMatch[2];
+          if (
+            !msg.startsWith("aborting due to") &&
+            !msg.startsWith("For more information about this error")
+          ) {
+            const severity: DiagnosticSeverity = level.startsWith("error")
+              ? "error"
+              : level.startsWith("warning")
+                ? "warning"
+                : "info";
+            currentHeader = { level: severity, message: msg };
+          } else {
+            currentHeader = null;
+          }
+        }
+
+        const spanMatch = RUSTC_SPAN_REGEX.exec(output.message);
+        if (spanMatch && currentHeader) {
+          const rawFilename = spanMatch[1]
+            .replace(/^\.\//, "")
+            .replace(/^\//, "");
+          const lineNum = parseInt(spanMatch[2], 10);
+          const colNum = parseInt(spanMatch[3], 10);
+
+          if (rawFilename !== "prog.rs" && !rawFilename.startsWith("<")) {
+            onDiagnostic?.({
+              frames: [
+                {
+                  filename: rawFilename,
+                  startLineNumber: lineNum,
+                  startColumn: colNum,
+                },
+              ],
+              message: currentHeader.message,
+              severity: currentHeader.level,
+            });
+          }
+          currentHeader = null;
+        }
+      }
+
       // Check for panic hook marker
       if (
         ndjsonType === "StdErr" &&
@@ -78,12 +141,47 @@ export async function rustRunFiles(
       }
 
       if (inPanicHook && ndjsonType === "StdErr") {
-        // Check for stack backtrace header
-        if (output.message === "stack backtrace:") {
-          foundBacktraceHeader = true;
+        if (!foundBacktraceHeader) {
+          // Check for panic location in header line (e.g. thread 'main' panicked at sub.rs:2:5:)
+          const locMatch =
+            /thread '.*?' panicked at (?:(?:\.\/)?([^:\s]+)):(\d+):(\d+):/.exec(
+              output.message
+            );
+          if (locMatch) {
+            const fn = locMatch[1].replace(/^\.\//, "").replace(/^\//, "");
+            if (fn !== "prog.rs" && !fn.startsWith("<")) {
+              panicLoc = {
+                filename: fn,
+                startLineNumber: parseInt(locMatch[2], 10),
+                startColumn: parseInt(locMatch[3], 10),
+              };
+            }
+            onOutput({
+              type: "error",
+              message: output.message,
+            });
+            return;
+          }
+
+          // Check for stack backtrace header
+          if (output.message === "stack backtrace:") {
+            foundBacktraceHeader = true;
+            onOutput({
+              type: "trace",
+              message: "Stack trace (filtered):",
+            });
+            return;
+          }
+
+          // Capture panic message lines
+          if (output.message.trim() && !output.message.startsWith("thread ")) {
+            panicMessages.push(output.message.trim());
+          }
+
+          // Output panic messages as errors
           onOutput({
-            type: "trace",
-            message: "Stack trace (filtered):",
+            type: "error",
+            message: output.message,
           });
           return;
         }
@@ -108,23 +206,52 @@ export async function rustRunFiles(
                   type: "trace",
                   message: output.message,
                 });
+
+                const m =
+                  /^\s*at\s+(?:(?:\.\/)?([^:\s]+)):(\d+):?(\d+)?/.exec(
+                    output.message
+                  );
+                if (m) {
+                  const fn = m[1].replace(/^\.\//, "").replace(/^\//, "");
+                  if (
+                    fn !== "prog.rs" &&
+                    !fn.startsWith("/") &&
+                    !fn.startsWith("<")
+                  ) {
+                    runtimeFrames.push({
+                      filename: fn,
+                      startLineNumber: parseInt(m[2], 10),
+                      startColumn: m[3] ? parseInt(m[3], 10) : undefined,
+                    });
+                  }
+                }
               }
               traceLines.pop(); // Remove the associated trace line (regardless of match)
             }
           }
           return;
         }
-
-        // Output panic messages as errors
-        onOutput({
-          type: "error",
-          message: output.message,
-        });
-        return;
       }
 
       // Output normally
       onOutput(output);
     }
   );
+
+  if (inPanicHook) {
+    const loc = panicLoc as DiagnosticFrame | null;
+    const finalFrames =
+      runtimeFrames.length > 0 ? runtimeFrames : loc ? [loc] : [];
+    if (finalFrames.length > 0) {
+      const fallbackMsg = loc
+        ? `panicked at ${loc.filename}:${loc.startLineNumber}`
+        : "Panic";
+      const message = panicMessages.filter(Boolean).join("\n") || fallbackMsg;
+      onDiagnostic?.({
+        frames: finalFrames,
+        message,
+        severity: "error",
+      });
+    }
+  }
 }

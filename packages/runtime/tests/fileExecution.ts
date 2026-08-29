@@ -176,65 +176,255 @@ export const fileExecutionTests: Record<
   },
 
   /**
-   * 単純なエラーで診断情報が得られるかテスト
-   *
-   * Python/Ruby: `raise "UniqueError"` で1件のDiagnosticが返り、
-   *   frames[0].filename・startLineNumber・messageが正しいか確認
-   *
-   * TypeScript: 存在しない型名を使うことでエラーメッセージに型名が含まれるようにする
-   *   例: `const x: TestDiagUniqueType9876 = 1;`
-   *   → TSのエラーメッセージに "TestDiagUniqueType9876" が含まれる
+   * 単一ファイルのコンパイルエラー（構文エラーや型エラー）で診断情報が得られるかテスト
    */
-  "should capture diagnostics on error": (lang) => {
-    // TypeScript用: 型名をユニークな識別子にしてエラーメッセージに含める
-    const uniqueTypeName = "TestDiagUniqueType9876";
+  "should capture diagnostics on compile error": (lang) => {
+    const uniqueTypeName = "TestCompileError1234";
     const [filename, code] = (
       {
-        python: ["test_diag.py", `raise Exception("${uniqueTypeName}")\n`],
-        ruby: ["test_diag.rb", `raise "${uniqueTypeName}"\n`],
-        cpp: [null, null],
-        rust: [null, null],
-        javascript: [null, null],
-        typescript: ["test_diag.ts", `const x: ${uniqueTypeName} = 1;\n`],
-      } satisfies Record<RuntimeLang, [string, string] | [null, null]>
-    )[lang];
+        python: ["test_compile.py", `def foo(\n`],
+        ruby: null,
+        cpp: [
+          "test_compile.cpp",
+          `int ${uniqueTypeName} = "type error";\nint main() {}\n`,
+        ],
+        rust: [
+          "test_compile.rs",
+          `static X: i32 = ${uniqueTypeName};\npub fn main() {}\n`,
+        ],
+        javascript: null,
+        typescript: ["test_compile.ts", `const x: ${uniqueTypeName} = 1;\n`],
+      } satisfies Record<RuntimeLang, [string, string] | null>
+    )[lang] ?? [null, null];
     if (!filename || !code) return null;
 
     return async (runtimeRef) => {
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         [filename],
-        {
-          [filename]: code,
-        },
+        { [filename]: code },
         () => {},
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
       console.log(
-        `${lang} single file diagnostic test: `,
+        `${lang} compile error diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
       );
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
-      // 最初のDiagnosticの主要フレームが正しいファイル・行・メッセージを持つか確認
       const firstDiag = diagnostics[0];
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
       expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
-      expect(
-        firstDiag.frames[0].startLineNumber,
-        "frame startLineNumber"
-      ).to.equal(1);
-      expect(firstDiag.message, "error message").to.include(uniqueTypeName);
+      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(1);
+      expect(firstDiag.severity, "severity should be error").to.equal("error");
+    };
+  },
+
+  /**
+   * 複数ファイル構成でサブモジュール/ヘッダーファイル内のコンパイルエラーを検出できるかテスト
+   */
+  "should capture diagnostics on compile error in submodule": (lang) => {
+    const [codes, execFiles, expectedErrorFile, expectedLine] = (
+      {
+        python: null,
+        ruby: null,
+        cpp: [
+          {
+            "test_sub_main.cpp": '#include "test_sub.h"\nint main() { return 0; }\n',
+            "test_sub.h": 'inline void foo() {\n  int x = "err";\n}\n',
+          },
+          ["test_sub_main.cpp"],
+          "test_sub.h",
+          2,
+        ],
+        rust: [
+          {
+            "test_sub_main.rs": "mod test_sub;\npub fn main() {\n    test_sub::foo();\n}\n",
+            "test_sub.rs": 'pub fn foo() {\n    let x: i32 = "err";\n}\n',
+          },
+          ["test_sub_main.rs"],
+          "test_sub.rs",
+          2,
+        ],
+        javascript: null,
+        typescript: null,
+      } satisfies Record<
+        RuntimeLang,
+        [Record<string, string>, string[], string, number] | null
+      >
+    )[lang] ?? [null, null, null, null];
+    if (!codes || !execFiles || !expectedErrorFile || !expectedLine) return null;
+
+    return async (runtimeRef) => {
+      const diagnostics: Diagnostic[] = [];
+      await runtimeRef.current![lang].runFiles(
+        execFiles,
+        codes,
+        () => {},
+        (diagnostic) => {
+          diagnostics.push(diagnostic);
+        }
+      );
+      console.log(
+        `${lang} submodule compile error diagnostic test: `,
+        JSON.stringify(diagnostics, null, 2)
+      );
+      expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
+      const firstDiag = diagnostics[0];
+      expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
+      expect(firstDiag.frames[0].filename, "frame filename should point to submodule").to.equal(expectedErrorFile);
+      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(expectedLine);
+      expect(firstDiag.severity, "severity should be error").to.equal("error");
+    };
+  },
+
+  /**
+   * リンクエラー（未定義参照など）で診断情報が得られるかテスト
+   */
+  "should capture diagnostics on link error": (lang) => {
+    const [filename, code] = (
+      {
+        python: null,
+        ruby: null,
+        cpp: [
+          "test_link.cpp",
+          "void undefined_function();\nint main() {\n  undefined_function();\n  return 0;\n}\n",
+        ],
+        rust: null,
+        javascript: null,
+        typescript: null,
+      } satisfies Record<RuntimeLang, [string, string] | null>
+    )[lang] ?? [null, null];
+    if (!filename || !code) return null;
+
+    return async (runtimeRef) => {
+      const diagnostics: Diagnostic[] = [];
+      await runtimeRef.current![lang].runFiles(
+        [filename],
+        { [filename]: code },
+        () => {},
+        (diagnostic) => {
+          diagnostics.push(diagnostic);
+        }
+      );
+      console.log(
+        `${lang} link error diagnostic test: `,
+        JSON.stringify(diagnostics, null, 2)
+      );
+      expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
+      const firstDiag = diagnostics[0];
+      expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
+      expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
+      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(3);
+      expect(firstDiag.message, "error message").to.include("undefined reference");
+      expect(firstDiag.severity, "severity should be error").to.equal("error");
+    };
+  },
+
+  /**
+   * 単一フレームの実行時エラー（例外やpanic）で診断情報が得られるかテスト
+   */
+  "should capture diagnostics on runtime error": (lang) => {
+    const errorMsg = "RuntimeErrorUnique9876";
+    const [filename, code, expectedLine] = (
+      {
+        python: ["test_runtime.py", `raise Exception("${errorMsg}")\n`, 1],
+        ruby: ["test_runtime.rb", `raise "${errorMsg}"\n`, 1],
+        cpp: [
+          "test_runtime.cpp",
+          `#include <stdexcept>\nint main() {\n  throw std::runtime_error("${errorMsg}");\n  return 0;\n}\n`,
+          3,
+        ],
+        rust: [
+          "test_runtime.rs",
+          `pub fn main() {\n    panic!("${errorMsg}");\n}\n`,
+          2,
+        ],
+        javascript: null,
+        typescript: null,
+      } satisfies Record<RuntimeLang, [string, string, number] | null>
+    )[lang] ?? [null, null, null];
+    if (!filename || !code || expectedLine === null) return null;
+
+    return async (runtimeRef) => {
+      const diagnostics: Diagnostic[] = [];
+      await runtimeRef.current![lang].runFiles(
+        [filename],
+        { [filename]: code },
+        () => {},
+        (diagnostic) => {
+          diagnostics.push(diagnostic);
+        }
+      );
+      console.log(
+        `${lang} runtime error diagnostic test: `,
+        JSON.stringify(diagnostics, null, 2)
+      );
+      expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
+      const firstDiag = diagnostics[0];
+      expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
+      expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
+      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(expectedLine);
+      expect(firstDiag.message, "error message").to.include(errorMsg);
+      expect(firstDiag.severity, "severity should be error").to.equal("error");
+    };
+  },
+
+  /**
+   * クラッシュやシグナル（Segfault、配列外参照パニックなど）で診断情報が得られるかテスト
+   */
+  "should capture diagnostics on runtime crash or signal": (lang) => {
+    const [filename, code, expectedLine, expectedMsg] = (
+      {
+        python: null,
+        ruby: null,
+        cpp: [
+          "test_crash.cpp",
+          "int main() {\n  int* ptr = nullptr;\n  *ptr = 42;\n  return 0;\n}\n",
+          3,
+          "Segmentation fault",
+        ],
+        rust: [
+          "test_crash.rs",
+          "pub fn main() {\n    let v = vec![1, 2];\n    let _ = v[5];\n}\n",
+          3,
+          "index out of bounds",
+        ],
+        javascript: null,
+        typescript: null,
+      } satisfies Record<RuntimeLang, [string, string, number, string] | null>
+    )[lang] ?? [null, null, null, null];
+    if (!filename || !code || expectedLine === null || !expectedMsg) return null;
+
+    return async (runtimeRef) => {
+      const diagnostics: Diagnostic[] = [];
+      await runtimeRef.current![lang].runFiles(
+        [filename],
+        { [filename]: code },
+        () => {},
+        (diagnostic) => {
+          diagnostics.push(diagnostic);
+        }
+      );
+      console.log(
+        `${lang} crash diagnostic test: `,
+        JSON.stringify(diagnostics, null, 2)
+      );
+      expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
+      const firstDiag = diagnostics[0];
+      expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
+      expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
+      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(expectedLine);
+      expect(firstDiag.message, "error message").to.include(expectedMsg);
+      expect(firstDiag.severity, "severity should be error").to.equal("error");
     };
   },
 
   /**
    * 関数呼び出しを挟んだ複数フレームのエラーで1つのDiagnosticにまとめられるかテスト
    *
-   * Python/Ruby: 関数呼び出し連鎖でスタックトレースを生成し、
+   * Python/Ruby/CPP/Rust: 関数呼び出し連鎖でスタックトレースを生成し、
    *   - diagnosticsが1件だけ返ること
    *   - framesが2件以上あること
    *   - 全フレームがユーザーファイルを指すこと（<exec>等の内部フレームが含まれないこと）
@@ -254,8 +444,14 @@ export const fileExecutionTests: Record<
           // bar -> foo -> raise で複数フレームのエラーを生成
           `def foo\n  raise "${uniqueTypeName}"\nend\n\ndef bar\n  foo\nend\n\nbar\n`,
         ],
-        cpp: [null, null],
-        rust: [null, null],
+        cpp: [
+          "test_multiframe.cpp",
+          `#include <stdexcept>\nvoid foo() { throw std::runtime_error("${uniqueTypeName}"); }\nvoid bar() { foo(); }\nint main() { bar(); }\n`,
+        ],
+        rust: [
+          "test_multiframe.rs",
+          `fn foo() {\n    panic!("${uniqueTypeName}");\n}\nfn bar() {\n    foo();\n}\npub fn main() {\n    bar();\n}\n`,
+        ],
         javascript: [null, null],
         typescript: [null, null],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
@@ -306,8 +502,8 @@ export const fileExecutionTests: Record<
         {
           python: [2, 5, 7],
           ruby: [2, 6, 9],
-          cpp: null,
-          rust: null,
+          cpp: [2, 3, 4],
+          rust: [2, 5, 8],
           javascript: null,
           typescript: null,
         } satisfies Record<RuntimeLang, number[] | null>
@@ -329,6 +525,51 @@ export const fileExecutionTests: Record<
           filename
         );
       }
+    };
+  },
+
+  /**
+   * コンパイル警告で診断情報（severity: 'warning'）が得られるかテスト
+   */
+  "should capture diagnostics on warning": (lang) => {
+    const [filename, code] = (
+      {
+        python: null,
+        ruby: null,
+        cpp: [
+          "test_warning.cpp",
+          "int main() {\n  int unused_var = 42;\n  return 0;\n}\n",
+        ],
+        rust: [
+          "test_warning.rs",
+          "pub fn main() {\n    let unused_var = 42;\n}\n",
+        ],
+        javascript: null,
+        typescript: null,
+      } satisfies Record<RuntimeLang, [string, string] | null>
+    )[lang] ?? [null, null];
+    if (!filename || !code) return null;
+
+    return async (runtimeRef) => {
+      const diagnostics: Diagnostic[] = [];
+      await runtimeRef.current![lang].runFiles(
+        [filename],
+        { [filename]: code },
+        () => {},
+        (diagnostic) => {
+          diagnostics.push(diagnostic);
+        }
+      );
+      console.log(
+        `${lang} warning diagnostic test: `,
+        JSON.stringify(diagnostics, null, 2)
+      );
+      expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
+      const warnDiag = diagnostics.find((d) => d.severity === "warning");
+      expect(warnDiag, "should have warning diagnostic").to.exist;
+      expect(warnDiag!.frames[0].filename, "frame filename").to.equal(filename);
+      expect(warnDiag!.frames[0].startLineNumber, "frame startLineNumber").to.equal(2);
+      expect(warnDiag!.message, "warning message").to.include("unused");
     };
   },
 };
