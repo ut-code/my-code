@@ -165,7 +165,10 @@ describe("chatHistory lib (non-DB functions)", () => {
       ];
 
       const result = await applyChatDiff(sections, chatHistories);
-      assert.strictEqual(result[0].replacedContent, "Updated content for section 1");
+      assert.strictEqual(
+        result[0].replacedContent,
+        "Updated content for section 1"
+      );
       assert.strictEqual(result[0].isOutdated, false);
       assert.deepStrictEqual(result[0].outdatedDiffsToUpdate, []);
     });
