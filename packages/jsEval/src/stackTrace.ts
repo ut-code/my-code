@@ -46,74 +46,46 @@ export function parseStackTrace(
         continue;
       }
 
-      // Pattern 1a: eval at ... with function name
+      // V8 eval at pattern:
       // e.g. "at foo (eval at runFile (webpack-internal://...), <anonymous>:2:9)"
       // e.g. "at eval (eval at runFile (webpack-internal://...), <anonymous>:5:3)"
-      const evalAtWithFn = line.match(
-        /^at\s+(?:async\s+)?([^\s(]+)\s+\(eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:([^:]+):)?(\d+):(\d+)\)$/
-      );
-
-      // Pattern 1b: eval at ... without function name (or at eval at ...)
-      // e.g. "at (eval at runFile (...), <anonymous>:2:9)"
       // e.g. "at eval at runFile (webpack-internal://...), <anonymous>:5:3"
-      const evalAtWithoutFn =
-        line.match(
-          /^at\s+(?:async\s+)?\(eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:([^:]+):)?(\d+):(\d+)\)$/
-        ) ||
-        line.match(
-          /^at\s+(?:async\s+)?eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:([^:]+):)?(\d+):(\d+)$/
-        );
+      if (line.includes("eval at ")) {
+        const locMatch = line.match(/,\s*(?:([^:()\s]+):)?(\d+):(\d+)\)?$/);
+        if (locMatch) {
+          const rawFile = locMatch[1];
+          const filename =
+            rawFile && rawFile !== "<anonymous>" ? rawFile : defaultFilename;
+          const lineNumber = parseInt(locMatch[2], 10);
+          const columnNumber = parseInt(locMatch[3], 10);
 
-      if (evalAtWithFn) {
-        const rawFn = evalAtWithFn[1];
-        const fn =
-          rawFn && rawFn !== "eval" && rawFn !== "<anonymous>"
-            ? rawFn
-            : undefined;
-        const rawFile = evalAtWithFn[2];
-        const filename =
-          rawFile && rawFile !== "<anonymous>" ? rawFile : defaultFilename;
-        const lineNumber = parseInt(evalAtWithFn[3], 10);
-        const columnNumber = parseInt(evalAtWithFn[4], 10);
+          const fnMatch = line.match(
+            /^at\s+(?:async\s+)?([^\s(]+)\s+\(eval at\s/
+          );
+          const rawFn = fnMatch ? fnMatch[1] : undefined;
+          const fn =
+            rawFn && rawFn !== "eval" && rawFn !== "<anonymous>"
+              ? rawFn
+              : undefined;
 
-        frames.push({
-          functionName: fn,
-          filename,
-          lineNumber,
-          columnNumber,
-        });
-        continue;
-      } else if (evalAtWithoutFn) {
-        const rawFile = evalAtWithoutFn[1];
-        const filename =
-          rawFile && rawFile !== "<anonymous>" ? rawFile : defaultFilename;
-        const lineNumber = parseInt(evalAtWithoutFn[2], 10);
-        const columnNumber = parseInt(evalAtWithoutFn[3], 10);
-
-        frames.push({
-          functionName: undefined,
-          filename,
-          lineNumber,
-          columnNumber,
-        });
-        continue;
+          frames.push({
+            functionName: fn,
+            filename,
+            lineNumber,
+            columnNumber,
+          });
+          continue;
+        }
       }
 
-      // Pattern 2a: direct file reference with function name
-      // e.g. "at foo (main.js:2:9)", "at eval (main.js:5:3)"
-      const directWithFn = line.match(
-        /^at\s+(?:async\s+)?([^\s(]+)\s+\(([^:]+):(\d+):(\d+)\)$/
-      );
+      // Direct file reference pattern (e.g. with sourceURL or in Node/V8):
+      // e.g. "at foo (main.js:2:9)", "at eval (main.js:5:3)", "at main.js:5:3"
+      const locMatch =
+        line.match(/\(([^:()]+):(\d+):(\d+)\)$/) ||
+        line.match(/([^\s:()]+):(\d+):(\d+)$/);
 
-      // Pattern 2b: direct file reference without function name
-      // e.g. "at (main.js:5:3)" or "at main.js:5:3"
-      const directWithoutFn =
-        line.match(/^at\s+(?:async\s+)?\(([^:]+):(\d+):(\d+)\)$/) ||
-        line.match(/^at\s+(?:async\s+)?([^:()\s]+):(\d+):(\d+)$/);
-
-      if (directWithFn) {
-        const rawFn = directWithFn[1];
-        const file = directWithFn[2];
+      if (locMatch) {
+        const file = locMatch[1];
         // Skip internal runtime / bundler / worker frames
         if (
           file.startsWith("http:") ||
@@ -132,6 +104,8 @@ export function parseStackTrace(
           }
         }
 
+        const fnMatch = line.match(/^at\s+(?:async\s+)?([^\s(]+)\s+\(/);
+        const rawFn = fnMatch ? fnMatch[1] : undefined;
         const fn =
           rawFn &&
           rawFn !== "eval" &&
@@ -139,53 +113,18 @@ export function parseStackTrace(
           rawFn !== "Object.<anonymous>"
             ? rawFn
             : undefined;
+
         const filename =
           file === "<anonymous>"
             ? defaultFilename
             : file.endsWith("/" + defaultFilename)
               ? defaultFilename
               : file;
-        const lineNumber = parseInt(directWithFn[3], 10);
-        const columnNumber = parseInt(directWithFn[4], 10);
+        const lineNumber = parseInt(locMatch[2], 10);
+        const columnNumber = parseInt(locMatch[3], 10);
 
         frames.push({
           functionName: fn,
-          filename,
-          lineNumber,
-          columnNumber,
-        });
-        continue;
-      } else if (directWithoutFn) {
-        const file = directWithoutFn[1];
-        // Skip internal runtime / bundler / worker frames
-        if (
-          file.startsWith("http:") ||
-          file.startsWith("https:") ||
-          file.startsWith("webpack-internal:") ||
-          file.startsWith("webpack:") ||
-          file.startsWith("node:") ||
-          file.includes("node_modules") ||
-          file.includes("worker")
-        ) {
-          if (
-            file !== defaultFilename &&
-            !file.endsWith("/" + defaultFilename)
-          ) {
-            continue;
-          }
-        }
-
-        const filename =
-          file === "<anonymous>"
-            ? defaultFilename
-            : file.endsWith("/" + defaultFilename)
-              ? defaultFilename
-              : file;
-        const lineNumber = parseInt(directWithoutFn[2], 10);
-        const columnNumber = parseInt(directWithoutFn[3], 10);
-
-        frames.push({
-          functionName: undefined,
           filename,
           lineNumber,
           columnNumber,
