@@ -182,7 +182,9 @@ export async function cppRunFiles(
           const idx = output.message.indexOf("what():");
           exceptionMessage = output.message.slice(idx + 7).trim();
         } else if (
-          output.message.includes("terminate called after throwing an instance of")
+          output.message.includes(
+            "terminate called after throwing an instance of"
+          )
         ) {
           const m =
             /terminate called after throwing an instance of '([^']+)'/.exec(

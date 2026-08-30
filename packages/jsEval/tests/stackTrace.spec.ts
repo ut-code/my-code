@@ -35,7 +35,8 @@ callback@webpack-internal:///(app-pages-browser)/./node_modules/.pnpm/comlink@4.
       const frames = parseStackTrace(firefoxDevStack, "main.js");
       const err = new Error("test");
       const formatted = formatStackTrace(err, frames, "main.js");
-      const expected = "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
+      const expected =
+        "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
       assert.strictEqual(formatted, expected);
     });
   });
@@ -67,7 +68,8 @@ o@https://my-code.utcode.net/_next/static/chunks/3724.2004c2fc86f4d4ce.js:1:1201
       const frames = parseStackTrace(firefoxProdStack, "main.js");
       const err = new Error("test");
       const formatted = formatStackTrace(err, frames, "main.js");
-      const expected = "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
+      const expected =
+        "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
       assert.strictEqual(formatted, expected);
     });
   });
@@ -159,7 +161,8 @@ o@https://my-code.utcode.net/_next/static/chunks/3724.2004c2fc86f4d4ce.js:1:1202
       const frames = parseStackTrace(chromeDevStack, "main.js");
       const err = new Error("test");
       const formatted = formatStackTrace(err, frames, "main.js");
-      const expected = "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
+      const expected =
+        "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
       assert.strictEqual(formatted, expected);
     });
   });
@@ -193,7 +196,8 @@ o@https://my-code.utcode.net/_next/static/chunks/3724.2004c2fc86f4d4ce.js:1:1202
       const frames = parseStackTrace(chromeProdStack, "main.js");
       const err = new Error("test");
       const formatted = formatStackTrace(err, frames, "main.js");
-      const expected = "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
+      const expected =
+        "Error: test\n    at foo (main.js:2:9)\n    at (main.js:5:3)";
       assert.strictEqual(formatted, expected);
     });
   });
@@ -339,7 +343,10 @@ const c = 3;`;
       const result = parseError(err, code, "test_compile.js");
       assert.ok(result.diagnostic);
       assert.strictEqual(result.diagnostic.frames.length, 1);
-      assert.strictEqual(result.diagnostic.frames[0].filename, "test_compile.js");
+      assert.strictEqual(
+        result.diagnostic.frames[0].filename,
+        "test_compile.js"
+      );
       assert.strictEqual(result.diagnostic.frames[0].startLineNumber, 1);
       assert.strictEqual(result.diagnostic.severity, "error");
     });

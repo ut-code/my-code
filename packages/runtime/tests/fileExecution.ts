@@ -220,7 +220,10 @@ export const fileExecutionTests: Record<
       const firstDiag = diagnostics[0];
       expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
       expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
-      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(1);
+      expect(
+        firstDiag.frames[0].startLineNumber,
+        "frame startLineNumber"
+      ).to.equal(1);
       expect(firstDiag.severity, "severity should be error").to.equal("error");
     };
   },
@@ -235,7 +238,8 @@ export const fileExecutionTests: Record<
         ruby: null,
         cpp: [
           {
-            "test_sub_main.cpp": '#include "test_sub.h"\nint main() { return 0; }\n',
+            "test_sub_main.cpp":
+              '#include "test_sub.h"\nint main() { return 0; }\n',
             "test_sub.h": 'inline void foo() {\n  int x = "err";\n}\n',
           },
           ["test_sub_main.cpp"],
@@ -244,7 +248,8 @@ export const fileExecutionTests: Record<
         ],
         rust: [
           {
-            "test_sub_main.rs": "mod test_sub;\npub fn main() {\n    test_sub::foo();\n}\n",
+            "test_sub_main.rs":
+              "mod test_sub;\npub fn main() {\n    test_sub::foo();\n}\n",
             "test_sub.rs": 'pub fn foo() {\n    let x: i32 = "err";\n}\n',
           },
           ["test_sub_main.rs"],
@@ -258,7 +263,8 @@ export const fileExecutionTests: Record<
         [Record<string, string>, string[], string, number] | null
       >
     )[lang] ?? [null, null, null, null];
-    if (!codes || !execFiles || !expectedErrorFile || !expectedLine) return null;
+    if (!codes || !execFiles || !expectedErrorFile || !expectedLine)
+      return null;
 
     return async (runtimeRef) => {
       const outputs: ReplOutput[] = [];
@@ -281,8 +287,14 @@ export const fileExecutionTests: Record<
       expect(diagnostics, "diagnostics should not be empty").to.not.be.empty;
       const firstDiag = diagnostics[0];
       expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
-      expect(firstDiag.frames[0].filename, "frame filename should point to submodule").to.equal(expectedErrorFile);
-      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(expectedLine);
+      expect(
+        firstDiag.frames[0].filename,
+        "frame filename should point to submodule"
+      ).to.equal(expectedErrorFile);
+      expect(
+        firstDiag.frames[0].startLineNumber,
+        "frame startLineNumber"
+      ).to.equal(expectedLine);
       expect(firstDiag.severity, "severity should be error").to.equal("error");
     };
   },
@@ -328,8 +340,13 @@ export const fileExecutionTests: Record<
       const firstDiag = diagnostics[0];
       expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
       expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
-      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(3);
-      expect(firstDiag.message, "error message").to.include("undefined reference");
+      expect(
+        firstDiag.frames[0].startLineNumber,
+        "frame startLineNumber"
+      ).to.equal(3);
+      expect(firstDiag.message, "error message").to.include(
+        "undefined reference"
+      );
       expect(firstDiag.severity, "severity should be error").to.equal("error");
     };
   },
@@ -381,7 +398,10 @@ export const fileExecutionTests: Record<
       const firstDiag = diagnostics[0];
       expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
       expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
-      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(expectedLine);
+      expect(
+        firstDiag.frames[0].startLineNumber,
+        "frame startLineNumber"
+      ).to.equal(expectedLine);
       expect(firstDiag.message, "error message").to.include(errorMsg);
       expect(firstDiag.severity, "severity should be error").to.equal("error");
     };
@@ -411,7 +431,8 @@ export const fileExecutionTests: Record<
         typescript: null,
       } satisfies Record<RuntimeLang, [string, string, number, string] | null>
     )[lang] ?? [null, null, null, null];
-    if (!filename || !code || expectedLine === null || !expectedMsg) return null;
+    if (!filename || !code || expectedLine === null || !expectedMsg)
+      return null;
 
     return async (runtimeRef) => {
       const outputs: ReplOutput[] = [];
@@ -435,7 +456,10 @@ export const fileExecutionTests: Record<
       const firstDiag = diagnostics[0];
       expect(firstDiag.frames, "frames should not be empty").to.not.be.empty;
       expect(firstDiag.frames[0].filename, "frame filename").to.equal(filename);
-      expect(firstDiag.frames[0].startLineNumber, "frame startLineNumber").to.equal(expectedLine);
+      expect(
+        firstDiag.frames[0].startLineNumber,
+        "frame startLineNumber"
+      ).to.equal(expectedLine);
       expect(firstDiag.message, "error message").to.include(expectedMsg);
       expect(firstDiag.severity, "severity should be error").to.equal("error");
     };
@@ -599,7 +623,10 @@ export const fileExecutionTests: Record<
       const warnDiag = diagnostics.find((d) => d.severity === "warning");
       expect(warnDiag, "should have warning diagnostic").to.exist;
       expect(warnDiag!.frames[0].filename, "frame filename").to.equal(filename);
-      expect(warnDiag!.frames[0].startLineNumber, "frame startLineNumber").to.equal(2);
+      expect(
+        warnDiag!.frames[0].startLineNumber,
+        "frame startLineNumber"
+      ).to.equal(2);
       expect(warnDiag!.message, "warning message").to.include("unused");
     };
   },

@@ -143,8 +143,8 @@ export function parseStackTrace(
           file === "<anonymous>"
             ? defaultFilename
             : file.endsWith("/" + defaultFilename)
-            ? defaultFilename
-            : file;
+              ? defaultFilename
+              : file;
         const lineNumber = parseInt(directWithFn[3], 10);
         const columnNumber = parseInt(directWithFn[4], 10);
 
@@ -179,8 +179,8 @@ export function parseStackTrace(
           file === "<anonymous>"
             ? defaultFilename
             : file.endsWith("/" + defaultFilename)
-            ? defaultFilename
-            : file;
+              ? defaultFilename
+              : file;
         const lineNumber = parseInt(directWithoutFn[2], 10);
         const columnNumber = parseInt(directWithoutFn[3], 10);
 

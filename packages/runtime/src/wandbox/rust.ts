@@ -221,10 +221,9 @@ export async function rustRunFiles(
                   message: output.message,
                 });
 
-                const m =
-                  /^\s*at\s+(?:.*\/)?([^:\s]+):(\d+):?(\d+)?/.exec(
-                    output.message
-                  );
+                const m = /^\s*at\s+(?:.*\/)?([^:\s]+):(\d+):?(\d+)?/.exec(
+                  output.message
+                );
                 if (m) {
                   const fn = m[1].replace(/^\.\//, "").replace(/^\//, "");
                   if (!isSystemCode(fn)) {
