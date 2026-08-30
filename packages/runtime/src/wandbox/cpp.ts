@@ -11,7 +11,7 @@ import _stacktrace_cpp from "./cpp/_stacktrace.cpp?raw";
 const GCC_DIAG_REGEX =
   /^(?:.*\/)?([^:\n]+):(\d+):(?:(\d+):)?\s*(fatal error|error|warning|note):\s*(.*)$/;
 const LD_DIAG_REGEX =
-  /^(?:(?:\/usr\/bin\/ld:\s+)?(?:.*\/)?([^:\n]+)):(\d+):(?:\([^)]+\):)?\s*(undefined reference to .*)$/;
+  /^(?:(?:\/usr\/bin\/ld:\s+)?(?:.*\/)?([^:\n]+)):(?:(\d+):)?(?:\([^)]+\):)?\s*(undefined reference to .*)$/;
 
 export function selectCppCompiler(
   compilerList: CompilerInfo[]
@@ -159,7 +159,7 @@ export async function cppRunFiles(
               !rawFilename.startsWith("<") &&
               !rawFilename.includes("/include/")
             ) {
-              const lineNum = parseInt(ldMatch[2], 10);
+              const lineNum = ldMatch[2] ? parseInt(ldMatch[2], 10) : 1;
               const msg = ldMatch[3];
               onDiagnostic?.({
                 frames: [

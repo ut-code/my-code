@@ -47,8 +47,9 @@ export async function rustRunFiles(
 ): Promise<void> {
   // Regular expressions for parsing stack traces
   const STACK_FRAME_PATTERN = /^\s*\d+:/;
-  const LOCATION_PATTERN = /^\s*at .\//;
-  const SYSTEM_CODE_PATTERN = /^\s*at .\/prog.rs/;
+  const LOCATION_PATTERN = /^\s*at\s+/;
+  const SYSTEM_CODE_PATTERN =
+    /^\s*at\s+(?:(?:\.\/)?prog\.rs|.*\/prog\.rs|\/rustc\/|<)/;
 
   // Track state for processing panic traces
   let inPanicHook = false;
@@ -208,14 +209,16 @@ export async function rustRunFiles(
                 });
 
                 const m =
-                  /^\s*at\s+(?:(?:\.\/)?([^:\s]+)):(\d+):?(\d+)?/.exec(
+                  /^\s*at\s+(?:.*\/)?([^:\s]+):(\d+):?(\d+)?/.exec(
                     output.message
                   );
                 if (m) {
                   const fn = m[1].replace(/^\.\//, "").replace(/^\//, "");
                   if (
                     fn !== "prog.rs" &&
-                    !fn.startsWith("/") &&
+                    !output.message.includes("/rustc/") &&
+                    !output.message.includes("/std/") &&
+                    !output.message.includes("/core/") &&
                     !fn.startsWith("<")
                   ) {
                     runtimeFrames.push({

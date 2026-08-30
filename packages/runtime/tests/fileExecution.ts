@@ -199,15 +199,19 @@ export const fileExecutionTests: Record<
     if (!filename || !code) return null;
 
     return async (runtimeRef) => {
+      const outputs: ReplOutput[] = [];
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         [filename],
         { [filename]: code },
-        () => {},
+        (output) => {
+          if (output.type !== "file") outputs.push(output);
+        },
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
+      console.log(`${lang} compile error output: `, outputs);
       console.log(
         `${lang} compile error diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
@@ -257,15 +261,19 @@ export const fileExecutionTests: Record<
     if (!codes || !execFiles || !expectedErrorFile || !expectedLine) return null;
 
     return async (runtimeRef) => {
+      const outputs: ReplOutput[] = [];
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         execFiles,
         codes,
-        () => {},
+        (output) => {
+          if (output.type !== "file") outputs.push(output);
+        },
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
+      console.log(`${lang} submodule compile error output: `, outputs);
       console.log(
         `${lang} submodule compile error diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
@@ -299,15 +307,19 @@ export const fileExecutionTests: Record<
     if (!filename || !code) return null;
 
     return async (runtimeRef) => {
+      const outputs: ReplOutput[] = [];
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         [filename],
         { [filename]: code },
-        () => {},
+        (output) => {
+          if (output.type !== "file") outputs.push(output);
+        },
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
+      console.log(`${lang} link error output: `, outputs);
       console.log(
         `${lang} link error diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
@@ -348,15 +360,19 @@ export const fileExecutionTests: Record<
     if (!filename || !code || expectedLine === null) return null;
 
     return async (runtimeRef) => {
+      const outputs: ReplOutput[] = [];
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         [filename],
         { [filename]: code },
-        () => {},
+        (output) => {
+          if (output.type !== "file") outputs.push(output);
+        },
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
+      console.log(`${lang} runtime error output: `, outputs);
       console.log(
         `${lang} runtime error diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
@@ -398,15 +414,19 @@ export const fileExecutionTests: Record<
     if (!filename || !code || expectedLine === null || !expectedMsg) return null;
 
     return async (runtimeRef) => {
+      const outputs: ReplOutput[] = [];
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         [filename],
         { [filename]: code },
-        () => {},
+        (output) => {
+          if (output.type !== "file") outputs.push(output);
+        },
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
+      console.log(`${lang} crash output: `, outputs);
       console.log(
         `${lang} crash diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
@@ -459,15 +479,19 @@ export const fileExecutionTests: Record<
     if (!filename || !code) return null;
 
     return async (runtimeRef) => {
+      const outputs: ReplOutput[] = [];
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         [filename],
         { [filename]: code },
-        () => {},
+        (output) => {
+          if (output.type !== "file") outputs.push(output);
+        },
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
+      console.log(`${lang} multi-frame output: `, outputs);
       console.log(
         `${lang} multi-frame diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
@@ -551,15 +575,19 @@ export const fileExecutionTests: Record<
     if (!filename || !code) return null;
 
     return async (runtimeRef) => {
+      const outputs: ReplOutput[] = [];
       const diagnostics: Diagnostic[] = [];
       await runtimeRef.current![lang].runFiles(
         [filename],
         { [filename]: code },
-        () => {},
+        (output) => {
+          if (output.type !== "file") outputs.push(output);
+        },
         (diagnostic) => {
           diagnostics.push(diagnostic);
         }
       );
+      console.log(`${lang} warning output: `, outputs);
       console.log(
         `${lang} warning diagnostic test: `,
         JSON.stringify(diagnostics, null, 2)
