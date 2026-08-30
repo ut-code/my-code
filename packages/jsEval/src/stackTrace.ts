@@ -63,7 +63,9 @@ export function parseStackTrace(
             const columnNumber = parseInt(locMatch[3], 10);
 
             let fn: string | undefined;
-            const fnMatch = line.match(/^at\s+(?:async\s+)?([^\s(]+)\s+\(eval at\s/);
+            const fnMatch = line.match(
+              /^at\s+(?:async\s+)?([^\s(]+)\s+\(eval at\s/
+            );
             if (fnMatch) {
               const rawFn = fnMatch[1];
               if (rawFn && rawFn !== "eval" && rawFn !== "<anonymous>") {
@@ -127,8 +129,8 @@ export function parseStackTrace(
             file === "<anonymous>"
               ? defaultFilename
               : file.endsWith("/" + defaultFilename)
-              ? defaultFilename
-              : file;
+                ? defaultFilename
+                : file;
           const lineNumber = parseInt(locMatch[2], 10);
           const columnNumber = parseInt(locMatch[3], 10);
 
@@ -144,7 +146,9 @@ export function parseStackTrace(
 
       // Direct file reference pattern without parentheses:
       // e.g. "at main.js:5:3"
-      const noParenMatch = line.match(/^at\s+(?:async\s+)?([^:()\s]+):(\d+):(\d+)$/);
+      const noParenMatch = line.match(
+        /^at\s+(?:async\s+)?([^:()\s]+):(\d+):(\d+)$/
+      );
       if (noParenMatch) {
         const file = noParenMatch[1];
         // Skip internal runtime / bundler / worker frames
@@ -169,8 +173,8 @@ export function parseStackTrace(
           file === "<anonymous>"
             ? defaultFilename
             : file.endsWith("/" + defaultFilename)
-            ? defaultFilename
-            : file;
+              ? defaultFilename
+              : file;
         const lineNumber = parseInt(noParenMatch[2], 10);
         const columnNumber = parseInt(noParenMatch[3], 10);
 
