@@ -52,7 +52,7 @@ async function runCode(
   } catch (e) {
     originalConsole.log(e);
     await Promise.all(pendingOutputPromise);
-    const parsed = parseError(e, code, "main.js");
+    const parsed = parseError(e, code, "REPL");
     await onOutput({
       type: "error",
       message: parsed.formattedStackTrace,
