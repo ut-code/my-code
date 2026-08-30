@@ -46,29 +46,35 @@ export function parseStackTrace(
         continue;
       }
 
-      // Pattern 1: eval at ...
+      // Pattern 1a: eval at ... with function name
       // e.g. "at foo (eval at runFile (webpack-internal://...), <anonymous>:2:9)"
       // e.g. "at eval (eval at runFile (webpack-internal://...), <anonymous>:5:3)"
+      const evalAtWithFn = line.match(
+        /^at\s+(?:async\s+)?([^\s(]+)\s+\(eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:([^:]+):)?(\d+):(\d+)\)$/
+      );
+
+      // Pattern 1b: eval at ... without function name (or at eval at ...)
+      // e.g. "at (eval at runFile (...), <anonymous>:2:9)"
       // e.g. "at eval at runFile (webpack-internal://...), <anonymous>:5:3"
-      const evalAtMatch =
+      const evalAtWithoutFn =
         line.match(
-          /^at\s+(?:async\s+)?(?:(?<fn>[^\s(]+)\s+)?\(eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:(?<file>[^:]+):)?(?<line>\d+):(?<col>\d+)\)$/
+          /^at\s+(?:async\s+)?\(eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:([^:]+):)?(\d+):(\d+)\)$/
         ) ||
         line.match(
-          /^at\s+(?:async\s+)?eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:(?<file>[^:]+):)?(?<line>\d+):(?<col>\d+)$/
+          /^at\s+(?:async\s+)?eval at [^,]+(?:,\s*eval at [^,]+)*,\s*(?:([^:]+):)?(\d+):(\d+)$/
         );
 
-      if (evalAtMatch && evalAtMatch.groups) {
-        const rawFn = evalAtMatch.groups.fn;
+      if (evalAtWithFn) {
+        const rawFn = evalAtWithFn[1];
         const fn =
           rawFn && rawFn !== "eval" && rawFn !== "<anonymous>"
             ? rawFn
             : undefined;
-        const rawFile = evalAtMatch.groups.file;
+        const rawFile = evalAtWithFn[2];
         const filename =
           rawFile && rawFile !== "<anonymous>" ? rawFile : defaultFilename;
-        const lineNumber = parseInt(evalAtMatch.groups.line, 10);
-        const columnNumber = parseInt(evalAtMatch.groups.col, 10);
+        const lineNumber = parseInt(evalAtWithFn[3], 10);
+        const columnNumber = parseInt(evalAtWithFn[4], 10);
 
         frames.push({
           functionName: fn,
@@ -77,20 +83,37 @@ export function parseStackTrace(
           columnNumber,
         });
         continue;
+      } else if (evalAtWithoutFn) {
+        const rawFile = evalAtWithoutFn[1];
+        const filename =
+          rawFile && rawFile !== "<anonymous>" ? rawFile : defaultFilename;
+        const lineNumber = parseInt(evalAtWithoutFn[2], 10);
+        const columnNumber = parseInt(evalAtWithoutFn[3], 10);
+
+        frames.push({
+          functionName: undefined,
+          filename,
+          lineNumber,
+          columnNumber,
+        });
+        continue;
       }
 
-      // Pattern 2: direct file reference (e.g. with sourceURL or in Node/V8)
-      // e.g. "at foo (main.js:2:9)", "at eval (main.js:5:3)", "at main.js:5:3"
-      const directMatch =
-        line.match(
-          /^at\s+(?:async\s+)?(?:(?<fn>[^\s(]+)\s+)?\((?<file>[^:]+):(?<line>\d+):(?<col>\d+)\)$/
-        ) ||
-        line.match(
-          /^at\s+(?:async\s+)?(?<file>[^:()\s]+):(?<line>\d+):(?<col>\d+)$/
-        );
+      // Pattern 2a: direct file reference with function name
+      // e.g. "at foo (main.js:2:9)", "at eval (main.js:5:3)"
+      const directWithFn = line.match(
+        /^at\s+(?:async\s+)?([^\s(]+)\s+\(([^:]+):(\d+):(\d+)\)$/
+      );
 
-      if (directMatch && directMatch.groups) {
-        const file = directMatch.groups.file;
+      // Pattern 2b: direct file reference without function name
+      // e.g. "at (main.js:5:3)" or "at main.js:5:3"
+      const directWithoutFn =
+        line.match(/^at\s+(?:async\s+)?\(([^:]+):(\d+):(\d+)\)$/) ||
+        line.match(/^at\s+(?:async\s+)?([^:()\s]+):(\d+):(\d+)$/);
+
+      if (directWithFn) {
+        const rawFn = directWithFn[1];
+        const file = directWithFn[2];
         // Skip internal runtime / bundler / worker frames
         if (
           file.startsWith("http:") ||
@@ -109,7 +132,6 @@ export function parseStackTrace(
           }
         }
 
-        const rawFn = directMatch.groups.fn;
         const fn =
           rawFn &&
           rawFn !== "eval" &&
@@ -123,11 +145,47 @@ export function parseStackTrace(
             : file.endsWith("/" + defaultFilename)
             ? defaultFilename
             : file;
-        const lineNumber = parseInt(directMatch.groups.line, 10);
-        const columnNumber = parseInt(directMatch.groups.col, 10);
+        const lineNumber = parseInt(directWithFn[3], 10);
+        const columnNumber = parseInt(directWithFn[4], 10);
 
         frames.push({
           functionName: fn,
+          filename,
+          lineNumber,
+          columnNumber,
+        });
+        continue;
+      } else if (directWithoutFn) {
+        const file = directWithoutFn[1];
+        // Skip internal runtime / bundler / worker frames
+        if (
+          file.startsWith("http:") ||
+          file.startsWith("https:") ||
+          file.startsWith("webpack-internal:") ||
+          file.startsWith("webpack:") ||
+          file.startsWith("node:") ||
+          file.includes("node_modules") ||
+          file.includes("worker")
+        ) {
+          if (
+            file !== defaultFilename &&
+            !file.endsWith("/" + defaultFilename)
+          ) {
+            continue;
+          }
+        }
+
+        const filename =
+          file === "<anonymous>"
+            ? defaultFilename
+            : file.endsWith("/" + defaultFilename)
+            ? defaultFilename
+            : file;
+        const lineNumber = parseInt(directWithoutFn[2], 10);
+        const columnNumber = parseInt(directWithoutFn[3], 10);
+
+        frames.push({
+          functionName: undefined,
           filename,
           lineNumber,
           columnNumber,
@@ -172,11 +230,9 @@ export function parseStackTrace(
 
       // Direct location pattern in Firefox / Safari:
       // e.g. "foo@main.js:2:9", "@main.js:5:3", "eval code@main.js:5:3"
-      const locMatch = location.match(
-        /^(?<file>[^:]+):(?<line>\d+):(?<col>\d+)$/
-      );
-      if (locMatch && locMatch.groups) {
-        const file = locMatch.groups.file;
+      const locMatch = location.match(/^([^:]+):(\d+):(\d+)$/);
+      if (locMatch) {
+        const file = locMatch[1];
         if (
           file.startsWith("http:") ||
           file.startsWith("https:") ||
@@ -204,8 +260,8 @@ export function parseStackTrace(
           filename: file.endsWith("/" + defaultFilename)
             ? defaultFilename
             : file,
-          lineNumber: parseInt(locMatch.groups.line, 10),
-          columnNumber: parseInt(locMatch.groups.col, 10),
+          lineNumber: parseInt(locMatch[2], 10),
+          columnNumber: parseInt(locMatch[3], 10),
         });
         continue;
       }
