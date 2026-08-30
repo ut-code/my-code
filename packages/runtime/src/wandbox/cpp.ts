@@ -227,10 +227,12 @@ export async function cppRunFiles(
           m &&
           !output.message.includes("/boost/") &&
           !output.message.includes("/include/") &&
-          !output.message.includes("/opt/wandbox/")
+          !output.message.includes("/opt/wandbox/") &&
+          !output.message.includes("/usr/") &&
+          !output.message.includes("/lib/")
         ) {
           const filename = m[1].replace(/^\.\//, "");
-          if (filename !== "_stacktrace.cpp") {
+          if (filename !== "_stacktrace.cpp" && !filename.startsWith("<")) {
             const cleanedMessage = output.message.replace(
               /\s+at\s+.*\/([^\/]+:\d+.*)$/,
               " at $1"

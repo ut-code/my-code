@@ -48,8 +48,20 @@ export async function rustRunFiles(
   // Regular expressions for parsing stack traces
   const STACK_FRAME_PATTERN = /^\s*\d+:/;
   const LOCATION_PATTERN = /^\s*at\s+/;
-  const SYSTEM_CODE_PATTERN =
-    /^\s*at\s+(?:(?:\.\/)?prog\.rs|.*\/prog\.rs|\/rustc\/|<)/;
+
+  const isSystemCode = (msg: string) => {
+    return (
+      msg.includes("prog.rs") ||
+      msg.includes("/rustc/") ||
+      msg.includes("/library/") ||
+      msg.includes("/alloc/") ||
+      msg.includes("/core/") ||
+      msg.includes("/std/") ||
+      msg.includes("/.cargo/") ||
+      msg.includes("/.rustup/") ||
+      msg.includes("<")
+    );
+  };
 
   // Track state for processing panic traces
   let inPanicHook = false;
@@ -194,14 +206,15 @@ export async function rustRunFiles(
             traceLines.push(output.message);
           } else if (LOCATION_PATTERN.test(output.message)) {
             if (traceLines.length > 0) {
-              // Check if this is user code (not prog.rs)
-              if (!SYSTEM_CODE_PATTERN.test(output.message)) {
+              const lastTraceLine = traceLines[traceLines.length - 1];
+              // Check if this is user code (not system / std library / prog.rs)
+              if (
+                !isSystemCode(output.message) &&
+                !isSystemCode(lastTraceLine)
+              ) {
                 onOutput({
                   type: "trace",
-                  message: traceLines[traceLines.length - 1].replace(
-                    "prog::",
-                    ""
-                  ),
+                  message: lastTraceLine.replace("prog::", ""),
                 });
                 onOutput({
                   type: "trace",
@@ -214,13 +227,7 @@ export async function rustRunFiles(
                   );
                 if (m) {
                   const fn = m[1].replace(/^\.\//, "").replace(/^\//, "");
-                  if (
-                    fn !== "prog.rs" &&
-                    !output.message.includes("/rustc/") &&
-                    !output.message.includes("/std/") &&
-                    !output.message.includes("/core/") &&
-                    !fn.startsWith("<")
-                  ) {
+                  if (!isSystemCode(fn)) {
                     runtimeFrames.push({
                       filename: fn,
                       startLineNumber: parseInt(m[2], 10),
