@@ -4,7 +4,12 @@ import { expose } from "comlink";
 import type { Diagnostic, ReplOutput, UpdatedFile } from "../interface";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
-import { replLikeEval, checkSyntax, createReplConsole } from "@my-code/js-eval";
+import {
+  replLikeEval,
+  checkSyntax,
+  createReplConsole,
+  parseError,
+} from "@my-code/js-eval";
 
 let currentOutputCallback: ((output: ReplOutput) => Promise<void>) | null =
   null;
@@ -47,18 +52,11 @@ async function runCode(
   } catch (e) {
     originalConsole.log(e);
     await Promise.all(pendingOutputPromise);
-    // TODO: stack trace?
-    if (e instanceof Error) {
-      await onOutput({
-        type: "error",
-        message: `${e.name}: ${e.message}`,
-      });
-    } else {
-      await onOutput({
-        type: "error",
-        message: `${String(e)}`,
-      });
-    }
+    const parsed = parseError(e, code, "main.js");
+    await onOutput({
+      type: "error",
+      message: parsed.formattedStackTrace,
+    });
   }
 }
 
@@ -66,29 +64,28 @@ async function runFile(
   name: string,
   files: Record<string, string>,
   onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
+  onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
 ): Promise<void> {
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
   currentOutputCallback = onOutput;
   pendingOutputPromise = [];
   try {
-    self.eval(files[name]);
+    const code = files[name] ?? "";
+    const sourceUrlComment = code.endsWith("\n")
+      ? `//# sourceURL=${name}`
+      : `\n//# sourceURL=${name}`;
+    self.eval(`${code}${sourceUrlComment}`);
     await Promise.all(pendingOutputPromise);
   } catch (e) {
     originalConsole.log(e);
     await Promise.all(pendingOutputPromise);
-    // TODO: stack trace?
-    if (e instanceof Error) {
-      await onOutput({
-        type: "error",
-        message: `${e.name}: ${e.message}`,
-      });
-    } else {
-      await onOutput({
-        type: "error",
-        message: `${String(e)}`,
-      });
+    const parsed = parseError(e, files[name], name);
+    await onOutput({
+      type: "error",
+      message: parsed.formattedStackTrace,
+    });
+    if (onDiagnostic && parsed.diagnostic) {
+      await onDiagnostic(parsed.diagnostic);
     }
   }
 }

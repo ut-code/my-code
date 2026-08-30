@@ -192,7 +192,7 @@ export const fileExecutionTests: Record<
           "test_compile.rs",
           `static X: i32 = ${uniqueTypeName};\npub fn main() {}\n`,
         ],
-        javascript: null,
+        javascript: ["test_compile.js", `function foo(\n`],
         typescript: ["test_compile.ts", `const x: ${uniqueTypeName} = 1;\n`],
       } satisfies Record<RuntimeLang, [string, string] | null>
     )[lang] ?? [null, null];
@@ -353,7 +353,7 @@ export const fileExecutionTests: Record<
           `pub fn main() {\n    panic!("${errorMsg}");\n}\n`,
           2,
         ],
-        javascript: null,
+        javascript: ["test_runtime.js", `throw new Error("${errorMsg}");\n`, 1],
         typescript: null,
       } satisfies Record<RuntimeLang, [string, string, number] | null>
     )[lang] ?? [null, null, null];
@@ -472,7 +472,10 @@ export const fileExecutionTests: Record<
           "test_multiframe.rs",
           `fn foo() {\n    panic!("${uniqueTypeName}");\n}\nfn bar() {\n    foo();\n}\npub fn main() {\n    bar();\n}\n`,
         ],
-        javascript: [null, null],
+        javascript: [
+          "test_multiframe.js",
+          `function foo() {\n  throw new Error("${uniqueTypeName}");\n}\nfunction bar() {\n  foo();\n}\nbar();\n`,
+        ],
         typescript: [null, null],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
@@ -528,7 +531,7 @@ export const fileExecutionTests: Record<
           ruby: [2, 6, 9],
           cpp: [2, 3, 4],
           rust: [2, 5, 8],
-          javascript: null,
+          javascript: [2, 5, 7],
           typescript: null,
         } satisfies Record<RuntimeLang, number[] | null>
       )[lang];
