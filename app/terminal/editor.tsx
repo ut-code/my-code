@@ -43,7 +43,12 @@ export function EditorComponent(props: EditorProps) {
   const theme = useChangeTheme();
   const { files, writeFile, diagnostics } = useEmbedContext();
   const fileDiagnostics = useMemo(
-    () => diagnostics[props.filename] ?? [],
+    () =>
+      Object.values(diagnostics)
+        .flat()
+        .filter((diag) =>
+          diag.frames.some((f) => f.filename === props.filename)
+        ),
     [diagnostics, props.filename]
   );
 

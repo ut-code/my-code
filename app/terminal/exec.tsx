@@ -100,9 +100,7 @@ export function ExecFile(props: ExecProps) {
         // TODO: 1つのファイル名しか受け付けないところに無理やりコンマ区切りで全部のファイル名を突っ込んでいる
         const filenameKey = props.filenames.join(",");
         clearExecResult(filenameKey);
-        for (const fname of props.filenames) {
-          clearDiagnostics(fname);
-        }
+        clearDiagnostics(filenameKey);
         setContents("");
         let isFirstOutput = true;
         await runFiles(
@@ -130,13 +128,7 @@ export function ExecFile(props: ExecProps) {
             setContents((prev) => prev + output.message + "\n");
           },
           (diagnostic) => {
-            // diagnosticを関連する全ファイルに登録する
-            const relatedFiles = new Set(
-              diagnostic.frames.map((f) => f.filename)
-            );
-            for (const fname of relatedFiles) {
-              addDiagnostic(fname, diagnostic);
-            }
+            addDiagnostic(filenameKey, diagnostic);
           }
         );
         setExecutionState("idle");

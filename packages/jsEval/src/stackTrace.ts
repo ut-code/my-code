@@ -349,7 +349,6 @@ export function findSyntaxErrorLine(code: string): {
   for (let i = 1; i <= rawLines.length; i++) {
     const slice = rawLines.slice(0, i).join("\n");
     try {
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval
       (0, eval)(`() => {\n${slice}\n}`);
     } catch (e) {
       if (e instanceof SyntaxError) {

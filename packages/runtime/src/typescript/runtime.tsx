@@ -228,13 +228,14 @@ export function useTypeScript(jsEval: RuntimeContext): RuntimeContext {
             tsEnv.deleteFile(filename);
           }
 
-          console.log(emitOutput);
-          await jsEval.runFiles(
-            [emitOutput.outputFiles[0].name],
-            { ...files, ...emittedFiles },
-            onOutput,
-            onDiagnostic
-          );
+          if (emitOutput.outputFiles.length > 0) {
+            await jsEval.runFiles(
+              [emitOutput.outputFiles[0].name],
+              { ...files, ...emittedFiles },
+              onOutput,
+              onDiagnostic
+            );
+          }
         } catch (error) {
           onErrorRef.current?.(error);
           onOutput({
