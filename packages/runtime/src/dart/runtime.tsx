@@ -11,6 +11,9 @@ import {
 } from "react";
 import useSWR from "swr";
 import {
+  Diagnostic,
+  DiagnosticFrame,
+  DiagnosticSeverity,
   ReplOutput,
   RuntimeContext,
   RuntimeErrorHandler,
@@ -95,8 +98,10 @@ export function DartProvider({ children }: { children: ReactNode }) {
 
 async function performAnalysis(
   source: string,
-  onOutput: (output: ReplOutput | UpdatedFile) => void
-): Promise<void> {
+  onOutput: (output: ReplOutput | UpdatedFile) => void,
+  onDiagnostic?: (diagnostic: Diagnostic) => void,
+  filename: string = "main.dart"
+): Promise<{ hasError: boolean }> {
   try {
     const res = await fetch(`${DART_PAD_API_BASE}/analyze`, {
       method: "POST",
@@ -106,11 +111,15 @@ async function performAnalysis(
       body: JSON.stringify({ source }),
     });
 
-    if (!res.ok) return;
+    if (!res.ok) return { hasError: false };
 
     const data: AnalysisResponse = await res.json();
+    let hasError = false;
     if (Array.isArray(data.issues)) {
       for (const issue of data.issues) {
+        if (issue.kind === "error") {
+          hasError = true;
+        }
         const line = issue.location?.line ?? 1;
         const column = issue.location?.column ?? 1;
         const kindStr = (issue.kind || "info").toUpperCase();
@@ -121,11 +130,172 @@ async function performAnalysis(
           type: issue.kind === "error" ? "error" : "stderr",
           message: formattedMsg,
         });
+
+        let severity: DiagnosticSeverity = "error";
+        if (issue.kind === "warning") {
+          severity = "warning";
+        } else if (issue.kind === "info") {
+          severity = "info";
+        }
+
+        let endLineNumber: number | undefined = undefined;
+        let endColumn: number | undefined = undefined;
+        if (
+          issue.location?.column !== undefined &&
+          issue.location?.charLength !== undefined
+        ) {
+          endLineNumber = line;
+          endColumn = column + issue.location.charLength;
+        }
+
+        onDiagnostic?.({
+          frames: [
+            {
+              filename,
+              startLineNumber: line,
+              startColumn: column,
+              endLineNumber,
+              endColumn,
+            },
+          ],
+          message:
+            issue.message + (issue.correction ? ` (${issue.correction})` : ""),
+          severity,
+        });
       }
     }
+    return { hasError };
   } catch (err) {
     console.warn("Failed to perform Dart static analysis:", err);
+    return { hasError: false };
   }
+}
+
+export function parseDartRuntimeError(
+  rawMessage: string,
+  source: string,
+  filename: string = "main.dart"
+): Diagnostic {
+  const lines = rawMessage
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const errorMessage = lines[0] || "Runtime error";
+
+  const rawFnNames: string[] = [];
+  for (const line of lines) {
+    if (
+      line.includes("dart_sdk") ||
+      line.includes("ddc_module_loader") ||
+      line.includes("contextLoaded") ||
+      line.includes("bootstrap.dart") ||
+      line.includes("require.js") ||
+      line.includes("require.min.js")
+    ) {
+      continue;
+    }
+    let fn = "";
+    const v8Match = line.match(
+      /^at\s+(?:Object\.|Proxy\.)?([a-zA-Z0-9_$]+)(?:\s+\[as\s+([a-zA-Z0-9_$]+)\])?/
+    );
+    if (v8Match) {
+      fn = (v8Match[2] || v8Match[1]).replace(/\$$/, "");
+    } else {
+      const ffMatch = line.match(/^([a-zA-Z0-9_$]+)@/);
+      if (ffMatch) {
+        fn = ffMatch[1].replace(/\$$/, "");
+      }
+    }
+    if (
+      fn &&
+      fn !== "throw" &&
+      fn !== "throw_" &&
+      fn !== "eval" &&
+      fn !== "anonymous"
+    ) {
+      if (rawFnNames[rawFnNames.length - 1] !== fn) {
+        rawFnNames.push(fn);
+      }
+    }
+  }
+
+  const sourceLines = source.split("\n");
+  const frames: DiagnosticFrame[] = [];
+
+  for (let i = 0; i < rawFnNames.length; i++) {
+    const fnName = rawFnNames[i];
+    const isInnermost = i === 0;
+    const calleeName = i > 0 ? rawFnNames[i - 1] : undefined;
+
+    let defLineIndex = sourceLines.findIndex((line) =>
+      new RegExp(`\\b${fnName}\\s*\\(`).test(line)
+    );
+    if (defLineIndex === -1) {
+      defLineIndex = sourceLines.findIndex((line) => line.includes(fnName));
+    }
+    if (defLineIndex === -1) {
+      defLineIndex = 0;
+    }
+
+    const scopeStart = defLineIndex;
+    let scopeEnd = sourceLines.length - 1;
+    let braceCount = 0;
+    let started = false;
+    for (let j = defLineIndex; j < sourceLines.length; j++) {
+      for (const ch of sourceLines[j]) {
+        if (ch === "{") {
+          braceCount++;
+          started = true;
+        } else if (ch === "}") {
+          braceCount--;
+          if (started && braceCount === 0) {
+            scopeEnd = j;
+            break;
+          }
+        }
+      }
+      if (started && braceCount === 0) break;
+    }
+
+    let lineNum = defLineIndex + 1;
+    if (calleeName) {
+      const callIdx = sourceLines
+        .slice(scopeStart, scopeEnd + 1)
+        .findIndex((line) => new RegExp(`\\b${calleeName}\\s*\\(`).test(line));
+      if (callIdx !== -1) {
+        lineNum = scopeStart + callIdx + 1;
+      }
+    } else if (isInnermost) {
+      const throwIdx = sourceLines
+        .slice(scopeStart, scopeEnd + 1)
+        .findIndex((line) =>
+          /\b(?:throw|rethrow|Exception|Error)\b/.test(line)
+        );
+      if (throwIdx !== -1) {
+        lineNum = scopeStart + throwIdx + 1;
+      } else if (scopeStart + 1 <= scopeEnd) {
+        lineNum = scopeStart + 2;
+      }
+    }
+
+    frames.push({
+      filename,
+      startLineNumber: lineNum,
+    });
+  }
+
+  if (frames.length === 0) {
+    frames.push({
+      filename,
+      startLineNumber: 1,
+    });
+  }
+
+  return {
+    frames,
+    message: errorMessage,
+    severity: "error",
+  };
 }
 
 export function useDart(): RuntimeContext {
@@ -154,7 +324,8 @@ export function useDart(): RuntimeContext {
     async (
       filenames: string[],
       files: Readonly<Record<string, string>>,
-      onOutput: (output: ReplOutput | UpdatedFile) => void
+      onOutput: (output: ReplOutput | UpdatedFile) => void,
+      onDiagnostic?: (diagnostic: Diagnostic) => void
     ) => {
       if (typeof window === "undefined") {
         onOutput({
@@ -173,8 +344,8 @@ export function useDart(): RuntimeContext {
       }
 
       try {
-        const [, response] = await Promise.all([
-          performAnalysis(source, onOutput),
+        const [analysisResult, response] = await Promise.all([
+          performAnalysis(source, onOutput, onDiagnostic, filename),
           fetch(`${DART_PAD_API_BASE}/compileNewDDC`, {
             method: "POST",
             headers: {
@@ -191,6 +362,37 @@ export function useDart(): RuntimeContext {
             message:
               errorText || `Compilation failed with status ${response.status}`,
           });
+
+          if (!analysisResult.hasError && errorText) {
+            const lines = errorText.split("\n");
+            for (const line of lines) {
+              const match =
+                /^(?:.*\/)?([^:\n]+):(\d+):(?:(\d+):)?\s*(Error|Warning|Info):\s*(.*)$/i.exec(
+                  line
+                );
+              if (match) {
+                const lineNum = parseInt(match[2], 10);
+                const colNum = match[3] ? parseInt(match[3], 10) : undefined;
+                const kind = match[4].toLowerCase();
+                const msg = match[5];
+                let severity: DiagnosticSeverity = "error";
+                if (kind === "warning") severity = "warning";
+                else if (kind === "info") severity = "info";
+
+                onDiagnostic?.({
+                  frames: [
+                    {
+                      filename: match[1] || filename,
+                      startLineNumber: lineNum,
+                      startColumn: colNum,
+                    },
+                  ],
+                  message: msg,
+                  severity,
+                });
+              }
+            }
+          }
           return;
         }
 
@@ -238,6 +440,12 @@ export function useDart(): RuntimeContext {
               cleanup();
             } else if (msgData.type === "jserr") {
               onOutput({ type: "error", message: String(msgData.message) });
+              const diag = parseDartRuntimeError(
+                String(msgData.message),
+                source,
+                filename
+              );
+              onDiagnostic?.(diag);
               cleanup();
             }
           };

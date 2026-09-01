@@ -307,4 +307,3 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
       return { originalLang: lang };
   }
 }
-
