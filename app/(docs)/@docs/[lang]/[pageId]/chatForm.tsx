@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useState,
-  FormEvent,
-  useEffect,
-  useMemo,
-} from "react";
+import { useState, FormEvent, useEffect, useMemo } from "react";
 // import useSWR from "swr";
 // import {
 //   getQuestionExample,
@@ -23,7 +18,12 @@ interface ChatFormProps {
   close: () => void;
 }
 
-export function ChatForm({ path, langName, sectionContent, close }: ChatFormProps) {
+export function ChatForm({
+  path,
+  langName,
+  sectionContent,
+  close,
+}: ChatFormProps) {
   // const [messages, updateChatHistory] = useChatHistory(sectionId);
   const [inputValue, setInputValue] = useState("");
   const [questionScope, setQuestionScope] = useState<"page" | "language">(

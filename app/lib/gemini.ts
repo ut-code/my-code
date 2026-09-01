@@ -12,7 +12,10 @@ export async function generateContent(
   if (openRouterApiKey && openRouterModel) {
     // Support semicolon-separated list of models for automatic fallback via
     // OpenRouter's `models` array parameter.
-    const models = openRouterModel.split(";").map((m) => m.trim()).filter(Boolean);
+    const models = openRouterModel
+      .split(";")
+      .map((m) => m.trim())
+      .filter(Boolean);
 
     const messages: { role: string; content: string }[] = [];
     if (systemInstruction) {
@@ -20,14 +23,17 @@ export async function generateContent(
     }
     messages.push({ role: "user", content: prompt });
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${openRouterApiKey}`,
-      },
-      body: JSON.stringify({ models, messages }),
-    });
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${openRouterApiKey}`,
+        },
+        body: JSON.stringify({ models, messages }),
+      }
+    );
 
     if (!response.ok) {
       const body = await response.text();

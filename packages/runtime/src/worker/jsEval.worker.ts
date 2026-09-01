@@ -1,10 +1,15 @@
 /// <reference lib="webworker" />
 
 import { expose } from "comlink";
-import type { ReplOutput, UpdatedFile } from "../interface";
+import type { Diagnostic, ReplOutput, UpdatedFile } from "../interface";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
 import inspect from "object-inspect";
-import { replLikeEval, checkSyntax, createReplConsole } from "@my-code/js-eval";
+import {
+  replLikeEval,
+  checkSyntax,
+  createReplConsole,
+  parseError,
+} from "@my-code/js-eval";
 
 let currentOutputCallback: ((output: ReplOutput) => Promise<void>) | null =
   null;
@@ -38,53 +43,49 @@ async function runCode(
   try {
     const result = await replLikeEval(code);
     await Promise.all(pendingOutputPromise);
-    await onOutput({
-      type: "return",
-      message: inspect(result),
-    });
+    if (result !== undefined) {
+      await onOutput({
+        type: "return",
+        message: inspect(result),
+      });
+    }
   } catch (e) {
     originalConsole.log(e);
     await Promise.all(pendingOutputPromise);
-    // TODO: stack trace?
-    if (e instanceof Error) {
-      await onOutput({
-        type: "error",
-        message: `${e.name}: ${e.message}`,
-      });
-    } else {
-      await onOutput({
-        type: "error",
-        message: `${String(e)}`,
-      });
-    }
+    const parsed = parseError(e, code, "REPL");
+    await onOutput({
+      type: "error",
+      message: parsed.formattedStackTrace,
+    });
   }
 }
 
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
+  onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
 ): Promise<void> {
   // pyodide worker などと異なり、複数ファイルを読み込んでimportのようなことをするのには対応していません。
   currentOutputCallback = onOutput;
   pendingOutputPromise = [];
   try {
-    self.eval(files[name]);
+    const code = files[name] ?? "";
+    const sourceUrlComment = code.endsWith("\n")
+      ? `//# sourceURL=${name}`
+      : `\n//# sourceURL=${name}`;
+    self.eval(`${code}${sourceUrlComment}`);
     await Promise.all(pendingOutputPromise);
   } catch (e) {
     originalConsole.log(e);
     await Promise.all(pendingOutputPromise);
-    // TODO: stack trace?
-    if (e instanceof Error) {
-      await onOutput({
-        type: "error",
-        message: `${e.name}: ${e.message}`,
-      });
-    } else {
-      await onOutput({
-        type: "error",
-        message: `${String(e)}`,
-      });
+    const parsed = parseError(e, files[name], name);
+    await onOutput({
+      type: "error",
+      message: parsed.formattedStackTrace,
+    });
+    if (onDiagnostic && parsed.diagnostic) {
+      await onDiagnostic(parsed.diagnostic);
     }
   }
 }

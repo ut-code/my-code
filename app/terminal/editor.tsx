@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { useChangeTheme } from "@/themeToggle";
 import { useEmbedContext } from "./embedContext";
@@ -42,7 +42,83 @@ interface EditorProps {
 }
 export function EditorComponent(props: EditorProps) {
   const theme = useChangeTheme();
-  const { files, writeFile } = useEmbedContext();
+  const { files, writeFile, diagnostics } = useEmbedContext();
+  const fileDiagnostics = useMemo(
+    () =>
+      Object.values(diagnostics)
+        .flat()
+        .filter((diag) =>
+          diag.frames.some((f) => f.filename === props.filename)
+        ),
+    [diagnostics, props.filename]
+  );
+
+  const annotations = useMemo(() => {
+    return fileDiagnostics.flatMap((diag) =>
+      diag.frames
+        .slice(0, 1)
+        .filter((f) => f.filename === props.filename)
+        .map((f) => ({
+          row: Math.max(0, f.startLineNumber - 1),
+          column: Math.max(0, (f.startColumn ?? 1) - 1),
+          text: diag.message,
+          type: diag.severity ?? "error", // "error" | "warning" | "info"
+        }))
+    );
+  }, [fileDiagnostics, props.filename]);
+
+  const markers = useMemo(() => {
+    return fileDiagnostics.flatMap((diag) =>
+      diag.frames
+        .map((f, i) => ({ ...f, isFirstFrame: i === 0 }))
+        .filter((f) => f.filename === props.filename)
+        .map((f) => {
+          const startRow = Math.max(0, f.startLineNumber - 1);
+          const endRow = f.endLineNumber
+            ? Math.max(startRow, f.endLineNumber - 1)
+            : startRow;
+          const startCol =
+            f.startColumn !== undefined ? Math.max(0, f.startColumn - 1) : 0;
+          const endCol =
+            f.endColumn !== undefined
+              ? Math.max(startCol + 1, f.endColumn - 1)
+              : Number.MAX_SAFE_INTEGER;
+
+          const isError = (diag.severity ?? "error") === "error";
+          const isWarning = diag.severity === "warning";
+          const className = clsx(
+            "absolute rounded-b-none! border-dashed border-b-1",
+            isError
+              ? "border-error"
+              : isWarning
+                ? "border-warning"
+                : "border-accent",
+            f.isFirstFrame &&
+              (isError
+                ? "bg-error/20"
+                : isWarning
+                  ? "bg-warning/20"
+                  : "bg-accent/20")
+          );
+
+          return {
+            startRow,
+            startCol,
+            endRow,
+            endCol,
+            className,
+            type:
+              f.startColumn !== undefined &&
+              f.endColumn !== undefined &&
+              startRow === endRow
+                ? ("text" as const)
+                : ("fullLine" as const),
+            inFront: false,
+          };
+        })
+    );
+  }, [fileDiagnostics, props.filename]);
+
   const code = files[props.filename] || props.initContent;
   useEffect(() => {
     if (!files[props.filename] && props.initContent) {
@@ -183,7 +259,10 @@ export function EditorComponent(props: EditorProps) {
       {fontSize !== undefined && initAce ? (
         <Suspense
           fallback={
-            <FallbackPre className="grow-1 rounded-b-box" editorHeight={editorHeight}>
+            <FallbackPre
+              className="grow-1 rounded-b-box"
+              editorHeight={editorHeight}
+            >
               {code}
             </FallbackPre>
           }
@@ -205,6 +284,8 @@ export function EditorComponent(props: EditorProps) {
             value={code}
             onChange={(code: string) => writeFile({ [props.filename]: code })}
             setOptions={{ useWorker: false }}
+            annotations={annotations}
+            markers={markers}
           />
         </Suspense>
       ) : (

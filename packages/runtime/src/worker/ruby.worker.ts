@@ -5,12 +5,21 @@ import { expose } from "comlink";
 import { DefaultRubyVM } from "@ruby/wasm-wasi/dist/browser";
 import type { RubyVM } from "@ruby/wasm-wasi/dist/vm";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
-import type { ReplOutput, ReplOutputType, UpdatedFile } from "../interface";
+import type {
+  Diagnostic,
+  ReplOutput,
+  ReplOutputType,
+  UpdatedFile,
+} from "../interface";
 
 import init_rb from "./ruby/init.rb?raw";
+import execfile_rb from "./ruby/execfile.rb?raw";
+import eval_code_rb from "./ruby/eval_code.rb?raw";
 
 let rubyVM: RubyVM | null = null;
-let currentOutputCallback: ((output: ReplOutput | UpdatedFile) => Promise<void>) | null = null;
+let currentOutputCallback:
+  | ((output: ReplOutput | UpdatedFile) => Promise<void>)
+  | null = null;
 let stdoutBuffer = "";
 let stderrBuffer = "";
 
@@ -33,7 +42,10 @@ self.stderr = {
     stderrBuffer = await handleBatchOutput(stderrBuffer, "stderr");
   },
 };
-async function handleBatchOutput(buffer: string, type: ReplOutputType): Promise<string> {
+async function handleBatchOutput(
+  buffer: string,
+  type: ReplOutputType
+): Promise<string> {
   // If buffer contains newlines, flush complete lines immediately
   if (buffer.includes("\n")) {
     const lines = buffer.split("\n");
@@ -61,6 +73,8 @@ async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
       rubyVM = vm;
 
       rubyVM.eval(init_rb);
+      rubyVM.eval(execfile_rb);
+      rubyVM.eval(eval_code_rb);
 
       return { capabilities: { interrupt: "restart" } };
     } catch (e: unknown) {
@@ -84,29 +98,6 @@ async function flushOutput() {
   stderrBuffer = "";
 }
 
-function formatRubyError(
-  error: unknown,
-  isFile: boolean
-): { message: string; isFatal: boolean } {
-  if (!(error instanceof Error)) {
-    return { message: `予期せぬエラー: ${String(error).trim()}`, isFatal: true };
-  }
-
-  let errorMessage = error.message;
-
-  // Clean up Ruby error messages by filtering out internal eval lines
-  if (errorMessage.includes("Traceback") || errorMessage.includes("Error")) {
-    let lines = errorMessage.split("\n");
-    lines = lines.filter((line) => line !== "-e:in 'Kernel.eval'");
-    if (isFile) {
-      lines = lines.filter((line) => !line.startsWith("eval:1:in"));
-    }
-    errorMessage = lines.join("\n");
-  }
-
-  return { message: errorMessage, isFatal: false };
-}
-
 async function runCode(
   code: string,
   onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
@@ -120,28 +111,35 @@ async function runCode(
     stdoutBuffer = "";
     stderrBuffer = "";
 
-    const result = await rubyVM.evalAsync(code);
-
-    const resultStr = await result.callAsync("inspect");
+    const resultVal = await rubyVM.evalAsync(
+      `__ruby_eval_code(${JSON.stringify(code)})`
+    );
 
     // Flush any buffered output
     await flushOutput();
 
-    // Add result to output if it's not nil and not empty
-    await onOutput({
-      type: "return",
-      message: resultStr.toString(),
-    });
+    const result = JSON.parse(resultVal.toString());
+    if (result.success) {
+      await onOutput({
+        type: "return",
+        message: result.result,
+      });
+    } else {
+      await onOutput({
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
+      });
+    }
   } catch (e) {
     console.log(e);
 
     // Flush any buffered output
     await flushOutput();
-    const { message, isFatal } = formatRubyError(e, false);
+    const message = e instanceof Error ? e.message : String(e);
 
     await onOutput({
-      type: isFatal ? "fatalError" : "error",
-      message,
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
     });
   }
 
@@ -154,7 +152,8 @@ async function runCode(
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
+  onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
 ): Promise<void> {
   if (!rubyVM) {
     throw new Error("Ruby VM not initialized");
@@ -176,24 +175,35 @@ async function runFile(
       }
     }
 
-    // clear LOADED_FEATURES so that `require` can reload files
-    rubyVM.eval(`$LOADED_FEATURES.reject! { |f| f =~ /^\\/[^\\/]*\\.rb$/ }`);
-
     // Run the specified file
-    await rubyVM.evalAsync(`load ${JSON.stringify(name)}`);
+    const resultVal = await rubyVM.evalAsync(
+      `__ruby_exec_file(${JSON.stringify(name)})`
+    );
 
     // Flush any buffered output
     await flushOutput();
+
+    const result = JSON.parse(resultVal.toString());
+    if (!result.success) {
+      await onOutput({
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
+      });
+
+      if (onDiagnostic && result.diagnostic) {
+        await onDiagnostic(result.diagnostic);
+      }
+    }
   } catch (e) {
     console.log(e);
 
     // Flush any buffered output
     await flushOutput();
-    const { message, isFatal } = formatRubyError(e, true);
+    const message = e instanceof Error ? e.message : String(e);
 
     await onOutput({
-      type: isFatal ? "fatalError" : "error",
-      message,
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
     });
   }
 
@@ -282,7 +292,7 @@ async function restoreState(commands: string[]): Promise<object> {
 
   for (const command of commands) {
     try {
-      await rubyVM.evalAsync(command);
+      await rubyVM.evalAsync(`__ruby_eval_code(${JSON.stringify(command)})`);
     } catch (e) {
       // If restoration fails, we still continue with other commands
       console.error("Failed to restore command:", command, e);

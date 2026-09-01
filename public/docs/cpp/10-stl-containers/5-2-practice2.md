@@ -14,19 +14,18 @@ question:
 
 英文（スペースで区切られた単語の列）を読み込み、各単語が何回出現したかをカウントするプログラムを`std::map<std::string, int>`を使って作成してください。最後に、出現した全単語とその出現回数をアルファベット順に表示してください。
 
-> 文字列を単語ごとに分割するには、以下のように`std::istringstream`を使うと便利です。
-```cpp
-#include <sstream>
-
-std::string text = "this is a sample text";
-std::istringstream iss(text);
-std::string word;
-while (iss >> word) {
-    // wordには1単語ずつ格納される
-}
-```
-
-
+> [!TIP]
+> [[文字列]]を単語ごとに分割するには、以下のように`std::istringstream`を使うと便利です。
+> ```cpp
+> #include <sstream>
+> 
+> std::string text = "this is a sample text";
+> std::istringstream iss(text);
+> std::string word;
+> while (iss >> word) {
+>     // wordには1単語ずつ格納される
+> }
+> ```
 
 ```cpp:practice11_2.cpp
 #include <iostream>

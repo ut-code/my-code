@@ -7,12 +7,13 @@ import { loadPyodide } from "pyodide";
 import { version as pyodideVersion } from "pyodide/package.json";
 import type { PyCallable } from "pyodide/ffi";
 import type { WorkerAPI, WorkerCapabilities } from "./runtime";
-import type { ReplOutput, UpdatedFile } from "../interface";
+import type { Diagnostic, ReplOutput, UpdatedFile } from "../interface";
 
 import execfile_py from "./pyodide/execfile.py?raw";
+import eval_code_py from "./pyodide/eval_code.py?raw";
 import check_syntax_py from "./pyodide/check_syntax.py?raw";
 
-const HOME = `/home/pyodide/`;
+const HOME = `/home/pyodide`;
 
 let pyodide: PyodideInterface;
 let pendingOutputPromise: Promise<void>[] = [];
@@ -87,44 +88,32 @@ async function runCode(
   currentOutputCallback = onOutput;
   pendingOutputPromise = [];
   try {
-    const result = await pyodide.runPythonAsync(code);
+    const pyEvalCode = pyodide.runPython(eval_code_py) as PyCallable;
+    const resultJson = await pyEvalCode(code);
     await Promise.all(pendingOutputPromise);
-    if (result !== undefined) {
+
+    const result = JSON.parse(resultJson);
+    if (result.success) {
+      if (result.has_return && result.result !== null) {
+        await onOutput({
+          type: "return",
+          message: result.result,
+        });
+      }
+    } else {
       await onOutput({
-        type: "return",
-        message: String(result),
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
       });
     }
   } catch (e: unknown) {
     console.log(e);
     await Promise.all(pendingOutputPromise);
-    if (e instanceof Error) {
-      // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
-      if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
-        const lines = e.message.split("\n");
-        const execLineIndex = lines.findIndex((line) =>
-          line.includes("<exec>")
-        );
-        await onOutput({
-          type: "error",
-          message: lines
-            .slice(0, 1)
-            .concat(lines.slice(execLineIndex))
-            .join("\n")
-            .trim(),
-        });
-      } else {
-        await onOutput({
-          type: "fatalError",
-          message: `予期せぬエラー: ${e.message.trim()}`,
-        });
-      }
-    } else {
-      await onOutput({
-        type: "fatalError",
-        message: `予期せぬエラー: ${String(e).trim()}`,
-      });
-    }
+    const message = e instanceof Error ? e.message : String(e);
+    await onOutput({
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
+    });
   }
 
   const updatedFiles = readAllFiles();
@@ -136,7 +125,8 @@ async function runCode(
 async function runFile(
   name: string,
   files: Record<string, string>,
-  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>
+  onOutput: (output: ReplOutput | UpdatedFile) => Promise<void>,
+  onDiagnostic?: (diagnostic: Diagnostic) => Promise<void>
 ): Promise<void> {
   if (!pyodide) {
     throw new Error("Pyodide not initialized");
@@ -152,39 +142,27 @@ async function runFile(
     }
 
     const pyExecFile = pyodide.runPython(execfile_py) as PyCallable;
-    pyExecFile(`${HOME}/${name}`);
+    const resultJson = pyExecFile(`${HOME}/${name}`);
     await Promise.all(pendingOutputPromise);
+
+    const result = JSON.parse(resultJson);
+    if (!result.success) {
+      await onOutput({
+        type: result.is_fatal ? "fatalError" : "error",
+        message: result.error_message,
+      });
+      if (onDiagnostic && result.diagnostic) {
+        await onDiagnostic(result.diagnostic);
+      }
+    }
   } catch (e: unknown) {
     console.log(e);
     await Promise.all(pendingOutputPromise);
-    if (e instanceof Error) {
-      // エラーがPyodideのTracebackの場合、2行目から<exec>が出てくるまでを隠す
-      // <exec> 自身も隠す
-      if (e.name === "PythonError" && e.message.startsWith("Traceback")) {
-        const lines = e.message.split("\n");
-        const execLineIndex = lines.findLastIndex((line) =>
-          line.includes("<exec>")
-        );
-        await onOutput({
-          type: "error",
-          message: lines
-            .slice(0, 1)
-            .concat(lines.slice(execLineIndex + 1))
-            .join("\n")
-            .trim(),
-        });
-      } else {
-        await onOutput({
-          type: "fatalError",
-          message: `予期せぬエラー: ${e.message.trim()}`,
-        });
-      }
-    } else {
-      await onOutput({
-        type: "fatalError",
-        message: `予期せぬエラー: ${String(e).trim()}`,
-      });
-    }
+    const message = e instanceof Error ? e.message : String(e);
+    await onOutput({
+      type: "fatalError",
+      message: `予期せぬエラー: ${message.trim()}`,
+    });
   }
 
   const updatedFiles = readAllFiles();

@@ -121,6 +121,7 @@ export interface RuntimeContext {
    * @param filenames - 実行するファイル名
    * @param files - 実行環境に渡すファイル(実行するものと無関係のものを含んでも良い)
    * @param onOutput - 実行結果を返すコールバック
+   * @param onDiagnostic - 診断情報 (エラーや警告など) を返すコールバック
    * @returns 実行が完了した際に解決するPromise
    * ただし、onOutputコールバックは実行完了後に呼ばれる可能性もあります(実行したコマンドが非同期処理を含む場合)。
    *
@@ -132,7 +133,8 @@ export interface RuntimeContext {
   runFiles: (
     filenames: string[],
     files: Readonly<Record<string, string>>,
-    onOutput: (output: ReplOutput | UpdatedFile) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => void,
+    onDiagnostic?: (diagnostic: Diagnostic) => void
   ) => Promise<void>;
   /**
    * 指定されたファイルを実行するためのコマンドライン引数文字列を返します。
@@ -149,6 +151,33 @@ export interface RuntimeInfo {
   version?: string;
 }
 export type RuntimeErrorHandler = (error: unknown) => void;
+
+export const DiagnosticSeveritySchema = z.enum(["error", "warning", "info"]);
+export type DiagnosticSeverity = z.output<typeof DiagnosticSeveritySchema>;
+
+/**
+ * エラーや警告の1つのスタックフレーム（ファイル・行・列情報）
+ */
+export const DiagnosticFrameSchema = z.object({
+  filename: z.string(),
+  startLineNumber: z.number(), // 1-indexed
+  startColumn: z.number().optional(), // 1-indexed
+  endLineNumber: z.number().optional(), // 1-indexed
+  endColumn: z.number().optional(), // 1-indexed
+});
+export type DiagnosticFrame = z.output<typeof DiagnosticFrameSchema>;
+
+/**
+ * 1つのエラー・警告・情報メッセージ。
+ * 複数のスタックフレームが存在する場合、framesに複数の要素が含まれる。
+ * framesは順序通りで、最初の要素が主要フレーム（エラーが発生した場所）。
+ */
+export const DiagnosticSchema = z.object({
+  frames: z.array(DiagnosticFrameSchema).min(1),
+  message: z.string(),
+  severity: DiagnosticSeveritySchema.default("error"),
+});
+export type Diagnostic = z.output<typeof DiagnosticSchema>;
 
 export const ReplOutputTypeSchema = z.enum([
   "stdout",

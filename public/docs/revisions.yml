@@ -11,6 +11,9 @@ cpp-1-types-control-intro:
   - git: de11512
     md5: 33WnLkEocC4/Y1oHMZlphA==
     path: public/docs/cpp/1-types-control/-intro.md
+  - git: 5fab345
+    md5: CcTtfWgLzWhc1twhFEsrwA==
+    path: public/docs/cpp/1-types-control/-intro.md
 cpp-10-stl-containers-intro:
   page: cpp/10-stl-containers
   rev:
@@ -35,11 +38,17 @@ cpp-12-raii-smart-ptrs-intro:
   - git: df016a4
     md5: 3UfEZurAQVFBQilGJr9RzA==
     path: public/docs/cpp/12-raii-smart-ptrs/-intro.md
+  - git: 5fab345
+    md5: GErPEpqM7fXv0EdvB+pnBQ==
+    path: public/docs/cpp/12-raii-smart-ptrs/-intro.md
 cpp-2-data-containers-intro:
   page: cpp/2-data-containers
   rev:
   - git: de11512
     md5: 7VP0Gs/um5g1UFbiQ3FGQA==
+    path: public/docs/cpp/2-data-containers/-intro.md
+  - git: 5fab345
+    md5: c5+wfRqvbSlE3/1lJMSsFQ==
     path: public/docs/cpp/2-data-containers/-intro.md
 cpp-3-pointers-intro:
   page: cpp/3-pointers
@@ -50,6 +59,9 @@ cpp-3-pointers-intro:
   - git: df016a4
     md5: eorfqZ4mZetdhDZHaHx88w==
     path: public/docs/cpp/3-pointers/-intro.md
+  - git: 5fab345
+    md5: JE2sz94Vc9vW1eiEK8IKOw==
+    path: public/docs/cpp/3-pointers/-intro.md
 cpp-4-functions-intro:
   page: cpp/4-functions
   rev:
@@ -58,6 +70,9 @@ cpp-4-functions-intro:
     path: public/docs/cpp/4-functions/-intro.md
   - git: df016a4
     md5: 9+yze2zRdI0lSY1Omo1nnw==
+    path: public/docs/cpp/4-functions/-intro.md
+  - git: 5fab345
+    md5: 6JtpTEgw+j68qcEhpTYm/Q==
     path: public/docs/cpp/4-functions/-intro.md
 cpp-5-project-build-intro:
   page: cpp/5-project-build
@@ -71,6 +86,9 @@ cpp-6-classes-basics-intro:
   - git: de11512
     md5: naF1pTjZ7Fj082oP705yvA==
     path: public/docs/cpp/6-classes-basics/-intro.md
+  - git: 5fab345
+    md5: y8lFrv+IqQNfFiNseXAHCw==
+    path: public/docs/cpp/6-classes-basics/-intro.md
 cpp-7-classes-advanced-intro:
   page: cpp/7-classes-advanced
   rev:
@@ -79,6 +97,9 @@ cpp-7-classes-advanced-intro:
     path: public/docs/cpp/7-classes-advanced/-intro.md
   - git: df016a4
     md5: QuReKUvowvhwcyJWcOId/w==
+    path: public/docs/cpp/7-classes-advanced/-intro.md
+  - git: 5fab345
+    md5: bIgqSPE8xKXUVnUV94snSA==
     path: public/docs/cpp/7-classes-advanced/-intro.md
 cpp-8-inheritance-intro:
   page: cpp/8-inheritance
@@ -92,11 +113,17 @@ cpp-9-templates-intro:
   - git: de11512
     md5: HBe/0t3EHwKq4pC3tcHsCQ==
     path: public/docs/cpp/9-templates/-intro.md
+  - git: 5fab345
+    md5: 9wHpJj68I5HL265hz3C9Vw==
+    path: public/docs/cpp/9-templates/-intro.md
 cpp-classes-advanced-copy:
   page: cpp/7-classes-advanced
   rev:
   - git: de11512
     md5: Y6EqxeY3lvBRRxLEVVFb3g==
+    path: public/docs/cpp/7-classes-advanced/1-0-copy.md
+  - git: 5fab345
+    md5: 5kjJfEX1fmKWnbudYUmbOA==
     path: public/docs/cpp/7-classes-advanced/1-0-copy.md
 cpp-classes-advanced-deep-copy:
   page: cpp/7-classes-advanced
@@ -104,11 +131,17 @@ cpp-classes-advanced-deep-copy:
   - git: de11512
     md5: Nc9retbz7GeLXwYOqjKmrA==
     path: public/docs/cpp/7-classes-advanced/1-2-deep-copy.md
+  - git: 5fab345
+    md5: Bb3OeHhOnV0HO2HiuFBiqw==
+    path: public/docs/cpp/7-classes-advanced/1-2-deep-copy.md
 cpp-classes-advanced-operator-overload:
   page: cpp/7-classes-advanced
   rev:
   - git: de11512
     md5: kJR7AiMNzs43D2NOW43E2g==
+    path: public/docs/cpp/7-classes-advanced/2-0-operator-overload.md
+  - git: 5fab345
+    md5: XO7CtwE4POhBRNShTSbvXQ==
     path: public/docs/cpp/7-classes-advanced/2-0-operator-overload.md
 cpp-classes-advanced-practice1:
   page: cpp/7-classes-advanced
@@ -116,11 +149,17 @@ cpp-classes-advanced-practice1:
   - git: de11512
     md5: Y6SMYzck+fXD6KGjF7D9YQ==
     path: public/docs/cpp/7-classes-advanced/5-1-practice1.md
+  - git: 5fab345
+    md5: uatR9PGWYDt4dqyS1DRLCQ==
+    path: public/docs/cpp/7-classes-advanced/5-1-practice1.md
 cpp-classes-advanced-practice2:
   page: cpp/7-classes-advanced
   rev:
   - git: de11512
     md5: S7bBRA47Jeb8gej74QwPiw==
+    path: public/docs/cpp/7-classes-advanced/5-2-practice2.md
+  - git: 5fab345
+    md5: OEGVc34aMe4ZPL/zoQjhRw==
     path: public/docs/cpp/7-classes-advanced/5-2-practice2.md
 cpp-classes-advanced-shallow-copy:
   page: cpp/7-classes-advanced
@@ -128,11 +167,17 @@ cpp-classes-advanced-shallow-copy:
   - git: de11512
     md5: Jk67jkfaCzD7TOyUKJQnCQ==
     path: public/docs/cpp/7-classes-advanced/1-1-shallow-copy.md
+  - git: 5fab345
+    md5: Q+qCvf1cZrJaY2GXq2vXGw==
+    path: public/docs/cpp/7-classes-advanced/1-1-shallow-copy.md
 cpp-classes-advanced-static-member:
   page: cpp/7-classes-advanced
   rev:
   - git: de11512
     md5: XZ3TWzAPzhzGEn2nkFihRA==
+    path: public/docs/cpp/7-classes-advanced/3-0-static-member.md
+  - git: 5fab345
+    md5: yS/cI3SVSH3JCsaoqk63QA==
     path: public/docs/cpp/7-classes-advanced/3-0-static-member.md
 cpp-classes-advanced-summary:
   page: cpp/7-classes-advanced
@@ -140,11 +185,17 @@ cpp-classes-advanced-summary:
   - git: de11512
     md5: sapADdLTPBkDvHVgB5UBhg==
     path: public/docs/cpp/7-classes-advanced/5-0-summary.md
+  - git: 5fab345
+    md5: GuvTfI8RsoN9duEw6qRMlg==
+    path: public/docs/cpp/7-classes-advanced/5-0-summary.md
 cpp-classes-advanced-this:
   page: cpp/7-classes-advanced
   rev:
   - git: de11512
     md5: hOLhcP6ZdLxTQbNYLX/eVQ==
+    path: public/docs/cpp/7-classes-advanced/4-0-this.md
+  - git: 5fab345
+    md5: H/3Gy9JnX/caFoIuWXS5NA==
     path: public/docs/cpp/7-classes-advanced/4-0-this.md
 cpp-classes-basics-about:
   page: cpp/6-classes-basics
@@ -152,11 +203,17 @@ cpp-classes-basics-about:
   - git: de11512
     md5: cWiP7j9kcb86c52J8iQItA==
     path: public/docs/cpp/6-classes-basics/1-0-about.md
+  - git: 5fab345
+    md5: EveX15YLZC7mXnbxZpj6LA==
+    path: public/docs/cpp/6-classes-basics/1-0-about.md
 cpp-classes-basics-access-control:
   page: cpp/6-classes-basics
   rev:
   - git: de11512
     md5: TongeTIEdjLxZhBiXqkLNg==
+    path: public/docs/cpp/6-classes-basics/3-0-access-control.md
+  - git: 5fab345
+    md5: vgEQSw1dhSkwotizY52D8A==
     path: public/docs/cpp/6-classes-basics/3-0-access-control.md
 cpp-classes-basics-constructor:
   page: cpp/6-classes-basics
@@ -164,11 +221,17 @@ cpp-classes-basics-constructor:
   - git: de11512
     md5: VzG5Aj2x5Vh9vpcSoNPtSw==
     path: public/docs/cpp/6-classes-basics/4-1-constructor.md
+  - git: 5fab345
+    md5: cxMPruyJfYSf8HqznCV9OQ==
+    path: public/docs/cpp/6-classes-basics/4-1-constructor.md
 cpp-classes-basics-constructor-destructor:
   page: cpp/6-classes-basics
   rev:
   - git: de11512
     md5: l1uLYYGYuAGiZkBOkwcvZQ==
+    path: public/docs/cpp/6-classes-basics/4-0-constructor-destructor.md
+  - git: 5fab345
+    md5: 3sGptAXf282cQH2rBCXQqw==
     path: public/docs/cpp/6-classes-basics/4-0-constructor-destructor.md
 cpp-classes-basics-destructor:
   page: cpp/6-classes-basics
@@ -179,11 +242,17 @@ cpp-classes-basics-destructor:
   - git: df016a4
     md5: gQeklrvVXnEDsrXZwoDzRQ==
     path: public/docs/cpp/6-classes-basics/4-2-destructor.md
+  - git: 5fab345
+    md5: M/km5+XCih5YgFdqq8ze/w==
+    path: public/docs/cpp/6-classes-basics/4-2-destructor.md
 cpp-classes-basics-instance:
   page: cpp/6-classes-basics
   rev:
   - git: de11512
     md5: VY9C+s357ra9DZ/Lk94ZDg==
+    path: public/docs/cpp/6-classes-basics/2-0-instance.md
+  - git: 5fab345
+    md5: TPmOqfTHM79aMdekCEVetA==
     path: public/docs/cpp/6-classes-basics/2-0-instance.md
 cpp-classes-basics-practice1:
   page: cpp/6-classes-basics
@@ -191,11 +260,17 @@ cpp-classes-basics-practice1:
   - git: de11512
     md5: EP+8pUfCi9IzqGHMfyDnxw==
     path: public/docs/cpp/6-classes-basics/5-1-practice1.md
+  - git: 5fab345
+    md5: H+aKrT3y2DsBizC+SrcHUQ==
+    path: public/docs/cpp/6-classes-basics/5-1-practice1.md
 cpp-classes-basics-practice2:
   page: cpp/6-classes-basics
   rev:
   - git: de11512
     md5: 7D7/OuSW2WIIz/au4/SdEw==
+    path: public/docs/cpp/6-classes-basics/5-2-practice2.md
+  - git: 5fab345
+    md5: LsY9T+SEgL+3+5Tho+q03w==
     path: public/docs/cpp/6-classes-basics/5-2-practice2.md
 cpp-classes-basics-summary:
   page: cpp/6-classes-basics
@@ -205,6 +280,9 @@ cpp-classes-basics-summary:
     path: public/docs/cpp/6-classes-basics/5-0-summary.md
   - git: df016a4
     md5: YO7Sz89VTAlNYuv4cNBf9g==
+    path: public/docs/cpp/6-classes-basics/5-0-summary.md
+  - git: 5fab345
+    md5: 8TzOm1yvjnSnjHbomkOvpQ==
     path: public/docs/cpp/6-classes-basics/5-0-summary.md
 cpp-control:
   page: cpp/1-types-control
@@ -224,11 +302,17 @@ cpp-control-loop:
   - git: de11512
     md5: P8M0pMmo+3YE7cgLaaeXYw==
     path: public/docs/cpp/1-types-control/5-3-loop.md
+  - git: 5fab345
+    md5: P0go/3ilfHJXFrk2u1dq9w==
+    path: public/docs/cpp/1-types-control/5-3-loop.md
 cpp-control-switch:
   page: cpp/1-types-control
   rev:
   - git: de11512
     md5: lvXMJN4o1apcUmFI1e8FFg==
+    path: public/docs/cpp/1-types-control/5-2-switch.md
+  - git: 5fab345
+    md5: NHRK5sbd1d3Fe1FwOxL9tg==
     path: public/docs/cpp/1-types-control/5-2-switch.md
 cpp-data-containers-array:
   page: cpp/2-data-containers
@@ -236,17 +320,26 @@ cpp-data-containers-array:
   - git: de11512
     md5: hJgR712eVBqP8Vujzq1msg==
     path: public/docs/cpp/2-data-containers/3-0-array.md
+  - git: 5fab345
+    md5: 76VAuujIhv4o6OgWOSLk3g==
+    path: public/docs/cpp/2-data-containers/3-0-array.md
 cpp-data-containers-practice1:
   page: cpp/2-data-containers
   rev:
   - git: de11512
     md5: ThmiNqWLASNA8vXmY8sbWA==
     path: public/docs/cpp/2-data-containers/5-1-practice1.md
+  - git: 5fab345
+    md5: cnl8qIsvwNa73rSHu+9H6w==
+    path: public/docs/cpp/2-data-containers/5-1-practice1.md
 cpp-data-containers-practice2:
   page: cpp/2-data-containers
   rev:
   - git: de11512
     md5: 2ngqXilaEZSrvqb42/rA8w==
+    path: public/docs/cpp/2-data-containers/5-2-practice2.md
+  - git: 5fab345
+    md5: DXoC4GasTHPhj8ECuY6sfw==
     path: public/docs/cpp/2-data-containers/5-2-practice2.md
 cpp-data-containers-range-based-for:
   page: cpp/2-data-containers
@@ -257,17 +350,26 @@ cpp-data-containers-range-based-for:
   - git: df016a4
     md5: Gxjw6fyMyB2nv11WeK6+FA==
     path: public/docs/cpp/2-data-containers/4-0-range-based-for.md
+  - git: 5fab345
+    md5: C+/4gKvJpB7GgwoGM3cqsg==
+    path: public/docs/cpp/2-data-containers/4-0-range-based-for.md
 cpp-data-containers-string:
   page: cpp/2-data-containers
   rev:
   - git: de11512
     md5: kGe8J0M5RTLcW9mn1+UWPA==
     path: public/docs/cpp/2-data-containers/1-0-string.md
+  - git: 5fab345
+    md5: drJrW1Wr5KdX6aWTkICKXQ==
+    path: public/docs/cpp/2-data-containers/1-0-string.md
 cpp-data-containers-summary:
   page: cpp/2-data-containers
   rev:
   - git: de11512
     md5: YPlMNZuNFxcy+f/Mf01n4w==
+    path: public/docs/cpp/2-data-containers/5-0-summary.md
+  - git: 5fab345
+    md5: r0aP+ThlfTKfEnVzCEOd6Q==
     path: public/docs/cpp/2-data-containers/5-0-summary.md
 cpp-data-containers-vector:
   page: cpp/2-data-containers
@@ -281,6 +383,9 @@ cpp-functions-arg-by-const-reference:
   - git: de11512
     md5: /W6my5hMuCbCKvuE0Wwy5Q==
     path: public/docs/cpp/4-functions/2-4-arg-by-const-reference.md
+  - git: 5fab345
+    md5: qMyUYAhKuxgkNWwreIrQuQ==
+    path: public/docs/cpp/4-functions/2-4-arg-by-const-reference.md
 cpp-functions-arg-by-pointer:
   page: cpp/4-functions
   rev:
@@ -290,17 +395,26 @@ cpp-functions-arg-by-pointer:
   - git: df016a4
     md5: Xo7oNMaSR2OGg80Wq3e51A==
     path: public/docs/cpp/4-functions/2-2-arg-by-pointer.md
+  - git: 5fab345
+    md5: hl5bRsJpmBQJkyGhaFH9PA==
+    path: public/docs/cpp/4-functions/2-2-arg-by-pointer.md
 cpp-functions-arg-by-reference:
   page: cpp/4-functions
   rev:
   - git: de11512
     md5: KKAd5JbkFBsVzyquXTLkHA==
     path: public/docs/cpp/4-functions/2-3-arg-by-reference.md
+  - git: 5fab345
+    md5: VpTwZt6P1axVjm9x9AkHIQ==
+    path: public/docs/cpp/4-functions/2-3-arg-by-reference.md
 cpp-functions-arg-by-value:
   page: cpp/4-functions
   rev:
   - git: de11512
     md5: BRGZQ9zfkk3E9WbcKQdv9g==
+    path: public/docs/cpp/4-functions/2-1-arg-by-value.md
+  - git: 5fab345
+    md5: obGdnx1dK93Gg30NIXr9lQ==
     path: public/docs/cpp/4-functions/2-1-arg-by-value.md
 cpp-functions-argument:
   page: cpp/4-functions
@@ -320,6 +434,9 @@ cpp-functions-default-arg:
   - git: de11512
     md5: 1JclN7TMEptq/ifoFh/EnA==
     path: public/docs/cpp/4-functions/3-2-default-arg.md
+  - git: 5fab345
+    md5: d+YlxWnHvCcvJjy3QXv+rg==
+    path: public/docs/cpp/4-functions/3-2-default-arg.md
 cpp-functions-features:
   page: cpp/4-functions
   rev:
@@ -338,11 +455,17 @@ cpp-functions-practice1:
   - git: de11512
     md5: CVRlaLcCOxG7o16tZ41b4g==
     path: public/docs/cpp/4-functions/4-1-practice1.md
+  - git: 5fab345
+    md5: GaugYRt85zQLeHm3JesYdA==
+    path: public/docs/cpp/4-functions/4-1-practice1.md
 cpp-functions-practice2:
   page: cpp/4-functions
   rev:
   - git: de11512
     md5: tTyJjyjJQIU1Mqc3p8Je7g==
+    path: public/docs/cpp/4-functions/4-2-practice2.md
+  - git: 5fab345
+    md5: z8nzWI0/FXTqmh0oZN9M7Q==
     path: public/docs/cpp/4-functions/4-2-practice2.md
 cpp-functions-prototype-declaration:
   page: cpp/4-functions
@@ -353,11 +476,17 @@ cpp-functions-prototype-declaration:
   - git: df016a4
     md5: yZ/fAmYatmYHIK0wN7H57g==
     path: public/docs/cpp/4-functions/1-1-prototype-declaration.md
+  - git: 5fab345
+    md5: B1n9CK0mkzN3pqMfJ+XmJA==
+    path: public/docs/cpp/4-functions/1-1-prototype-declaration.md
 cpp-functions-summary:
   page: cpp/4-functions
   rev:
   - git: de11512
     md5: VkMBFgXVMVE/Hq3IHKy65A==
+    path: public/docs/cpp/4-functions/4-0-summary.md
+  - git: 5fab345
+    md5: SZ+y2g48aBYINaiZCYuNHQ==
     path: public/docs/cpp/4-functions/4-0-summary.md
 cpp-functions-void:
   page: cpp/4-functions
@@ -368,11 +497,17 @@ cpp-functions-void:
   - git: df016a4
     md5: 82vKUyPj9C54v4DskU7GCA==
     path: public/docs/cpp/4-functions/1-2-void.md
+  - git: 5fab345
+    md5: HcZxxswfNkqbKN4NTqRUtg==
+    path: public/docs/cpp/4-functions/1-2-void.md
 cpp-inheritance-abstract-class:
   page: cpp/8-inheritance
   rev:
   - git: de11512
     md5: 9+Ir9aU/224GzkePOT3fBA==
+    path: public/docs/cpp/8-inheritance/4-0-abstract-class.md
+  - git: 5fab345
+    md5: O9QDV34RjP2KGG6rp+kVNg==
     path: public/docs/cpp/8-inheritance/4-0-abstract-class.md
 cpp-inheritance-inheritance:
   page: cpp/8-inheritance
@@ -380,11 +515,17 @@ cpp-inheritance-inheritance:
   - git: de11512
     md5: GNdmRXqe6nDGiA9rGyFkgw==
     path: public/docs/cpp/8-inheritance/1-0-inheritance.md
+  - git: 5fab345
+    md5: OmAgqhbKuhHzk26iWYNfxA==
+    path: public/docs/cpp/8-inheritance/1-0-inheritance.md
 cpp-inheritance-override:
   page: cpp/8-inheritance
   rev:
   - git: de11512
     md5: VbdtcSyYB6IQZMNbtu9s0A==
+    path: public/docs/cpp/8-inheritance/3-0-override.md
+  - git: 5fab345
+    md5: a6xrNR8CyU+ayKsi8HW8rg==
     path: public/docs/cpp/8-inheritance/3-0-override.md
 cpp-inheritance-polymorphism:
   page: cpp/8-inheritance
@@ -392,11 +533,17 @@ cpp-inheritance-polymorphism:
   - git: de11512
     md5: zC6j+NZP+LZhqPQSiRNVLA==
     path: public/docs/cpp/8-inheritance/2-0-polymorphism.md
+  - git: 5fab345
+    md5: csuW+hQju7WRYjnV/7Qk2g==
+    path: public/docs/cpp/8-inheritance/2-0-polymorphism.md
 cpp-inheritance-practice1:
   page: cpp/8-inheritance
   rev:
   - git: de11512
     md5: 9bq/R13GV5JUAd3jOk0jLQ==
+    path: public/docs/cpp/8-inheritance/5-1-practice1.md
+  - git: 5fab345
+    md5: I7LvSfxQgyF8pxm+jBs0dQ==
     path: public/docs/cpp/8-inheritance/5-1-practice1.md
 cpp-inheritance-practice2:
   page: cpp/8-inheritance
@@ -404,11 +551,17 @@ cpp-inheritance-practice2:
   - git: de11512
     md5: wLlFXiD6eSjnzWYFHLww8A==
     path: public/docs/cpp/8-inheritance/5-2-practice2.md
+  - git: 5fab345
+    md5: 63Ks5wskHyQ9wmjD1bcR3g==
+    path: public/docs/cpp/8-inheritance/5-2-practice2.md
 cpp-inheritance-summary:
   page: cpp/8-inheritance
   rev:
   - git: de11512
     md5: g2BRaNHXn65ecI2Ql3GIuw==
+    path: public/docs/cpp/8-inheritance/5-0-summary.md
+  - git: 5fab345
+    md5: 2WiwjIDExzqHU/V+am6vYA==
     path: public/docs/cpp/8-inheritance/5-0-summary.md
 cpp-intro-about:
   page: cpp/0-intro
@@ -434,6 +587,9 @@ cpp-intro-feature:
   - git: de11512
     md5: 75IQEvM0Rh8TMOF0Nc8EvA==
     path: public/docs/cpp/0-intro/1-1-feature.md
+  - git: 5fab345
+    md5: cUc8nhNMZvcsNVFXbYpp0g==
+    path: public/docs/cpp/0-intro/1-1-feature.md
 cpp-intro-helloworld:
   page: cpp/0-intro
   rev:
@@ -455,6 +611,9 @@ cpp-intro-include:
   - git: df016a4
     md5: NGCmE+Au2Oho8VaRWmhxiA==
     path: public/docs/cpp/0-intro/4-1-include.md
+  - git: 5fab345
+    md5: EC31C/uzYbgPgh9S9dDGZw==
+    path: public/docs/cpp/0-intro/4-1-include.md
 cpp-intro-main:
   page: cpp/0-intro
   rev:
@@ -466,6 +625,9 @@ cpp-intro-namespace:
   rev:
   - git: de11512
     md5: S/2Spv1KKrK1LimKSoc40g==
+    path: public/docs/cpp/0-intro/4-3-namespace.md
+  - git: 5fab345
+    md5: Xvb2tWIaIRLJ5hkP7U2psw==
     path: public/docs/cpp/0-intro/4-3-namespace.md
 cpp-intro-run:
   page: cpp/0-intro
@@ -488,6 +650,9 @@ cpp-intro-summary:
   - git: df016a4
     md5: lphzOkycxvlezj29dFzthA==
     path: public/docs/cpp/0-intro/5-0-summary.md
+  - git: 5fab345
+    md5: EOZA1A6GTd/Tnp51/UdKzw==
+    path: public/docs/cpp/0-intro/5-0-summary.md
 cpp-intro-usage:
   page: cpp/0-intro
   rev:
@@ -500,6 +665,9 @@ cpp-pointers-address-operator:
   - git: de11512
     md5: LAEgPZDuL/VkpbHj+Gssxw==
     path: public/docs/cpp/3-pointers/1-1-address-operator.md
+  - git: 5fab345
+    md5: h+B0/7Z3cwRwpk/i9VP/rQ==
+    path: public/docs/cpp/3-pointers/1-1-address-operator.md
 cpp-pointers-array:
   page: cpp/3-pointers
   rev:
@@ -509,11 +677,17 @@ cpp-pointers-array:
   - git: df016a4
     md5: 3MyhXXpA1CtdpqIDr9hXTA==
     path: public/docs/cpp/3-pointers/2-0-array.md
+  - git: 5fab345
+    md5: 17HeNCG2088saWvirnxFYw==
+    path: public/docs/cpp/3-pointers/2-0-array.md
 cpp-pointers-basic:
   page: cpp/3-pointers
   rev:
   - git: de11512
     md5: i9wKd1mjyJ67/jMwolFH5A==
+    path: public/docs/cpp/3-pointers/1-0-basic.md
+  - git: 5fab345
+    md5: gxma5EHNhVIgadeNVt2zJw==
     path: public/docs/cpp/3-pointers/1-0-basic.md
 cpp-pointers-heap:
   page: cpp/3-pointers
@@ -526,6 +700,9 @@ cpp-pointers-legacy-string:
   rev:
   - git: de11512
     md5: bcpSPEJ0+KPgoHx91QzaAQ==
+    path: public/docs/cpp/3-pointers/3-0-legacy-string.md
+  - git: 5fab345
+    md5: cNp1WXk09DSNvZelRf5x3g==
     path: public/docs/cpp/3-pointers/3-0-legacy-string.md
 cpp-pointers-memory-area:
   page: cpp/3-pointers
@@ -542,11 +719,17 @@ cpp-pointers-memory-leak:
   - git: df016a4
     md5: WjTbjzQOoft9ysqA0lsJ6Q==
     path: public/docs/cpp/3-pointers/4-4-memory-leak.md
+  - git: 5fab345
+    md5: JElBOjA7la3QM84ESCb1sQ==
+    path: public/docs/cpp/3-pointers/4-4-memory-leak.md
 cpp-pointers-nullptr:
   page: cpp/3-pointers
   rev:
   - git: de11512
     md5: /DmogMulr/zFJkh/yi5hQQ==
+    path: public/docs/cpp/3-pointers/1-2-nullptr.md
+  - git: 5fab345
+    md5: 6D/T+oEkOosP48Us/+hYaw==
     path: public/docs/cpp/3-pointers/1-2-nullptr.md
 cpp-pointers-practice1:
   page: cpp/3-pointers
@@ -554,11 +737,17 @@ cpp-pointers-practice1:
   - git: de11512
     md5: 1oBOsSZZL12jZz8nKynCXg==
     path: public/docs/cpp/3-pointers/5-1-practice1.md
+  - git: 5fab345
+    md5: s/7LBPxwsSLxPXs0VwHuZw==
+    path: public/docs/cpp/3-pointers/5-1-practice1.md
 cpp-pointers-practice2:
   page: cpp/3-pointers
   rev:
   - git: de11512
     md5: 46m3y9YoYSDs7qLpWr1qYQ==
+    path: public/docs/cpp/3-pointers/5-2-practice2.md
+  - git: 5fab345
+    md5: +wWsSixaUaLQeA/cg7B+7A==
     path: public/docs/cpp/3-pointers/5-2-practice2.md
 cpp-pointers-stack:
   page: cpp/3-pointers
@@ -566,17 +755,26 @@ cpp-pointers-stack:
   - git: de11512
     md5: /5PFPpLruQMDpdFHx8E9zA==
     path: public/docs/cpp/3-pointers/4-1-stack.md
+  - git: 5fab345
+    md5: /1znBpl87gyLZRy/+RTLMg==
+    path: public/docs/cpp/3-pointers/4-1-stack.md
 cpp-pointers-summary:
   page: cpp/3-pointers
   rev:
   - git: de11512
     md5: DNUcGtBI3+/6qnwzmpuICQ==
     path: public/docs/cpp/3-pointers/5-0-summary.md
+  - git: 5fab345
+    md5: lfMse0udtAlJOuQmkxo0hw==
+    path: public/docs/cpp/3-pointers/5-0-summary.md
 cpp-project-build-build:
   page: cpp/5-project-build
   rev:
   - git: de11512
     md5: uocSzDxNVy3OB6697AnWAA==
+    path: public/docs/cpp/5-project-build/3-0-build.md
+  - git: 5fab345
+    md5: JuA0m/wzb9XSvdJXvS/bgg==
     path: public/docs/cpp/5-project-build/3-0-build.md
 cpp-project-build-cmake:
   page: cpp/5-project-build
@@ -590,17 +788,26 @@ cpp-project-build-gcc-manual:
   - git: de11512
     md5: eIBvdnjUOXvqhaD3IB0UQw==
     path: public/docs/cpp/5-project-build/3-1-gcc-manual.md
+  - git: 5fab345
+    md5: JkRn16y7MlObRq3zb1SsTQ==
+    path: public/docs/cpp/5-project-build/3-1-gcc-manual.md
 cpp-project-build-header-and-source:
   page: cpp/5-project-build
   rev:
   - git: de11512
     md5: uY4PtYrokAdVOQnbu14qKw==
     path: public/docs/cpp/5-project-build/1-0-header-and-source.md
+  - git: 5fab345
+    md5: zKAFwZk4YwiejOwqDo/hxA==
+    path: public/docs/cpp/5-project-build/1-0-header-and-source.md
 cpp-project-build-include-guard:
   page: cpp/5-project-build
   rev:
   - git: de11512
     md5: k7AL5Gtnx2XyeFojGd9Itw==
+    path: public/docs/cpp/5-project-build/2-0-include-guard.md
+  - git: 5fab345
+    md5: A+pZ4+5ps+7vLSWVjD13fg==
     path: public/docs/cpp/5-project-build/2-0-include-guard.md
 cpp-project-build-include-guard-by-define:
   page: cpp/5-project-build
@@ -620,11 +827,17 @@ cpp-project-build-practice1:
   - git: de11512
     md5: AdFcDE+wcpBWLs87H9c5yw==
     path: public/docs/cpp/5-project-build/4-1-practice1.md
+  - git: 5fab345
+    md5: I4wwRUpeuHWDrHqAXxavzA==
+    path: public/docs/cpp/5-project-build/4-1-practice1.md
 cpp-project-build-pragma-once:
   page: cpp/5-project-build
   rev:
   - git: de11512
     md5: XIr3ito1Grxoa0WMKuxVKQ==
+    path: public/docs/cpp/5-project-build/2-2-pragma-once.md
+  - git: 5fab345
+    md5: noHOQv3hxMCpM65xwmEz7w==
     path: public/docs/cpp/5-project-build/2-2-pragma-once.md
 cpp-project-build-split-example:
   page: cpp/5-project-build
@@ -632,11 +845,17 @@ cpp-project-build-split-example:
   - git: de11512
     md5: vqTlU9Z58LcEPJBzTb/SuA==
     path: public/docs/cpp/5-project-build/1-2-split-example.md
+  - git: 5fab345
+    md5: XqxLgmR3HWKpat3rj4OjKg==
+    path: public/docs/cpp/5-project-build/1-2-split-example.md
 cpp-project-build-summary:
   page: cpp/5-project-build
   rev:
   - git: de11512
     md5: kSe9bv2FSf0VlpB2kJyfkQ==
+    path: public/docs/cpp/5-project-build/4-0-summary.md
+  - git: 5fab345
+    md5: 7haChQih8/T/dJJPjx/KgA==
     path: public/docs/cpp/5-project-build/4-0-summary.md
 cpp-raii:
   page: cpp/12-raii-smart-ptrs
@@ -644,11 +863,17 @@ cpp-raii:
   - git: de11512
     md5: XlxqwDgHPYRDhTZoT/RM0w==
     path: public/docs/cpp/12-raii-smart-ptrs/2-0-raii.md
+  - git: 5fab345
+    md5: Ij8PCbl1jPlQwAsdmwze1w==
+    path: public/docs/cpp/12-raii-smart-ptrs/2-0-raii.md
 cpp-raii-smartptr-practice1:
   page: cpp/12-raii-smart-ptrs
   rev:
   - git: de11512
     md5: SlxBqSMT9RI8pUyZq/gXqg==
+    path: public/docs/cpp/12-raii-smart-ptrs/4-1-practice1.md
+  - git: 5fab345
+    md5: yOrqypSexaccnkuVFlkmYw==
     path: public/docs/cpp/12-raii-smart-ptrs/4-1-practice1.md
 cpp-raii-smartptr-practice2:
   page: cpp/12-raii-smart-ptrs
@@ -656,11 +881,17 @@ cpp-raii-smartptr-practice2:
   - git: de11512
     md5: GHMiQ2/zsSEvWJmgtP9bbw==
     path: public/docs/cpp/12-raii-smart-ptrs/4-2-practice2.md
+  - git: 5fab345
+    md5: WROoXgHKxVen3kMW9jCGDg==
+    path: public/docs/cpp/12-raii-smart-ptrs/4-2-practice2.md
 cpp-raii-smartptr-summary:
   page: cpp/12-raii-smart-ptrs
   rev:
   - git: de11512
     md5: Cgr7YPsUiEbrN4Lo6HXn3g==
+    path: public/docs/cpp/12-raii-smart-ptrs/4-0-summary.md
+  - git: 5fab345
+    md5: aI/i6w9/U7J8uPmAJ6KoZA==
     path: public/docs/cpp/12-raii-smart-ptrs/4-0-summary.md
 cpp-smartptr:
   page: cpp/12-raii-smart-ptrs
@@ -668,11 +899,17 @@ cpp-smartptr:
   - git: de11512
     md5: 7qBqkt86MgoUQCZhrjD7Lg==
     path: public/docs/cpp/12-raii-smart-ptrs/3-0-smartptr.md
+  - git: 5fab345
+    md5: odEWEnXOfcRPfjmACitDgA==
+    path: public/docs/cpp/12-raii-smart-ptrs/3-0-smartptr.md
 cpp-smartptr-sharedptr:
   page: cpp/12-raii-smart-ptrs
   rev:
   - git: de11512
     md5: QSoz3fXH1wztujWGW8ul5w==
+    path: public/docs/cpp/12-raii-smart-ptrs/3-2-sharedptr.md
+  - git: 5fab345
+    md5: MmCOxEmsLW5Eh3By86NgYA==
     path: public/docs/cpp/12-raii-smart-ptrs/3-2-sharedptr.md
 cpp-smartptr-uniqueptr:
   page: cpp/12-raii-smart-ptrs
@@ -680,11 +917,17 @@ cpp-smartptr-uniqueptr:
   - git: de11512
     md5: f185jUMRGx0He58p3x5tjg==
     path: public/docs/cpp/12-raii-smart-ptrs/3-1-uniqueptr.md
+  - git: 5fab345
+    md5: LZJHJtkB0Ecj5WlbkoXJig==
+    path: public/docs/cpp/12-raii-smart-ptrs/3-1-uniqueptr.md
 cpp-stl-algorithms-about:
   page: cpp/11-stl-algorithms
   rev:
   - git: de11512
     md5: 7HEkLXfDbCAUEHVyMIJDKg==
+    path: public/docs/cpp/11-stl-algorithms/1-0-about.md
+  - git: 5fab345
+    md5: /JudhedwippshIJcZzu/HQ==
     path: public/docs/cpp/11-stl-algorithms/1-0-about.md
 cpp-stl-algorithms-algo:
   page: cpp/11-stl-algorithms
@@ -698,11 +941,17 @@ cpp-stl-algorithms-find:
   - git: de11512
     md5: yCr1NxsrnDTROdTsYzxGCw==
     path: public/docs/cpp/11-stl-algorithms/2-2-find.md
+  - git: 5fab345
+    md5: 9L8eNosry5fiaDygJlXPcg==
+    path: public/docs/cpp/11-stl-algorithms/2-2-find.md
 cpp-stl-algorithms-foreach:
   page: cpp/11-stl-algorithms
   rev:
   - git: de11512
     md5: 5exwY1mfdhy5NeITc08YCw==
+    path: public/docs/cpp/11-stl-algorithms/2-3-foreach.md
+  - git: 5fab345
+    md5: EGSB0xwSXT80RkHxLw5NrQ==
     path: public/docs/cpp/11-stl-algorithms/2-3-foreach.md
 cpp-stl-algorithms-lambda:
   page: cpp/11-stl-algorithms
@@ -710,17 +959,26 @@ cpp-stl-algorithms-lambda:
   - git: de11512
     md5: Jny24K546GqocZvRi2+5rA==
     path: public/docs/cpp/11-stl-algorithms/3-0-lambda.md
+  - git: 5fab345
+    md5: 8jT3rtXwjSBFTLfQGp0Gjw==
+    path: public/docs/cpp/11-stl-algorithms/3-0-lambda.md
 cpp-stl-algorithms-practice1:
   page: cpp/11-stl-algorithms
   rev:
   - git: de11512
     md5: tUejXo+mnumi6cruzVKbUQ==
     path: public/docs/cpp/11-stl-algorithms/4-1-practice1.md
+  - git: 5fab345
+    md5: AAz7+krqYPVL4h9BGNX/GA==
+    path: public/docs/cpp/11-stl-algorithms/4-1-practice1.md
 cpp-stl-algorithms-practice2:
   page: cpp/11-stl-algorithms
   rev:
   - git: de11512
     md5: cFn5YUDT0DzlOvHE19MqRg==
+    path: public/docs/cpp/11-stl-algorithms/4-2-practice2.md
+  - git: 5fab345
+    md5: CdNuvD5x7W11DC1USgHnSg==
     path: public/docs/cpp/11-stl-algorithms/4-2-practice2.md
 cpp-stl-algorithms-sort:
   page: cpp/11-stl-algorithms
@@ -734,6 +992,9 @@ cpp-stl-algorithms-summary:
   - git: de11512
     md5: CrDhZqHqlhMLHxTdd9nPvw==
     path: public/docs/cpp/11-stl-algorithms/4-0-summary.md
+  - git: 5fab345
+    md5: bY7eQ7qYeqKSmtykPoYExA==
+    path: public/docs/cpp/11-stl-algorithms/4-0-summary.md
 cpp-stl-containers-about:
   page: cpp/10-stl-containers
   rev:
@@ -743,17 +1004,26 @@ cpp-stl-containers-about:
   - git: df016a4
     md5: +WbqkUh5pOG2Ze9SiILUrQ==
     path: public/docs/cpp/10-stl-containers/1-0-about.md
+  - git: 5fab345
+    md5: 4R6xwQXQRlyUWYe6ZIGyow==
+    path: public/docs/cpp/10-stl-containers/1-0-about.md
 cpp-stl-containers-map:
   page: cpp/10-stl-containers
   rev:
   - git: de11512
     md5: 0AIc7DFI6pEo6Zb0CH28Ng==
     path: public/docs/cpp/10-stl-containers/3-0-map.md
+  - git: 5fab345
+    md5: oXMdjABbj1BVkiap1hVeVQ==
+    path: public/docs/cpp/10-stl-containers/3-0-map.md
 cpp-stl-containers-other:
   page: cpp/10-stl-containers
   rev:
   - git: de11512
     md5: Hie8BeXD8WuJHNMjErH4sQ==
+    path: public/docs/cpp/10-stl-containers/4-0-other.md
+  - git: 5fab345
+    md5: +A1kESZ5/+6Gsna18PAA7w==
     path: public/docs/cpp/10-stl-containers/4-0-other.md
 cpp-stl-containers-practice1:
   page: cpp/10-stl-containers
@@ -767,11 +1037,17 @@ cpp-stl-containers-practice2:
   - git: de11512
     md5: 3DQL1bqHteYbprQPcgaspg==
     path: public/docs/cpp/10-stl-containers/5-2-practice2.md
+  - git: 5fab345
+    md5: +okJN+s60/ttttpBtv8C0Q==
+    path: public/docs/cpp/10-stl-containers/5-2-practice2.md
 cpp-stl-containers-summary:
   page: cpp/10-stl-containers
   rev:
   - git: de11512
     md5: EAqr89J/VVbANzt7c6NwsA==
+    path: public/docs/cpp/10-stl-containers/5-0-summary.md
+  - git: 5fab345
+    md5: SnBMOHfL36H6Clipuf3HZg==
     path: public/docs/cpp/10-stl-containers/5-0-summary.md
 cpp-stl-containers-vector:
   page: cpp/10-stl-containers
@@ -779,11 +1055,17 @@ cpp-stl-containers-vector:
   - git: de11512
     md5: ZH/jLUlGSNsT14fvwhlL/A==
     path: public/docs/cpp/10-stl-containers/2-0-vector.md
+  - git: 5fab345
+    md5: U4IEa9dJGhHNtpWckHfMeQ==
+    path: public/docs/cpp/10-stl-containers/2-0-vector.md
 cpp-templates-class-template:
   page: cpp/9-templates
   rev:
   - git: de11512
     md5: /GrTbWA+lMM5zhwLe/5qvg==
+    path: public/docs/cpp/9-templates/2-0-class-template.md
+  - git: 5fab345
+    md5: sgFctraGBSVA0AkXcvUZEg==
     path: public/docs/cpp/9-templates/2-0-class-template.md
 cpp-templates-class-template-detail:
   page: cpp/9-templates
@@ -800,6 +1082,9 @@ cpp-templates-function-template:
   - git: de11512
     md5: vfZNnhBGasUvLdd42MCHnA==
     path: public/docs/cpp/9-templates/1-0-function-template.md
+  - git: 5fab345
+    md5: 2zcu/cPHJlp7xb/Qaq8U/g==
+    path: public/docs/cpp/9-templates/1-0-function-template.md
 cpp-templates-function-template-detail:
   page: cpp/9-templates
   rev:
@@ -812,11 +1097,17 @@ cpp-templates-practice1:
   - git: de11512
     md5: FF3dFdw0CeZI+rHBWBur+A==
     path: public/docs/cpp/9-templates/3-1-practice1.md
+  - git: 5fab345
+    md5: ZRvp3bS4qAesZ+Kjr4Ly+w==
+    path: public/docs/cpp/9-templates/3-1-practice1.md
 cpp-templates-practice2:
   page: cpp/9-templates
   rev:
   - git: de11512
     md5: n9SDp1LUPbbZWWB62tJSDg==
+    path: public/docs/cpp/9-templates/3-2-practice2.md
+  - git: 5fab345
+    md5: hdWP0578wjgG7EazqOH4wQ==
     path: public/docs/cpp/9-templates/3-2-practice2.md
 cpp-templates-summary:
   page: cpp/9-templates
@@ -824,11 +1115,17 @@ cpp-templates-summary:
   - git: de11512
     md5: QCfLNSP+OYCow0+fH9bIiA==
     path: public/docs/cpp/9-templates/3-0-summary.md
+  - git: 5fab345
+    md5: ZPcTveuPTEscRjg52ymekQ==
+    path: public/docs/cpp/9-templates/3-0-summary.md
 cpp-trycatch:
   page: cpp/12-raii-smart-ptrs
   rev:
   - git: de11512
     md5: cEkPGVDQNv+CBLKMdm7DFw==
+    path: public/docs/cpp/12-raii-smart-ptrs/1-0-trycatch.md
+  - git: 5fab345
+    md5: SxNGFqNBIR+mFpRRRFVUPw==
     path: public/docs/cpp/12-raii-smart-ptrs/1-0-trycatch.md
 cpp-trycatch-leak:
   page: cpp/12-raii-smart-ptrs
@@ -836,17 +1133,26 @@ cpp-trycatch-leak:
   - git: de11512
     md5: uGTuHU2tYRlVWMT028/XfA==
     path: public/docs/cpp/12-raii-smart-ptrs/1-1-leak.md
+  - git: 5fab345
+    md5: Q/mVkPw5hgU5DAD2YbS01g==
+    path: public/docs/cpp/12-raii-smart-ptrs/1-1-leak.md
 cpp-types-auto:
   page: cpp/1-types-control
   rev:
   - git: de11512
     md5: ZttEhQWDRYX1cIc+Tzoqmg==
     path: public/docs/cpp/1-types-control/3-2-auto.md
+  - git: 5fab345
+    md5: H4pGGQKOhO1f7RdxtxqNpw==
+    path: public/docs/cpp/1-types-control/3-2-auto.md
 cpp-types-basic:
   page: cpp/1-types-control
   rev:
   - git: de11512
     md5: 8cF4whLMW9pkKE1ivQXuIw==
+    path: public/docs/cpp/1-types-control/1-0-basic-types.md
+  - git: 5fab345
+    md5: hROzrUe/5S7bIT/TzXtzlg==
     path: public/docs/cpp/1-types-control/1-0-basic-types.md
 cpp-types-console:
   page: cpp/1-types-control
@@ -860,11 +1166,17 @@ cpp-types-const:
   - git: de11512
     md5: UKb1gR2sSspc4QhHeu+qxQ==
     path: public/docs/cpp/1-types-control/3-1-const.md
+  - git: 5fab345
+    md5: D8EwG1IVHxME3LSsavbYQA==
+    path: public/docs/cpp/1-types-control/3-1-const.md
 cpp-types-control-practice1:
   page: cpp/1-types-control
   rev:
   - git: de11512
     md5: 48Me3QKvfmuOCPiLddW6Og==
+    path: public/docs/cpp/1-types-control/6-1-practice1.md
+  - git: 5fab345
+    md5: yOT+YQVWOJ5Ht4aqmyOYow==
     path: public/docs/cpp/1-types-control/6-1-practice1.md
 cpp-types-control-practice2:
   page: cpp/1-types-control
@@ -872,11 +1184,17 @@ cpp-types-control-practice2:
   - git: de11512
     md5: 9LDGwa5QpUokKbn0Ri3YEw==
     path: public/docs/cpp/1-types-control/6-2-practice2.md
+  - git: 5fab345
+    md5: C77GpWKbeR46A0xA0CvvPQ==
+    path: public/docs/cpp/1-types-control/6-2-practice2.md
 cpp-types-control-summary:
   page: cpp/1-types-control
   rev:
   - git: de11512
     md5: x6A3D7QrAaDT80lU3EpVdA==
+    path: public/docs/cpp/1-types-control/6-0-summary.md
+  - git: 5fab345
+    md5: YAMx045ZeMFE1Abz5YCPxA==
     path: public/docs/cpp/1-types-control/6-0-summary.md
 cpp-types-modifier:
   page: cpp/1-types-control
@@ -889,6 +1207,9 @@ cpp-types-uniform-init:
   rev:
   - git: de11512
     md5: d0SQM7obR9if+uMhtKS7GA==
+    path: public/docs/cpp/1-types-control/2-0-uniform-init.md
+  - git: 5fab345
+    md5: dn8nlfkOhf4ZX+G71oM+Zg==
     path: public/docs/cpp/1-types-control/2-0-uniform-init.md
 javascript-0-intro-intro:
   page: javascript/0-intro

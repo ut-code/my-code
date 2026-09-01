@@ -301,7 +301,8 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
     default:
       lang satisfies never;
       if (process.env.NODE_ENV === "development") {
-        throw new Error(`LangConstants not defined for language: ${lang}`);
+        // throw new Error(`LangConstants not defined for language: ${lang}`);
+        console.error(`LangConstants not defined for language: ${lang}`);
       }
       return { originalLang: lang };
   }
