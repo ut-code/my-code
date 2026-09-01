@@ -116,50 +116,63 @@ export async function compileAndRun(
   options: CompileProps,
   onOutput: (event: CompileOutputEvent) => void
 ): Promise<void> {
+  const streamBuffers: Record<string, string> = {
+    CompilerMessageS: "",
+    CompilerMessageE: "",
+    StdOut: "",
+    StdErr: "",
+  };
+
+  const emitStreamLines = (
+    type: "CompilerMessageS" | "CompilerMessageE" | "StdOut" | "StdErr",
+    data: string,
+    flush = false
+  ) => {
+    streamBuffers[type] += data;
+    const lines = streamBuffers[type].split("\n");
+    if (!flush) {
+      streamBuffers[type] = lines.pop() ?? "";
+    } else {
+      streamBuffers[type] = "";
+    }
+    const outputType =
+      type === "CompilerMessageS" || type === "StdOut"
+        ? ("stdout" as const)
+        : type === "CompilerMessageE"
+          ? ("error" as const)
+          : ("stderr" as const);
+    for (const line of lines) {
+      if (line.length > 0) {
+        onOutput({
+          ndjsonType: type,
+          output: { type: outputType, message: line },
+        });
+      }
+    }
+  };
+
+  const flushAllStreamBuffers = () => {
+    for (const type of [
+      "CompilerMessageS",
+      "CompilerMessageE",
+      "StdOut",
+      "StdErr",
+    ] as const) {
+      emitStreamLines(type, "", true);
+    }
+  };
+
   // Helper function to process NDJSON result and call onOutput
   const processNdjsonResult = (r: CompileNdjsonResult) => {
     switch (r.type) {
       case "CompilerMessageS":
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            onOutput({
-              ndjsonType: r.type,
-              output: { type: "stdout", message: line },
-            });
-          }
-        }
-        break;
       case "CompilerMessageE":
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            onOutput({
-              ndjsonType: r.type,
-              output: { type: "error", message: line },
-            });
-          }
-        }
-        break;
       case "StdOut":
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            onOutput({
-              ndjsonType: r.type,
-              output: { type: "stdout", message: line },
-            });
-          }
-        }
-        break;
       case "StdErr":
-        if (r.data.trim()) {
-          for (const line of r.data.trim().split("\n")) {
-            onOutput({
-              ndjsonType: r.type,
-              output: { type: "stderr", message: line },
-            });
-          }
-        }
+        emitStreamLines(r.type, r.data);
         break;
       case "ExitCode":
+        flushAllStreamBuffers();
         if (r.data !== "0") {
           onOutput({
             ndjsonType: r.type,
@@ -245,6 +258,7 @@ export async function compileAndRun(
       processNdjsonResult(r);
     }
   } finally {
+    flushAllStreamBuffers();
     reader.releaseLock();
   }
 }

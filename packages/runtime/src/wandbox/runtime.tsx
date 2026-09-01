@@ -15,6 +15,7 @@ import { cppRunFiles, selectCppCompiler } from "./cpp";
 import { RuntimeLang } from "../languages";
 import { rustRunFiles, selectRustCompiler } from "./rust";
 import {
+  Diagnostic,
   ReplOutput,
   RuntimeContext,
   RuntimeErrorHandler,
@@ -35,7 +36,8 @@ interface IWandboxContext {
   ) => (
     filenames: string[],
     files: Readonly<Record<string, string>>,
-    onOutput: (output: ReplOutput | UpdatedFile) => void
+    onOutput: (output: ReplOutput | UpdatedFile) => void,
+    onDiagnostic?: (diagnostic: Diagnostic) => void
   ) => Promise<void>;
   runtimeInfo: Record<WandboxLang, RuntimeInfo> | undefined;
 }
@@ -86,7 +88,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
       async (
         filenames: string[],
         files: Readonly<Record<string, string>>,
-        onOutput: (output: ReplOutput | UpdatedFile) => void
+        onOutput: (output: ReplOutput | UpdatedFile) => void,
+        onDiagnostic?: (diagnostic: Diagnostic) => void
       ) => {
         if (!selectedCompiler) {
           onOutput({ type: "error", message: "Wandbox is not ready yet." });
@@ -99,7 +102,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
                 selectedCompiler.cpp,
                 files,
                 filenames,
-                onOutput
+                onOutput,
+                onDiagnostic
               );
               break;
             case "rust":
@@ -107,7 +111,8 @@ export function WandboxProvider({ children }: { children: ReactNode }) {
                 selectedCompiler.rust,
                 files,
                 filenames,
-                onOutput
+                onOutput,
+                onDiagnostic
               );
               break;
             default:
