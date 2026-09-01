@@ -7,6 +7,7 @@ import sub_h from "./samples/sub.h?raw";
 import sub_cpp from "./samples/sub.cpp?raw";
 import main2_rs from "./samples/main2.rs?raw";
 import sub_rs from "./samples/sub.rs?raw";
+import main_dart from "./samples/main.dart?raw";
 
 // Markdownで指定される可能性のある言語名を列挙
 export type MarkdownLang =
@@ -32,7 +33,8 @@ export type MarkdownLang =
   | "makefile"
   | "cmake"
   | "text"
-  | "txt";
+  | "txt"
+  | "dart";
 
 export type RuntimeLang =
   | "python"
@@ -40,7 +42,8 @@ export type RuntimeLang =
   | "cpp"
   | "rust"
   | "javascript"
-  | "typescript";
+  | "typescript"
+  | "dart";
 
 export type LangConstants = {
   originalLang: MarkdownLang | undefined;
@@ -60,7 +63,8 @@ export type LangConstants = {
     | "json"
     | "ini"
     | "makefile"
-    | "cmake";
+    | "cmake"
+    | "dart";
 } & (
   | {
       // terminal/editor.tsx でimportする mode-xxxx.js のファイル名と、AceEditorの mode プロパティの値と対応する
@@ -73,7 +77,8 @@ export type LangConstants = {
         | "typescript"
         | "json"
         | "csv"
-        | "text";
+        | "text"
+        | "dart";
       tabSize: number;
     }
   | {
@@ -244,6 +249,21 @@ export function langConstants(lang: MarkdownLang | undefined): LangConstants {
         },
         sampleExec: () => ["main2.rs"],
         supportsMultiFile: true,
+        supportsFileOutput: false,
+      };
+    case "dart":
+      return {
+        originalLang: lang,
+        rsh: "dart",
+        ace: "dart",
+        tabSize: 2,
+        runtime: "dart",
+        repl: false,
+        sampleFiles: {
+          "main.dart": main_dart,
+        },
+        sampleExec: () => ["main.dart"],
+        supportsMultiFile: false,
         supportsFileOutput: false,
       };
     case "bash":

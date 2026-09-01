@@ -24,6 +24,7 @@ export const fileExecutionTests: Record<
         rust: ["test.rs", `fn main() {\n    println!("${msg}");\n}\n`],
         javascript: ["test.js", `console.log("${msg}")`],
         typescript: ["test.ts", `console.log("${msg}")`],
+        dart: ["main.dart", `void main() {\n  print("${msg}");\n}\n`],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;
@@ -57,6 +58,10 @@ export const fileExecutionTests: Record<
         rust: ["test_error.rs", `fn main() {\n    panic!("${errorMsg}");\n}\n`],
         javascript: ["test_error.js", `throw new Error("${errorMsg}");\n`],
         typescript: ["test_error.ts", `throw new Error("${errorMsg}");\n`],
+        dart: [
+          "test_error.dart",
+          `void main() {\n  throw Exception("${errorMsg}");\n}\n`,
+        ],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;
@@ -118,6 +123,7 @@ export const fileExecutionTests: Record<
         ],
         javascript: [null, null],
         typescript: [null, null],
+        dart: [null, null],
       } satisfies Record<
         RuntimeLang,
         [Record<string, string>, string[]] | [null, null]
@@ -152,6 +158,7 @@ export const fileExecutionTests: Record<
         rust: [null, null],
         javascript: [null, null],
         typescript: [null, null],
+        dart: [null, null],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;
@@ -194,6 +201,10 @@ export const fileExecutionTests: Record<
         ],
         javascript: ["test_compile.js", `function foo(\n`],
         typescript: ["test_compile.ts", `const x: ${uniqueTypeName} = 1;\n`],
+        dart: [
+          "test_compile.dart",
+          `int ${uniqueTypeName} = "type error";\nvoid main() {}\n`,
+        ],
       } satisfies Record<RuntimeLang, [string, string] | null>
     )[lang] ?? [null, null];
     if (!filename || !code) return null;
@@ -258,6 +269,7 @@ export const fileExecutionTests: Record<
         ],
         javascript: null,
         typescript: null,
+        dart: null,
       } satisfies Record<
         RuntimeLang,
         [Record<string, string>, string[], string, number] | null
@@ -314,6 +326,7 @@ export const fileExecutionTests: Record<
         rust: null,
         javascript: null,
         typescript: null,
+        dart: null,
       } satisfies Record<RuntimeLang, [string, string] | null>
     )[lang] ?? [null, null];
     if (!filename || !code) return null;
@@ -372,6 +385,11 @@ export const fileExecutionTests: Record<
         ],
         javascript: ["test_runtime.js", `throw new Error("${errorMsg}");\n`, 1],
         typescript: null,
+        dart: [
+          "test_runtime.dart",
+          `void main() {\n  throw Exception("${errorMsg}");\n}\n`,
+          2,
+        ],
       } satisfies Record<RuntimeLang, [string, string, number] | null>
     )[lang] ?? [null, null, null];
     if (!filename || !code || expectedLine === null) return null;
@@ -429,6 +447,7 @@ export const fileExecutionTests: Record<
         ],
         javascript: null,
         typescript: null,
+        dart: null,
       } satisfies Record<RuntimeLang, [string, string, number, string] | null>
     )[lang] ?? [null, null, null, null];
     if (!filename || !code || expectedLine === null || !expectedMsg)
@@ -501,6 +520,10 @@ export const fileExecutionTests: Record<
           `function foo() {\n  throw new Error("${uniqueTypeName}");\n}\nfunction bar() {\n  foo();\n}\nbar();\n`,
         ],
         typescript: [null, null],
+        dart: [
+          "test_multiframe.dart",
+          `void foo() {\n  throw Exception("${uniqueTypeName}");\n}\nvoid bar() {\n  foo();\n}\nvoid main() {\n  bar();\n}\n`,
+        ],
       } satisfies Record<RuntimeLang, [string, string] | [null, null]>
     )[lang];
     if (!filename || !code) return null;
@@ -557,6 +580,7 @@ export const fileExecutionTests: Record<
           rust: [2, 5, 8],
           javascript: [2, 5, 7],
           typescript: null,
+          dart: [2, 5, 8],
         } satisfies Record<RuntimeLang, number[] | null>
       )[lang];
       if (expectedLines) {
@@ -597,6 +621,10 @@ export const fileExecutionTests: Record<
         ],
         javascript: null,
         typescript: null,
+        dart: [
+          "test_warning.dart",
+          "void main() {\n  int unused_var = 42;\n}\n",
+        ],
       } satisfies Record<RuntimeLang, [string, string] | null>
     )[lang] ?? [null, null];
     if (!filename || !code) return null;
