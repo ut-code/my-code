@@ -15,8 +15,6 @@ def __execfile(filepath):
         code_obj = compile(code_bytes, filepath, "exec")
         exec(code_obj, exec_globals)
         return json.dumps({"success": True})
-    except (KeyboardInterrupt, SystemExit, GeneratorExit):
-        raise
     except BaseException as e:
         frames = []
         if isinstance(e, SyntaxError):
@@ -77,7 +75,7 @@ def __execfile(filepath):
             formatted_tb = "".join(traceback.format_exception(type(e), e, None)).strip()
 
         diagnostic = None
-        if frames:
+        if frames and not isinstance(e, (KeyboardInterrupt, SystemExit)):
             diagnostic = {
                 "frames": frames,
                 "message": error_message,

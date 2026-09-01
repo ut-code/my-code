@@ -11,8 +11,6 @@ async def __eval_code(code):
             "result": str(result) if result is not None else None,
             "has_return": result is not None,
         })
-    except (KeyboardInterrupt, SystemExit, GeneratorExit):
-        raise
     except BaseException as e:
         tb = e.__traceback__
         entries = traceback.extract_tb(tb)
