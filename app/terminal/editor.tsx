@@ -55,6 +55,7 @@ export function EditorComponent(props: EditorProps) {
   const annotations = useMemo(() => {
     return fileDiagnostics.flatMap((diag) =>
       diag.frames
+        .slice(0, 1)
         .filter((f) => f.filename === props.filename)
         .map((f) => ({
           row: Math.max(0, f.startLineNumber - 1),
@@ -68,26 +69,36 @@ export function EditorComponent(props: EditorProps) {
   const markers = useMemo(() => {
     return fileDiagnostics.flatMap((diag) =>
       diag.frames
+        .map((f, i) => ({ ...f, isFirstFrame: i === 0 }))
         .filter((f) => f.filename === props.filename)
         .map((f) => {
           const startRow = Math.max(0, f.startLineNumber - 1);
           const endRow = f.endLineNumber
-            ? Math.max(0, f.endLineNumber - 1)
+            ? Math.max(startRow, f.endLineNumber - 1)
             : startRow;
           const startCol =
             f.startColumn !== undefined ? Math.max(0, f.startColumn - 1) : 0;
           const endCol =
             f.endColumn !== undefined
-              ? Math.max(0, f.endColumn - 1)
+              ? Math.max(startCol + 1, f.endColumn - 1)
               : Number.MAX_SAFE_INTEGER;
 
           const isError = (diag.severity ?? "error") === "error";
           const isWarning = diag.severity === "warning";
-          const className = isError
-            ? "ace_error-marker"
-            : isWarning
-              ? "ace_warning-marker"
-              : "ace_info-marker";
+          const className = clsx(
+            "absolute rounded-b-none! border-dashed border-b-1",
+            isError
+              ? "border-error"
+              : isWarning
+                ? "border-warning"
+                : "border-accent",
+            f.isFirstFrame &&
+              (isError
+                ? "bg-error/20"
+                : isWarning
+                  ? "bg-warning/20"
+                  : "bg-accent/20")
+          );
 
           return {
             startRow,
