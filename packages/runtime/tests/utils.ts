@@ -9,6 +9,7 @@ export const RUNTIME_TIMEOUTS: Record<RuntimeLang, number> = {
   typescript: 2000,
   cpp: 10000,
   rust: 20000,
+  dart: 15000,
 };
 
 export async function waitForRuntimeReady(

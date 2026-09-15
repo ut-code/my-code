@@ -1,0 +1,42 @@
+name: Dart
+description: Googleによって開発された、Flutterの基盤となるUI最適化・マルチプラットフォーム言語
+pages:
+- slug: 0-intro
+  name: Dartへようこそ
+  title: Dartへようこそ
+- slug: 1-basics
+  name: 基本構文
+  title: 基本構文と組み込み型
+- slug: 2-null-safety
+  name: Null Safety
+  title: Null Safetyの完全理解
+- slug: 3-functions
+  name: 関数とクロージャ
+  title: 関数とクロージャ
+- slug: 4-collections-control
+  name: コレクションと制御構文
+  title: コレクションと制御構文
+- slug: 5-records-patterns
+  name: レコードとパターンマッチ
+  title: レコードとパターンマッチング
+- slug: 6-classes
+  name: クラスとコンストラクタ
+  title: クラスとコンストラクタ
+- slug: 7-class-extension
+  name: クラスの拡張と高度な設計
+  title: クラスの拡張と高度な設計
+- slug: 8-class-modifiers
+  name: クラス修飾子とモデリング
+  title: クラス修飾子による厳密なモデリング
+- slug: 9-async-future
+  name: '非同期処理: Future'
+  title: 非同期処理の基礎 (Futureとasync/await)
+- slug: 10-async-stream
+  name: '非同期処理: Stream'
+  title: 非同期処理の応用 (Stream)
+- slug: 11-error-handling
+  name: エラーハンドリング
+  title: エラーハンドリングとResultパターン
+- slug: 12-concurrency-isolate
+  name: 並行処理とIsolate
+  title: 並行処理とIsolate

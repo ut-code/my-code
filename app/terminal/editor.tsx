@@ -26,6 +26,7 @@ const AceEditor = lazy(async () => {
     await import("ace-builds/src-min-noconflict/mode-json");
     await import("ace-builds/src-min-noconflict/mode-csv");
     await import("ace-builds/src-min-noconflict/mode-text");
+    await import("ace-builds/src-min-noconflict/mode-dart");
     return ace;
   } else {
     throw new Error("should not try SSR");
