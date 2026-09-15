@@ -34,6 +34,7 @@
     "@vitejs/plugin-react": "^5.1.4",
     "@vitest/browser-webdriverio": "^4.1.10",
     "dotenv": "^17.4.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "webdriverio": "^9.29.1"
   }
 }
