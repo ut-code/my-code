@@ -5,6 +5,10 @@
 
 FROM node:lts-slim AS dependencies
 
+# libatomic1がpnpmに必要
+# ここではca-certificatesは必要ないがbuilderと同一のコマンドにすることでキャッシュできるようにしている
+RUN apt-get update && apt-get install -y ca-certificates libatomic1
+
 # Install pnpm
 RUN npm install -g pnpm
 
@@ -24,11 +28,11 @@ RUN mkdir app && pnpm exec tsx ./scripts/removeHinting.ts
 
 FROM node:lts-slim AS builder
 
+# ca-certificatesはビルド中にsentryでソースマップをアップロードするのに必要
+RUN apt-get update && apt-get install -y ca-certificates libatomic1
+
 # Install pnpm
 RUN npm install -g pnpm
-
-# ビルド中にsentryでソースマップをアップロードするのに必要
-RUN apt-get update && apt-get install -y ca-certificates
 
 # Set working directory
 WORKDIR /app
