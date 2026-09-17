@@ -22,4 +22,5 @@ undefined
 3
 ```
 
-※ `undefined` は `console.log` 関数の戻り値が表示されています。
+> [!TIP]
+> [[`undefined`]] は `console.log` 関数の戻り値が表示されています。

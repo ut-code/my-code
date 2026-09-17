@@ -10,7 +10,7 @@ question:
 
 ### 2\. 関数式 (Function Expression)
 
-変数に関数を代入するスタイルです。変数の代入は実行時に行われるため、定義する前に呼び出すとエラーになります。現代のJavaScript開発では、意図しない巻き上げを防ぐためにこちら（または後述のアロー関数）が好まれる傾向にあります。
+[[変数]]に関数を代入するスタイルです。[[変数]]の代入は実行時に行われるため、定義する前に呼び出すとエラーになります。現代のJavaScript開発では、意図しない巻き上げを防ぐためにこちら（または後述のアロー関数）が好まれる傾向にあります。
 
 ```js:function_expression.js
 // 定義前に呼び出すと... ReferenceError: Cannot access 'sayHi' before initialization
