@@ -16,6 +16,7 @@ strictPeerDependencies: true
 verifyDepsBeforeRun: warn
 
 allowBuilds:
+  '@google/genai': true
   '@prisma/engines': true
   '@sentry/cli': true
   edgedriver: true

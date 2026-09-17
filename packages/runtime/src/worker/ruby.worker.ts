@@ -18,8 +18,7 @@ import eval_code_rb from "./ruby/eval_code.rb?raw";
 
 let rubyVM: RubyVM | null = null;
 let currentOutputCallback:
-  | ((output: ReplOutput | UpdatedFile) => Promise<void>)
-  | null = null;
+  ((output: ReplOutput | UpdatedFile) => Promise<void>) | null = null;
 let stdoutBuffer = "";
 let stderrBuffer = "";
 
@@ -57,7 +56,9 @@ async function handleBatchOutput(
   return buffer;
 }
 
-async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
+async function init(
+  /*_interruptBuffer?: Uint8Array*/
+): Promise<{
   capabilities: WorkerCapabilities;
 }> {
   // interruptBuffer is not used for Ruby (restart-based interruption)

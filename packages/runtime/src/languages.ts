@@ -35,12 +35,7 @@ export type MarkdownLang =
   | "txt";
 
 export type RuntimeLang =
-  | "python"
-  | "ruby"
-  | "cpp"
-  | "rust"
-  | "javascript"
-  | "typescript";
+  "python" | "ruby" | "cpp" | "rust" | "javascript" | "typescript";
 
 export type LangConstants = {
   originalLang: MarkdownLang | undefined;

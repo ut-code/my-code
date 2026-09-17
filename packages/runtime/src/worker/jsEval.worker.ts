@@ -26,7 +26,9 @@ self.console = {
   }),
 };
 
-async function init(/*_interruptBuffer?: Uint8Array*/): Promise<{
+async function init(
+  /*_interruptBuffer?: Uint8Array*/
+): Promise<{
   capabilities: WorkerCapabilities;
 }> {
   // Initialize the worker and report capabilities

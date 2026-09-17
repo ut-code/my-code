@@ -18,8 +18,7 @@ const HOME = `/home/pyodide`;
 let pyodide: PyodideInterface;
 let pendingOutputPromise: Promise<void>[] = [];
 let currentOutputCallback:
-  | ((output: ReplOutput | UpdatedFile) => Promise<void>)
-  | null = null;
+  ((output: ReplOutput | UpdatedFile) => Promise<void>) | null = null;
 
 // Helper function to read all files from the Pyodide file system
 function readAllFiles(): Record<string, string> {

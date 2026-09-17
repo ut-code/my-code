@@ -11,30 +11,30 @@
   },
   "dependencies": {
     "@my-code/js-eval": "workspace:*",
-    "@ruby/wasm-wasi": "^2.7.2",
-    "@typescript/vfs": "^1.6.2",
+    "@ruby/wasm-wasi": "^2.10.1",
+    "@typescript/vfs": "^1.6.4",
     "async-mutex": "^0.5.0",
-    "chai": "^6.2.0",
+    "chai": "^6.2.2",
     "comlink": "^4.4.2",
     "object-inspect": "^1.13.4",
-    "pyodide": "^0.29.0",
-    "react": "^19",
-    "react-dom": "^19",
-    "swr": "^2",
-    "typescript": "^5",
-    "zod": "^4.0.17"
+    "pyodide": "^0.29.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "swr": "^2.5.1",
+    "typescript": "^5.9.3",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.0.0",
-    "@testing-library/react": "^16.3.2",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/chai": "^5.2.3",
     "@types/object-inspect": "^1.13.0",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^5.1.4",
-    "@vitest/browser-webdriverio": "^4.1.10",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/browser-webdriverio": "^4.1.11",
     "dotenv": "^17.4.2",
-    "vitest": "^4.1.10",
-    "webdriverio": "^9.29.1"
+    "vitest": "^4.1.11",
+    "webdriverio": "^9.31.9"
   }
 }

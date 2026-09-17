@@ -1,6 +1,5 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
-import reactHooks from "eslint-plugin-react-hooks";
 
 const eslintConfig = [
   {
@@ -16,7 +15,6 @@ const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    plugins: { "react-hooks": reactHooks },
     rules: {
       // Next.jsのデフォルト設定を上書き
       "@typescript-eslint/no-unused-vars": [
@@ -27,6 +25,8 @@ const eslintConfig = [
           ignoreRestSiblings: true,
         },
       ],
+      "react-hooks/refs": "warn",
+      "react-hooks/set-state-in-effect": "warn",
     },
   },
 ];
