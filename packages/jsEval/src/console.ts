@@ -1,8 +1,7 @@
 import inspect from "object-inspect";
 
 export type ConsoleOutput =
-  | { type: "stdout"; message: string }
-  | { type: "stderr"; message: string };
+  { type: "stdout"; message: string } | { type: "stderr"; message: string };
 
 export type ConsoleEmitter = (output: ConsoleOutput) => void;
 
