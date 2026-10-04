@@ -9,13 +9,13 @@ question:
 
 ### 問題 2: 簡易コマンドディスパッチャ
 
-以下の仕様を満たす関数 `executeCommand(command)` を `switch` 文と `try...catch` を用いて作成してください。
+以下の仕様を満たす[[関数]] `executeCommand(command)` を [[`switch`]] 文と `[[try]]...[[catch]]` を用いて作成してください。
 
 1.  引数 `command` は[[文字列]]を受け取る。
 2.  `"start"` の場合、"System starting..." を出力。
 3.  `"stop"` の場合、"System stopping..." を出力。
-4.  それ以外の文字列の場合、`Error` [[オブジェクト]]を `throw` する（メッセージは "Unknown command"）。
-5.  `try...catch` ブロックを用いてこの関数を呼び出し、エラーが発生した場合は "Error caught: Unknown command" のように出力する。
+4.  それ以外の[[文字列]]の場合、[[`Error`]] [[オブジェクト]]を [[`throw`]] する（メッセージは "Unknown command"）。
+5.  `[[try]]...[[catch]]` ブロックを用いてこの[[関数]]を呼び出し、エラーが発生した場合は "Error caught: Unknown command" のように出力する。
 
 **ヒント:** `command` が [[`null`]] や [[`undefined`]] の場合もエラーとして処理されるように実装してください。
 

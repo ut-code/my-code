@@ -8,13 +8,18 @@ question:
   - '`this.name = name;` の `this` は何を示しているのですか？'
   - コードの実行結果で `undefined` と表示されるのは、エラーではないのですか？
   - クラスなのに `typeof User` が `function` になるのはなぜですか？
+term:
+  - クラス
+  - class
+  - constructor
+  - コンストラクタ
 ---
 
 ## クラスの定義とコンストラクタ
 
-JavaScriptのクラスは `class` キーワードを使って定義します。初期化処理は `constructor` という特別なメソッド内で行います。
+JavaScriptの[[クラス]]は [[`class`]] キーワードを使って定義します。初期化処理は [[`constructor`]] という特別な[[メソッド]]内で行います。
 
-基本的に、クラス定義の内部は自動的に **Strict Mode (`'use strict'`)** で実行されます。
+基本的に、[[クラス]]定義の内部は自動的に **[[Strict Mode]] (`'use strict'`)** で実行されます。
 
 ```js-repl
 > class User {

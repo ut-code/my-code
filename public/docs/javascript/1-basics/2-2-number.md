@@ -10,6 +10,7 @@ term:
   - 数値
   - Number
   - number
+  - NaN
 ---
 
 ### 数値（Number）

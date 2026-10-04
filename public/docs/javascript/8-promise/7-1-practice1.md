@@ -10,7 +10,7 @@ question:
 
 ### 練習問題1: ランダムな成功/失敗
 
-`Math.random()` を使い、50%の確率で成功（Resolve）、50%の確率で失敗（Reject）するPromiseを返す関数 `coinToss` を作成してください。
+`Math.random()` を使い、50%の確率で成功（[[resolve|Resolve]]）、50%の確率で失敗（[[reject|Reject]]）する[[Promise]]を返す[[関数]] `coinToss` を作成してください。
 それを使用し、成功時は "Win\!"、失敗時は "Lose..." とコンソールに表示するコードを書いてください。
 
 ```js:practice9_1.js

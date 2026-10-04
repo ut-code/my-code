@@ -2,6 +2,10 @@
 id: javascript-async-await-await
 title: await 式
 level: 3
+term:
+  - await
+  - await式
+  - Settled
 question:
   - awaitはasync関数の中でしか使えないのですか？
   - awaitが関数の実行を一時停止するとはどういうことですか？
@@ -12,8 +16,8 @@ question:
 
 ### `await` 式
 
-`async` 関数の内部（またはモジュールのトップレベル）でのみ使用できるキーワードです。
-`await` は、右側の Promise が **Settled（解決または拒否）されるまで関数の実行を一時停止** します。Promiseが解決されると、その結果の値を返して実行を再開します。
+`[[async]]` 関数の内部（またはモジュールのトップレベル）でのみ使用できるキーワードです。
+`[[`await`]]` は、右側の [[Promise]] が **[[Settled]]（解決または拒否）されるまで関数の実行を一時停止** します。[[Promise]]が解決されると、その結果の値を返して実行を再開します。
 
 これは、C\# の `async/await` や Python の `asyncio` に慣れている方にはおなじみの挙動でしょう。
 

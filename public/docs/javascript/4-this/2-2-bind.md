@@ -9,11 +9,13 @@ question:
     `brokenStart()`が`Cannot read property 'type' of
     undefined`というエラーになるのは、`this.type`がなぜ読めないのですか？
   - '`engine.start.bind(engine)`と書くとき、なぜ`engine`を2回書くのですか？'
+term:
+  - bind
 ---
 
 ### bind
 
-`bind` は関数を実行せず、**`this` を固定した新しい関数**を返します。これは、イベントリスナーやコールバック関数としてメソッドを渡す際に非常に重要です。
+[[`bind`]] は[[関数]]を実行せず、**[[`this`]] を固定した新しい[[関数]]**を返します。これは、イベントリスナーや[[コールバック関数]]として[[メソッド]]を渡す際に非常に重要です。
 
 ```js:bind-example.js
 const engine = {

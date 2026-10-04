@@ -2,6 +2,9 @@
 id: javascript-async-await-promise-race
 title: Promise.race()
 level: 3
+term:
+  - Promise.race
+  - Promise.race()
 question:
   - Promise.race()は何をするための関数ですか？
   - Promise.race()が最も早く完了（または失敗）したものだけを返すのはなぜですか？
@@ -11,7 +14,7 @@ question:
 
 ### `Promise.race()`
 
-複数のPromiseのうち、**最も早く完了（または失敗）したもの**の結果だけを返します。タイムアウト処理の実装などによく使われます。
+複数の[[Promise]]のうち、**最も早く完了（または失敗）したもの**の結果だけを返します。タイムアウト処理の実装などによく使われます。
 
 ```js-repl
 > const fast = new Promise(r => setTimeout(() => r("Fast"), 100));

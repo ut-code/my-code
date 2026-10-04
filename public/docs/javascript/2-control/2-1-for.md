@@ -4,6 +4,10 @@ title: 古典的な for ループ
 level: 3
 question:
   - forループの3つの式はそれぞれどのような役割ですか？
+term:
+  - for
+  - for文
+  - forループ
 ---
 
 ### 古典的な for ループ
