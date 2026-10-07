@@ -1,7 +1,12 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { ReplCommand, ReplOutput, RuntimeContext, RuntimeInfo } from "../interface";
+import {
+  ReplCommand,
+  ReplOutput,
+  RuntimeContext,
+  RuntimeInfo,
+} from "../interface";
 
 export const JSEvalContext = createContext<RuntimeContext>(null!);
 

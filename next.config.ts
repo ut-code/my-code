@@ -19,6 +19,7 @@ let nextConfig: NextConfig = {
   },
   env: {
     SENTRY_DSN: process.env.SENTRY_DSN,
+    WANDBOX_URL: process.env.WANDBOX_URL,
   },
   serverExternalPackages: [
     "@prisma/client",

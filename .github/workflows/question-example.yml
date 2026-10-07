@@ -2,7 +2,7 @@ name: Generate Question Examples
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
     # paths:
     #   - 'public/docs/**'
 
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm exec tsx ./scripts/questionExample.ts 4

@@ -15,10 +15,7 @@ import {
   PageSlug,
   SectionId,
 } from "@/lib/docs";
-import {
-  ReplCommand,
-  ReplOutput,
-} from "@my-code/runtime/interface";
+import { ReplCommand, ReplOutput } from "@my-code/runtime/interface";
 
 export interface BuildChatPromptParams {
   path: PagePath;

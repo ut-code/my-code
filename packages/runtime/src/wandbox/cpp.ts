@@ -1,7 +1,17 @@
-import { ReplOutput } from "../interface";
+import {
+  Diagnostic,
+  DiagnosticFrame,
+  DiagnosticSeverity,
+  ReplOutput,
+} from "../interface";
 import { compileAndRun, CompilerInfo, SelectedCompiler } from "./api";
 
 import _stacktrace_cpp from "./cpp/_stacktrace.cpp?raw";
+
+const GCC_DIAG_REGEX =
+  /^(?:.*\/)?([^:\n]+):(\d+):(?:(\d+):)?\s*(fatal error|error|warning|note):\s*(.*)$/;
+const LD_DIAG_REGEX =
+  /^(?:(?:\/usr\/bin\/ld:\s+)?(?:.*\/)?([^:\n]+)):(?:(\d+):)?(?:\([^)]+\):)?\s*(undefined reference to .*)$/;
 
 export function selectCppCompiler(
   compilerList: CompilerInfo[]
@@ -73,8 +83,8 @@ export function selectCppCompiler(
   }
 
   // その他オプション
-  options.compilerOptionsRaw.push("-g");
-  commandline.push("-g");
+  options.compilerOptionsRaw.push("-g", "-no-pie");
+  commandline.push("-g", "-no-pie");
 
   options.getCommandlineStr = (filenames: string[]) => {
     return [...commandline, ...filenames, "&&", "./a.out"].join(" ");
@@ -87,13 +97,14 @@ export async function cppRunFiles(
   options: SelectedCompiler,
   files: Record<string, string | undefined>,
   filenames: string[],
-  onOutput: (output: ReplOutput) => void
+  onOutput: (output: ReplOutput) => void,
+  onDiagnostic?: (diagnostic: Diagnostic) => void
 ): Promise<void> {
-  // Constants for stack trace processing
-  const WANDBOX_PATH = "/home/wandbox";
-
   // Track state for processing stack traces
   let inStackTrace = false;
+  let signal = "";
+  let exceptionMessage = "";
+  const runtimeFrames: DiagnosticFrame[] = [];
 
   await compileAndRun(
     {
@@ -108,14 +119,92 @@ export async function cppRunFiles(
     (event) => {
       const { ndjsonType, output } = event;
 
+      // Parse compiler messages for diagnostics
+      if (ndjsonType === "CompilerMessageE") {
+        const gccMatch = GCC_DIAG_REGEX.exec(output.message);
+        if (gccMatch) {
+          const rawFilename = gccMatch[1].replace(/^\.\//, "");
+          if (
+            rawFilename !== "_stacktrace.cpp" &&
+            !rawFilename.startsWith("<") &&
+            !rawFilename.includes("/include/")
+          ) {
+            const lineNum = parseInt(gccMatch[2], 10);
+            const colNum = gccMatch[3] ? parseInt(gccMatch[3], 10) : undefined;
+            const sev = gccMatch[4];
+            const msg = gccMatch[5];
+
+            let severity: DiagnosticSeverity = "error";
+            if (sev === "warning") severity = "warning";
+            else if (sev === "note") severity = "info";
+
+            onDiagnostic?.({
+              frames: [
+                {
+                  filename: rawFilename,
+                  startLineNumber: lineNum,
+                  startColumn: colNum,
+                },
+              ],
+              message: msg,
+              severity,
+            });
+          }
+        } else {
+          const ldMatch = LD_DIAG_REGEX.exec(output.message);
+          if (ldMatch) {
+            const rawFilename = ldMatch[1].replace(/^\.\//, "");
+            if (
+              rawFilename !== "_stacktrace.cpp" &&
+              !rawFilename.startsWith("<") &&
+              !rawFilename.includes("/include/")
+            ) {
+              const lineNum = ldMatch[2] ? parseInt(ldMatch[2], 10) : 1;
+              const msg = ldMatch[3];
+              onDiagnostic?.({
+                frames: [
+                  {
+                    filename: rawFilename,
+                    startLineNumber: lineNum,
+                  },
+                ],
+                message: msg,
+                severity: "error",
+              });
+            }
+          }
+        }
+      }
+
+      // Check for exception / terminate message in stderr
+      if (ndjsonType === "StdErr") {
+        if (output.message.includes("what():")) {
+          const idx = output.message.indexOf("what():");
+          exceptionMessage = output.message.slice(idx + 7).trim();
+        } else if (
+          output.message.includes(
+            "terminate called after throwing an instance of"
+          )
+        ) {
+          const m =
+            /terminate called after throwing an instance of '([^']+)'/.exec(
+              output.message
+            );
+          if (m && !exceptionMessage) {
+            exceptionMessage = m[1];
+          }
+        }
+      }
+
       // Check for signal marker in stderr
       if (
         ndjsonType === "StdErr" &&
         output.message.startsWith("#!my_code_signal:")
       ) {
+        signal = output.message.slice(17).trim();
         onOutput({
           type: "error",
-          message: output.message.slice(17),
+          message: signal,
         });
         return;
       }
@@ -135,12 +224,30 @@ export async function cppRunFiles(
 
       // Process stack trace lines
       if (inStackTrace && ndjsonType === "StdErr") {
-        // Filter to show only user source code
-        if (output.message.includes(WANDBOX_PATH)) {
-          onOutput({
-            type: "trace",
-            message: output.message.replace(`${WANDBOX_PATH}/`, ""),
-          });
+        const m = /\sat\s+(?:.*\/)?([^:\s]+):(\d+)/.exec(output.message);
+        if (
+          m &&
+          !output.message.includes("/boost/") &&
+          !output.message.includes("/include/") &&
+          !output.message.includes("/opt/wandbox/") &&
+          !output.message.includes("/usr/") &&
+          !output.message.includes("/lib/")
+        ) {
+          const filename = m[1].replace(/^\.\//, "");
+          if (filename !== "_stacktrace.cpp" && !filename.startsWith("<")) {
+            const cleanedMessage = output.message.replace(
+              /\s+at\s+.*\/([^\/]+:\d+.*)$/,
+              " at $1"
+            );
+            onOutput({
+              type: "trace",
+              message: cleanedMessage,
+            });
+            runtimeFrames.push({
+              filename,
+              startLineNumber: parseInt(m[2], 10),
+            });
+          }
         }
         return;
       }
@@ -149,4 +256,13 @@ export async function cppRunFiles(
       onOutput(output);
     }
   );
+
+  if (runtimeFrames.length > 0) {
+    const message = exceptionMessage || signal || "Runtime error";
+    onDiagnostic?.({
+      frames: runtimeFrames,
+      message,
+      severity: "error",
+    });
+  }
 }

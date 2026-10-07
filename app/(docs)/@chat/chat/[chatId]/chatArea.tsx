@@ -5,7 +5,12 @@ import { useStreamingChatContext } from "@/(docs)/streamingChatContext";
 import { useSendChat } from "@/(docs)/useSendChat";
 import { deleteChatAction } from "@/actions/deleteChat";
 import { ChatWithMessages } from "@/lib/chatHistory";
-import { DynamicMarkdownSection, LangId, MarkdownSection, PageSlug } from "@/lib/docs";
+import {
+  DynamicMarkdownSection,
+  LangId,
+  MarkdownSection,
+  PageSlug,
+} from "@/lib/docs";
 import { Heading } from "@/markdown/heading";
 import { StyledMarkdown } from "@/markdown/markdown";
 import { usePagesListForLang } from "@/pagesListContext";
@@ -147,7 +152,9 @@ export function ChatAreaContent(props: Props) {
           </li>
           {targetSection?.title && targetSection.title !== "sandbox" && (
             <li>
-              <Link href={`/${chatData.section.pagePath}#${chatData.sectionId}`}>
+              <Link
+                href={`/${chatData.section.pagePath}#${chatData.sectionId}`}
+              >
                 {targetSection.title}
               </Link>
             </li>

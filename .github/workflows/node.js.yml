@@ -1,24 +1,39 @@
 name: Node.js CI
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 permissions:
   contents: read
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prettier --check .
+
   lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [22.x]
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v6
-    - uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm run lint
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
 
   types:
     runs-on: ubuntu-latest
@@ -26,14 +41,14 @@ jobs:
       matrix:
         node-version: [22.x]
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v6
-    - uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm run tsc
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run tsc
 
   test:
     runs-on: ubuntu-latest
@@ -41,14 +56,14 @@ jobs:
       matrix:
         node-version: [22.x]
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v6
-    - uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm run test
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test
 
   check-docs:
     runs-on: ubuntu-latest
@@ -56,11 +71,11 @@ jobs:
       matrix:
         node-version: [22.x]
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v6
-    - uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    - run: pnpm ci
-    - run: pnpm exec tsx ./scripts/checkDocs.ts
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - run: pnpm ci
+      - run: pnpm exec tsx ./scripts/checkDocs.ts

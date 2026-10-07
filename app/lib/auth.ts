@@ -58,8 +58,10 @@ export async function getAuthServer(
           cloudflareEnv.GOOGLE_CLIENT_SECRET,
       },
     },
-    experimental: {
-      joins: true,
+    advanced: {
+      database: {
+        joins: true,
+      },
     },
     onAPIError: {
       customizeDefaultErrorPage: {

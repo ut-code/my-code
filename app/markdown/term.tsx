@@ -3,7 +3,13 @@
 import { createContext, JSX, ReactNode, useContext, useState } from "react";
 import { ExtraProps } from "react-markdown";
 import { onlyText } from "react-children-utilities";
-import { LangId, PageEntry, PageSlug, TermDefinition } from "@/lib/docs";
+import {
+  LangId,
+  PageEntry,
+  PageSlug,
+  SectionId,
+  TermDefinition,
+} from "@/lib/docs";
 import Link from "next/link";
 import { StyledMarkdown } from "./markdown";
 import {
@@ -46,6 +52,21 @@ export function TermDefinitionProvider({
   );
 }
 
+const CurrentSectionContext = createContext<SectionId | null>(null);
+export function CurrentSectionContextProvider({
+  sectionId,
+  children,
+}: {
+  sectionId: SectionId;
+  children: ReactNode;
+}) {
+  return (
+    <CurrentSectionContext.Provider value={sectionId}>
+      {children}
+    </CurrentSectionContext.Provider>
+  );
+}
+
 /**
  * https://github.com/ut-code/utcode-learn/blob/main/src/components/Term/index.tsx をもとに独自実装
  * Copyright (c) 2023 ut.code();
@@ -55,6 +76,7 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
   // @docs/lang/pageId/page.tsx で取得したものをcontextに渡してそれを取得する
   const { lang, page, termDefinitions } =
     useContext(TermDefinitionContext) ?? {};
+  const currentSectionId = useContext(CurrentSectionContext);
 
   const langEntry = usePagesListForLang(lang);
 
@@ -157,6 +179,11 @@ export default function Term(props: JSX.IntrinsicElements["q"] & ExtraProps) {
         {props.children}
       </WithAutoTooltipPosition>
     );
+  }
+
+  if (currentSectionId === term.id) {
+    // このセクション自身へのリンクは表示しない
+    return props.children;
   }
 
   const pageEntry = langEntry?.pages.find((p) => p.slug === term.page);

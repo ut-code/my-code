@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2023"
-    ],
+    "lib": ["dom", "dom.iterable", "es2023"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,15 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./app/*"
-      ],
-      "@my-code/runtime/tests/*": [
-        "./packages/runtime/tests/*"
-      ],
-      "@my-code/runtime/*": [
-        "./packages/runtime/src/*"
-      ]
+      "@/*": ["./app/*"],
+      "@my-code/runtime/tests/*": ["./packages/runtime/tests/*"],
+      "@my-code/runtime/*": ["./packages/runtime/src/*"]
     }
   },
   "include": [
@@ -41,7 +31,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

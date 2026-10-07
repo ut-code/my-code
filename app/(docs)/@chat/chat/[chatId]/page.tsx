@@ -6,11 +6,7 @@ import {
   getChatOne,
   initContext,
 } from "@/lib/chatHistory";
-import {
-  getMarkdownSections,
-  LangId,
-  PageSlug,
-} from "@/lib/docs";
+import { getMarkdownSections, LangId, PageSlug } from "@/lib/docs";
 import { ChatAreaContainer, ChatAreaContent } from "./chatArea";
 import { cacheLife, cacheTag } from "next/cache";
 import { isCloudflare } from "@/lib/detectCloudflare";

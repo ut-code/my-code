@@ -12,10 +12,7 @@ export const chat = pgTable("chat", {
     .$type<Record<string, ReplCommand[]>>()
     .notNull()
     .default({}),
-  files: jsonb("files")
-    .$type<Record<string, string>>()
-    .notNull()
-    .default({}),
+  files: jsonb("files").$type<Record<string, string>>().notNull().default({}),
   execResults: jsonb("execResults")
     .$type<Record<string, ReplOutput[]>>()
     .notNull()

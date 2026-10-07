@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { revalidateChatAction } from "@/actions/revalidateChat";
 import { RegenerateStreamEvent } from "@/api/chat/regenerate-section/route";
 import { captureException } from "@sentry/nextjs";
+import { CurrentSectionContextProvider } from "@/markdown/term";
 
 interface PageContentProps {
   splitMdContent: SectionWithDiff[];
@@ -120,12 +121,14 @@ export function PageContent(props: PageContentProps) {
                   path={path}
                 />
               )}
-              {/* ドキュメントのコンテンツ */}
-              <StyledMarkdown
-                content={section.replacedContent}
-                replacedRange={section.replacedRange}
-                interactive
-              />
+              <CurrentSectionContextProvider sectionId={section.id}>
+                {/* ドキュメントのコンテンツ */}
+                <StyledMarkdown
+                  content={section.replacedContent}
+                  replacedRange={section.replacedRange}
+                  interactive
+                />
+              </CurrentSectionContextProvider>
             </section>
             <div>
               <ChatListForSection
