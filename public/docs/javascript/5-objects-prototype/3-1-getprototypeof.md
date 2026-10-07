@@ -6,11 +6,13 @@ question:
   - '`__proto__` と `Object.getPrototypeOf` は同じプロトタイプにアクセスしているのですか？'
   - なぜ `__proto__` は非推奨なのですか？
   - '`Object.prototype` の親が `null` なのはなぜですか？'
+term:
+  - Object.getPrototypeOf
 ---
 
 ### `__proto__` と `Object.getPrototypeOf`
 
-歴史的経緯により、多くのブラウザで `obj.__proto__` というプロパティを通じてプロトタイプにアクセスできますが、現在の標準的な方法は `Object.getPrototypeOf(obj)` です。
+歴史的経緯により、多くのブラウザで `obj.[[__proto__]]` という[[プロパティ]]を通じて[[プロトタイプ]]にアクセスできますが、現在の標準的な方法は `[[Object.getPrototypeOf]](obj)` です。
 
 ```js-repl
 > const arr = [1, 2, 3];

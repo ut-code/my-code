@@ -11,11 +11,11 @@ question:
 
 ### 練習問題1: ユーザー情報の取得と表示
 
-以下の要件を満たす関数 `displayUserSummary(userId)` を作成してください。
+以下の要件を満たす[[関数]] `displayUserSummary(userId)` を作成してください。
 
 1.  `https://jsonplaceholder.typicode.com/users/{userId}` からユーザー情報を取得する。
 2.  `https://jsonplaceholder.typicode.com/users/{userId}/todos` からそのユーザーのTODOリストを取得する。
-3.  上記2つのリクエストは、**パフォーマンスを考慮して並列に実行**すること。
+3.  上記2つのリクエストは、**パフォーマンスを考慮して[[並列処理|並列に実行]]**すること。
 4.  取得したデータから、「ユーザー名」と「完了済み(completed: true)のTODOの数」を出力する。
 5.  通信エラー時は適切にエラーメッセージを表示する。
 

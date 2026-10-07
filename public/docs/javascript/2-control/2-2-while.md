@@ -4,6 +4,11 @@ title: while ループ
 level: 3
 question:
   - whileループとforループはどのように使い分けるのが一般的ですか？
+term:
+  - while
+  - while文
+  - whileループ
+  - do...while
 ---
 
 ### while ループ

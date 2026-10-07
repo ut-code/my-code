@@ -2,6 +2,10 @@
 id: javascript-async-await-fetch
 title: Fetch API によるHTTPリクエスト
 level: 2
+term:
+  - Fetch API
+  - fetch
+  - fetch関数
 question:
   - Fetch APIとは具体的に何ですか？
   - fetch関数はなぜPromiseを返すのですか？
@@ -13,15 +17,15 @@ question:
 
 ## Fetch API によるHTTPリクエスト
 
-JavaScript（特にブラウザ環境や最近のNode.js）でHTTPリクエストを行うための標準APIが `fetch` です。以前は `XMLHttpRequest` という扱いづらいAPIが使われていましたが、現在は `fetch` が主流です。
+JavaScript（特にブラウザ環境や最近のNode.js）でHTTPリクエストを行うための標準APIが `[[`fetch`]]` です。以前は `XMLHttpRequest` という扱いづらいAPIが使われていましたが、現在は `[[Fetch API|fetch]]` が主流です。
 
-`fetch` 関数は `Promise` を返します。
+`[[`fetch`]]` 関数は `[[Promise]]` を返します。
 
 基本的な流れは以下の通りです：
 
 1.  `fetch(url)` を実行し、レスポンスヘッダーが届くのを待つ。
-2.  Responseオブジェクトを受け取る。
-3.  Responseオブジェクトからメソッド（`.json()`, `.text()`など）を使ってボディを読み込む（これも非同期）。
+2.  Response[[オブジェクト]]を受け取る。
+3.  Response[[オブジェクト]]から[[メソッド]]（`.json()`, `.text()`など）を使ってボディを読み込む（これも[[非同期処理|非同期]]）。
 
 ```js:fetch_basic.js
 // 外部APIからJSONデータを取得する例

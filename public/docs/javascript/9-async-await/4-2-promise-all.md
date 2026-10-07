@@ -2,6 +2,9 @@
 id: javascript-async-await-promise-all
 title: Promise.all() による並列実行
 level: 3
+term:
+  - Promise.all
+  - Promise.all()
 question:
   - Promise.all()は何をするための関数ですか？
   - Promise.all()に渡す引数はどのような形式ですか？
@@ -14,7 +17,7 @@ question:
 
 ### `Promise.all()` による並列実行
 
-複数のPromiseを配列として受け取り、**全て完了するのを待って**から結果の配列を返します。一つでも失敗すると全体が失敗（reject）します。
+複数の[[Promise]]を[[配列]]として受け取り、**全て完了するのを待って**から結果の[[配列]]を返します。一つでも失敗すると全体が失敗（[[reject]]）します。
 
 ```js:promise_all.js
 const wait = (ms, value) => new Promise(r => setTimeout(() => r(value), ms));

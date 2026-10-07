@@ -5,6 +5,12 @@ level: 3
 question:
   - Boolean型はどんな場面で使いますか？
   - '`true` / `false` は文字列の `"true"` / `"false"` と何が違いますか？'
+term:
+  - 真偽値
+  - Boolean
+  - boolean
+  - "true"
+  - "false"
 ---
 
 ### 真偽値（Boolean）

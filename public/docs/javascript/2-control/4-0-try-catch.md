@@ -6,13 +6,20 @@ question:
   - catchブロックの(e)にはどのような情報が入っていますか？エラーオブジェクトの具体的な中身を知りたいです。
   - finallyブロックはどのような場合に使うのが適切ですか？具体的な例を教えてください。
   - try...catchで捕捉できないエラーは存在しますか？
+term:
+  - try
+  - catch
+  - finally
+  - try...catch
+  - 例外処理
+  - 例外
 ---
 
 ## 例外処理 (`try...catch...finally`)
 
-JavaScriptの例外処理は `try...catch...finally` 構文を使用します。
+JavaScriptの[[例外処理]]は `[[try]]...[[catch]]...[[finally]]` 構文を使用します。
 
-実行時にエラーが発生すると、処理が中断され `catch` ブロックに移行します。
+実行時にエラーが発生すると、処理が中断され [[`catch`]] ブロックに移行します。
 
 ```js:try_catch.js
 function parseJson(jsonString) {

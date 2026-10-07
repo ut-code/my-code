@@ -13,7 +13,7 @@ question:
 
 ### JSONデータの送信 (POST)
 
-データを送信する場合は、第2引数にオプションオブジェクトを渡します。
+データを送信する場合は、第2引数にオプション[[オブジェクト]]を渡します。
 
 ```js-repl
 > const postData = { title: 'foo', body: 'bar', userId: 1 };
